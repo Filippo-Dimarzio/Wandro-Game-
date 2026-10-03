@@ -3,7 +3,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { Category, Place } from '@wandro/shared';
+import { CATEGORIES, type Category, type Place } from '@wandro/shared';
 import { CategoryChips } from '@/components/CategoryChips';
 import { PlaceSheet } from '@/components/PlaceSheet';
 import { usePlaces, useUnlockedIds } from '@/data/places';
@@ -11,11 +11,11 @@ import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { PlaceMap } from '@/map/PlaceMap';
 import { useSession } from '@/state/session';
-import { radius, space, useColors } from '@/theme';
+import { radius, shadow, space, useColors } from '@/theme';
 
 export default function Explore() {
   const c = useColors();
-  const params = useLocalSearchParams<{ place?: string }>();
+  const params = useLocalSearchParams<{ place?: string; category?: string }>();
   const loc = useLocation();
   const places = usePlaces(loc.position);
   const { ids } = useUnlockedIds();
@@ -28,6 +28,11 @@ export default function Explore() {
     () => (places.data ?? []).filter((p) => !category || p.category === category),
     [places.data, category],
   );
+
+  useEffect(() => {
+    if (params.category && CATEGORIES.includes(params.category as Category))
+      setCategory(params.category as Category);
+  }, [params.category]);
 
   useEffect(() => {
     if (params.place) setSelected((places.data ?? []).find((p) => p.id === params.place) ?? null);
@@ -45,10 +50,12 @@ export default function Explore() {
 
       <SafeAreaView edges={['top']} style={styles.top} pointerEvents="box-none">
         <CategoryChips value={category} onChange={setCategory} />
-        <View style={[styles.legend, { backgroundColor: c.card }]}>
+        <View style={[styles.legend, shadow, { backgroundColor: c.card }]}>
           <View style={[styles.dot, { backgroundColor: c.locked }]} />
           <Text style={{ color: c.text }}>{t('explore.locked')}</Text>
-          <View style={[styles.dot, { backgroundColor: c.accent }]} />
+          <View
+            style={[styles.dot, { backgroundColor: category ? c.category[category] : c.accent }]}
+          />
           <Text style={{ color: c.text }}>{t('explore.unlocked')}</Text>
           <Text style={{ color: c.textMuted }}>· {visible.length}</Text>
         </View>
@@ -58,7 +65,7 @@ export default function Explore() {
         onPress={() => setRecenter((n) => n + 1)}
         accessibilityRole="button"
         accessibilityLabel={t('explore.recenter')}
-        style={[styles.fab, { backgroundColor: c.card, bottom: selected ? 300 : space.xl }]}
+        style={[styles.fab, shadow, { backgroundColor: c.card, bottom: selected ? 300 : space.xl }]}
       >
         <Ionicons name="locate" size={22} color={c.accent} />
       </Pressable>
@@ -100,10 +107,5 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
   },
 });

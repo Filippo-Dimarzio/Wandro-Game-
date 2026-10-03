@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import {
   ActivityIndicator,
@@ -11,15 +11,16 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { formatDistance, haversineMeters, pointsForVisit } from '@wandro/shared';
-import { categoryIcon } from '@/components/PlaceSheet';
+import { CATEGORIES, haversineMeters } from '@wandro/shared';
+import { CATEGORY_META, placeImage } from '@/categories';
 import { DailyChallengeCard } from '@/components/DailyChallengeCard';
+import { CategoryPill, PlaceCard } from '@/components/PlaceBits';
 import { ProgressStrip } from '@/components/ProgressStrip';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { useSession } from '@/state/session';
-import { radius, space, useColors } from '@/theme';
+import { radius, shadow, space, useColors } from '@/theme';
 
 export default function Home() {
   const c = useColors();
@@ -34,7 +35,7 @@ export default function Home() {
     .filter((p) => !ids.has(p.id))
     .map((p) => ({ p, d: haversineMeters(loc.position, p) }))
     .sort((a, b) => a.d - b.d)
-    .slice(0, 6);
+    .slice(0, 8);
   const recent = Object.entries(unlockedMap)
     .sort((a, b) => b[1].at.localeCompare(a[1].at))
     .map(([id, u]) => ({ place: list.find((p) => p.id === id), ...u }))
@@ -49,21 +50,62 @@ export default function Home() {
         }
       >
         <View style={styles.header}>
-          <Text style={[styles.brand, { color: c.text }]} accessibilityRole="header">
-            Wandro
+          <View style={[styles.avatar, { backgroundColor: c.accentSoft }]}>
+            <Text style={{ fontSize: 22 }} accessible={false}>
+              🐙
+            </Text>
+          </View>
+          <Text style={[styles.greeting, { color: c.text }]}>
+            {t('home.greeting', { name: profile?.username ?? '' })}
           </Text>
-          <Ionicons
-            name="notifications-outline"
-            size={24}
-            color={c.text}
-            accessibilityLabel="Notifications"
-          />
+          <View
+            style={[styles.bell, shadow, { backgroundColor: c.card }]}
+            accessible
+            accessibilityLabel={t('home.notifications')}
+          >
+            <Ionicons name="notifications-outline" size={22} color={c.text} />
+          </View>
         </View>
-        <Text style={[styles.greeting, { color: c.text }]}>
-          {t('home.greeting', { name: profile?.username ?? '' })}
+        <Text style={[styles.headline, { color: c.text }]} accessibilityRole="header">
+          {t('home.headline')}
         </Text>
 
         <ProgressStrip points={totalPoints} discoveries={ids.size} />
+
+        <View style={styles.sectionRow}>
+          <Text style={[styles.section, { color: c.text }]} accessibilityRole="header">
+            {t('home.interests')}
+          </Text>
+          <Pressable onPress={() => router.push('/discover')} accessibilityRole="link" hitSlop={8}>
+            <Text style={{ color: c.accent, fontWeight: '800' }}>{t('home.seeAll')}</Text>
+          </Pressable>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.interests}
+        >
+          {CATEGORIES.map((cat) => (
+            <Pressable
+              key={cat}
+              onPress={() =>
+                router.push({ pathname: '/discover/[category]', params: { category: cat } })
+              }
+              accessibilityRole="button"
+              accessibilityLabel={t(`category.${cat}`)}
+              style={styles.interest}
+              testID={`interest-${cat}`}
+            >
+              <View style={[styles.interestIcon, { backgroundColor: c.categoryTint[cat] }]}>
+                <Ionicons name={CATEGORY_META[cat].icon} size={26} color={c.category[cat]} />
+              </View>
+              <Text style={[styles.interestLabel, { color: c.text }]} numberOfLines={2}>
+                {t(`category.${cat}`)}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+
         <DailyChallengeCard places={list} />
 
         <Text style={[styles.section, { color: c.text }]} accessibilityRole="header">
@@ -80,30 +122,17 @@ export default function Home() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: space.md }}
+          contentContainerStyle={styles.rail}
         >
           {nearby.map(({ p, d }) => (
-            <Pressable
+            <PlaceCard
               key={p.id}
+              place={p}
+              distanceM={d}
+              unlocked={false}
+              width={180}
               onPress={() => router.push({ pathname: '/(tabs)/explore', params: { place: p.id } })}
-              accessibilityRole="button"
-              accessibilityLabel={`${p.name}, ${formatDistance(d)}, ${pointsForVisit(p.category, p.uniqueVisitors, p.basePoints).total} points`}
-              style={styles.nearCard}
-            >
-              <LinearGradient colors={[c.category[p.category], '#0B2A24']} style={styles.nearPhoto}>
-                <Ionicons name={categoryIcon(p.category)} size={30} color="rgba(255,255,255,0.9)" />
-                <View style={styles.lockBadge}>
-                  <Ionicons name="lock-closed" size={12} color="#fff" />
-                </View>
-              </LinearGradient>
-              <Text style={[styles.nearName, { color: c.text }]} numberOfLines={2}>
-                {p.name}
-              </Text>
-              <Text style={{ color: c.textMuted, fontSize: 13 }}>
-                {formatDistance(d)} ·{' '}
-                {pointsForVisit(p.category, p.uniqueVisitors, p.basePoints).total} pts
-              </Text>
-            </Pressable>
+            />
           ))}
         </ScrollView>
 
@@ -114,25 +143,24 @@ export default function Home() {
           <Text style={{ color: c.textMuted }}>{t('home.noRecent')}</Text>
         ) : (
           recent.map((r) => (
-            <View
-              key={r.place!.id}
-              style={[styles.post, { backgroundColor: c.card, borderColor: c.border }]}
-            >
-              <LinearGradient
-                colors={[c.category[r.place!.category], '#0B2A24']}
+            <View key={r.place!.id} style={[styles.post, shadow, { backgroundColor: c.card }]}>
+              <Image
+                source={placeImage(r.place!)}
                 style={styles.postPhoto}
-              >
-                <Ionicons
-                  name={categoryIcon(r.place!.category)}
-                  size={48}
-                  color="rgba(255,255,255,0.85)"
-                />
-              </LinearGradient>
-              <View style={{ padding: space.md, gap: 2 }}>
+                contentFit="cover"
+                accessible={false}
+              />
+              <View style={{ padding: space.md, gap: 6 }}>
+                <CategoryPill category={r.place!.category} />
                 <Text style={{ color: c.text, fontWeight: '800' }}>
-                  {profile?.username} discovered {r.place!.name}
+                  {t('home.discoveredBy', {
+                    name: profile?.username ?? '',
+                    place: r.place!.name,
+                  })}
                 </Text>
-                <Text style={{ color: c.accent, fontWeight: '700' }}>+{r.points} pts</Text>
+                <Text style={{ color: c.category[r.place!.category], fontWeight: '800' }}>
+                  +{r.points} pts
+                </Text>
               </View>
             </View>
           ))
@@ -147,26 +175,41 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: { padding: space.lg, gap: space.lg },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  brand: { fontSize: 28, fontWeight: '900', letterSpacing: -0.5 },
-  greeting: { fontSize: 18, fontWeight: '600' },
-  section: { fontSize: 20, fontWeight: '800', marginTop: space.sm },
-  nearCard: { width: 150, gap: 4 },
-  nearPhoto: {
-    height: 110,
-    borderRadius: radius.md,
+  header: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  lockBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    borderRadius: 10,
-    padding: 4,
+  greeting: { fontSize: 16, fontWeight: '700', flex: 1 },
+  bell: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  nearName: { fontWeight: '700' },
-  post: { borderRadius: radius.md, overflow: 'hidden', borderWidth: StyleSheet.hairlineWidth },
-  postPhoto: { height: 220, alignItems: 'center', justifyContent: 'center' },
+  headline: { fontSize: 30, fontWeight: '900', letterSpacing: -0.5, marginTop: -space.sm },
+  sectionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: space.sm,
+  },
+  section: { fontSize: 20, fontWeight: '800' },
+  interests: { gap: space.md, paddingRight: space.lg },
+  interest: { width: 76, alignItems: 'center', gap: 6 },
+  interestIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  interestLabel: { fontSize: 12, fontWeight: '700', textAlign: 'center' },
+  rail: { gap: space.md, paddingBottom: space.sm, paddingRight: space.lg },
+  post: { borderRadius: radius.lg, overflow: 'hidden' },
+  postPhoto: { height: 200 },
 });

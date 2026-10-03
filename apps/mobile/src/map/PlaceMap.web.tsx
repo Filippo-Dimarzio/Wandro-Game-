@@ -3,6 +3,7 @@ import * as maplibregl from 'maplibre-gl';
 import type { GeoJSONSource, Map as MLMap, MapLayerMouseEvent } from 'maplibre-gl';
 import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
+import { CATEGORIES } from '@wandro/shared';
 import { lightColors } from '@/theme';
 import type { PlaceMapProps } from './types';
 import { placesGeoJson, useFog } from './useFog';
@@ -30,19 +31,13 @@ const STYLE: maplibregl.StyleSpecification = {
   layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
 };
 
-const categoryColor: maplibregl.ExpressionSpecification = [
+// Spread pairs don't fit MapLibre's tuple types, hence the cast.
+const categoryColor = [
   'match',
   ['get', 'category'],
-  'culture',
-  lightColors.category.culture,
-  'heritage',
-  lightColors.category.heritage,
-  'nature',
-  lightColors.category.nature,
-  'music_events',
-  lightColors.category.music_events,
+  ...CATEGORIES.flatMap((cat) => [cat, lightColors.category[cat]]),
   lightColors.category.other,
-];
+] as unknown as maplibregl.ExpressionSpecification;
 
 export function PlaceMap({
   places,
@@ -77,7 +72,7 @@ export function PlaceMap({
         id: 'fog',
         type: 'fill',
         source: 'fog',
-        paint: { 'fill-color': '#ECE9E0', 'fill-opacity': 0.78 },
+        paint: { 'fill-color': lightColors.fogFill, 'fill-opacity': 0.78 },
       });
       m.addSource('places', { type: 'geojson', data: placesData });
       m.addLayer({
@@ -101,7 +96,7 @@ export function PlaceMap({
         source: 'me',
         paint: {
           'circle-radius': 7,
-          'circle-color': '#2B6CB0',
+          'circle-color': lightColors.me,
           'circle-stroke-color': '#fff',
           'circle-stroke-width': 3,
         },

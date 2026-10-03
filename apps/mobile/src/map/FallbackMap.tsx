@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useState } from 'react';
 import { t } from '@/i18n';
-import { useColors } from '@/theme';
+import { lightColors, useColors } from '@/theme';
 import type { PlaceMapProps } from './types';
 
 /**
@@ -34,7 +34,7 @@ export function FallbackMap({
 
   return (
     <View
-      style={[styles.map, { backgroundColor: '#DDE7DC' }]}
+      style={[styles.map, { backgroundColor: c.surface }]}
       onLayout={(e) => setSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
     >
       <View style={[StyleSheet.absoluteFill, { backgroundColor: c.fog }]} pointerEvents="none" />
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: '#2B6CB0',
+    backgroundColor: lightColors.me,
     borderWidth: 3,
     borderColor: '#fff',
   },

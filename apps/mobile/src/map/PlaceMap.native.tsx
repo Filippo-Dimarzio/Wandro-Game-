@@ -1,6 +1,7 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { useEffect, useRef } from 'react';
 import { env } from '@/lib/env';
+import { CATEGORIES } from '@wandro/shared';
 import { lightColors } from '@/theme';
 import { FallbackMap } from './FallbackMap';
 import type { PlaceMapProps } from './types';
@@ -64,7 +65,7 @@ function MapboxPlaceMap({
         }}
       />
       <ShapeSource id="fog" shape={fog}>
-        <FillLayer id="fog-fill" style={{ fillColor: '#ECE9E0', fillOpacity: 0.78 }} />
+        <FillLayer id="fog-fill" style={{ fillColor: lightColors.fogFill, fillOpacity: 0.78 }} />
       </ShapeSource>
       <ShapeSource
         id="places"
@@ -85,14 +86,7 @@ function MapboxPlaceMap({
               [
                 'match',
                 ['get', 'category'],
-                'culture',
-                lightColors.category.culture,
-                'heritage',
-                lightColors.category.heritage,
-                'nature',
-                lightColors.category.nature,
-                'music_events',
-                lightColors.category.music_events,
+                ...CATEGORIES.flatMap((cat) => [cat, lightColors.category[cat]]),
                 lightColors.category.other,
               ],
               lightColors.locked,
@@ -110,7 +104,7 @@ function MapboxPlaceMap({
           id="me-dot"
           style={{
             circleRadius: 7,
-            circleColor: '#2B6CB0',
+            circleColor: lightColors.me,
             circleStrokeColor: '#fff',
             circleStrokeWidth: 3,
           }}
