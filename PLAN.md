@@ -12,28 +12,28 @@ Wandro is a photo-first, community-driven exploration game. Players uncover real
 
 ### Navigation (bottom tabs)
 
-| Tab | Purpose |
-|---|---|
-| Home | Photo feed from followed players, "Today's challenge" card (later), search, notifications |
-| Explore | Map with locked/unlocked places, category chips, Maps-style place sheet (photos, name, category, points, distance, directions) |
-| Capture (+) | Start a check-in; optional proof photo |
-| Collections | Maps-style lists with progress and a completion bonus; shareable |
-| Profile | Photo grid of unlocks, level, badges, followers, mini-map of visited places |
+| Tab         | Purpose                                                                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Home        | Photo feed from followed players, "Today's challenge" card (later), search, notifications                                      |
+| Explore     | Map with locked/unlocked places, category chips, Maps-style place sheet (photos, name, category, points, distance, directions) |
+| Capture (+) | Start a check-in; optional proof photo                                                                                         |
+| Collections | Maps-style lists with progress and a completion bonus; shareable                                                               |
+| Profile     | Photo grid of unlocks, level, badges, followers, mini-map of visited places                                                    |
 
 ## 2. Decisions and assumptions (see also section 14 for UX decisions) (change any of these)
 
-| # | Topic | Default I will build to |
-|---|---|---|
-| 1 | Photos in MVP | **Yes.** Feed and photo posts are MVP (Phase 4a). Proof photo is optional and never required for points. |
-| 2 | Place photos | Wikimedia Commons (licence + author + source URL stored for attribution), plus moderated user uploads. |
-| 3 | Accounts | Assumed none exist yet. Dev runs locally (Supabase CLI + Docker). One hosted prod project; staging added only if needed. Mapbox, Apple Developer and Google Play accounts are needed by Phase 2 / Phase 5 — see section 11. |
-| 4 | Repo | pnpm monorepo (see section 3). |
-| 5 | Branching | One branch per phase (`phase-N-...`). I open a PR only when you ask. |
-| 6 | Moderation tool | Supabase Studio plus SQL views for the MVP. A small in-app admin screen only if Studio proves too clumsy. |
-| 7 | Location privacy | Raw location pings are kept only until a visit is verified (or 24 h at most), then deleted. Only the verified summary is kept. |
-| 8 | Rarity / streaks | Rarity by all-time unique visitors (formula in section 6). Streak is daily and gives XP only, never points. |
-| 9 | Minimum age | 16+ (conservative GDPR choice; confirm before launch). |
-| 10 | Languages | English first; every string goes through i18n from day one so PT/ES/IT/FR can be added without refactoring. |
+| #   | Topic            | Default I will build to                                                                                                                                                                                                     |
+| --- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Photos in MVP    | **Yes.** Feed and photo posts are MVP (Phase 4a). Proof photo is optional and never required for points.                                                                                                                    |
+| 2   | Place photos     | Wikimedia Commons (licence + author + source URL stored for attribution), plus moderated user uploads.                                                                                                                      |
+| 3   | Accounts         | Assumed none exist yet. Dev runs locally (Supabase CLI + Docker). One hosted prod project; staging added only if needed. Mapbox, Apple Developer and Google Play accounts are needed by Phase 2 / Phase 5 — see section 11. |
+| 4   | Repo             | pnpm monorepo (see section 3).                                                                                                                                                                                              |
+| 5   | Branching        | One branch per phase (`phase-N-...`). I open a PR only when you ask.                                                                                                                                                        |
+| 6   | Moderation tool  | Supabase Studio plus SQL views for the MVP. A small in-app admin screen only if Studio proves too clumsy.                                                                                                                   |
+| 7   | Location privacy | Raw location pings are kept only until a visit is verified (or 24 h at most), then deleted. Only the verified summary is kept.                                                                                              |
+| 8   | Rarity / streaks | Rarity by all-time unique visitors (formula in section 6). Streak is daily and gives XP only, never points.                                                                                                                 |
+| 9   | Minimum age      | 16+ (conservative GDPR choice; confirm before launch).                                                                                                                                                                      |
+| 10  | Languages        | English first; every string goes through i18n from day one so PT/ES/IT/FR can be added without refactoring.                                                                                                                 |
 
 ## 3. Architecture
 
@@ -61,18 +61,21 @@ wandro/
 All tables have `id uuid pk`, `created_at`, and RLS enabled. Key columns only:
 
 **Identity & social**
+
 - `profiles` — user_id (fk auth.users), username (unique, citext), display_name, avatar_url, home_city, is_private, level, xp, streak_days, last_active_date, locale, deleted_at.
 - `follows` — follower_id, followee_id, status (`accepted` | `pending`), unique pair. Private profiles use pending requests.
 - `blocks` — blocker_id, blocked_id. Blocks hide content both ways and prevent follows.
 - `reports` — reporter_id, target_type (`profile`|`post`|`place_submission`|`photo`), target_id, reason, status, reviewed_by.
 
 **Places**
+
 - `regions` — slug, name, bbox/polygon, is_active (basis for later "expansions").
 - `places` — name, description (i18n jsonb), location `geography(Point)`, category (`culture`|`heritage`|`nature`|`music_events`|`other`), geofence_radius_m (default 75), dwell_seconds (default 120), base_points, source, source_id (unique pair), wikidata_id, region_id, status (`draft`|`active`|`hidden`|`closed`), safety_notes, is_private_property (must be false to be active).
 - `place_photos` — place_id, storage_path or external_url, author, license, source_url, status, is_primary.
 - `place_stats` — place_id, unique_visitors (maintained only by the check-in function).
 
 **Gameplay**
+
 - `checkin_sessions` — user_id, place_id, started_at (server clock), status, expires_at.
 - `checkin_pings` — session_id, lat, lng, accuracy, is_mocked, recorded_at. Ephemeral: deleted on completion, plus a scheduled cleanup after 24 h.
 - `visits` — user_id, place_id, verified_at, lat, lng, accuracy, dwell_seconds, flags, **unique (user_id, place_id)**.
@@ -82,6 +85,7 @@ All tables have `id uuid pk`, `created_at`, and RLS enabled. Key columns only:
 - `user_collection_progress` — derived view.
 
 **Content**
+
 - `posts` — user_id, visit_id (a post can only exist for a verified visit), caption, photo path(s), visibility, status. Photos have EXIF/GPS stripped on upload.
 - `place_submissions` — user_id, name, location, category, description, photo, status (`pending`|`approved`|`rejected`), reviewer_id, reject_reason, safety checklist.
 - `push_tokens`, `notifications`.
@@ -141,6 +145,7 @@ Honest limits: GPS can always be spoofed by a determined user, especially on roo
 ## 9. Place data import
 
 `scripts/importer` is idempotent (safe to re-run):
+
 1. Query Overpass for the Sintra bounding box (tourism=museum, historic=*, leisure=park, tourism=viewpoint, natural features, music venues, etc.).
 2. Enrich with Wikidata/Wikipedia (descriptions, images via Commons).
 3. De-duplicate by `(source, source_id)` and by name plus proximity.
@@ -151,28 +156,28 @@ Honest limits: GPS can always be spoofed by a determined user, especially on roo
 
 Each phase ends with: tests + lint green, a summary of changes, a manual test list, a commit, then **stop for your review**.
 
-**Phase 0 — Foundation:** monorepo, TypeScript strict, ESLint, Prettier, Jest, GitHub Actions CI, `.env.example`, Expo app skeleton with a development build configured for EAS, i18n scaffold, CLAUDE.md in place. *Manual check:* app boots on a device or simulator; CI is green.
+**Phase 0 — Foundation:** monorepo, TypeScript strict, ESLint, Prettier, Jest, GitHub Actions CI, `.env.example`, Expo app skeleton with a development build configured for EAS, i18n scaffold, CLAUDE.md in place. _Manual check:_ app boots on a device or simulator; CI is green.
 
-**Phase 1 — Data & auth:** schema and migrations, RLS policies with tests, Supabase Auth (email, Google, Apple), profile creation/editing (username, avatar, home city, privacy), Sintra importer and seed. *Manual check:* sign up, edit profile, inspect imported places.
+**Phase 1 — Data & auth:** schema and migrations, RLS policies with tests, Supabase Auth (email, Google, Apple), profile creation/editing (username, avatar, home city, privacy), Sintra importer and seed. _Manual check:_ sign up, edit profile, inspect imported places.
 
-**Phase 2 — Map:** Mapbox map with fog styling, user location (foreground), nearby places, locked/unlocked styling, category filters, place sheet. *Manual check:* map performance, contrast, small-screen layout, screen-reader labels.
+**Phase 2 — Map:** Mapbox map with fog styling, user location (foreground), nearby places, locked/unlocked styling, category filters, place sheet. _Manual check:_ map performance, contrast, small-screen layout, screen-reader labels.
 
-**Phase 3 — Check-in & scoring:** Edge Functions (`start_checkin`, `complete_checkin`), scoring, levels, streaks, badges, integration tests for scoring/validation/RLS. *Manual check:* real-world walk to a Sintra place; negative tests (too far, too short, mock location).
+**Phase 3 — Check-in & scoring:** Edge Functions (`start_checkin`, `complete_checkin`), scoring, levels, streaks, badges, integration tests for scoring/validation/RLS. _Manual check:_ real-world walk to a Sintra place; negative tests (too far, too short, mock location).
 
-**Phase 4a — Photos, feed & safety:** posts with optional proof photo, follow/unfollow (with private-profile requests), home feed, likes, report/block, guidelines. *Manual check:* two test accounts following each other; report and block flows.
+**Phase 4a — Photos, feed & safety:** posts with optional proof photo, follow/unfollow (with private-profile requests), home feed, likes, report/block, guidelines. _Manual check:_ two test accounts following each other; report and block flows.
 
-**Phase 4b — Leaderboards, collections, submissions:** leaderboards (friends/region/global/weekly), collections with completion bonus, place submissions, moderation queue. *Manual check:* collection completion; submission approved in Studio shows on the map.
+**Phase 4b — Leaderboards, collections, submissions:** leaderboards (friends/region/global/weekly), collections with completion bonus, place submissions, moderation queue. _Manual check:_ collection completion; submission approved in Studio shows on the map.
 
-**Phase 5 — Polish & release:** onboarding, empty/error/offline states, accessibility pass, test coverage, privacy policy and data export/delete flows verified, store-ready EAS builds. *Manual check:* full end-to-end on iOS and Android.
+**Phase 5 — Polish & release:** onboarding, empty/error/offline states, accessibility pass, test coverage, privacy policy and data export/delete flows verified, store-ready EAS builds. _Manual check:_ full end-to-end on iOS and Android.
 
 ## 11. Things I need from you, and when
 
-| By | What |
-|---|---|
-| Phase 1 | Supabase project (or confirm local-only for now); Google OAuth and Apple sign-in config |
-| Phase 2 | Mapbox account with a public token and a secret download token |
-| Phase 5 | Apple Developer and Google Play accounts; privacy policy and terms (I can draft; a lawyer should review) |
-| Before launch | Trademark and app-store name check for "Wandro" |
+| By            | What                                                                                                     |
+| ------------- | -------------------------------------------------------------------------------------------------------- |
+| Phase 1       | Supabase project (or confirm local-only for now); Google OAuth and Apple sign-in config                  |
+| Phase 2       | Mapbox account with a public token and a secret download token                                           |
+| Phase 5       | Apple Developer and Google Play accounts; privacy policy and terms (I can draft; a lawyer should review) |
+| Before launch | Trademark and app-store name check for "Wandro"                                                          |
 
 ## 12. Risks
 
@@ -189,15 +194,18 @@ Comments, daily challenge (rolling 24 h from when it appears for each user), fri
 ## 14. UX decisions (confirmed with the product owner)
 
 **Platform & theme**
+
 - Portrait only on phones. Light + dark follow the system; clean neutral UI so photos carry the colour, with one octopus-inspired accent.
 - Tone: warm and respectful in all copy and community guidelines.
 - English only at launch, all strings in the i18n layer.
 
 **Entry & registration**
+
 - Entry portal: full-screen real photo of Sintra under fog; the user swipes or holds to clear the fog and the octopus logo appears.
 - Gamified registration: **pick explorer style** (interests such as castles, nature, music) so the first suggested places match. Other gamified touches (passport stamp, starter badge) are optional and still open.
 
 **Home / map / check-in**
+
 - Home: photo feed first, with a slim progress strip (level, streak, points) above it.
 - Explore: tapping a place opens a Google Maps-style bottom sheet (peek, then drag to expand).
 - Unlock moment: the fog clears in an animated circle around the place. Celebration is otherwise kept restrained.
@@ -205,11 +213,13 @@ Comments, daily challenge (rolling 24 h from when it appears for each user), fri
 - Nearby suggestions appear as in-app banners only (foreground location only; no background alerts).
 
 **Profile & progression**
+
 - Profile opens with a "map of you": the cleared-fog map with stats beneath, and the photo grid below.
 - Levels are shown as **octopus evolution** (the mascot grows or gains accessories). Rank names are still open.
 - Badges at launch: category, region, rarity and streak/community badges.
 
 **Social**
+
 - Follow, photo feed, leaderboards and **likes in the MVP**; comments later.
 - Collections: Maps-style lists (cover photo, progress, map, share). Curated for now; private favourites lists are a later option.
 - Place submissions: long-press a map pin, then a form with name, category, photo and a safety checklist, then the moderation queue.

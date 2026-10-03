@@ -1,0 +1,139 @@
+import { BASE_POINTS, DEFAULT_GEOFENCE_RADIUS_M } from './constants';
+import type { Category, Place } from './types';
+
+function p(
+  id: string,
+  name: string,
+  category: Category,
+  lat: number,
+  lng: number,
+  uniqueVisitors: number,
+  description: string,
+): Place {
+  return {
+    id,
+    name,
+    description,
+    category,
+    lat,
+    lng,
+    geofenceRadiusM: DEFAULT_GEOFENCE_RADIUS_M,
+    basePoints: BASE_POINTS[category],
+    uniqueVisitors,
+  };
+}
+
+/**
+ * Demo data for running the app without a backend. Coordinates are approximate;
+ * the real catalogue comes from the OSM importer (scripts/importer).
+ */
+export const DEMO_PLACES: Place[] = [
+  p(
+    'demo-pena',
+    'Pena Palace',
+    'heritage',
+    38.7876,
+    -9.3906,
+    5000,
+    'Colourful Romanticist palace on a hilltop above Sintra.',
+  ),
+  p(
+    'demo-regaleira',
+    'Quinta da Regaleira',
+    'heritage',
+    38.7967,
+    -9.3958,
+    3200,
+    'Estate with gardens, grottoes and the famous initiation well.',
+  ),
+  p(
+    'demo-mouros',
+    'Castle of the Moors',
+    'heritage',
+    38.7917,
+    -9.388,
+    2800,
+    'Medieval hilltop castle with walls that climb the ridge.',
+  ),
+  p(
+    'demo-monserrate',
+    'Monserrate Palace',
+    'culture',
+    38.7919,
+    -9.4191,
+    600,
+    'Exotic palace surrounded by botanical gardens.',
+  ),
+  p(
+    'demo-capuchos',
+    'Convent of the Capuchos',
+    'heritage',
+    38.7777,
+    -9.4469,
+    120,
+    'Tiny cork-lined convent hidden in the forest.',
+  ),
+  p(
+    'demo-seteais',
+    'Seteais Palace Gardens',
+    'culture',
+    38.7938,
+    -9.403,
+    90,
+    'Neoclassical arch with sweeping views of the coast.',
+  ),
+  p(
+    'demo-cabo',
+    'Cabo da Roca Viewpoint',
+    'nature',
+    38.7804,
+    -9.4989,
+    900,
+    'The westernmost point of mainland Europe.',
+  ),
+  p(
+    'demo-adraga',
+    'Adraga Beach',
+    'nature',
+    38.8236,
+    -9.4731,
+    40,
+    'Wild cove with rock arches and dramatic sunsets.',
+  ),
+  p(
+    'demo-condessa',
+    "Countess of Edla's Chalet",
+    'culture',
+    38.7845,
+    -9.3917,
+    15,
+    'Alpine-style chalet in the Pena Park.',
+  ),
+  p(
+    'demo-cruz-alta',
+    'Cruz Alta Viewpoint',
+    'nature',
+    38.7861,
+    -9.3897,
+    8,
+    'The highest point of the Sintra hills.',
+  ),
+  p(
+    'demo-brinquedo',
+    'Toy Museum',
+    'culture',
+    38.8,
+    -9.3867,
+    3,
+    'Quirky museum of toys from across the centuries.',
+  ),
+  p(
+    'demo-music',
+    'Sintra Live Music Corner',
+    'music_events',
+    38.7985,
+    -9.3875,
+    0,
+    'Small local venue with traditional fado nights.',
+  ),
+];

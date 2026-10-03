@@ -28,18 +28,17 @@ packages/shared/   shared types, scoring constants, geo helpers
 
 ## Commands
 
-These are created in Phase 0. Update this list if they change.
-
 ```
-pnpm install              install dependencies
-pnpm lint                 ESLint
-pnpm format               Prettier (check with pnpm format:check)
-pnpm typecheck            tsc --noEmit across workspaces
-pnpm test                 Jest unit tests
-pnpm test:db              SQL/RLS/scoring tests against local Supabase
-pnpm supabase start       local Supabase (needs Docker)
-pnpm --filter mobile start   Expo dev server
-pnpm import:places        run the place importer (idempotent)
+pnpm install                     install dependencies
+pnpm web                         run the app in the browser (demo mode without .env)
+pnpm --filter mobile start       Expo dev server (Expo Go / dev build)
+pnpm lint                        ESLint
+pnpm format                      Prettier (check with pnpm format:check)
+pnpm typecheck                   tsc --noEmit across workspaces
+pnpm test                        Jest unit/component tests
+pnpm test:db                     SQL/RLS/scoring tests (Postgres 16 + PostGIS on localhost)
+pnpm import:places [--dry-run]   run the place importer (idempotent)
+pnpm --filter mobile build:web   static web build
 ```
 
 Before reporting a phase done, run `pnpm lint && pnpm typecheck && pnpm test && pnpm test:db`.
