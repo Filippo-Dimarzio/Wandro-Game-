@@ -29,6 +29,7 @@ function MapboxPlaceMap({
   onSelect,
   compact,
   recenterSignal,
+  onLongPress,
   mb,
 }: PlaceMapProps & { mb: typeof import('@rnmapbox/maps') }) {
   const { MapView, Camera, ShapeSource, FillLayer, CircleLayer, StyleURL } = mb;
@@ -55,6 +56,10 @@ function MapboxPlaceMap({
       pitchEnabled={false}
       scaleBarEnabled={false}
       accessibilityLabel="Map of places"
+      onLongPress={(f) => {
+        const [lng, lat] = (f.geometry as GeoJSON.Point).coordinates;
+        onLongPress?.({ lat, lng });
+      }}
     >
       <Camera
         ref={camera}

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { DEMO_PLACES, type Place } from '@wandro/shared';
+import { BASE_POINTS, DEFAULT_GEOFENCE_RADIUS_M, DEMO_PLACES, type Place } from '@wandro/shared';
 import { isDemo } from '@/lib/env';
 import { supabase } from '@/lib/supabase';
 import { useSession } from '@/state/session';
@@ -37,10 +37,26 @@ export function rowToPlace(r: PlaceRow): Place {
 export function usePlaces(center: { lat: number; lng: number }) {
   // Round so small GPS jitter doesn't refetch.
   const key = [center.lat.toFixed(2), center.lng.toFixed(2)];
+  const approved = useSession((s) => s.submissions.filter((x) => x.status === 'approved'));
+  const approvedKey = approved.map((x) => x.id).join(',');
   return useQuery({
-    queryKey: ['places', ...key, isDemo],
+    queryKey: ['places', ...key, isDemo, approvedKey],
     queryFn: async (): Promise<Place[]> => {
-      if (!supabase) return DEMO_PLACES;
+      if (!supabase) {
+        // Demo: approved suggestions become new missions, like approve_place_submission().
+        const extra: Place[] = approved.map((x) => ({
+          id: x.id,
+          name: x.name,
+          description: x.description,
+          category: x.category,
+          lat: x.lat,
+          lng: x.lng,
+          geofenceRadiusM: DEFAULT_GEOFENCE_RADIUS_M,
+          basePoints: BASE_POINTS[x.category],
+          uniqueVisitors: 0,
+        }));
+        return [...DEMO_PLACES, ...extra];
+      }
       const { data, error } = await supabase.rpc('nearby_places', {
         lat: center.lat,
         lng: center.lng,

@@ -51,14 +51,15 @@ export function PlaceMap({
   onSelect,
   compact,
   recenterSignal,
+  onLongPress,
 }: PlaceMapProps) {
   const container = useRef<HTMLDivElement | null>(null);
   const map = useRef<MLMap | null>(null);
   const ready = useRef(false);
   const fog = useFog(places, unlockedIds);
   const placesData = placesGeoJson(places, unlockedIds);
-  const latest = useRef({ places, onSelect });
-  latest.current = { places, onSelect };
+  const latest = useRef({ places, onSelect, onLongPress });
+  latest.current = { places, onSelect, onLongPress };
 
   useEffect(() => {
     if (!container.current) return;
@@ -111,6 +112,9 @@ export function PlaceMap({
         const p = latest.current.places.find((x) => x.id === id);
         if (p) latest.current.onSelect?.(p);
       });
+      m.on('contextmenu', (e) =>
+        latest.current.onLongPress?.({ lat: e.lngLat.lat, lng: e.lngLat.lng }),
+      );
       m.on('mouseenter', 'places', () => (m.getCanvas().style.cursor = 'pointer'));
       m.on('mouseleave', 'places', () => (m.getCanvas().style.cursor = ''));
       ready.current = true;

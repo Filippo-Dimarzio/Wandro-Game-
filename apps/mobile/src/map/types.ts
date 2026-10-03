@@ -8,4 +8,6 @@ export interface PlaceMapProps {
   /** Non-interactive mini map (e.g. "map of you" on the profile). */
   compact?: boolean;
   recenterSignal?: number;
+  /** Long-press (or right-click on web) to pin a spot, e.g. to suggest a place. */
+  onLongPress?: (position: LatLng) => void;
 }

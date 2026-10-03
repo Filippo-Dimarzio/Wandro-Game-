@@ -2,7 +2,9 @@ import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { octopusStage } from '@wandro/shared';
+import { Ionicons } from '@expo/vector-icons';
 import { useBadges } from '@/data/badges';
+import { useIsModerator } from '@/data/moderation';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { useWallet } from '@/data/wallet';
 import { t } from '@/i18n';
@@ -20,6 +22,7 @@ export default function Profile() {
   const { ids } = useUnlockedIds();
   const wallet = useWallet();
   const allBadges = useBadges();
+  const isModerator = useIsModerator();
   const profile = useSession((s) => s.profile);
   const reset = useSession((s) => s.reset);
   const level = wallet.level;
@@ -54,6 +57,26 @@ export default function Profile() {
               {t('profile.stage', { stage: octopusStage(level) })}
             </Text>
           </View>
+        </View>
+
+        <View style={styles.links}>
+          <LinkButton
+            icon="search"
+            label={t('search.title')}
+            onPress={() => router.push('/search')}
+          />
+          <LinkButton
+            icon="trophy"
+            label={t('leaderboard.title')}
+            onPress={() => router.push('/leaderboard')}
+          />
+          {isModerator && (
+            <LinkButton
+              icon="shield-checkmark"
+              label={t('mod.title')}
+              onPress={() => router.push('/moderation')}
+            />
+          )}
         </View>
 
         <Text style={[styles.section, { color: c.text }]}>{t('profile.mapOfYou')}</Text>
@@ -111,6 +134,15 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
+  links: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  link: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderRadius: radius.pill,
+    paddingHorizontal: 14,
+    minHeight: 40,
+  },
   container: { padding: space.lg, gap: space.md },
   header: { flexDirection: 'row', gap: space.lg, alignItems: 'center' },
   avatar: {
@@ -148,3 +180,25 @@ const styles = StyleSheet.create({
     marginTop: space.lg,
   },
 });
+
+function LinkButton({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  onPress: () => void;
+}) {
+  const c = useColors();
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      style={[styles.link, { backgroundColor: c.surface }]}
+    >
+      <Ionicons name={icon} size={18} color={c.accent} />
+      <Text style={{ color: c.text, fontWeight: '700' }}>{label}</Text>
+    </Pressable>
+  );
+}

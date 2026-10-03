@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -37,6 +37,9 @@ export default function Explore() {
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <PlaceMap
         places={visible}
+        onLongPress={(p) =>
+          router.push({ pathname: '/submit', params: { lat: String(p.lat), lng: String(p.lng) } })
+        }
         unlockedIds={ids}
         userPosition={loc.position}
         onSelect={setSelected}
@@ -54,6 +57,18 @@ export default function Explore() {
         </View>
       </SafeAreaView>
 
+      {!selected && (
+        <Pressable
+          onPress={() => router.push('/submit')}
+          accessibilityRole="button"
+          accessibilityHint={t('submit.longPress')}
+          style={[styles.suggest, { backgroundColor: c.card }]}
+          testID="suggest-place"
+        >
+          <Ionicons name="add-circle" size={20} color={c.accent} />
+          <Text style={{ color: c.text, fontWeight: '700' }}>{t('submit.button')}</Text>
+        </Pressable>
+      )}
       <Pressable
         onPress={() => setRecenter((n) => n + 1)}
         accessibilityRole="button"
@@ -92,6 +107,22 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
   dot: { width: 10, height: 10, borderRadius: 5 },
+  suggest: {
+    position: 'absolute',
+    left: space.lg,
+    bottom: space.xl,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderRadius: radius.pill,
+    paddingHorizontal: 14,
+    minHeight: 44,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+  },
   fab: {
     position: 'absolute',
     right: space.lg,
