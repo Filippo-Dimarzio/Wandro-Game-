@@ -176,11 +176,11 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
           <Pressable
             onPress={onGuide}
             accessibilityRole="button"
-            style={[styles.action, { backgroundColor: c.gold }]}
+            style={[styles.action, { backgroundColor: c.goldSoft }]}
             testID="guide-me"
           >
-            <Ionicons name="compass" size={16} color="#1C1404" />
-            <Text style={{ color: '#1C1404', fontWeight: '800' }}>{t('hud.guide')}</Text>
+            <Ionicons name="compass" size={16} color={c.gold} />
+            <Text style={{ color: c.gold, fontWeight: '800' }}>{t('hud.guide')}</Text>
           </Pressable>
         )}
         {isDemo && onTeleport && (

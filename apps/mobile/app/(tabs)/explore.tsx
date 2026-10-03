@@ -137,10 +137,10 @@ export default function Explore() {
           <Pressable
             onPress={() => startGuide(nudge.place)}
             accessibilityRole="button"
-            style={[styles.nudge, { backgroundColor: c.gold }]}
+            style={[styles.nudge, { backgroundColor: c.goldSoft }]}
             testID="nearby-nudge"
           >
-            <Text style={{ color: '#1C1404', fontWeight: '800' }}>
+            <Text style={{ color: c.gold, fontWeight: '800' }}>
               {t('nudge.near', {
                 name: nudge.place.name,
                 distance: formatDistance(nudge.distanceM),
