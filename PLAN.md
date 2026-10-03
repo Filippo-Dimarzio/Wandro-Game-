@@ -20,7 +20,7 @@ Wandro is a photo-first, community-driven exploration game. Players uncover real
 | Collections | Maps-style lists with progress and a completion bonus; shareable |
 | Profile | Photo grid of unlocks, level, badges, followers, mini-map of visited places |
 
-## 2. Decisions and assumptions (change any of these)
+## 2. Decisions and assumptions (see also section 14 for UX decisions) (change any of these)
 
 | # | Topic | Default I will build to |
 |---|---|---|
@@ -86,7 +86,9 @@ All tables have `id uuid pk`, `created_at`, and RLS enabled. Key columns only:
 - `place_submissions` — user_id, name, location, category, description, photo, status (`pending`|`approved`|`rejected`), reviewer_id, reject_reason, safety checklist.
 - `push_tokens`, `notifications`.
 
-**Later (design hooks, not built):** `likes`, `comments`, `daily_challenges`, `events`, `teams`, `venue_partners`, `place_translations`.
+- `likes` — user_id, post_id, unique pair (MVP; no comments yet).
+
+**Later (design hooks, not built):** `comments`, `daily_challenges`, `events`, `teams`, `venue_partners`, `place_translations`.
 
 **Leaderboards:** SQL views / materialized views, refreshed on a schedule. Scopes: friends, region, global, weekly. Private profiles are excluded from public boards.
 
@@ -157,7 +159,7 @@ Each phase ends with: tests + lint green, a summary of changes, a manual test li
 
 **Phase 3 — Check-in & scoring:** Edge Functions (`start_checkin`, `complete_checkin`), scoring, levels, streaks, badges, integration tests for scoring/validation/RLS. *Manual check:* real-world walk to a Sintra place; negative tests (too far, too short, mock location).
 
-**Phase 4a — Photos, feed & safety:** posts with optional proof photo, follow/unfollow (with private-profile requests), home feed, report/block, guidelines. *Manual check:* two test accounts following each other; report and block flows.
+**Phase 4a — Photos, feed & safety:** posts with optional proof photo, follow/unfollow (with private-profile requests), home feed, likes, report/block, guidelines. *Manual check:* two test accounts following each other; report and block flows.
 
 **Phase 4b — Leaderboards, collections, submissions:** leaderboards (friends/region/global/weekly), collections with completion bonus, place submissions, moderation queue. *Manual check:* collection completion; submission approved in Studio shows on the map.
 
@@ -182,4 +184,38 @@ Each phase ends with: tests + lint green, a summary of changes, a manual test li
 
 ## 13. Later (designed for, not built)
 
-Likes/comments, daily 5 pm local-time challenge, friend dares, food and beach challenges (venue QR codes for proof), Instagram sharing via the share sheet with a branded frame, time-limited events, team challenges, offline map caching, full i18n (PT, EN, ES, IT, FR), venue partnerships, region expansions (Lisbon coast, Alentejo, Algarve…).
+Comments, daily challenge (rolling 24 h from when it appears for each user), friend dares, food and beach challenges (venue QR codes for proof), Instagram sharing via the share sheet with a branded frame, time-limited events, team challenges, offline map caching, full i18n (PT, EN, ES, IT, FR), venue partnerships, region expansions (Lisbon coast, Alentejo, Algarve…).
+
+## 14. UX decisions (confirmed with the product owner)
+
+**Platform & theme**
+- Portrait only on phones. Light + dark follow the system; clean neutral UI so photos carry the colour, with one octopus-inspired accent.
+- Tone: warm and respectful in all copy and community guidelines.
+- English only at launch, all strings in the i18n layer.
+
+**Entry & registration**
+- Entry portal: full-screen real photo of Sintra under fog; the user swipes or holds to clear the fog and the octopus logo appears.
+- Gamified registration: **pick explorer style** (interests such as castles, nature, music) so the first suggested places match. Other gamified touches (passport stamp, starter badge) are optional and still open.
+
+**Home / map / check-in**
+- Home: photo feed first, with a slim progress strip (level, streak, points) above it.
+- Explore: tapping a place opens a Google Maps-style bottom sheet (peek, then drag to expand).
+- Unlock moment: the fog clears in an animated circle around the place. Celebration is otherwise kept restrained.
+- Capture (+): auto-detect and confirm. When the user is near a place, a banner offers "You're at X — start discovery", a progress ring fills during the dwell time, then the user can add a photo.
+- Nearby suggestions appear as in-app banners only (foreground location only; no background alerts).
+
+**Profile & progression**
+- Profile opens with a "map of you": the cleared-fog map with stats beneath, and the photo grid below.
+- Levels are shown as **octopus evolution** (the mascot grows or gains accessories). Rank names are still open.
+- Badges at launch: category, region, rarity and streak/community badges.
+
+**Social**
+- Follow, photo feed, leaderboards and **likes in the MVP**; comments later.
+- Collections: Maps-style lists (cover photo, progress, map, share). Curated for now; private favourites lists are a later option.
+- Place submissions: long-press a map pin, then a form with name, category, photo and a safety checklist, then the moderation queue.
+
+**Daily challenge (later):** a rolling 24 hours from when it appears for each user. It rewards taking part, never speed.
+
+**Notifications (default on, user-configurable):** friend activity, daily challenge, streak reminders. Nearby alerts are in-app only.
+
+**Monetisation:** a subscription is the intended direction. Not built in the MVP. Constraints to keep in mind: digital subscriptions on iOS and Android must use the stores' in-app purchase systems; premium should never buy points or leaderboard advantage, only extras such as regions, stats and cosmetics.
