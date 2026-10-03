@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { BASE_POINTS, DEFAULT_GEOFENCE_RADIUS_M, DEMO_PLACES, type Place } from '@wandro/shared';
 import { isDemo } from '@/lib/env';
 import { supabase } from '@/lib/supabase';
@@ -37,7 +38,10 @@ export function rowToPlace(r: PlaceRow): Place {
 export function usePlaces(center: { lat: number; lng: number }) {
   // Round so small GPS jitter doesn't refetch.
   const key = [center.lat.toFixed(2), center.lng.toFixed(2)];
-  const approved = useSession((s) => s.submissions.filter((x) => x.status === 'approved'));
+  // Select the stable array and derive from it; filtering inside the selector would return a
+  // new array on every render and loop forever.
+  const submissions = useSession((s) => s.submissions);
+  const approved = useMemo(() => submissions.filter((x) => x.status === 'approved'), [submissions]);
   const approvedKey = approved.map((x) => x.id).join(',');
   return useQuery({
     queryKey: ['places', ...key, isDemo, approvedKey],

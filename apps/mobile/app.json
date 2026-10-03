@@ -19,7 +19,7 @@
     "android": {
       "package": "com.wandro.app",
       "adaptiveIcon": {
-        "backgroundColor": "#0E5E4E",
+        "backgroundColor": "#0E7C66",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"

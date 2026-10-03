@@ -1,7 +1,8 @@
 name: Release
 
-# Publishes a GitHub Release with notes from docs/releases/<tag>.md.
-# Either push a tag like v1.0.0, or run this workflow manually with the tag name;
+# Publishes a GitHub Release with notes from docs/releases/<tag>.md, then builds the desktop
+# installers (Windows, macOS, Linux) and attaches them to it.
+# Either push a tag like v2.0.0, or run this workflow manually with the tag name;
 # the manual run creates the tag on the selected branch's latest commit.
 on:
   push:
@@ -9,17 +10,18 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to release, e.g. v1.0.0 (needs docs/releases/<tag>.md)'
+        description: 'Tag to release, e.g. v2.0.0 (needs docs/releases/<tag>.md)'
         required: true
 
 permissions:
   contents: write
 
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
+
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
       - uses: softprops/action-gh-release@v2
@@ -29,3 +31,34 @@ jobs:
           name: Wandro ${{ env.TAG }}
           body_path: docs/releases/${{ env.TAG }}.md
           make_latest: true
+
+  desktop:
+    needs: release
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      EXPO_NO_TELEMETRY: 1
+      # Unsigned builds for now; add certificates as secrets to sign them later.
+      CSC_IDENTITY_AUTO_DISCOVERY: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter desktop dist
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          files: |
+            apps/desktop/dist/*.exe
+            apps/desktop/dist/*.dmg
+            apps/desktop/dist/*.AppImage
+          fail_on_unmatched_files: false

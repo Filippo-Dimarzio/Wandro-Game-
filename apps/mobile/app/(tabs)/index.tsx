@@ -15,6 +15,7 @@ import { formatDistance, haversineMeters, pointsForVisit } from '@wandro/shared'
 import { DailyChallengeCard } from '@/components/DailyChallengeCard';
 import { FeedCard } from '@/components/FeedCard';
 import { HowToPlay } from '@/components/HowToPlay';
+import { InstallBanner } from '@/components/InstallBanner';
 import { categoryIcon } from '@/components/PlaceSheet';
 import { ProgressStrip } from '@/components/ProgressStrip';
 import { usePlaces, useUnlockedIds } from '@/data/places';
@@ -91,6 +92,7 @@ export default function Home() {
           {t('home.greeting', { name: profile?.username ?? '' })}
         </Text>
 
+        <InstallBanner />
         {wallet.discoveries === 0 && <HowToPlay />}
         <ProgressStrip wallet={wallet} />
         <DailyChallengeCard places={list} />

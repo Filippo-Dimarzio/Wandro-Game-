@@ -14,6 +14,7 @@ export default tseslint.config(
       '**/*.config.js',
       '**/jest.setup.js',
       '**/public/**',
+      'apps/desktop/web/**',
     ],
   },
   js.configs.recommended,
@@ -33,5 +34,11 @@ export default tseslint.config(
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
       ],
     },
+  },
+  {
+    // Electron main/preload run as CommonJS in Node.
+    files: ['apps/desktop/**/*.js'],
+    languageOptions: { sourceType: 'commonjs' },
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
   },
 );

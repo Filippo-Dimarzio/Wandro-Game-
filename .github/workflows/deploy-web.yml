@@ -23,6 +23,7 @@ jobs:
       EXPO_BASE_URL: /${{ github.event.repository.name }}
       EXPO_PUBLIC_BASE_URL: /${{ github.event.repository.name }}
       EXPO_NO_TELEMETRY: 1
+      ELECTRON_SKIP_BINARY_DOWNLOAD: 1
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

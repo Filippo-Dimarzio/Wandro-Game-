@@ -6,3 +6,5 @@ coverage
 supabase/migrations
 apps/mobile/public/maplibre
 apps/mobile/dist
+apps/desktop/web
+apps/desktop/dist
