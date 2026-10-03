@@ -10,7 +10,7 @@ Hidden gems are worth the most.
 
 - **Pilot region:** Sintra and its surroundings, Portugal
 - **Status:** v1.0 — foundation, backend and app preview (Phases 0–2). See the [roadmap](#roadmap).
-- **Try it in your browser:** <https://filippo-dimarzio.github.io/FDM-Space-Website/> (demo mode,
+- **Try it in your browser:** <https://filippo-dimarzio.github.io/Wandro-Game-/> (demo mode,
   see [Hosting](#hosting-the-web-app))
 
 ---------------------------- | --------------------------- | -------------------------- | --------------------- |
@@ -151,7 +151,7 @@ The full plan — architecture, data model, check-in validation and every decisi
 You need **Node 22+** and **pnpm 10** (`npm i -g pnpm`).
 
 ```bash
-git clone https://github.com/Filippo-Dimarzio/FDM-Space-Website.git wandro
+git clone https://github.com/Filippo-Dimarzio/Wandro-Game-.git wandro
 cd wandro
 pnpm install
 ```
