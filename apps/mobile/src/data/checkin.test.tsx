@@ -1,9 +1,8 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook } from '@testing-library/react-native';
-import type { ReactNode } from 'react';
 import { DEMO_PLACES, pointsForVisit } from '@wandro/shared';
 import type { UserLocation } from '@/lib/useLocation';
 import { useSession } from '@/state/session';
+import { queryWrapper } from '@/test/queryWrapper';
 import { useCheckin } from './checkin';
 
 const adraga = DEMO_PLACES.find((p) => p.id === 'demo-adraga')!;
@@ -15,9 +14,7 @@ const at = (lat: number, lng: number): UserLocation => ({
   permission: 'granted',
   request: async () => undefined,
 });
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>
-);
+const wrapper = queryWrapper();
 
 describe('useCheckin (demo mode)', () => {
   beforeEach(() => {

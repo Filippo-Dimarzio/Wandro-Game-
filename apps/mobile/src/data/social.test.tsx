@@ -1,12 +1,9 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook } from '@testing-library/react-native';
-import type { ReactNode } from 'react';
 import { useSession } from '@/state/session';
+import { queryWrapper } from '@/test/queryWrapper';
 import { useFeed, useLeaderboard, useToggleLike } from './social';
 
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>
-);
+const wrapper = queryWrapper();
 
 describe('social (demo mode)', () => {
   beforeEach(() => useSession.getState().reset());

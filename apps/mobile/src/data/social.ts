@@ -238,14 +238,12 @@ export function useReport() {
       if (isDemo) return report(r);
       const db = supabase!;
       const me = (await db.auth.getUser()).data.user!.id;
-      const { error } = await db
-        .from('reports')
-        .insert({
-          reporter_id: me,
-          target_type: r.targetType,
-          target_id: r.targetId,
-          reason: r.reason,
-        });
+      const { error } = await db.from('reports').insert({
+        reporter_id: me,
+        target_type: r.targetType,
+        target_id: r.targetId,
+        reason: r.reason,
+      });
       // Reporting the same thing twice is fine: the first report already counts.
       if (error && error.code !== '23505') throw error;
     },
@@ -389,15 +387,13 @@ export function useCreatePost() {
           .upload(photoPath, blob, { contentType: 'image/jpeg', upsert: true });
         if (up.error) throw up.error;
       }
-      const { error } = await db
-        .from('posts')
-        .insert({
-          user_id: me,
-          visit_id: visit.data.id,
-          place_id: placeId,
-          caption: caption || null,
-          photo_path: photoPath,
-        });
+      const { error } = await db.from('posts').insert({
+        user_id: me,
+        visit_id: visit.data.id,
+        place_id: placeId,
+        caption: caption || null,
+        photo_path: photoPath,
+      });
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['feed'] }),

@@ -12,7 +12,8 @@
       "bundleIdentifier": "com.wandro.app",
       "usesAppleSignIn": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Wandro uses your location while the app is open to show nearby places and confirm your discoveries."
+        "NSLocationWhenInUseUsageDescription": "Wandro uses your location while the app is open to show nearby places and confirm your discoveries.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -42,7 +43,15 @@
           "isAndroidBackgroundLocationEnabled": false
         }
       ],
-      "@rnmapbox/maps"
+      "@rnmapbox/maps",
+      "expo-notifications",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Wandro lets you choose a photo to share with your discovery.",
+          "cameraPermission": "Wandro lets you take a photo of the place you discovered."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false

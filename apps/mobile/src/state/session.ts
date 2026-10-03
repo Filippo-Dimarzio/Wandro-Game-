@@ -80,6 +80,7 @@ interface SessionState extends DemoProgress {
   /** Demo-only switch so the moderation screens can be tried. */
   demoModerator: boolean;
   installPromptDismissed: boolean;
+  prefs: { dailyReminder: boolean };
 
   completeOnboarding: (profile: LocalProfile) => void;
   updateProfile: (patch: Partial<LocalProfile>) => void;
@@ -99,6 +100,7 @@ interface SessionState extends DemoProgress {
   equip: (slot: 'skin' | 'hat', itemCode: string | undefined) => void;
   setDemoModerator: (on: boolean) => void;
   dismissInstallPrompt: () => void;
+  setPref: (key: 'dailyReminder', value: boolean) => void;
   reset: () => void;
 }
 
@@ -118,6 +120,7 @@ const initial = {
   inventory: { owned: {}, activeUntil: {}, equipped: {} },
   demoModerator: false,
   installPromptDismissed: false,
+  prefs: { dailyReminder: true },
 };
 
 function progressOf(s: SessionState): DemoProgress {
@@ -211,6 +214,7 @@ export const useSession = create<SessionState>()(
         })),
       setDemoModerator: (demoModerator) => set({ demoModerator }),
       dismissInstallPrompt: () => set({ installPromptDismissed: true }),
+      setPref: (key, value) => set((s) => ({ prefs: { ...s.prefs, [key]: value } })),
       reset: () => set(initial),
     }),
     {

@@ -70,6 +70,11 @@ export default function Profile() {
             label={t('leaderboard.title')}
             onPress={() => router.push('/leaderboard')}
           />
+          <LinkButton
+            icon="settings"
+            label={t('profile.settings')}
+            onPress={() => router.push('/settings')}
+          />
           {isModerator && (
             <LinkButton
               icon="shield-checkmark"

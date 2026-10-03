@@ -1,15 +1,12 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import type { ReactNode } from 'react';
 import { DEMO_PLACES } from '@wandro/shared';
 import { useSession } from '@/state/session';
+import { queryWrapper } from '@/test/queryWrapper';
 import { DailyChallengeCard } from './DailyChallengeCard';
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: () => null }));
 
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>
-);
+const wrapper = queryWrapper();
 
 describe('DailyChallengeCard (demo mode)', () => {
   beforeEach(() => useSession.getState().reset());
