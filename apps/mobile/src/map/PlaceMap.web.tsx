@@ -76,6 +76,7 @@ export function PlaceMap({
   onSelect,
   compact,
   recenterSignal,
+  focus,
   onLongPress,
   accuracyM,
   target,
@@ -234,6 +235,10 @@ export function PlaceMap({
     const el = marker.current?.getElement();
     if (el) el.innerHTML = markerHtml(avatar?.skin, avatar?.hat, trail);
   }, [avatar?.skin, avatar?.hat, trail]);
+
+  useEffect(() => {
+    if (focus) map.current?.flyTo({ center: [focus.lng, focus.lat], zoom: 13, duration: 1500 });
+  }, [focus?.lat, focus?.lng]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (recenterSignal)

@@ -18,6 +18,8 @@ export interface PlaceMapProps {
   avatar?: { skin?: string; hat?: string };
   /** Keep the camera on the octopus while walking. */
   follow?: boolean;
+  /** Fly the camera here (e.g. after picking another city), without moving the octopus. */
+  focus?: LatLng | null;
   /** Long-press (or right-click on web) to pin a spot, e.g. to suggest a place. */
   onLongPress?: (position: LatLng) => void;
 }

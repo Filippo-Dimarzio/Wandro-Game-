@@ -1,9 +1,11 @@
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { octopusStage } from '@wandro/shared';
+import { FriendButton } from '@/components/FriendButton';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { useFriendStatus } from '@/data/friends';
 import { useBlock, useFollow, useProfileCard, useReport } from '@/data/social';
 import { t } from '@/i18n';
 import { isDemo } from '@/lib/env';
@@ -17,6 +19,7 @@ export default function UserProfile() {
   const block = useBlock();
   const report = useReport();
   const [reported, setReported] = useState(false);
+  const friendStatus = useFriendStatus(id!);
 
   if (!card) {
     return (
@@ -72,6 +75,22 @@ export default function UserProfile() {
             {followLabel}
           </Text>
         </Pressable>
+
+        <View style={styles.row}>
+          <View style={{ flex: 1 }}>
+            <FriendButton userId={card.id} />
+          </View>
+          {friendStatus === 'friends' && (
+            <Pressable
+              onPress={() => router.push({ pathname: '/challenge/[id]', params: { id: card.id } })}
+              accessibilityRole="button"
+              style={[styles.follow, styles.challenge, { backgroundColor: c.goldSoft }]}
+              testID="challenge-friend"
+            >
+              <Text style={{ color: c.gold, fontWeight: '800' }}>🎯 {t('friends.challenge')}</Text>
+            </Pressable>
+          )}
+        </View>
 
         {!card.canSee && <Text style={{ color: c.textMuted }}>🔒 {t('user.private')}</Text>}
 
@@ -137,6 +156,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   row: { flexDirection: 'row', gap: space.sm },
+  challenge: { paddingHorizontal: 18 },
   small: {
     flex: 1,
     borderWidth: 1,

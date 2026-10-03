@@ -1,4 +1,5 @@
 import { BASE_POINTS, DEFAULT_GEOFENCE_RADIUS_M } from './constants';
+import { EUROPE_PLACES } from './europe-places';
 import type { Category, OpeningSlot, Place } from './types';
 
 function p(
@@ -13,6 +14,7 @@ function p(
 ): Place {
   return {
     id,
+    region: 'sintra',
     name,
     description,
     category,
@@ -29,7 +31,7 @@ function p(
  * Demo data for running the app without a backend. Coordinates are approximate;
  * the real catalogue comes from the OSM importer (scripts/importer).
  */
-export const DEMO_PLACES: Place[] = [
+const SINTRA_PLACES: Place[] = [
   p(
     'demo-pena',
     'Pena Palace',
@@ -158,3 +160,5 @@ export const DEMO_PLACES: Place[] = [
     'White village tumbling down a cliff to a tide pool.',
   ),
 ];
+
+export const DEMO_PLACES: Place[] = [...SINTRA_PLACES, ...EUROPE_PLACES];

@@ -12,6 +12,13 @@ import {
   type LedgerEntry,
   type VisitResult,
 } from '@/demo/engine';
+import {
+  INITIAL_FRIENDS,
+  initialFriendChallenges,
+  type DemoFriendChallenge,
+  type FriendStatus,
+} from '@/demo/friends';
+import { DEMO_USERS } from '@/demo/social';
 
 export type { DemoUnlock } from '@/demo/engine';
 
@@ -48,7 +55,7 @@ export interface DemoSubmission {
 }
 
 export interface DemoReport {
-  targetType: 'post' | 'profile';
+  targetType: 'post' | 'profile' | 'friend_challenge';
   targetId: string;
   reason: string;
   at: string;
@@ -77,6 +84,14 @@ interface SessionState extends DemoProgress {
   reports: DemoReport[];
   submissions: DemoSubmission[];
   inventory: Inventory;
+  /** Hidden gems this player has walked within range of (demo). */
+  revealed: Record<string, string>;
+  /** Gem that was just revealed, for the "you found a hidden gem" banner. */
+  justRevealed: string | null;
+  /** Where the map is looking when browsing another city; null follows the player. */
+  browse: LatLng | null;
+  friends: Record<string, FriendStatus>;
+  friendChallenges: DemoFriendChallenge[];
   /** Demo-only switch so the moderation screens can be tried. */
   demoModerator: boolean;
   installPromptDismissed: boolean;
@@ -98,6 +113,14 @@ interface SessionState extends DemoProgress {
   reviewSubmission: (id: string, approve: boolean) => void;
   buy: (itemCode: string, price: number, durationMinutes?: number) => boolean;
   equip: (slot: 'skin' | 'hat', itemCode: string | undefined) => void;
+  reveal: (placeId: string) => void;
+  clearJustRevealed: () => void;
+  setBrowse: (p: LatLng | null) => void;
+  sendFriendRequest: (userId: string) => FriendStatus;
+  respondFriendRequest: (userId: string, accept: boolean) => void;
+  removeFriend: (userId: string) => void;
+  challengeFriend: (friendId: string, placeId: string, note: string | null) => string;
+  respondFriendChallenge: (id: string, accept: boolean) => void;
   setDemoModerator: (on: boolean) => void;
   dismissInstallPrompt: () => void;
   setPref: (key: 'dailyReminder', value: boolean) => void;
@@ -118,6 +141,11 @@ const initial = {
   reports: [],
   submissions: [],
   inventory: { owned: {}, activeUntil: {}, equipped: {} },
+  revealed: {},
+  justRevealed: null,
+  browse: null,
+  friends: INITIAL_FRIENDS,
+  friendChallenges: initialFriendChallenges(),
   demoModerator: false,
   installPromptDismissed: false,
   prefs: { dailyReminder: true },
@@ -133,6 +161,10 @@ function progressOf(s: SessionState): DemoProgress {
     challengesCompleted: s.challengesCompleted,
     collectionsClaimed: s.collectionsClaimed,
   };
+}
+
+function demoIsPrivate(id: string) {
+  return DEMO_USERS.find((u) => u.id === id)?.isPrivate ?? true;
 }
 
 export const useSession = create<SessionState>()(
@@ -177,9 +209,87 @@ export const useSession = create<SessionState>()(
         }),
       addPost: (post) => set((s) => ({ posts: [post, ...s.posts] })),
       block: (id) =>
+        set((s) => {
+          const friends = { ...s.friends };
+          delete friends[id];
+          return {
+            blocked: [...new Set([...s.blocked, id])],
+            following: s.following.filter((x) => x !== id),
+            friends,
+            friendChallenges: s.friendChallenges.map((c) =>
+              c.friendId === id && c.status === 'pending' ? { ...c, status: 'declined' } : c,
+            ),
+          };
+        }),
+      reveal: (placeId) =>
+        set((s) =>
+          s.revealed[placeId]
+            ? {}
+            : {
+                revealed: { ...s.revealed, [placeId]: new Date().toISOString() },
+                justRevealed: placeId,
+              },
+        ),
+      clearJustRevealed: () => set({ justRevealed: null }),
+      setBrowse: (browse) => set({ browse }),
+      sendFriendRequest: (id) => {
+        const current = get().friends[id];
+        // Like send_friend_request(): answering their pending request makes you friends.
+        // Demo explorers with public profiles say yes straight away so the flow can be tried.
+        const next: FriendStatus =
+          current === 'friends' || current === 'incoming' || !demoIsPrivate(id)
+            ? 'friends'
+            : 'outgoing';
+        set((s) => ({ friends: { ...s.friends, [id]: next } }));
+        return next;
+      },
+      respondFriendRequest: (id, accept) =>
+        set((s) => {
+          if (s.friends[id] !== 'incoming') return {};
+          const friends = { ...s.friends };
+          if (accept) friends[id] = 'friends';
+          else delete friends[id];
+          return { friends };
+        }),
+      removeFriend: (id) =>
+        set((s) => {
+          const friends = { ...s.friends };
+          delete friends[id];
+          return { friends };
+        }),
+      challengeFriend: (friendId, placeId, note) => {
+        const existing = get().friendChallenges.find(
+          (c) =>
+            c.direction === 'outgoing' &&
+            c.friendId === friendId &&
+            c.placeId === placeId &&
+            (c.status === 'pending' || c.status === 'accepted'),
+        );
+        if (existing) return existing.id;
+        const id = `demo-fc-${Date.now().toString(36)}`;
         set((s) => ({
-          blocked: [...new Set([...s.blocked, id])],
-          following: s.following.filter((x) => x !== id),
+          friendChallenges: [
+            {
+              id,
+              friendId,
+              direction: 'outgoing',
+              placeId,
+              note: note?.trim() || null,
+              status: 'pending',
+              createdAt: new Date().toISOString(),
+            },
+            ...s.friendChallenges,
+          ],
+        }));
+        return id;
+      },
+      respondFriendChallenge: (id, accept) =>
+        set((s) => ({
+          friendChallenges: s.friendChallenges.map((c) =>
+            c.id === id && c.direction === 'incoming' && c.status === 'pending'
+              ? { ...c, status: accept ? 'accepted' : 'declined' }
+              : c,
+          ),
         })),
       report: (r) =>
         set((s) => ({ reports: [...s.reports, { ...r, at: new Date().toISOString() }] })),
@@ -215,13 +325,13 @@ export const useSession = create<SessionState>()(
       setDemoModerator: (demoModerator) => set({ demoModerator }),
       dismissInstallPrompt: () => set({ installPromptDismissed: true }),
       setPref: (key, value) => set((s) => ({ prefs: { ...s.prefs, [key]: value } })),
-      reset: () => set(initial),
+      reset: () => set({ ...initial, friendChallenges: initialFriendChallenges() }),
     }),
     {
       name: 'wandro-session',
       version: 2,
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: ({ justUnlocked: _j, ...rest }) => rest,
+      partialize: ({ justUnlocked: _j, justRevealed: _r, browse: _b, ...rest }) => rest,
       // v1 kept coins in `unlocked[].points` and `bonusPoints`; rebuild a ledger from them.
       migrate: (persisted, version) => {
         const old = (persisted ?? {}) as Record<string, unknown>;

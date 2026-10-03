@@ -234,7 +234,11 @@ export function useReport() {
   const qc = useQueryClient();
   const report = useSession((s) => s.report);
   return useMutation({
-    mutationFn: async (r: { targetType: 'post' | 'profile'; targetId: string; reason: string }) => {
+    mutationFn: async (r: {
+      targetType: 'post' | 'profile' | 'friend_challenge';
+      targetId: string;
+      reason: string;
+    }) => {
       if (isDemo) return report(r);
       const db = supabase!;
       const me = (await db.auth.getUser()).data.user!.id;
@@ -287,15 +291,15 @@ export interface LeaderboardRow {
   isMe: boolean;
 }
 
-export function useLeaderboard(scope: LeaderboardScope) {
+export function useLeaderboard(scope: LeaderboardScope, region = 'sintra') {
   const s = useSession();
   const server = useQuery({
-    queryKey: ['leaderboard', scope],
+    queryKey: ['leaderboard', scope, region],
     enabled: !isDemo,
     queryFn: async (): Promise<LeaderboardRow[]> => {
       const { data, error } = await supabase!.rpc('leaderboard', {
         p_scope: scope,
-        p_region: 'sintra',
+        p_region: region,
       });
       if (error) throw error;
       return (

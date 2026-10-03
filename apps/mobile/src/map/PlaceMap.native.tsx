@@ -37,6 +37,7 @@ function MapboxPlaceMap({
   trail = false,
   avatar,
   follow,
+  focus,
   mb,
 }: PlaceMapProps & { mb: typeof import('@rnmapbox/maps') }) {
   const { MapView, Camera, ShapeSource, FillLayer, LineLayer, CircleLayer, MarkerView, StyleURL } =
@@ -59,6 +60,15 @@ function MapboxPlaceMap({
         animationDuration: 250,
       });
   }, [follow, userPosition.lat, userPosition.lng]);
+
+  useEffect(() => {
+    if (focus)
+      camera.current?.setCamera({
+        centerCoordinate: [focus.lng, focus.lat],
+        zoomLevel: 13,
+        animationDuration: 1200,
+      });
+  }, [focus?.lat, focus?.lng]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (recenterSignal)

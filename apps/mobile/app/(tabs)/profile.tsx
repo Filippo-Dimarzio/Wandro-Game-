@@ -9,9 +9,8 @@ import { useLoadout } from '@/data/loadout';
 import { useIsModerator } from '@/data/moderation';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { useWallet } from '@/data/wallet';
+import { LogOutButton } from '@/components/LogOutButton';
 import { t } from '@/i18n';
-import { isDemo } from '@/lib/env';
-import { supabase } from '@/lib/supabase';
 import { useLocation } from '@/lib/useLocation';
 import { PlaceMap } from '@/map/PlaceMap';
 import { useSession } from '@/state/session';
@@ -27,15 +26,8 @@ export default function Profile() {
   const isModerator = useIsModerator();
   const loadout = useLoadout();
   const profile = useSession((s) => s.profile);
-  const reset = useSession((s) => s.reset);
   const level = wallet.level;
   const discovered = places.filter((p) => ids.has(p.id));
-
-  const signOut = async () => {
-    await supabase?.auth.signOut();
-    reset();
-    router.replace('/welcome');
-  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
@@ -137,15 +129,7 @@ export default function Profile() {
           ))}
         </View>
 
-        <Pressable
-          onPress={signOut}
-          accessibilityRole="button"
-          style={[styles.button, { borderColor: c.border }]}
-        >
-          <Text style={{ color: c.danger, fontWeight: '700' }}>
-            {isDemo ? t('profile.reset') : t('profile.signOut')}
-          </Text>
-        </Pressable>
+        <LogOutButton />
       </ScrollView>
     </SafeAreaView>
   );

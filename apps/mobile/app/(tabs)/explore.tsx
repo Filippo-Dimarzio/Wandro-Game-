@@ -1,21 +1,36 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Animated,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   CATEGORIES,
   formatDistance,
   haversineMeters,
   NEARBY_NUDGE_M,
+  regionFor,
   type Category,
+  type LatLng,
   type Place,
+  type Region,
 } from '@wandro/shared';
 import { CategoryChips } from '@/components/CategoryChips';
+import { ChallengeSidebar, SIDEBAR_WIDTH } from '@/components/ChallengeSidebar';
+import { CityPicker } from '@/components/CityPicker';
 import { PlaceSheet } from '@/components/PlaceSheet';
 import { ProximityHud } from '@/components/ProximityHud';
 import { WalkPad } from '@/components/WalkPad';
 import { nearestLocked } from '@/data/discovery';
+import { useFriendChallenges, type FriendChallengeView } from '@/data/friends';
+import { useHiddenGems } from '@/data/hidden';
 import { useLoadout } from '@/data/loadout';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t } from '@/i18n';
@@ -30,7 +45,33 @@ export default function Explore() {
   const c = useColors();
   const params = useLocalSearchParams<{ place?: string; category?: string }>();
   const loc = useLocation();
-  const places = usePlaces(loc.position);
+  const { width } = useWindowDimensions();
+  // Tablets and desktop keep the adventures panel open beside the map; phones slide it out.
+  const docked = width >= 900;
+  const browse = useSession((s) => s.browse);
+  const setBrowse = useSession((s) => s.setBrowse);
+  const justRevealed = useSession((s) => s.justRevealed);
+  const clearJustRevealed = useSession((s) => s.clearJustRevealed);
+  const mapCenter = browse ?? loc.position;
+  const places = usePlaces(mapCenter);
+  const hidden = useHiddenGems(loc.position, isDemo || loc.isReal);
+  const region = regionFor(mapCenter);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [focus, setFocus] = useState<LatLng | null>(null);
+  const [pendingSelect, setPendingSelect] = useState<string | null>(null);
+  const pendingFriendChallenges = useFriendChallenges().filter(
+    (x) => x.direction === 'incoming' && x.status === 'pending',
+  ).length;
+  const panelWidth = Math.min(SIDEBAR_WIDTH, width * 0.88);
+  const slide = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(slide, {
+      toValue: sidebarOpen ? 1 : 0,
+      duration: 220,
+      useNativeDriver: Platform.OS !== 'web',
+    }).start();
+  }, [sidebarOpen, slide]);
   const { ids } = useUnlockedIds();
   const loadout = useLoadout();
   const setTeleport = useSession((s) => s.setTeleport);
@@ -69,6 +110,60 @@ export default function Explore() {
     if (params.place) setSelected(all.find((p) => p.id === params.place) ?? null);
   }, [params.place, all]);
 
+  // A place picked from another city opens once that city's places have loaded.
+  useEffect(() => {
+    if (!pendingSelect) return;
+    const p = all.find((x) => x.id === pendingSelect);
+    if (p) {
+      setSelected(p);
+      setPendingSelect(null);
+    }
+  }, [pendingSelect, all]);
+
+  const revealedPlace = justRevealed ? all.find((p) => p.id === justRevealed) : undefined;
+  useEffect(() => {
+    if (!justRevealed) return;
+    const timer = setTimeout(clearJustRevealed, 8000);
+    return () => clearTimeout(timer);
+  }, [justRevealed, clearJustRevealed]);
+
+  const pickCity = (r: Region) => {
+    setPickerOpen(false);
+    setSidebarOpen(false);
+    setSelected(null);
+    setGuideTo(null);
+    if (isDemo) {
+      // Demo: you travel there, so walking and check-ins work in the new city.
+      setTeleport(r.center);
+      setBrowse(null);
+    } else {
+      setBrowse(r.center);
+    }
+    setFocus({ ...r.center });
+  };
+
+  const backToMe = () => {
+    setBrowse(null);
+    setFocus(null);
+    setRecenter((n) => n + 1);
+  };
+
+  const selectPlace = (p: Place) => {
+    setSelected(p);
+    setFocus({ lat: p.lat, lng: p.lng });
+    if (!docked) setSidebarOpen(false);
+  };
+
+  const showChallenge = (x: FriendChallengeView) => {
+    const loaded = all.find((p) => p.id === x.place.id);
+    if (loaded) return selectPlace(loaded);
+    // Another city: look there, then open the place once it's loaded.
+    setBrowse({ lat: x.place.lat, lng: x.place.lng });
+    setFocus({ lat: x.place.lat, lng: x.place.lng });
+    setPendingSelect(x.place.id);
+    if (!docked) setSidebarOpen(false);
+  };
+
   const startGuide = (p: Place) => {
     guideStart.current = haversineMeters(loc.position, p);
     setGuideTo(p);
@@ -80,140 +175,293 @@ export default function Explore() {
       ? nearest
       : null;
 
-  return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <PlaceMap
-        places={visible}
-        unlockedIds={ids}
-        userPosition={loc.position}
-        accuracyM={loc.accuracy}
-        target={target}
-        trail={loadout.trailActive && !!target}
-        avatar={{ skin: loadout.skin, hat: loadout.hat }}
-        follow={walking}
-        onSelect={setSelected}
-        recenterSignal={recenter}
-        onLongPress={(p) =>
-          router.push({ pathname: '/submit', params: { lat: String(p.lat), lng: String(p.lng) } })
-        }
-      />
+  const sidebar = (onClose?: () => void) => (
+    <ChallengeSidebar
+      places={all}
+      unlockedIds={ids}
+      position={loc.position}
+      region={region}
+      hidden={hidden}
+      onSelect={selectPlace}
+      onShowChallenge={showChallenge}
+      onPickCity={() => setPickerOpen(true)}
+      onClose={onClose}
+    />
+  );
 
-      <SafeAreaView edges={['top']} style={styles.top} pointerEvents="box-none">
-        <CategoryChips value={category} onChange={setCategory} />
-        <View style={styles.topRow} pointerEvents="box-none">
-          <View style={[styles.legend, shadow, { backgroundColor: c.card }]}>
-            <View style={[styles.dot, { backgroundColor: c.locked }]} />
-            <Text style={{ color: c.text }}>{t('explore.locked')}</Text>
-            <View
-              style={[styles.dot, { backgroundColor: category ? c.category[category] : c.accent }]}
-            />
-            <Text style={{ color: c.text }}>{t('explore.unlocked')}</Text>
-            <Text style={{ color: c.textMuted }}>· {visible.length}</Text>
+  return (
+    <View style={{ flex: 1, flexDirection: 'row', backgroundColor: c.bg }}>
+      {docked && (
+        <SafeAreaView edges={['top']} style={{ width: SIDEBAR_WIDTH }}>
+          {sidebar()}
+        </SafeAreaView>
+      )}
+      <View style={{ flex: 1 }}>
+        <PlaceMap
+          places={visible}
+          unlockedIds={ids}
+          userPosition={loc.position}
+          accuracyM={loc.accuracy}
+          target={target}
+          trail={loadout.trailActive && !!target}
+          avatar={{ skin: loadout.skin, hat: loadout.hat }}
+          follow={walking}
+          onSelect={setSelected}
+          recenterSignal={recenter}
+          focus={focus}
+          onLongPress={(p) =>
+            router.push({ pathname: '/submit', params: { lat: String(p.lat), lng: String(p.lng) } })
+          }
+        />
+
+        <SafeAreaView edges={['top']} style={styles.top} pointerEvents="box-none">
+          <CategoryChips value={category} onChange={setCategory} />
+          <View style={styles.topRow} pointerEvents="box-none">
+            <View style={[styles.legend, shadow, { backgroundColor: c.card }]}>
+              <View style={[styles.dot, { backgroundColor: c.locked }]} />
+              <Text style={{ color: c.text }}>{t('explore.locked')}</Text>
+              <View
+                style={[
+                  styles.dot,
+                  { backgroundColor: category ? c.category[category] : c.accent },
+                ]}
+              />
+              <Text style={{ color: c.text }}>{t('explore.unlocked')}</Text>
+              <Text style={{ color: c.textMuted }}>· {visible.length}</Text>
+            </View>
+            {isDemo && (
+              <Pressable
+                onPress={() => {
+                  if (!walking && !useSession.getState().teleport) setTeleport(loc.position);
+                  setWalking((w) => !w);
+                }}
+                accessibilityRole="button"
+                accessibilityState={{ selected: walking }}
+                accessibilityHint={t('walk.hint')}
+                style={[styles.walkToggle, { backgroundColor: walking ? c.accent : c.card }]}
+                testID="walk-toggle"
+              >
+                <Text style={{ color: walking ? c.accentOn : c.text, fontWeight: '800' }}>
+                  🎮 {walking ? t('walk.toggleOff') : t('walk.toggle')}
+                </Text>
+              </Pressable>
+            )}
           </View>
-          {isDemo && (
+          {walking && Platform.OS === 'web' && (
+            <Text style={[styles.hint, { backgroundColor: c.card, color: c.textMuted }]}>
+              {t('walk.hint')}
+            </Text>
+          )}
+          {nudge && (
             <Pressable
-              onPress={() => {
-                if (!walking && !useSession.getState().teleport) setTeleport(loc.position);
-                setWalking((w) => !w);
-              }}
+              onPress={() => startGuide(nudge.place)}
               accessibilityRole="button"
-              accessibilityState={{ selected: walking }}
-              accessibilityHint={t('walk.hint')}
-              style={[styles.walkToggle, { backgroundColor: walking ? c.accent : c.card }]}
-              testID="walk-toggle"
+              style={[styles.nudge, { backgroundColor: c.goldSoft }]}
+              testID="nearby-nudge"
             >
-              <Text style={{ color: walking ? c.accentOn : c.text, fontWeight: '800' }}>
-                🎮 {walking ? t('walk.toggleOff') : t('walk.toggle')}
+              <Text style={{ color: c.gold, fontWeight: '800' }}>
+                {t('nudge.near', {
+                  name: nudge.place.name,
+                  distance: formatDistance(nudge.distanceM),
+                })}{' '}
+                · {t('hud.guide')}
               </Text>
             </Pressable>
           )}
-        </View>
-        {walking && Platform.OS === 'web' && (
-          <Text style={[styles.hint, { backgroundColor: c.card, color: c.textMuted }]}>
-            {t('walk.hint')}
-          </Text>
-        )}
-        {nudge && (
-          <Pressable
-            onPress={() => startGuide(nudge.place)}
-            accessibilityRole="button"
-            style={[styles.nudge, { backgroundColor: c.goldSoft }]}
-            testID="nearby-nudge"
+          {revealedPlace && (
+            <Pressable
+              onPress={() => {
+                selectPlace(revealedPlace);
+                clearJustRevealed();
+              }}
+              accessibilityRole="button"
+              accessibilityLiveRegion="assertive"
+              style={[styles.nudge, { backgroundColor: c.accent }]}
+              testID="gem-revealed"
+            >
+              <Text style={{ color: c.accentOn, fontWeight: '800' }}>
+                💎 {t('hidden.found', { name: revealedPlace.name })}
+              </Text>
+            </Pressable>
+          )}
+          {browse && (
+            <Pressable
+              onPress={backToMe}
+              accessibilityRole="button"
+              style={[styles.nudge, { backgroundColor: c.card }]}
+              testID="back-to-me"
+            >
+              <Text style={{ color: c.text, fontWeight: '700' }}>
+                🌍 {t('travel.browsing', { city: region?.name ?? '…' })} ·{' '}
+                <Text style={{ color: c.accent, fontWeight: '800' }}>{t('travel.backToMe')}</Text>
+              </Text>
+            </Pressable>
+          )}
+        </SafeAreaView>
+
+        {walking && (
+          <View
+            style={[styles.pad, { bottom: target ? 230 : space.xl + 56 }]}
+            pointerEvents="box-none"
           >
-            <Text style={{ color: c.gold, fontWeight: '800' }}>
-              {t('nudge.near', {
-                name: nudge.place.name,
-                distance: formatDistance(nudge.distanceM),
-              })}{' '}
-              · {t('hud.guide')}
-            </Text>
+            <WalkPad press={walk.press} release={walk.release} />
+          </View>
+        )}
+
+        {!selected && !target && (
+          <Pressable
+            onPress={() => router.push('/submit')}
+            accessibilityRole="button"
+            accessibilityHint={t('submit.longPress')}
+            style={[styles.suggest, { backgroundColor: c.card }]}
+            testID="suggest-place"
+          >
+            <Ionicons name="add-circle" size={20} color={c.accent} />
+            <Text style={{ color: c.text, fontWeight: '700' }}>{t('submit.button')}</Text>
           </Pressable>
         )}
-      </SafeAreaView>
 
-      {walking && (
-        <View
-          style={[styles.pad, { bottom: target ? 230 : space.xl + 56 }]}
-          pointerEvents="box-none"
-        >
-          <WalkPad press={walk.press} release={walk.release} />
-        </View>
-      )}
-
-      {!selected && !target && (
         <Pressable
-          onPress={() => router.push('/submit')}
+          onPress={backToMe}
           accessibilityRole="button"
-          accessibilityHint={t('submit.longPress')}
-          style={[styles.suggest, { backgroundColor: c.card }]}
-          testID="suggest-place"
+          accessibilityLabel={t('explore.recenter')}
+          style={[
+            styles.fab,
+            { backgroundColor: c.card, bottom: selected ? 300 : target ? 220 : space.xl },
+          ]}
         >
-          <Ionicons name="add-circle" size={20} color={c.accent} />
-          <Text style={{ color: c.text, fontWeight: '700' }}>{t('submit.button')}</Text>
+          <Ionicons name="locate" size={22} color={c.accent} />
         </Pressable>
+
+        {target && !selected && (
+          <ProximityHud
+            target={target}
+            distanceM={targetDistance}
+            startDistanceM={Math.max(guideStart.current, targetDistance)}
+            trailActive={loadout.trailActive}
+            onDiscover={() => router.push('/(tabs)/capture')}
+            onStop={() => setGuideTo(null)}
+          />
+        )}
+
+        {selected && (
+          <PlaceSheet
+            place={selected}
+            userPosition={loc.position}
+            unlocked={ids.has(selected.id)}
+            onClose={() => setSelected(null)}
+            onGuide={() => startGuide(selected)}
+            onTeleport={() => {
+              setTeleport({ lat: selected.lat, lng: selected.lng });
+              setRecenter((n) => n + 1);
+            }}
+          />
+        )}
+
+        {!docked && !selected && (
+          <Pressable
+            onPress={() => setSidebarOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={t('sidebar.open')}
+            accessibilityState={{ expanded: sidebarOpen }}
+            style={[styles.edgeTab, { backgroundColor: c.accent }]}
+            testID="open-sidebar"
+          >
+            <Ionicons name="compass" size={22} color={c.accentOn} />
+            <Ionicons name="chevron-forward" size={16} color={c.accentOn} />
+            {hidden.count + pendingFriendChallenges > 0 && (
+              <View style={[styles.edgeBadge, { backgroundColor: c.gold }]}>
+                <Text style={styles.edgeBadgeText}>{hidden.count + pendingFriendChallenges}</Text>
+              </View>
+            )}
+          </Pressable>
+        )}
+      </View>
+
+      {!docked && (
+        <>
+          <Animated.View
+            pointerEvents={sidebarOpen ? 'auto' : 'none'}
+            style={[StyleSheet.absoluteFill, styles.scrim, { opacity: slide }]}
+          >
+            <Pressable
+              style={StyleSheet.absoluteFill}
+              onPress={() => setSidebarOpen(false)}
+              accessibilityRole="button"
+              accessibilityLabel={t('sidebar.close')}
+            />
+          </Animated.View>
+          <Animated.View
+            pointerEvents={sidebarOpen ? 'auto' : 'none'}
+            accessibilityElementsHidden={!sidebarOpen}
+            importantForAccessibility={sidebarOpen ? 'auto' : 'no-hide-descendants'}
+            style={[
+              styles.drawer,
+              {
+                width: panelWidth,
+                transform: [
+                  {
+                    translateX: slide.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-panelWidth - 16, 0],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: c.bg }}>
+              {sidebar(() => setSidebarOpen(false))}
+            </SafeAreaView>
+          </Animated.View>
+        </>
       )}
 
-      <Pressable
-        onPress={() => setRecenter((n) => n + 1)}
-        accessibilityRole="button"
-        accessibilityLabel={t('explore.recenter')}
-        style={[
-          styles.fab,
-          { backgroundColor: c.card, bottom: selected ? 300 : target ? 220 : space.xl },
-        ]}
-      >
-        <Ionicons name="locate" size={22} color={c.accent} />
-      </Pressable>
-
-      {target && !selected && (
-        <ProximityHud
-          target={target}
-          distanceM={targetDistance}
-          startDistanceM={Math.max(guideStart.current, targetDistance)}
-          trailActive={loadout.trailActive}
-          onDiscover={() => router.push('/(tabs)/capture')}
-          onStop={() => setGuideTo(null)}
-        />
-      )}
-
-      {selected && (
-        <PlaceSheet
-          place={selected}
-          userPosition={loc.position}
-          unlocked={ids.has(selected.id)}
-          onClose={() => setSelected(null)}
-          onGuide={() => startGuide(selected)}
-          onTeleport={() => {
-            setTeleport({ lat: selected.lat, lng: selected.lng });
-            setRecenter((n) => n + 1);
-          }}
-        />
-      )}
+      <CityPicker
+        visible={pickerOpen}
+        current={region?.slug ?? null}
+        onPick={pickCity}
+        onClose={() => setPickerOpen(false)}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  edgeTab: {
+    position: 'absolute',
+    left: 0,
+    top: '42%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 10,
+    paddingRight: 6,
+    minHeight: 56,
+    borderTopRightRadius: radius.lg,
+    borderBottomRightRadius: radius.lg,
+    ...shadow,
+  },
+  edgeBadge: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 5,
+  },
+  edgeBadgeText: { color: '#fff', fontWeight: '900', fontSize: 12 },
+  scrim: { backgroundColor: 'rgba(0,0,0,0.3)' },
+  drawer: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    ...shadow,
+    shadowOpacity: 0.25,
+  },
   top: { position: 'absolute', top: 0, left: 0, right: 0, gap: space.sm },
   topRow: {
     flexDirection: 'row',

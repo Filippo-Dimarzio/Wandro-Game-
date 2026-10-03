@@ -2,9 +2,11 @@
 // demo plays exactly like the real game; with a backend none of this runs.
 import {
   DAILY_CHALLENGE_BONUS,
+  DEMO_PLACES,
   FIRST_DISCOVERER_BONUS,
   levelFromXp,
   newlyEarnedBadges,
+  regionFor,
   nextStreak,
   pointsForVisit,
   streakXp,
@@ -81,8 +83,19 @@ export function walletOf(p: DemoProgress) {
   };
 }
 
-function regionOf(_place: Place): string {
-  return 'sintra';
+function regionOf(place: Place): string | undefined {
+  return place.region ?? regionFor(place)?.slug;
+}
+
+/** Like the server, count every place in a region, hidden gems included, not just loaded ones. */
+function countByRegion(places: Place[]): Record<string, number> {
+  const all = new Map([...DEMO_PLACES, ...places].map((x) => [x.id, x]));
+  const counts: Record<string, number> = {};
+  for (const place of all.values()) {
+    const region = regionOf(place);
+    if (region) counts[region] = (counts[region] ?? 0) + 1;
+  }
+  return counts;
 }
 
 function applyBadgesAndCollections(p: DemoProgress, places: Place[], now: Date) {
@@ -111,7 +124,7 @@ function applyBadgesAndCollections(p: DemoProgress, places: Place[], now: Date) 
   const earned = newlyEarnedBadges(
     {
       visits,
-      regionPlaceCounts: { sintra: places.length },
+      regionPlaceCounts: countByRegion(places),
       streak: p.streak,
       dailyChallenges: p.challengesCompleted,
     },

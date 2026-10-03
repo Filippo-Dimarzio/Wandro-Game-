@@ -1,7 +1,28 @@
-import { BASE_POINTS, haversineMeters, type Category } from '@wandro/shared';
+import {
+  BASE_POINTS,
+  DEFAULT_REGION,
+  REGIONS,
+  haversineMeters,
+  regionBySlug,
+  type Category,
+  type Region,
+} from '@wandro/shared';
 
 /** Sintra and surroundings: south, west, north, east. */
-export const SINTRA_BBOX = [38.73, -9.52, 38.85, -9.3] as const;
+export const SINTRA_BBOX = DEFAULT_REGION.bbox;
+
+/** Reads `--region <slug>` (default: sintra). Unknown slugs list the valid ones. */
+export function regionFromArgs(argv: readonly string[]): Region {
+  const i = argv.indexOf('--region');
+  if (i === -1) return DEFAULT_REGION;
+  const slug = argv[i + 1] ?? '';
+  const region = regionBySlug(slug);
+  if (!region)
+    throw new Error(
+      `Unknown region "${slug}". Try one of: ${REGIONS.map((r) => r.slug).join(', ')}`,
+    );
+  return region;
+}
 
 export interface OsmElement {
   type: 'node' | 'way' | 'relation';

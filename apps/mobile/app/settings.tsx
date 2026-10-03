@@ -12,12 +12,12 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LogOutButton } from '@/components/LogOutButton';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useDeleteAccount, useExportData, useUpdatePrivacy } from '@/data/account';
 import { t } from '@/i18n';
 import { isDemo } from '@/lib/env';
 import { setDailyReminder } from '@/lib/notifications';
-import { supabase } from '@/lib/supabase';
 import { useSession } from '@/state/session';
 import { radius, space, useColors } from '@/theme';
 
@@ -28,7 +28,6 @@ export default function Settings() {
   const setPref = useSession((s) => s.setPref);
   const demoModerator = useSession((s) => s.demoModerator);
   const setDemoModerator = useSession((s) => s.setDemoModerator);
-  const reset = useSession((s) => s.reset);
   const privacy = useUpdatePrivacy();
   const exportData = useExportData();
   const deleteAccount = useDeleteAccount();
@@ -38,12 +37,6 @@ export default function Settings() {
     setPref('dailyReminder', on);
     const ok = await setDailyReminder(on).catch(() => false);
     if (on && !ok && Platform.OS !== 'web') setPref('dailyReminder', false);
-  };
-
-  const signOut = async () => {
-    await supabase?.auth.signOut();
-    reset();
-    router.replace('/welcome');
   };
 
   return (
@@ -140,15 +133,7 @@ export default function Settings() {
           </Text>
         </Section>
 
-        <Pressable
-          onPress={signOut}
-          accessibilityRole="button"
-          style={[styles.button, { borderColor: c.border, borderWidth: 1 }]}
-        >
-          <Text style={{ color: c.danger, fontWeight: '700' }}>
-            {isDemo ? t('profile.reset') : t('profile.signOut')}
-          </Text>
-        </Pressable>
+        <LogOutButton />
       </ScrollView>
     </SafeAreaView>
   );

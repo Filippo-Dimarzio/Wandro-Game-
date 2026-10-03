@@ -2,7 +2,8 @@
 begin;
 select pg_temp.as_anon();
 select pg_temp.check(
-  (select count(*) from places_public where category = 'coast') = 4,
+  (select count(*) from places_public
+   where category = 'coast' and region_id = (select id from regions where slug = 'sintra')) = 4,
   'coastal places are listed under the coast category');
 select pg_temp.check(
   (select opening_hours -> 0 ->> 'open' from places_public

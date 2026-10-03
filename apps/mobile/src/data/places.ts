@@ -1,6 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { BASE_POINTS, DEFAULT_GEOFENCE_RADIUS_M, DEMO_PLACES, type Place } from '@wandro/shared';
+import {
+  BASE_POINTS,
+  DEFAULT_GEOFENCE_RADIUS_M,
+  DEMO_PLACES,
+  haversineMeters,
+  NEARBY_RADIUS_M,
+  regionFor,
+  visiblePlaces,
+  type Place,
+} from '@wandro/shared';
 import { isDemo } from '@/lib/env';
 import { supabase } from '@/lib/supabase';
 import { useSession } from '@/state/session';
@@ -17,6 +26,7 @@ interface PlaceRow {
   unique_visitors: number;
   photo_url: string | null;
   photo_author: string | null;
+  is_hidden?: boolean;
 }
 
 export function rowToPlace(r: PlaceRow): Place {
@@ -32,6 +42,8 @@ export function rowToPlace(r: PlaceRow): Place {
     uniqueVisitors: r.unique_visitors,
     photoUrl: r.photo_url ?? undefined,
     photoCredit: r.photo_author ?? undefined,
+    region: regionFor(r)?.slug,
+    ...(r.is_hidden && { hidden: true }),
   };
 }
 
@@ -43,8 +55,12 @@ export function usePlaces(center: { lat: number; lng: number }) {
   const submissions = useSession((s) => s.submissions);
   const approved = useMemo(() => submissions.filter((x) => x.status === 'approved'), [submissions]);
   const approvedKey = approved.map((x) => x.id).join(',');
+  const revealed = useSession((s) => s.revealed);
+  const unlocked = useSession((s) => s.unlocked);
+  // Demo: gems stay hidden until revealed or discovered, like the places RLS policy.
+  const knownKey = [...Object.keys(revealed), ...Object.keys(unlocked)].sort().join(',');
   return useQuery({
-    queryKey: ['places', ...key, isDemo, approvedKey],
+    queryKey: ['places', ...key, isDemo, approvedKey, isDemo ? knownKey : ''],
     queryFn: async (): Promise<Place[]> => {
       if (!supabase) {
         // Demo: approved suggestions become new missions, like approve_place_submission().
@@ -59,12 +75,15 @@ export function usePlaces(center: { lat: number; lng: number }) {
           basePoints: BASE_POINTS[x.category],
           uniqueVisitors: 0,
         }));
-        return [...DEMO_PLACES, ...extra];
+        const known = (o: Record<string, unknown>) => new Set(Object.keys(o));
+        return visiblePlaces([...DEMO_PLACES, ...extra], known(revealed), known(unlocked)).filter(
+          (p) => haversineMeters(center, p) <= NEARBY_RADIUS_M,
+        );
       }
       const { data, error } = await supabase.rpc('nearby_places', {
         lat: center.lat,
         lng: center.lng,
-        radius_m: 30000,
+        radius_m: NEARBY_RADIUS_M,
       });
       if (error) throw error;
       return (data as PlaceRow[]).map(rowToPlace);

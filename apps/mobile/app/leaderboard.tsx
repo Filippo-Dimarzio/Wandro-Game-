@@ -2,9 +2,11 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { DEFAULT_REGION, regionFor } from '@wandro/shared';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { ME, useLeaderboard, type LeaderboardScope } from '@/data/social';
 import { t } from '@/i18n';
+import { useLocation } from '@/lib/useLocation';
 import { radius, space, useColors } from '@/theme';
 
 const SCOPES: LeaderboardScope[] = ['friends', 'region', 'global', 'weekly'];
@@ -13,7 +15,9 @@ const MEDALS = ['🥇', '🥈', '🥉'];
 export default function Leaderboard() {
   const c = useColors();
   const [scope, setScope] = useState<LeaderboardScope>('friends');
-  const { rows } = useLeaderboard(scope);
+  const loc = useLocation();
+  const region = regionFor(loc.position) ?? DEFAULT_REGION;
+  const { rows } = useLeaderboard(scope, region.slug);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
       <ScreenHeader title={t('leaderboard.title')} />
@@ -27,7 +31,7 @@ export default function Leaderboard() {
             style={[styles.tab, { backgroundColor: scope === s ? c.accent : c.surface }]}
           >
             <Text style={{ color: scope === s ? c.accentOn : c.text, fontWeight: '700' }}>
-              {t(`leaderboard.${s}`)}
+              {s === 'region' ? `${region.flag} ${region.name}` : t(`leaderboard.${s}`)}
             </Text>
           </Pressable>
         ))}
