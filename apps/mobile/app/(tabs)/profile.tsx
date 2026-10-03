@@ -1,9 +1,11 @@
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { levelFromXp, octopusStage } from '@wandro/shared';
+import { octopusStage } from '@wandro/shared';
+import { useBadges } from '@/data/badges';
 import { usePlaces, useUnlockedIds } from '@/data/places';
-import { t, type TranslationKey } from '@/i18n';
+import { useWallet } from '@/data/wallet';
+import { t } from '@/i18n';
 import { isDemo } from '@/lib/env';
 import { supabase } from '@/lib/supabase';
 import { useLocation } from '@/lib/useLocation';
@@ -15,23 +17,13 @@ export default function Profile() {
   const c = useColors();
   const loc = useLocation();
   const places = usePlaces(loc.position).data ?? [];
-  const { ids, totalPoints } = useUnlockedIds();
+  const { ids } = useUnlockedIds();
+  const wallet = useWallet();
+  const allBadges = useBadges();
   const profile = useSession((s) => s.profile);
-  const challenge = useSession((s) => s.challenge);
   const reset = useSession((s) => s.reset);
-  const level = levelFromXp(totalPoints);
+  const level = wallet.level;
   const discovered = places.filter((p) => ids.has(p.id));
-
-  const badges: { key: TranslationKey; earned: boolean; emoji: string }[] = [
-    { key: 'badge.first', earned: discovered.length >= 1, emoji: '👣' },
-    {
-      key: 'badge.castles',
-      earned: discovered.filter((p) => p.category === 'heritage').length >= 3,
-      emoji: '🏰',
-    },
-    { key: 'badge.gem', earned: discovered.some((p) => p.uniqueVisitors < 10), emoji: '💎' },
-    { key: 'badge.challenge', earned: !!challenge?.completedAt, emoji: '⚡' },
-  ];
 
   const signOut = async () => {
     await supabase?.auth.signOut();
@@ -72,7 +64,7 @@ export default function Profile() {
         <View style={styles.stats}>
           {[
             [t('profile.discoveries'), discovered.length],
-            [t('profile.points'), totalPoints],
+            [t('profile.points'), wallet.coins],
             [t('profile.level'), level],
           ].map(([label, value]) => (
             <View
@@ -89,16 +81,16 @@ export default function Profile() {
 
         <Text style={[styles.section, { color: c.text }]}>{t('profile.badges')}</Text>
         <View style={styles.badges}>
-          {badges.map((b) => (
+          {allBadges.map((b) => (
             <View
-              key={b.key}
-              style={[styles.badge, { backgroundColor: c.surface, opacity: b.earned ? 1 : 0.45 }]}
+              key={b.code}
+              style={[styles.badge, { backgroundColor: c.surface, opacity: b.awardedAt ? 1 : 0.4 }]}
               accessible
-              accessibilityLabel={`${t(b.key)}${b.earned ? '' : ', locked'}`}
+              accessibilityLabel={`${b.name}: ${b.description}${b.awardedAt ? '' : ', locked'}`}
             >
               <Text style={{ fontSize: 26 }}>{b.emoji}</Text>
               <Text style={{ color: c.text, fontWeight: '600', textAlign: 'center', fontSize: 12 }}>
-                {t(b.key)}
+                {b.name}
               </Text>
             </View>
           ))}

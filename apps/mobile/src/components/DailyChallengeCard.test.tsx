@@ -14,7 +14,7 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 describe('DailyChallengeCard (demo mode)', () => {
   beforeEach(() => useSession.getState().reset());
 
-  it('stays locked until a matching place is discovered, then a hold claims the bonus once', async () => {
+  it('stays locked until a matching place is discovered, then a hold claims double coins once', async () => {
     jest.useFakeTimers();
     await render(<DailyChallengeCard places={DEMO_PLACES} />, { wrapper });
     const button = screen.getByRole('button', { name: /confirm the daily challenge/i });
@@ -26,7 +26,7 @@ describe('DailyChallengeCard (demo mode)', () => {
       for (const p of DEMO_PLACES) {
         if (seen.has(p.category)) continue;
         seen.add(p.category);
-        useSession.getState().unlock(p.id, 10);
+        useSession.getState().recordVisit(p, DEMO_PLACES);
       }
     });
     expect(screen.getByRole('button', { name: /confirm the daily challenge/i })).toBeEnabled();
@@ -38,7 +38,13 @@ describe('DailyChallengeCard (demo mode)', () => {
     await act(async () => void jest.advanceTimersByTime(1000));
 
     expect(screen.getByText(/Completed/)).toBeOnTheScreen();
-    expect(useSession.getState().bonusPoints).toBe(75);
+    const state = useSession.getState();
+    const daily = state.ledger.filter((e) => e.kind === 'daily_challenge');
+    expect(daily).toHaveLength(1);
+    // Double coins: the bonus repeats the best qualifying discovery's coins (never below 75).
+    const best = Math.max(75, ...Object.values(state.unlocked).map((u) => u.points));
+    expect(daily[0].coins).toBeLessThanOrEqual(best);
+    expect(daily[0].coins).toBeGreaterThanOrEqual(75);
     jest.useRealTimers();
   });
 });

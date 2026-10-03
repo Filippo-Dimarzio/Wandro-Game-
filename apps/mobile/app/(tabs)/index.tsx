@@ -16,6 +16,7 @@ import { categoryIcon } from '@/components/PlaceSheet';
 import { DailyChallengeCard } from '@/components/DailyChallengeCard';
 import { ProgressStrip } from '@/components/ProgressStrip';
 import { usePlaces, useUnlockedIds } from '@/data/places';
+import { useWallet } from '@/data/wallet';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { useSession } from '@/state/session';
@@ -27,7 +28,8 @@ export default function Home() {
   const unlockedMap = useSession((s) => s.unlocked);
   const loc = useLocation();
   const places = usePlaces(loc.position);
-  const { ids, totalPoints } = useUnlockedIds();
+  const { ids } = useUnlockedIds();
+  const wallet = useWallet();
   const list = places.data ?? [];
 
   const nearby = list
@@ -63,7 +65,7 @@ export default function Home() {
           {t('home.greeting', { name: profile?.username ?? '' })}
         </Text>
 
-        <ProgressStrip points={totalPoints} discoveries={ids.size} />
+        <ProgressStrip wallet={wallet} />
         <DailyChallengeCard places={list} />
 
         <Text style={[styles.section, { color: c.text }]} accessibilityRole="header">
@@ -132,7 +134,7 @@ export default function Home() {
                 <Text style={{ color: c.text, fontWeight: '800' }}>
                   {profile?.username} discovered {r.place!.name}
                 </Text>
-                <Text style={{ color: c.accent, fontWeight: '700' }}>+{r.points} pts</Text>
+                <Text style={{ color: c.accent, fontWeight: '700' }}>🪙 +{r.points}</Text>
               </View>
             </View>
           ))

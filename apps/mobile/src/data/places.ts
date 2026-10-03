@@ -53,27 +53,17 @@ export function usePlaces(center: { lat: number; lng: number }) {
 }
 
 /** IDs of places the current user has discovered. */
-export function useUnlockedIds(): { ids: Set<string>; totalPoints: number } {
+export function useUnlockedIds(): { ids: Set<string> } {
   const unlocked = useSession((s) => s.unlocked);
-  const bonus = useSession((s) => s.bonusPoints);
   const server = useQuery({
     queryKey: ['my-visits'],
     enabled: !isDemo,
     queryFn: async () => {
-      const db = supabase!;
-      const [visits, points] = await Promise.all([
-        db.from('visits').select('place_id'),
-        db.rpc('my_total_points'),
-      ]);
-      if (visits.error) throw visits.error;
-      if (points.error) throw points.error;
-      return { ids: visits.data.map((v) => v.place_id as string), total: points.data as number };
+      const { data, error } = await supabase!.from('visits').select('place_id');
+      if (error) throw error;
+      return data.map((v) => v.place_id as string);
     },
   });
-  if (!isDemo) {
-    return { ids: new Set(server.data?.ids ?? []), totalPoints: server.data?.total ?? 0 };
-  }
-  const ids = new Set(Object.keys(unlocked));
-  const totalPoints = Object.values(unlocked).reduce((s, u) => s + u.points, 0) + bonus;
-  return { ids, totalPoints };
+  if (!isDemo) return { ids: new Set(server.data ?? []) };
+  return { ids: new Set(Object.keys(unlocked)) };
 }

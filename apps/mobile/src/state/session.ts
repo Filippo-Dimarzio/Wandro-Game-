@@ -1,17 +1,25 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { LatLng } from '@wandro/shared';
+import type { Category, LatLng, Place } from '@wandro/shared';
+import {
+  applyDailyChallenge,
+  applyPurchase,
+  applyVisit,
+  EMPTY_PROGRESS,
+  type DemoProgress,
+  type DemoUnlock,
+  type LedgerEntry,
+  type VisitResult,
+} from '@/demo/engine';
+
+export type { DemoUnlock } from '@/demo/engine';
 
 export interface LocalProfile {
   username: string;
   homeCity: string;
   explorerStyles: string[];
-}
-
-export interface DemoUnlock {
-  at: string;
-  points: number;
+  isPrivate?: boolean;
 }
 
 export interface DemoChallengeState {
@@ -20,61 +28,230 @@ export interface DemoChallengeState {
   completedAt?: string;
 }
 
-interface SessionState {
+export interface DemoPost {
+  id: string;
+  placeId: string;
+  caption: string;
+  photoUri?: string;
+  at: string;
+}
+
+export interface DemoSubmission {
+  id: string;
+  name: string;
+  description: string;
+  category: Category;
+  lat: number;
+  lng: number;
+  status: 'pending' | 'approved' | 'rejected';
+  at: string;
+}
+
+export interface DemoReport {
+  targetType: 'post' | 'profile';
+  targetId: string;
+  reason: string;
+  at: string;
+}
+
+/** Equipment bought in the shop: owned items, and timed boosts with an expiry. */
+export interface Inventory {
+  owned: Record<string, string>;
+  activeUntil: Record<string, string>;
+  equipped: { skin?: string; hat?: string };
+}
+
+interface SessionState extends DemoProgress {
   onboarded: boolean;
   profile: LocalProfile | null;
-  /** Demo mode only: on-device unlocks. With a backend, unlocks come from the server. */
-  unlocked: Record<string, DemoUnlock>;
   challenge: DemoChallengeState | null;
-  bonusPoints: number;
-  /** Demo helper so the app can be explored from anywhere (e.g. in a browser). */
+  /** Demo position (teleport / keyboard walking). Null means real GPS. */
   teleport: LatLng | null;
   /** Place that was just unlocked, so the map can animate the fog clearing. */
   justUnlocked: string | null;
+  // Social (demo): accounts you follow, posts you liked, your posts, blocks and reports.
+  following: string[];
+  liked: Record<string, true>;
+  posts: DemoPost[];
+  blocked: string[];
+  reports: DemoReport[];
+  submissions: DemoSubmission[];
+  inventory: Inventory;
+  /** Demo-only switch so the moderation screens can be tried. */
+  demoModerator: boolean;
+  installPromptDismissed: boolean;
 
   completeOnboarding: (profile: LocalProfile) => void;
-  unlock: (placeId: string, points: number) => void;
+  updateProfile: (patch: Partial<LocalProfile>) => void;
+  recordVisit: (place: Place, places: Place[]) => VisitResult | null;
+  completeChallenge: (qualifying: string[], challengeId: string, places: Place[]) => number;
   setChallenge: (c: DemoChallengeState) => void;
-  addBonus: (points: number) => void;
   setTeleport: (p: LatLng | null) => void;
   clearJustUnlocked: () => void;
+  toggleFollow: (userId: string) => void;
+  toggleLike: (postId: string) => void;
+  addPost: (post: DemoPost) => void;
+  block: (userId: string) => void;
+  report: (r: Omit<DemoReport, 'at'>) => void;
+  addSubmission: (s: DemoSubmission) => void;
+  reviewSubmission: (id: string, approve: boolean) => void;
+  buy: (itemCode: string, price: number, durationMinutes?: number) => boolean;
+  equip: (slot: 'skin' | 'hat', itemCode: string | undefined) => void;
+  setDemoModerator: (on: boolean) => void;
+  dismissInstallPrompt: () => void;
   reset: () => void;
 }
 
 const initial = {
+  ...EMPTY_PROGRESS,
   onboarded: false,
   profile: null,
-  unlocked: {},
   challenge: null,
-  bonusPoints: 0,
   teleport: null,
   justUnlocked: null,
+  following: ['demo-user-ines', 'demo-user-tomas'],
+  liked: {},
+  posts: [],
+  blocked: [],
+  reports: [],
+  submissions: [],
+  inventory: { owned: {}, activeUntil: {}, equipped: {} },
+  demoModerator: false,
+  installPromptDismissed: false,
 };
+
+function progressOf(s: SessionState): DemoProgress {
+  return {
+    unlocked: s.unlocked,
+    ledger: s.ledger,
+    streak: s.streak,
+    lastActiveDate: s.lastActiveDate,
+    badges: s.badges,
+    challengesCompleted: s.challengesCompleted,
+    collectionsClaimed: s.collectionsClaimed,
+  };
+}
 
 export const useSession = create<SessionState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...initial,
       completeOnboarding: (profile) => set({ onboarded: true, profile }),
-      unlock: (placeId, points) =>
-        set((s) =>
-          s.unlocked[placeId]
-            ? s
-            : {
-                unlocked: { ...s.unlocked, [placeId]: { at: new Date().toISOString(), points } },
-                justUnlocked: placeId,
-              },
-        ),
+      updateProfile: (patch) =>
+        set((s) => ({ profile: s.profile ? { ...s.profile, ...patch } : s.profile })),
+      recordVisit: (place, places) => {
+        const r = applyVisit(progressOf(get()), place, places, new Date());
+        if (!r) return null;
+        set({ ...r.progress, justUnlocked: place.id });
+        return r.result;
+      },
+      completeChallenge: (qualifying, challengeId, places) => {
+        const r = applyDailyChallenge(
+          progressOf(get()),
+          qualifying,
+          challengeId,
+          places,
+          new Date(),
+        );
+        set(r.progress);
+        return r.bonus;
+      },
       setChallenge: (challenge) => set({ challenge }),
-      addBonus: (points) => set((s) => ({ bonusPoints: s.bonusPoints + points })),
       setTeleport: (teleport) => set({ teleport }),
       clearJustUnlocked: () => set({ justUnlocked: null }),
+      toggleFollow: (id) =>
+        set((s) => ({
+          following: s.following.includes(id)
+            ? s.following.filter((x) => x !== id)
+            : [...s.following, id],
+        })),
+      toggleLike: (id) =>
+        set((s) => {
+          const liked = { ...s.liked };
+          if (liked[id]) delete liked[id];
+          else liked[id] = true;
+          return { liked };
+        }),
+      addPost: (post) => set((s) => ({ posts: [post, ...s.posts] })),
+      block: (id) =>
+        set((s) => ({
+          blocked: [...new Set([...s.blocked, id])],
+          following: s.following.filter((x) => x !== id),
+        })),
+      report: (r) =>
+        set((s) => ({ reports: [...s.reports, { ...r, at: new Date().toISOString() }] })),
+      addSubmission: (sub) => set((s) => ({ submissions: [sub, ...s.submissions] })),
+      reviewSubmission: (id, approve) =>
+        set((s) => ({
+          submissions: s.submissions.map((x) =>
+            x.id === id ? { ...x, status: approve ? 'approved' : 'rejected' } : x,
+          ),
+        })),
+      buy: (code, price, durationMinutes) => {
+        const s = get();
+        const next = applyPurchase(progressOf(s), code, price, new Date());
+        if (!next) return false;
+        const inv = {
+          ...s.inventory,
+          owned: { ...s.inventory.owned },
+          activeUntil: { ...s.inventory.activeUntil },
+        };
+        if (durationMinutes) {
+          const base = Math.max(Date.now(), Date.parse(inv.activeUntil[code] ?? '') || 0);
+          inv.activeUntil[code] = new Date(base + durationMinutes * 60_000).toISOString();
+        } else {
+          inv.owned[code] = new Date().toISOString();
+        }
+        set({ ...next, inventory: inv });
+        return true;
+      },
+      equip: (slot, code) =>
+        set((s) => ({
+          inventory: { ...s.inventory, equipped: { ...s.inventory.equipped, [slot]: code } },
+        })),
+      setDemoModerator: (demoModerator) => set({ demoModerator }),
+      dismissInstallPrompt: () => set({ installPromptDismissed: true }),
       reset: () => set(initial),
     }),
     {
       name: 'wandro-session',
+      version: 2,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: ({ justUnlocked: _j, ...rest }) => rest,
+      // v1 kept coins in `unlocked[].points` and `bonusPoints`; rebuild a ledger from them.
+      migrate: (persisted, version) => {
+        const old = (persisted ?? {}) as Record<string, unknown>;
+        if (version < 2) {
+          const unlocked = (old.unlocked ?? {}) as Record<string, { at: string; points: number }>;
+          const ledger: LedgerEntry[] = Object.entries(unlocked).map(([ref, u]) => ({
+            kind: 'visit',
+            coins: u.points,
+            xp: u.points,
+            at: u.at,
+            ref,
+          }));
+          const bonus = Number(old.bonusPoints ?? 0);
+          if (bonus)
+            ledger.push({
+              kind: 'daily_challenge',
+              coins: bonus,
+              xp: bonus,
+              at: new Date().toISOString(),
+              ref: 'legacy',
+            });
+          const upgraded: Record<string, DemoUnlock> = {};
+          for (const [id, u] of Object.entries(unlocked)) {
+            upgraded[id] = {
+              at: u.at,
+              points: u.points,
+              visitorsBefore: 0,
+              firstDiscoverer: false,
+            };
+          }
+          return { ...initial, ...old, unlocked: upgraded, ledger } as unknown as SessionState;
+        }
+        return old as unknown as SessionState;
+      },
     },
   ),
 );
