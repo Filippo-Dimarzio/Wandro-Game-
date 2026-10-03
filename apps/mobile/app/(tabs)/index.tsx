@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDistance, haversineMeters, pointsForVisit } from '@wandro/shared';
+import { CoinCounter } from '@/components/CoinCounter';
 import { DailyChallengeCard } from '@/components/DailyChallengeCard';
 import { FeedCard } from '@/components/FeedCard';
 import { HowToPlay } from '@/components/HowToPlay';
@@ -68,7 +69,7 @@ export default function Home() {
               style={[styles.coinPill, { backgroundColor: c.surface }]}
               testID="coin-pill"
             >
-              <Text style={{ color: c.gold, fontWeight: '900' }}>🪙 {wallet.coins}</Text>
+              <CoinCounter coins={wallet.coins} />
             </Pressable>
             <Pressable
               onPress={() => router.push('/search')}

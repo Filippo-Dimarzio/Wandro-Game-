@@ -3,7 +3,9 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { octopusStage } from '@wandro/shared';
 import { Ionicons } from '@expo/vector-icons';
+import { OctopusAvatar } from '@/components/OctopusAvatar';
 import { useBadges } from '@/data/badges';
+import { useLoadout } from '@/data/loadout';
 import { useIsModerator } from '@/data/moderation';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { useWallet } from '@/data/wallet';
@@ -23,6 +25,7 @@ export default function Profile() {
   const wallet = useWallet();
   const allBadges = useBadges();
   const isModerator = useIsModerator();
+  const loadout = useLoadout();
   const profile = useSession((s) => s.profile);
   const reset = useSession((s) => s.reset);
   const level = wallet.level;
@@ -38,14 +41,19 @@ export default function Profile() {
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
-          <View style={[styles.avatar, { backgroundColor: c.accent }]}>
-            <Text
-              style={{ fontSize: 34 }}
+          <Pressable
+            onPress={() => router.push('/shop')}
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.store')}
+          >
+            <OctopusAvatar
+              size={76}
+              skin={loadout.skin}
+              hat={loadout.hat}
+              glow={loadout.trailActive}
               accessibilityLabel={t('profile.stage', { stage: octopusStage(level) })}
-            >
-              🐙
-            </Text>
-          </View>
+            />
+          </Pressable>
           <View style={{ flex: 1 }}>
             <Text style={[styles.name, { color: c.text }]} accessibilityRole="header">
               {profile?.username}
@@ -69,6 +77,11 @@ export default function Profile() {
             icon="trophy"
             label={t('leaderboard.title')}
             onPress={() => router.push('/leaderboard')}
+          />
+          <LinkButton
+            icon="storefront"
+            label={t('profile.store')}
+            onPress={() => router.push('/shop')}
           />
           <LinkButton
             icon="settings"
@@ -149,14 +162,7 @@ const styles = StyleSheet.create({
     minHeight: 40,
   },
   container: { padding: space.lg, gap: space.md },
-  header: { flexDirection: 'row', gap: space.lg, alignItems: 'center' },
-  avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  header: { flexDirection: 'row', gap: space.lg, alignItems: 'center', paddingTop: space.lg },
   name: { fontSize: 24, fontWeight: '900' },
   section: { fontSize: 18, fontWeight: '800', marginTop: space.sm },
   map: {
