@@ -15,12 +15,12 @@ export const CATEGORY_META: Record<Category, CategoryMeta> = {
   nature: { icon: 'leaf', art: require('../assets/art/nature.svg') },
   heritage: { icon: 'business', art: require('../assets/art/heritage.svg') },
   culture: { icon: 'color-palette', art: require('../assets/art/culture.svg') },
+  art: { icon: 'brush', art: require('../assets/art/art.svg') },
   music_events: { icon: 'musical-notes', art: require('../assets/art/music_events.svg') },
+  travel: { icon: 'train', art: require('../assets/art/travel.svg') },
   other: { icon: 'compass', art: require('../assets/art/other.svg') },
 };
 
-/** Cover for "anywhere" challenges: the Wandro octopus. */
-export const WANDER_ART: ImageSource = require('../assets/art/wander.svg');
 /* eslint-enable @typescript-eslint/no-require-imports */
 
 export function categoryIcon(cat: Category): CategoryMeta['icon'] {

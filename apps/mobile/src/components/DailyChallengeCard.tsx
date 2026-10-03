@@ -3,8 +3,8 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import type { Place } from '@wandro/shared';
-import { CATEGORY_META, WANDER_ART } from '@/categories';
+import { haversineMeters, type LatLng, type Place } from '@wandro/shared';
+import { placeImage } from '@/categories';
 import { useDailyChallenge } from '@/data/challenge';
 import { t } from '@/i18n';
 import { radius, shadow, space, useColors } from '@/theme';
@@ -16,7 +16,32 @@ function formatRemaining(ms: number): string {
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
-export function DailyChallengeCard({ places }: { places: Place[] }) {
+/** The closest place you haven't discovered that would complete today's challenge. */
+export function coverPlace(
+  places: Place[],
+  category: Place['category'] | null,
+  unlocked: ReadonlySet<string>,
+  near?: LatLng,
+): Place | null {
+  const candidates = places.filter(
+    (p) => !p.hidden && !unlocked.has(p.id) && (!category || p.category === category),
+  );
+  if (candidates.length === 0) return null;
+  if (!near) return candidates[0]!;
+  return candidates.reduce((best, p) =>
+    haversineMeters(near, p) < haversineMeters(near, best) ? p : best,
+  );
+}
+
+export function DailyChallengeCard({
+  places,
+  unlocked = new Set(),
+  near,
+}: {
+  places: Place[];
+  unlocked?: ReadonlySet<string>;
+  near?: LatLng;
+}) {
   const c = useColors();
   const { challenge, confirm } = useDailyChallenge(places);
   const [now, setNow] = useState(Date.now());
@@ -37,16 +62,29 @@ export function DailyChallengeCard({ places }: { places: Place[] }) {
   const expired = remaining <= 0 && !challenge.completedAt;
   const cat = challenge.category;
   const accent = cat ? c.category[cat] : c.accent;
+  // A real place that fits today's challenge, instead of a mascot drawing.
+  const pictured = coverPlace(places, cat, unlocked, near);
 
   return (
     <View style={[styles.card, shadow, { backgroundColor: c.card }]} testID="daily-challenge">
       <View style={styles.cover}>
-        <Image
-          source={cat ? CATEGORY_META[cat].art : WANDER_ART}
-          style={StyleSheet.absoluteFill}
-          contentFit="cover"
-          accessible={false}
-        />
+        {pictured ? (
+          <Image
+            source={placeImage(pictured)}
+            style={StyleSheet.absoluteFill}
+            contentFit="cover"
+            accessible={false}
+          />
+        ) : (
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: accent }]} />
+        )}
+        {pictured && (
+          <View style={styles.pictured}>
+            <Text style={styles.picturedText} numberOfLines={1} testID="challenge-pictured">
+              📍 {t('challenge.pictured', { name: pictured.name })}
+            </Text>
+          </View>
+        )}
         <View style={[styles.kickerPill, { backgroundColor: c.goldSoft }]}>
           <Ionicons name="flash" size={14} color={c.gold} accessibilityElementsHidden />
           <Text style={[styles.kicker, { color: c.gold }]}>{t('challenge.title')}</Text>
@@ -116,6 +154,17 @@ export function DailyChallengeCard({ places }: { places: Place[] }) {
 }
 
 const styles = StyleSheet.create({
+  pictured: {
+    position: 'absolute',
+    left: space.md,
+    bottom: space.sm,
+    maxWidth: '85%',
+    backgroundColor: 'rgba(14,26,36,0.72)',
+    borderRadius: radius.pill,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  picturedText: { color: '#fff', fontWeight: '700', fontSize: 12 },
   card: { borderRadius: radius.lg, overflow: 'hidden' },
   cover: {
     height: 130,

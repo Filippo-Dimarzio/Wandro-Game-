@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { DEMO_PLACES } from '@wandro/shared';
 import { useSession } from '@/state/session';
 import { queryWrapper } from '@/test/queryWrapper';
-import { DailyChallengeCard } from './DailyChallengeCard';
+import { coverPlace, DailyChallengeCard } from './DailyChallengeCard';
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: () => null }));
 
@@ -43,5 +43,22 @@ describe('DailyChallengeCard (demo mode)', () => {
     expect(daily[0].coins).toBeLessThanOrEqual(best);
     expect(daily[0].coins).toBeGreaterThanOrEqual(75);
     jest.useRealTimers();
+  });
+});
+
+describe('coverPlace', () => {
+  const here = { lat: 41.3874, lng: 2.1686 }; // Barcelona
+
+  it('pictures the nearest undiscovered place that fits the challenge', () => {
+    const art = coverPlace(DEMO_PLACES, 'art', new Set(), here)!;
+    expect(art.category).toBe('art');
+    expect(art.region).toBe('barcelona');
+    const next = coverPlace(DEMO_PLACES, 'art', new Set([art.id]), here)!;
+    expect(next.id).not.toBe(art.id);
+  });
+
+  it('never pictures a hidden gem', () => {
+    const gems = new Set(DEMO_PLACES.filter((p) => !p.hidden).map((p) => p.id));
+    expect(coverPlace(DEMO_PLACES, null, gems, here)).toBeNull();
   });
 });

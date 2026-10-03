@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import {
@@ -9,7 +9,6 @@ import {
   type Place,
   type Region,
 } from '@wandro/shared';
-import { WANDER_ART } from '@/categories';
 import { DailyChallengeCard } from '@/components/DailyChallengeCard';
 import { FriendChallengeCard } from '@/components/FriendChallengeCard';
 import { PlaceCard } from '@/components/PlaceBits';
@@ -88,20 +87,22 @@ export function ChallengeSidebar({
 
       <ScrollView contentContainerStyle={styles.content} testID="sidebar">
         <Section title={t('sidebar.today')}>
-          <DailyChallengeCard places={places} />
+          <DailyChallengeCard places={places} unlocked={unlockedIds} near={position} />
         </Section>
 
         <Section title={`💎 ${t('hidden.title')}`}>
           <View style={[styles.gem, shadow, { backgroundColor: c.card }]}>
-            <Image
-              source={WANDER_ART}
+            {/* A foggy mystery: no picture, so nothing gives the gem away. */}
+            <LinearGradient
+              colors={['#5B7A93', '#9FB6C8', '#DCE6EE']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
               style={styles.gemArt}
-              contentFit="cover"
-              accessible={false}
             />
-            <View style={styles.gemShade} />
+            <View style={[styles.fogBand, { top: 24 }]} />
+            <View style={[styles.fogBand, { top: 62, left: 60 }]} />
             <Text style={styles.gemMark} accessible={false}>
-              ?
+              💎?
             </Text>
             <View style={styles.gemBody}>
               <Text style={{ color: c.text, fontWeight: '800' }} testID="gem-hint">
@@ -186,21 +187,21 @@ const styles = StyleSheet.create({
   section: { fontSize: 16, fontWeight: '800' },
   gem: { borderRadius: radius.lg, overflow: 'hidden' },
   gemArt: { height: 110 },
-  gemShade: {
+  fogBand: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 110,
-    backgroundColor: 'rgba(11,58,94,0.45)',
+    left: -20,
+    width: 280,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: 'rgba(255,255,255,0.45)',
   },
   gemMark: {
     position: 'absolute',
-    top: 18,
+    top: 26,
     alignSelf: 'center',
-    fontSize: 54,
+    fontSize: 44,
     fontWeight: '900',
-    color: '#fff',
+    color: '#0B3A5E',
   },
   gemBody: { padding: space.md, gap: 4 },
   empty: { borderRadius: radius.md, padding: space.md, gap: 6 },

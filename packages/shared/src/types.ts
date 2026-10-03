@@ -1,4 +1,5 @@
-export type Category = 'coast' | 'nature' | 'heritage' | 'culture' | 'music_events' | 'other';
+export type Category =
+  'coast' | 'nature' | 'heritage' | 'culture' | 'art' | 'music_events' | 'travel' | 'other';
 
 /** 0 = Sunday … 6 = Saturday, matching Date#getDay(). */
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -24,7 +25,10 @@ export interface Place {
   basePoints: number;
   uniqueVisitors: number;
   photoUrl?: string;
+  /** Photo author, licence and source page (Wikimedia Commons): shown as attribution. */
   photoCredit?: string;
+  photoLicense?: string;
+  photoSource?: string;
   /** Only for places with set times (venues, events, markets). Absent = always accessible. */
   hours?: OpeningSlot[];
   /** Region slug (see REGIONS), e.g. 'lisbon'. */

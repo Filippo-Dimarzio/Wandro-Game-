@@ -143,7 +143,17 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
             </Text>
           )}
           {place.photoCredit && (
-            <Text style={{ color: c.textMuted, fontSize: 12 }}>Photo: {place.photoCredit}</Text>
+            <Text
+              style={{ color: c.textMuted, fontSize: 12 }}
+              onPress={place.photoSource ? () => Linking.openURL(place.photoSource!) : undefined}
+              accessibilityRole={place.photoSource ? 'link' : 'text'}
+              testID="photo-credit"
+            >
+              {t('place.photoCredit', {
+                author: place.photoCredit,
+                license: place.photoLicense ?? '',
+              })}
+            </Text>
           )}
           <Pressable
             onPress={() =>

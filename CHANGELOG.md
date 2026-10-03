@@ -19,6 +19,12 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
   today's challenge, the hidden-gem hint, friends' challenges and nearby places.
 - Arrival flights: opening the app in a new city plays a flight from your old airport.
 - Log out button with confirmation on Profile and Settings, also in demo mode.
+- Art (galleries, murals, street art) and Travel (stations, trams, funiculars, cable cars)
+  categories, with colours, Discover pages, importer mapping and daily challenges.
+- 130 more places: 10 per city (3 art, 2 culture, 3 nature, 2 travel).
+- `pnpm --filter importer photos` finds a real, freely licensed photo for every place on
+  Wikidata / Wikimedia Commons and records author, licence and source; the place sheet credits
+  it and links to the source.
 
 ### Changed
 
@@ -26,6 +32,8 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - The check-in tab is now labelled "Check in" so "Discover" can name the new learning area.
 - Tab labels have a proper line height and medium weight, so they no longer clip or run together.
 - The friends leaderboard and private-profile access include accepted friends.
+- The daily challenge card shows a real place that fits the challenge instead of the octopus,
+  and the hidden-gem card is a fog mystery instead of the octopus.
 
 ### Fixed
 

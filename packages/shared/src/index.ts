@@ -12,3 +12,4 @@ export * from './shop';
 export * from './regions';
 export * from './europe-places';
 export * from './hidden';
+export * from './place-photos';

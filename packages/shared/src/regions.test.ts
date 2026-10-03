@@ -44,6 +44,30 @@ describe('regions', () => {
     }
   });
 
+  it('every city has 3 art, 2 culture, 3 nature and 2 travel challenges or more', () => {
+    for (const { slug } of REGIONS) {
+      const count = (cat: string) =>
+        DEMO_PLACES.filter((p) => p.region === slug && p.category === cat).length;
+      expect([
+        slug,
+        count('art'),
+        count('culture') >= 2,
+        count('nature') >= 3,
+        count('travel'),
+      ]).toEqual([slug, 3, true, true, 2]);
+    }
+  });
+
+  it('places are at least 100 m apart, so check-ins are never ambiguous', () => {
+    for (let i = 0; i < DEMO_PLACES.length; i++)
+      for (let j = i + 1; j < DEMO_PLACES.length; j++)
+        expect([
+          DEMO_PLACES[i]!.id,
+          DEMO_PLACES[j]!.id,
+          haversineMeters(DEMO_PLACES[i]!, DEMO_PLACES[j]!) >= 100,
+        ]).toEqual([DEMO_PLACES[i]!.id, DEMO_PLACES[j]!.id, true]);
+  });
+
   it('demo place ids are unique', () => {
     expect(new Set(DEMO_PLACES.map((p) => p.id)).size).toBe(DEMO_PLACES.length);
   });

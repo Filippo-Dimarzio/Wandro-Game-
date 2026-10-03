@@ -26,6 +26,8 @@ interface PlaceRow {
   unique_visitors: number;
   photo_url: string | null;
   photo_author: string | null;
+  photo_license?: string | null;
+  photo_source?: string | null;
   is_hidden?: boolean;
 }
 
@@ -42,6 +44,8 @@ export function rowToPlace(r: PlaceRow): Place {
     uniqueVisitors: r.unique_visitors,
     photoUrl: r.photo_url ?? undefined,
     photoCredit: r.photo_author ?? undefined,
+    photoLicense: r.photo_license ?? undefined,
+    photoSource: r.photo_source ?? undefined,
     region: regionFor(r)?.slug,
     ...(r.is_hidden && { hidden: true }),
   };

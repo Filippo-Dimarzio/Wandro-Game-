@@ -123,6 +123,8 @@ export const DEMO_SUBMISSION_CATEGORIES: Category[] = [
   'culture',
   'heritage',
   'nature',
+  'art',
   'music_events',
+  'travel',
   'other',
 ];

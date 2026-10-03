@@ -9,7 +9,9 @@ export const CATEGORIES: readonly Category[] = [
   'nature',
   'heritage',
   'culture',
+  'art',
   'music_events',
+  'travel',
   'other',
 ];
 
@@ -17,6 +19,8 @@ export const CATEGORIES: readonly Category[] = [
 export const BASE_POINTS: Record<Category, number> = {
   coast: 80,
   culture: 100,
+  art: 100,
+  travel: 80,
   heritage: 120,
   nature: 80,
   music_events: 100,

@@ -73,7 +73,9 @@ export const en = {
   'category.nature': 'Nature',
   'category.heritage': 'Heritage',
   'category.culture': 'Culture',
+  'category.art': 'Art',
   'category.music_events': 'Music & events',
+  'category.travel': 'Travel',
   'category.other': 'Curiosities',
 
   'place.points': '{points} pts',
@@ -150,6 +152,22 @@ export const en = {
     'Murals and street art can turn a whole neighbourhood into an open-air gallery.',
   'learn.culture.fact3': "Audio guides and tours reveal stories you'd never spot on your own.",
   'learn.culture.tip': 'Check opening times before you go. Many places close one day a week.',
+  'learn.art.intro':
+    'Galleries, murals, sculpture and street art. Hunt down the painted walls, studios and statues that give a city its colour.',
+  'learn.art.fact1': 'Many big museums have a free entry evening or day each week or month.',
+  'learn.art.fact2':
+    'Street art changes all the time: a wall you saw last year may have a new mural now.',
+  'learn.art.fact3': 'Looking slowly at one artwork for a few minutes helps you notice far more.',
+  'learn.art.tip':
+    'Photos are often allowed without flash in galleries; check the signs, and never touch the art.',
+  'learn.travel.intro':
+    'Grand stations, rattling trams, funiculars, cable cars and harbour ferries. The journey is part of the adventure.',
+  'learn.travel.fact1': 'Some of the oldest trams and funiculars in Europe still run every day.',
+  'learn.travel.fact2':
+    'Railway stations were built as "cathedrals of travel", so many are worth a visit for the architecture alone.',
+  'learn.travel.fact3': 'A day pass is often cheaper than two or three single tickets.',
+  'learn.travel.tip':
+    'Validate your ticket before boarding, mind the gap, and keep your bag in front of you in crowds.',
   'learn.music_events.intro':
     "Live gigs, open-air concerts and dance floors that come alive after dark. Find the beats, the crowds and the nights you'll remember.",
   'learn.music_events.fact1':
@@ -462,6 +480,8 @@ export const en = {
   'hidden.hint.walk': 'One is a short walk away, within 3 km.',
   'hidden.hint.area': 'Somewhere in this area. Walk around to find it.',
   'hidden.rule': 'Gems appear on the map when you’re within 200 m.',
+  'place.photoCredit': 'Photo: {author} · {license} · Wikimedia Commons',
+  'challenge.pictured': 'For example: {name}',
   'flight.kicker': 'NEW CITY UNLOCKED',
   'flight.flying': 'Flying to {city}…',
   'flight.welcome': 'Welcome to {city}!',

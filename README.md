@@ -4,7 +4,8 @@
 
 Wandro is a photo-first, location-based exploration game and community app. It gives you the
 "map reveal" feeling of open-world games, but the missions are real places: lesser-known museums,
-castles, heritage sites, parks, viewpoints, beaches, music venues and nature spots. Places start
+castles, galleries and street art, parks, viewpoints, beaches, music venues, historic stations,
+trams and funiculars, and nature spots. Places start
 hidden under fog; visiting one unlocks it, clears the fog around it and earns **coins** for your
 octopus. Hidden gems are worth the most.
 

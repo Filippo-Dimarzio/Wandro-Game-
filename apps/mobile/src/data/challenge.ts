@@ -42,6 +42,16 @@ const ROTATION: { title: string; description: string; category: Category | null 
     category: 'coast',
   },
   {
+    title: 'Art attack',
+    description: 'Discover a gallery, mural or piece of street art today.',
+    category: 'art',
+  },
+  {
+    title: 'All aboard',
+    description: 'Discover a famous station, tram, funicular or cable car today.',
+    category: 'travel',
+  },
+  {
     title: 'Wander anywhere new',
     description: 'Discover any place you have never visited.',
     category: null,

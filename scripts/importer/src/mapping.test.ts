@@ -31,6 +31,13 @@ describe('importer mapping', () => {
     expect(categoryFor({ natural: 'cape' })).toBe('coast');
     expect(categoryFor({ amenity: 'music_venue' })).toBe('music_events');
     expect(categoryFor({ tourism: 'attraction' })).toBe('other');
+    expect(categoryFor({ tourism: 'gallery' })).toBe('art');
+    expect(categoryFor({ tourism: 'artwork', artwork_type: 'mural' })).toBe('art');
+    expect(categoryFor({ railway: 'funicular' })).toBe('travel');
+    expect(categoryFor({ historic: 'railway_station' })).toBe('travel');
+    expect(categoryFor({ railway: 'station', heritage: '2' })).toBe('travel');
+    // Ordinary stations aren't adventures.
+    expect(categoryFor({ railway: 'station' })).toBe('other');
   });
 
   it('excludes private, unsafe and trivial features', () => {

@@ -1,5 +1,6 @@
 import { BASE_POINTS, DEFAULT_GEOFENCE_RADIUS_M } from './constants';
 import { EUROPE_PLACES } from './europe-places';
+import { PLACE_PHOTOS } from './place-photos';
 import type { Category, OpeningSlot, Place } from './types';
 
 function p(
@@ -161,4 +162,17 @@ const SINTRA_PLACES: Place[] = [
   ),
 ];
 
-export const DEMO_PLACES: Place[] = [...SINTRA_PLACES, ...EUROPE_PLACES];
+function withPhoto(place: Place): Place {
+  const photo = PLACE_PHOTOS[place.id];
+  return photo
+    ? {
+        ...place,
+        photoUrl: photo.url,
+        photoCredit: photo.author,
+        photoLicense: photo.license,
+        photoSource: photo.source,
+      }
+    : place;
+}
+
+export const DEMO_PLACES: Place[] = [...SINTRA_PLACES, ...EUROPE_PLACES].map(withPhoto);

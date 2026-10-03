@@ -63,6 +63,9 @@ export function buildOverpassQuery(bbox: readonly number[] = SINTRA_BBOX): strin
     'amenity=theatre',
     'amenity=arts_centre',
     'amenity=music_venue',
+    'tourism=artwork',
+    'railway=funicular',
+    'aerialway=station',
   ];
   const parts = selectors.map((s) => {
     const [k, v] = s.split('=');
@@ -86,7 +89,16 @@ export function exclusionReason(tags: Record<string, string>): string | null {
 
 export function categoryFor(tags: Record<string, string>): Category {
   if (['music_venue', 'theatre', 'arts_centre'].includes(tags.amenity ?? '')) return 'music_events';
-  if (tags.tourism === 'museum' || tags.tourism === 'gallery') return 'culture';
+  if (tags.tourism === 'gallery' || tags.tourism === 'artwork') return 'art';
+  if (tags.tourism === 'museum') return 'culture';
+  // Historic stations, funiculars and cable cars: the journey is the attraction.
+  if (
+    tags.historic === 'railway_station' ||
+    tags.railway === 'funicular' ||
+    tags.aerialway === 'station' ||
+    (tags.railway === 'station' && (tags.heritage || tags.tourism === 'attraction'))
+  )
+    return 'travel';
   if (tags.historic) return 'heritage';
   if (['beach', 'bay', 'cape'].includes(tags.natural ?? '') || tags.leisure === 'beach_resort')
     return 'coast';

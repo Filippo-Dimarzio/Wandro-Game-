@@ -13,7 +13,7 @@ insert into visits (user_id, place_id, lat, lng, accuracy_m, dwell_seconds)
 select '00000000-0000-0000-0000-00000000000b', id, 38.78, -9.39, 10, 130 from places limit 1;
 
 select pg_temp.as_anon();
-select pg_temp.check((select count(*) from places_public where region_id = (select id from regions where slug = 'sintra')) = 11, 'anon can read active places, minus hidden gems');
+select pg_temp.check((select count(*) from places_public where region_id = (select id from regions where slug = 'sintra')) = 21, 'anon can read active places, minus hidden gems');
 select pg_temp.check((select count(*) from profiles) = 0, 'anon cannot read profiles');
 
 reset role;

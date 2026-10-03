@@ -160,7 +160,7 @@ export default function Home() {
           ))}
         </ScrollView>
 
-        <DailyChallengeCard places={list} />
+        <DailyChallengeCard places={list} unlocked={ids} near={loc.position} />
 
         <Text style={[styles.section, { color: c.text }]} accessibilityRole="header">
           {t('home.nearYou')}

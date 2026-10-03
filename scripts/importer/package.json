@@ -5,7 +5,8 @@
   "scripts": {
     "start": "tsx --env-file-if-exists=../../.env src/main.ts",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "photos": "tsx src/photos.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

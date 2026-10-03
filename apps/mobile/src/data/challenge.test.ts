@@ -4,7 +4,8 @@ import { demoChallenge, todayKey } from './challenge';
 const heritage = DEMO_PLACES.find((p) => p.category === 'heritage')!;
 const nature = DEMO_PLACES.find((p) => p.category === 'nature')!;
 const DAY = 86_400_000;
-const dateFor = (rotation: number) => new Date((20000 + rotation) * DAY + 10 * 3_600_000);
+// Day 20006 is a multiple of 7, the length of the rotation, so dateFor(n) is rotation entry n.
+const dateFor = (rotation: number) => new Date((20006 + rotation) * DAY + 10 * 3_600_000);
 
 describe('demoChallenge', () => {
   it('starts a rolling 24 h window when first opened', () => {
@@ -46,8 +47,26 @@ describe('demoChallenge', () => {
     expect(demoChallenge(now, state, { [coast.id]: { at } }, DEMO_PLACES).isReady).toBe(true);
   });
 
+  it('art and travel days need an art or travel place', () => {
+    for (const [rotation, category] of [
+      [4, 'art'],
+      [5, 'travel'],
+    ] as const) {
+      const now = dateFor(rotation);
+      const state = {
+        date: todayKey(now),
+        startedAt: new Date(now.getTime() - 1000).toISOString(),
+      };
+      const match = DEMO_PLACES.find((p) => p.category === category)!;
+      const at = now.toISOString();
+      expect(demoChallenge(now, state, {}, DEMO_PLACES).category).toBe(category);
+      expect(demoChallenge(now, state, { [heritage.id]: { at } }, DEMO_PLACES).isReady).toBe(false);
+      expect(demoChallenge(now, state, { [match.id]: { at } }, DEMO_PLACES).isReady).toBe(true);
+    }
+  });
+
   it('"any place" days accept every category', () => {
-    const now = dateFor(4);
+    const now = dateFor(6);
     const state = { date: todayKey(now), startedAt: new Date(now.getTime() - 1000).toISOString() };
     const c = demoChallenge(now, state, { [nature.id]: { at: now.toISOString() } }, DEMO_PLACES);
     expect(c.category).toBeNull();
