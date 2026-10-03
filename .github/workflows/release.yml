@@ -1,0 +1,20 @@
+name: Release
+
+# Pushing a tag like v1.0.0 creates a GitHub Release whose notes come from
+# docs/releases/<tag>.md.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: Wandro ${{ github.ref_name }}
+          body_path: docs/releases/${{ github.ref_name }}.md

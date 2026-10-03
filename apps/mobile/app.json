@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "Wandro",
+    "slug": "wandro",
+    "scheme": "wandro",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.wandro.app",
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Wandro uses your location while the app is open to show nearby places and confirm your discoveries."
+      }
+    },
+    "android": {
+      "package": "com.wandro.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0E5E4E",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
+      "blockedPermissions": ["ACCESS_BACKGROUND_LOCATION"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-web-browser",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Wandro uses your location while the app is open to show nearby places and confirm your discoveries.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false
+        }
+      ],
+      "@rnmapbox/maps"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

@@ -1,0 +1,8 @@
+node_modules
+.expo
+pnpm-lock.yaml
+dist
+coverage
+supabase/migrations
+apps/mobile/public/maplibre
+apps/mobile/dist
