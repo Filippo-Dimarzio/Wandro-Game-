@@ -37,6 +37,8 @@ export function buildOverpassQuery(bbox: readonly number[] = SINTRA_BBOX): strin
     'leisure=garden',
     'natural=beach',
     'natural=peak',
+    'natural=cape',
+    'natural=bay',
     'amenity=theatre',
     'amenity=arts_centre',
     'amenity=music_venue',
@@ -65,6 +67,8 @@ export function categoryFor(tags: Record<string, string>): Category {
   if (['music_venue', 'theatre', 'arts_centre'].includes(tags.amenity ?? '')) return 'music_events';
   if (tags.tourism === 'museum' || tags.tourism === 'gallery') return 'culture';
   if (tags.historic) return 'heritage';
+  if (['beach', 'bay', 'cape'].includes(tags.natural ?? '') || tags.leisure === 'beach_resort')
+    return 'coast';
   if (
     tags.leisure === 'park' ||
     tags.leisure === 'garden' ||

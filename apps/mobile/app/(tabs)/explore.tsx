@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
+  CATEGORIES,
   formatDistance,
   haversineMeters,
   NEARBY_NUDGE_M,
@@ -23,11 +24,11 @@ import { useLocation } from '@/lib/useLocation';
 import { useWalkControls } from '@/lib/walk';
 import { PlaceMap } from '@/map/PlaceMap';
 import { useSession } from '@/state/session';
-import { radius, space, useColors } from '@/theme';
+import { radius, shadow, space, useColors } from '@/theme';
 
 export default function Explore() {
   const c = useColors();
-  const params = useLocalSearchParams<{ place?: string }>();
+  const params = useLocalSearchParams<{ place?: string; category?: string }>();
   const loc = useLocation();
   const places = usePlaces(loc.position);
   const { ids } = useUnlockedIds();
@@ -58,6 +59,11 @@ export default function Explore() {
     // Only reset when the target changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target?.id]);
+
+  useEffect(() => {
+    if (params.category && CATEGORIES.includes(params.category as Category))
+      setCategory(params.category as Category);
+  }, [params.category]);
 
   useEffect(() => {
     if (params.place) setSelected(all.find((p) => p.id === params.place) ?? null);
@@ -95,10 +101,12 @@ export default function Explore() {
       <SafeAreaView edges={['top']} style={styles.top} pointerEvents="box-none">
         <CategoryChips value={category} onChange={setCategory} />
         <View style={styles.topRow} pointerEvents="box-none">
-          <View style={[styles.legend, { backgroundColor: c.card }]}>
+          <View style={[styles.legend, shadow, { backgroundColor: c.card }]}>
             <View style={[styles.dot, { backgroundColor: c.locked }]} />
             <Text style={{ color: c.text }}>{t('explore.locked')}</Text>
-            <View style={[styles.dot, { backgroundColor: c.accent }]} />
+            <View
+              style={[styles.dot, { backgroundColor: category ? c.category[category] : c.accent }]}
+            />
             <Text style={{ color: c.text }}>{t('explore.unlocked')}</Text>
             <Text style={{ color: c.textMuted }}>· {visible.length}</Text>
           </View>
@@ -129,10 +137,10 @@ export default function Explore() {
           <Pressable
             onPress={() => startGuide(nudge.place)}
             accessibilityRole="button"
-            style={[styles.nudge, { backgroundColor: c.gold }]}
+            style={[styles.nudge, { backgroundColor: c.goldSoft }]}
             testID="nearby-nudge"
           >
-            <Text style={{ color: '#1C1404', fontWeight: '800' }}>
+            <Text style={{ color: c.gold, fontWeight: '800' }}>
               {t('nudge.near', {
                 name: nudge.place.name,
                 distance: formatDistance(nudge.distanceM),
@@ -204,14 +212,6 @@ export default function Explore() {
     </View>
   );
 }
-
-const shadow = {
-  elevation: 6,
-  shadowColor: '#000',
-  shadowOpacity: 0.2,
-  shadowRadius: 6,
-  shadowOffset: { width: 0, height: 2 },
-};
 
 const styles = StyleSheet.create({
   top: { position: 'absolute', top: 0, left: 0, right: 0, gap: space.sm },

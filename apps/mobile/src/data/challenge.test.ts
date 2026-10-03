@@ -36,8 +36,18 @@ describe('demoChallenge', () => {
     );
   });
 
-  it('"any place" days accept every category', () => {
+  it('coast days need a beach or coastal spot', () => {
     const now = dateFor(3);
+    const state = { date: todayKey(now), startedAt: new Date(now.getTime() - 1000).toISOString() };
+    const coast = DEMO_PLACES.find((p) => p.category === 'coast')!;
+    const at = now.toISOString();
+    expect(demoChallenge(now, state, {}, DEMO_PLACES).category).toBe('coast');
+    expect(demoChallenge(now, state, { [nature.id]: { at } }, DEMO_PLACES).isReady).toBe(false);
+    expect(demoChallenge(now, state, { [coast.id]: { at } }, DEMO_PLACES).isReady).toBe(true);
+  });
+
+  it('"any place" days accept every category', () => {
+    const now = dateFor(4);
     const state = { date: todayKey(now), startedAt: new Date(now.getTime() - 1000).toISOString() };
     const c = demoChallenge(now, state, { [nature.id]: { at: now.toISOString() } }, DEMO_PLACES);
     expect(c.category).toBeNull();

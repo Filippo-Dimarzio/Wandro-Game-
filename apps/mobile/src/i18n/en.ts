@@ -32,11 +32,16 @@ export const en = {
 
   'tabs.home': 'Home',
   'tabs.explore': 'Explore',
-  'tabs.capture': 'Discover',
+  'tabs.capture': 'Check in',
   'tabs.collections': 'Collections',
   'tabs.profile': 'Profile',
 
   'home.greeting': 'Olá, {name}',
+  'home.headline': 'Where to today?',
+  'home.notifications': 'Notifications',
+  'home.interests': 'Discover by interest',
+  'home.seeAll': 'See all',
+  'home.discoveredBy': '{name} discovered {place}',
   'home.level': 'Level {level}',
   'home.points': '{points} pts',
   'home.streak': '{days}-day streak',
@@ -56,6 +61,7 @@ export const en = {
   'challenge.done': 'Completed — +{points} claimed',
   'challenge.expired': 'This challenge has ended',
   'challenge.none': 'No challenge today. Check back tomorrow.',
+  'challenge.explore': 'Explore {category}',
 
   'explore.filters': 'Filter by category',
   'explore.all': 'All',
@@ -63,11 +69,12 @@ export const en = {
   'explore.unlocked': 'Discovered',
   'explore.recenter': 'Center on me',
 
-  'category.culture': 'Culture',
-  'category.heritage': 'Heritage',
+  'category.coast': 'Beaches & coast',
   'category.nature': 'Nature',
+  'category.heritage': 'Heritage',
+  'category.culture': 'Culture',
   'category.music_events': 'Music & events',
-  'category.other': 'Other',
+  'category.other': 'Curiosities',
 
   'place.points': '{points} pts',
   'place.rarity': '{visitors} explorers',
@@ -79,8 +86,86 @@ export const en = {
   'place.discovered': 'Discovered',
   'place.close': 'Close',
   'place.expand': 'Show details',
+  'place.learnMore': 'More about {category}',
+  'place.locked': 'Not discovered yet',
 
-  'capture.title': 'Discover',
+  'hours.openUntil': 'Open now · until {time}',
+  'hours.opensToday': 'Opens today at {time}',
+  'hours.opensTomorrow': 'Opens tomorrow at {time}',
+  'hours.opensOn': 'Opens {day} at {time}',
+  'hours.schedule': '{days} · {open}–{close}',
+  'day.0': 'Sun',
+  'day.1': 'Mon',
+  'day.2': 'Tue',
+  'day.3': 'Wed',
+  'day.4': 'Thu',
+  'day.5': 'Fri',
+  'day.6': 'Sat',
+
+  'discover.title': 'Discover',
+  'discover.subtitle': 'Explore the world through what you love.',
+  'discover.back': 'Back',
+  'discover.placeCount': '{count} places',
+  'discover.tabOverview': 'Overview',
+  'discover.tabPlaces': 'Places',
+  'discover.tabLearn': 'Learn',
+  'discover.statPlaces': 'Places',
+  'discover.statFound': 'Discovered',
+  'discover.statNearest': 'Nearest',
+  'discover.onMap': 'See on the map',
+  'discover.didYouKnow': 'Did you know?',
+  'discover.goodToKnow': 'Good to know',
+  'discover.empty': 'No places here yet. Suggest one from the map.',
+  'discover.challengeMatch': "Today's challenge is in this category",
+
+  'learn.coast.intro':
+    'Golden sand, salty air and waves rolling in. Find hidden coves, sunset viewpoints and the best spots for a swim, a surf or a long barefoot walk.',
+  'learn.coast.fact1':
+    'Low tide is the best time to explore rock pools for crabs, anemones and starfish.',
+  'learn.coast.fact2':
+    'The "golden hour" just before sunset gives the warmest, softest light for photos.',
+  'learn.coast.fact3': 'Tides rise and fall about twice a day, so a beach can change by the hour.',
+  'learn.coast.tip':
+    'Check the tide and keep well back from cliff edges. Some coves are cut off at high tide.',
+  'learn.nature.intro':
+    'Lush forests, winding trails and peaks with views that go on forever. Breathe in the fresh air and find waterfalls, wildflowers and quiet picnic spots.',
+  'learn.nature.fact1': 'Early morning is often the best time to spot birds and wildlife.',
+  'learn.nature.fact2':
+    'Many trails are waymarked with coloured signs so you can follow the route.',
+  'learn.nature.fact3': 'Time among trees is linked to lower stress and a brighter mood.',
+  'learn.nature.tip': 'Stay on marked trails and take your litter home.',
+  'learn.heritage.intro':
+    'Fairytale castles, grand palaces and ancient ruins full of stories. Step back in time through towers, gates and secret gardens.',
+  'learn.heritage.fact1':
+    'Many castles were built on hilltops so guards could see visitors coming from far away.',
+  'learn.heritage.fact2':
+    'Carvings and coats of arms on old buildings often reveal who built them.',
+  'learn.heritage.fact3':
+    'UNESCO protects World Heritage Sites for their value to everyone, everywhere.',
+  'learn.heritage.tip': 'Old stairs and walls can be slippery. Wear good shoes.',
+  'learn.culture.intro':
+    'Vibrant galleries, quirky museums and street art around every corner. Get inspired by paintings, sculptures and stories from every era.',
+  'learn.culture.fact1': 'Many museums have a free entry day or evening each month.',
+  'learn.culture.fact2':
+    'Murals and street art can turn a whole neighbourhood into an open-air gallery.',
+  'learn.culture.fact3': "Audio guides and tours reveal stories you'd never spot on your own.",
+  'learn.culture.tip': 'Check opening times before you go. Many places close one day a week.',
+  'learn.music_events.intro':
+    "Live gigs, open-air concerts and dance floors that come alive after dark. Find the beats, the crowds and the nights you'll remember.",
+  'learn.music_events.fact1':
+    'Open-air concerts and festivals are some of the best-loved summer outings.',
+  'learn.music_events.fact2': 'Singing along with a crowd is a proven mood booster.',
+  'learn.music_events.fact3': 'Many venues host open-mic nights where anyone can take the stage.',
+  'learn.music_events.tip':
+    "These places have set times, so check when they're on. Keep it down on the way out.",
+  'learn.other.intro':
+    "Hidden fountains, odd corners and wonderful surprises that don't fit a box. Curiosities are where the real hidden gems hide.",
+  'learn.other.fact1': 'Places with fewer explorers are worth more points.',
+  'learn.other.fact2': 'A place nobody has discovered yet is worth five times its base points.',
+  'learn.other.fact3': 'The first explorer to discover a place earns an extra bonus.',
+  'learn.other.tip': 'Respect the place and the people around you.',
+
+  'capture.title': 'Check in',
   'capture.nearest': 'Nearest place',
   'capture.atPlace': "You're at {name}",
   'capture.tooFar': '{distance} away — get within {radius} m',

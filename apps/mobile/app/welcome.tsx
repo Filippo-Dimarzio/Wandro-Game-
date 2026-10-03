@@ -46,9 +46,9 @@ export default function Welcome() {
     <View style={styles.root}>
       {/* Replace with a real photo of Sintra (assets/portal.jpg) once licensed. */}
       <LinearGradient
-        colors={['#0F4C3A', '#2F855A', '#C9A227']}
+        colors={['#0B6FB8', '#2F8FE0', '#7CC4F2']}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        end={{ x: 0.4, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
       <Animated.View
@@ -100,7 +100,7 @@ export default function Welcome() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  fog: { backgroundColor: '#E9E6DD' },
+  fog: { backgroundColor: '#E3EEF7' },
   content: {
     flex: 1,
     justifyContent: 'space-between',
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   tagline: { fontSize: 18, color: '#fff', textAlign: 'center', fontWeight: '600', maxWidth: 320 },
   holdButton: {
     borderWidth: 2,
-    borderColor: '#1C2B26',
+    borderColor: '#0E1A24',
     borderRadius: radius.pill,
     paddingHorizontal: 28,
     minHeight: 56,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     marginBottom: space.xl,
     backgroundColor: 'rgba(255,255,255,0.7)',
   },
-  holdText: { fontSize: 17, fontWeight: '800', color: '#1C2B26' },
+  holdText: { fontSize: 17, fontWeight: '800', color: '#0E1A24' },
   cta: {
     backgroundColor: '#fff',
     borderRadius: radius.pill,
@@ -129,5 +129,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: space.xl,
   },
-  ctaText: { fontSize: 17, fontWeight: '800', color: '#0F4C3A' },
+  ctaText: { fontSize: 17, fontWeight: '800', color: '#0B6FB8' },
 });

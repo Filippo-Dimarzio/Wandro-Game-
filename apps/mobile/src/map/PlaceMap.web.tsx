@@ -3,6 +3,7 @@ import * as maplibregl from 'maplibre-gl';
 import type { GeoJSONSource, Map as MLMap, MapLayerMouseEvent } from 'maplibre-gl';
 import { useEffect, useMemo, useRef } from 'react';
 import { View } from 'react-native';
+import { CATEGORIES } from '@wandro/shared';
 import { shopItem, skinColor } from '@wandro/shared';
 import { lightColors } from '@/theme';
 import type { PlaceMapProps } from './types';
@@ -31,19 +32,13 @@ const STYLE: maplibregl.StyleSpecification = {
   layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
 };
 
-const categoryColor: maplibregl.ExpressionSpecification = [
+// Spread pairs don't fit MapLibre's tuple types, hence the cast.
+const categoryColor = [
   'match',
   ['get', 'category'],
-  'culture',
-  lightColors.category.culture,
-  'heritage',
-  lightColors.category.heritage,
-  'nature',
-  lightColors.category.nature,
-  'music_events',
-  lightColors.category.music_events,
+  ...CATEGORIES.flatMap((cat) => [cat, lightColors.category[cat]]),
   lightColors.category.other,
-];
+] as unknown as maplibregl.ExpressionSpecification;
 
 // Find-My-style pulse and incense glow for the octopus marker.
 const MARKER_CSS = `
@@ -131,20 +126,20 @@ export function PlaceMap({
         id: 'fog',
         type: 'fill',
         source: 'fog',
-        paint: { 'fill-color': '#ECE9E0', 'fill-opacity': 0.78 },
+        paint: { 'fill-color': lightColors.fogFill, 'fill-opacity': 0.78 },
       });
       m.addSource('accuracy', { type: 'geojson', data: d.accuracy });
       m.addLayer({
         id: 'accuracy',
         type: 'fill',
         source: 'accuracy',
-        paint: { 'fill-color': '#2B6CB0', 'fill-opacity': 0.12 },
+        paint: { 'fill-color': lightColors.me, 'fill-opacity': 0.12 },
       });
       m.addLayer({
         id: 'accuracy-edge',
         type: 'line',
         source: 'accuracy',
-        paint: { 'line-color': '#2B6CB0', 'line-opacity': 0.45, 'line-width': 1.5 },
+        paint: { 'line-color': lightColors.me, 'line-opacity': 0.45, 'line-width': 1.5 },
       });
       m.addSource('target-ring', { type: 'geojson', data: d.guidance.ring });
       m.addLayer({

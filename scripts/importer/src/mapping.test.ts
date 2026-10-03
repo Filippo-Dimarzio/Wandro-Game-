@@ -26,6 +26,8 @@ describe('importer mapping', () => {
     expect(categoryFor({ tourism: 'museum' })).toBe('culture');
     expect(categoryFor({ historic: 'castle' })).toBe('heritage');
     expect(categoryFor({ tourism: 'viewpoint' })).toBe('nature');
+    expect(categoryFor({ natural: 'beach' })).toBe('coast');
+    expect(categoryFor({ natural: 'cape' })).toBe('coast');
     expect(categoryFor({ amenity: 'music_venue' })).toBe('music_events');
     expect(categoryFor({ tourism: 'attraction' })).toBe('other');
   });

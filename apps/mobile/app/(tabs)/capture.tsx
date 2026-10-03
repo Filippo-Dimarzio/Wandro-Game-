@@ -1,9 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDistance } from '@wandro/shared';
+import { placeImage } from '@/categories';
 import { HoldToConfirm } from '@/components/HoldToConfirm';
+import { CategoryPill, HoursChip } from '@/components/PlaceBits';
 import { RewardCard } from '@/components/RewardCard';
 import { useCheckin } from '@/data/checkin';
 import { nearestLocked } from '@/data/discovery';
@@ -11,7 +14,7 @@ import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t, type TranslationKey } from '@/i18n';
 import { DEMO_DWELL_SECONDS, isDemo } from '@/lib/env';
 import { useLocation } from '@/lib/useLocation';
-import { radius, space, useColors } from '@/theme';
+import { radius, shadow, space, useColors } from '@/theme';
 
 export default function Capture() {
   const c = useColors();
@@ -74,18 +77,25 @@ export default function Capture() {
         )}
 
         {phase.kind !== 'done' && phase.kind !== 'error' && nearest && (
-          <View
-            style={[
-              styles.card,
-              { backgroundColor: c.card, borderColor: c.border, borderWidth: 1 },
-            ]}
-          >
-            <Text style={{ color: c.textMuted, fontWeight: '700' }}>{t('capture.nearest')}</Text>
+          <View style={[styles.card, shadow, { backgroundColor: c.card }]}>
+            <Image
+              source={placeImage(nearest.place)}
+              style={styles.photo}
+              contentFit="cover"
+              accessible={false}
+            />
+            <View style={styles.row}>
+              <Text style={{ color: c.textMuted, fontWeight: '700', flex: 1 }}>
+                {t('capture.nearest')}
+              </Text>
+              <CategoryPill category={nearest.place.category} />
+            </View>
             <Text style={[styles.place, { color: c.text }]}>
               {nearest.inRange
                 ? t('capture.atPlace', { name: nearest.place.name })
                 : nearest.place.name}
             </Text>
+            <HoursChip place={nearest.place} />
             {!nearest.inRange && (
               <Text style={{ color: c.textMuted }}>
                 {t('capture.tooFar', {
@@ -144,6 +154,8 @@ const styles = StyleSheet.create({
   title: { fontSize: 28, fontWeight: '900' },
   card: { borderRadius: radius.lg, padding: space.lg, gap: space.md },
   place: { fontSize: 22, fontWeight: '800' },
+  photo: { height: 140, borderRadius: radius.md },
+  row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   dwell: { alignItems: 'center', gap: space.sm },
   ring: {
     width: 96,

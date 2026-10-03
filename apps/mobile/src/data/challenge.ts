@@ -37,6 +37,11 @@ const ROTATION: { title: string; description: string; category: Category | null 
     category: 'culture',
   },
   {
+    title: 'Follow the coastline',
+    description: 'Discover any beach or coastal spot today.',
+    category: 'coast',
+  },
+  {
     title: 'Wander anywhere new',
     description: 'Discover any place you have never visited.',
     category: null,

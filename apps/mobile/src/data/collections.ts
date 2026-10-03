@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import type { Place } from '@wandro/shared';
+import type { Category, Place } from '@wandro/shared';
 import { DEMO_COLLECTIONS } from '@/demo/collections';
 import { isDemo } from '@/lib/env';
 import { supabase } from '@/lib/supabase';
@@ -9,7 +9,8 @@ export interface CollectionProgress {
   id: string;
   title: string;
   description: string;
-  colors: [string, string];
+  /** Cover art and colour come from this category. */
+  theme: Category;
   coverUrl?: string;
   bonus: number;
   placeIds: string[];
@@ -18,18 +19,21 @@ export interface CollectionProgress {
   completed: boolean;
 }
 
-const PALETTE: [string, string][] = [
-  ['#B7791F', '#3C2A0A'],
-  ['#2B6CB0', '#0A2540'],
-  ['#2F855A', '#0B2A24'],
-  ['#6B46C1', '#241046'],
-];
+/** A collection takes the colour of the category most of its places share. */
+function dominantCategory(placeIds: string[], places: Place[]): Category {
+  const counts = new Map<Category, number>();
+  for (const id of placeIds) {
+    const cat = places.find((p) => p.id === id)?.category;
+    if (cat) counts.set(cat, (counts.get(cat) ?? 0) + 1);
+  }
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'other';
+}
 
 export function useCollections(places: Place[]) {
   const unlocked = useSession((s) => s.unlocked);
   const claimed = useSession((s) => s.collectionsClaimed);
   const server = useQuery({
-    queryKey: ['collections'],
+    queryKey: ['collections', places.length],
     enabled: !isDemo,
     queryFn: async (): Promise<CollectionProgress[]> => {
       const { data, error } = await supabase!.rpc('my_collections');
@@ -46,11 +50,11 @@ export function useCollections(places: Place[]) {
           completed: boolean;
           place_ids: string[];
         }[]
-      ).map((c, i) => ({
+      ).map((c) => ({
         id: c.id,
         title: c.title,
         description: c.description,
-        colors: PALETTE[i % PALETTE.length],
+        theme: dominantCategory(c.place_ids, places),
         coverUrl: c.cover_url ?? undefined,
         bonus: c.completion_bonus,
         placeIds: c.place_ids,
@@ -67,7 +71,7 @@ export function useCollections(places: Place[]) {
       id: c.id,
       title: c.title,
       description: c.description,
-      colors: c.colors,
+      theme: c.theme,
       bonus: c.bonus,
       placeIds: ids,
       done: ids.filter((id) => unlocked[id]).length,

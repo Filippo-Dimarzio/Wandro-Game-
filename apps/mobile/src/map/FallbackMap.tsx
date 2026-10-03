@@ -37,7 +37,7 @@ export function FallbackMap({
 
   return (
     <View
-      style={[styles.map, { backgroundColor: '#DDE7DC' }]}
+      style={[styles.map, { backgroundColor: c.surface }]}
       onLayout={(e) => setSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
     >
       <View style={[StyleSheet.absoluteFill, { backgroundColor: c.fog }]} pointerEvents="none" />

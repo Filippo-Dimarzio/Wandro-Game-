@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import {
@@ -10,9 +10,14 @@ import {
   type LatLng,
   type Place,
 } from '@wandro/shared';
+import { placeImage } from '@/categories';
 import { t } from '@/i18n';
 import { isDemo } from '@/lib/env';
+import { scheduleLines } from '@/lib/hours';
 import { radius, space, useColors } from '@/theme';
+import { CategoryPill, HoursChip } from './PlaceBits';
+
+export { categoryIcon } from '@/categories';
 
 interface Props {
   place: Place;
@@ -24,25 +29,14 @@ interface Props {
   onGuide?: () => void;
 }
 
-export function categoryIcon(cat: Place['category']): keyof typeof Ionicons.glyphMap {
-  return (
-    {
-      culture: 'color-palette',
-      heritage: 'business',
-      nature: 'leaf',
-      music_events: 'musical-notes',
-      other: 'compass',
-    } as const
-  )[cat];
-}
-
-/** Google Maps-style sheet: a peek card that expands to full details. */
+/** Google Maps-style sheet: a peek card that expands to full details, coloured by category. */
 export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport, onGuide }: Props) {
   const c = useColors();
   const [expanded, setExpanded] = useState(false);
   const pts = pointsForVisit(place.category, place.uniqueVisitors, place.basePoints);
   const distance = haversineMeters(userPosition, place);
   const catColor = c.category[place.category];
+  const schedule = scheduleLines(place.hours);
 
   const openDirections = () => {
     const q = `${place.lat},${place.lng}`;
@@ -55,7 +49,7 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
 
   return (
     <View
-      style={[styles.sheet, { backgroundColor: c.card, shadowColor: '#000' }]}
+      style={[styles.sheet, { backgroundColor: c.card, shadowColor: '#0B3A5E' }]}
       testID="place-sheet"
     >
       <Pressable
@@ -69,41 +63,32 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
 
       {expanded && (
         <View style={styles.photo}>
-          {place.photoUrl ? (
-            <Image
-              source={{ uri: place.photoUrl }}
-              style={StyleSheet.absoluteFill}
-              contentFit="cover"
-              accessibilityLabel={place.name}
-            />
-          ) : (
-            <LinearGradient colors={[catColor, '#0B2A24']} style={StyleSheet.absoluteFill}>
-              <View style={styles.photoIcon}>
-                <Ionicons
-                  name={categoryIcon(place.category)}
-                  size={56}
-                  color="rgba(255,255,255,0.85)"
-                />
-              </View>
-            </LinearGradient>
-          )}
+          <Image
+            source={placeImage(place)}
+            style={StyleSheet.absoluteFill}
+            contentFit="cover"
+            accessibilityLabel={place.photoUrl ? place.name : undefined}
+            accessible={!!place.photoUrl}
+          />
           {!unlocked && (
-            <View
-              style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(230,228,220,0.55)' }]}
-            />
+            <View style={[styles.lockedTag, { backgroundColor: 'rgba(14,26,36,0.65)' }]}>
+              <Ionicons name="lock-closed" size={12} color="#fff" />
+              <Text style={styles.lockedText}>{t('place.locked')}</Text>
+            </View>
           )}
         </View>
       )}
 
       <View style={styles.headerRow}>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, gap: 6 }}>
+          <CategoryPill category={place.category} />
           <Text style={[styles.name, { color: c.text }]} accessibilityRole="header">
             {place.name}
           </Text>
-          <Text style={{ color: catColor, fontWeight: '700' }}>
-            {t(`category.${place.category}`)} ·{' '}
+          <Text style={{ color: c.textMuted, fontWeight: '600' }}>
             {t('place.distance', { distance: formatDistance(distance) })}
           </Text>
+          <HoursChip place={place} />
         </View>
         <Pressable
           onPress={onClose}
@@ -116,13 +101,18 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
       </View>
 
       <View style={styles.badges}>
-        <View style={[styles.badge, { backgroundColor: unlocked ? c.accent : c.surface }]}>
+        <View
+          style={[
+            styles.badge,
+            { backgroundColor: unlocked ? catColor : c.categoryTint[place.category] },
+          ]}
+        >
           <Ionicons
-            name={unlocked ? 'lock-open' : 'lock-closed'}
+            name={unlocked ? 'lock-open' : 'star'}
             size={14}
-            color={unlocked ? c.accentOn : c.text}
+            color={unlocked ? c.onCategory : catColor}
           />
-          <Text style={{ color: unlocked ? c.accentOn : c.text, fontWeight: '700' }}>
+          <Text style={{ color: unlocked ? c.onCategory : catColor, fontWeight: '800' }}>
             {unlocked ? t('place.discovered') : t('place.points', { points: pts.total })}
           </Text>
         </View>
@@ -132,7 +122,7 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
           </Text>
         </View>
         {place.uniqueVisitors < 20 && (
-          <View style={[styles.badge, { backgroundColor: c.surface }]}>
+          <View style={[styles.badge, { backgroundColor: c.goldSoft }]}>
             <Text style={{ color: c.gold, fontWeight: '700' }}>💎 {t('place.hiddenGem')}</Text>
           </View>
         )}
@@ -141,6 +131,12 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
       {expanded && (
         <>
           <Text style={{ color: c.text, lineHeight: 21 }}>{place.description}</Text>
+          {schedule.map((line) => (
+            <View key={line} style={styles.scheduleRow}>
+              <Ionicons name="calendar-outline" size={16} color={catColor} />
+              <Text style={{ color: c.text, fontWeight: '600' }}>{line}</Text>
+            </View>
+          ))}
           {pts.firstDiscovererBonus > 0 && !unlocked && (
             <Text style={{ color: c.gold, fontWeight: '700' }}>
               {t('place.firstBonus', { points: pts.firstDiscovererBonus })}
@@ -149,6 +145,21 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
           {place.photoCredit && (
             <Text style={{ color: c.textMuted, fontSize: 12 }}>Photo: {place.photoCredit}</Text>
           )}
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: '/discover/[category]',
+                params: { category: place.category },
+              })
+            }
+            accessibilityRole="link"
+            style={styles.learn}
+          >
+            <Text style={{ color: catColor, fontWeight: '800' }}>
+              {t('place.learnMore', { category: t(`category.${place.category}`) })}
+            </Text>
+            <Ionicons name="arrow-forward" size={16} color={catColor} />
+          </Pressable>
         </>
       )}
 
@@ -156,20 +167,20 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
         <Pressable
           onPress={openDirections}
           accessibilityRole="button"
-          style={[styles.action, { backgroundColor: c.accent }]}
+          style={[styles.action, { backgroundColor: catColor }]}
         >
-          <Ionicons name="navigate" size={16} color={c.accentOn} />
-          <Text style={{ color: c.accentOn, fontWeight: '700' }}>{t('place.directions')}</Text>
+          <Ionicons name="navigate" size={16} color={c.onCategory} />
+          <Text style={{ color: c.onCategory, fontWeight: '800' }}>{t('place.directions')}</Text>
         </Pressable>
         {!unlocked && onGuide && (
           <Pressable
             onPress={onGuide}
             accessibilityRole="button"
-            style={[styles.action, { backgroundColor: c.gold }]}
+            style={[styles.action, { backgroundColor: c.goldSoft }]}
             testID="guide-me"
           >
-            <Ionicons name="compass" size={16} color="#1C1404" />
-            <Text style={{ color: '#1C1404', fontWeight: '800' }}>{t('hud.guide')}</Text>
+            <Ionicons name="compass" size={16} color={c.gold} />
+            <Text style={{ color: c.gold, fontWeight: '800' }}>{t('hud.guide')}</Text>
           </Pressable>
         )}
         {isDemo && onTeleport && (
@@ -193,20 +204,31 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
     padding: space.lg,
     paddingTop: 0,
     gap: space.md,
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
+    shadowOpacity: 0.16,
+    shadowRadius: 18,
     shadowOffset: { width: 0, height: -4 },
     elevation: 12,
   },
   handleArea: { alignItems: 'center', paddingVertical: space.sm },
   handle: { width: 44, height: 5, borderRadius: 3 },
-  photo: { height: 170, borderRadius: radius.md, overflow: 'hidden' },
-  photoIcon: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  photo: { height: 180, borderRadius: radius.lg, overflow: 'hidden' },
+  lockedTag: {
+    position: 'absolute',
+    top: space.sm,
+    left: space.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderRadius: radius.pill,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  lockedText: { color: '#fff', fontWeight: '700', fontSize: 12 },
   headerRow: { flexDirection: 'row', alignItems: 'flex-start', gap: space.md },
   name: { fontSize: 22, fontWeight: '800' },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
@@ -218,13 +240,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
+  scheduleRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  learn: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44 },
   actions: { flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' },
   action: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     borderRadius: radius.pill,
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
     minHeight: 44,
   },
 });

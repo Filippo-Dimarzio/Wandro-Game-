@@ -71,7 +71,7 @@ All tables have `id uuid pk`, `created_at`, and RLS enabled. Key columns only:
 **Places**
 
 - `regions` — slug, name, bbox/polygon, is_active (basis for later "expansions").
-- `places` — name, description (i18n jsonb), location `geography(Point)`, category (`culture`|`heritage`|`nature`|`music_events`|`other`), geofence_radius_m (default 75), dwell_seconds (default 120), base_points, source, source_id (unique pair), wikidata_id, region_id, status (`draft`|`active`|`hidden`|`closed`), safety_notes, is_private_property (must be false to be active).
+- `places` — name, description (i18n jsonb), location `geography(Point)`, category (`coast`|`nature`|`heritage`|`culture`|`music_events`|`other`), opening_hours (jsonb, only for places with set times such as venues), geofence_radius_m (default 75), dwell_seconds (default 120), base_points, source, source_id (unique pair), wikidata_id, region_id, status (`draft`|`active`|`hidden`|`closed`), safety_notes, is_private_property (must be false to be active).
 - `place_photos` — place_id, storage_path or external_url, author, license, source_url, status, is_primary.
 - `place_stats` — place_id, unique_visitors (maintained only by the check-in function).
 
@@ -202,7 +202,10 @@ Comments, daily challenge (rolling 24 h from when it appears for each user), fri
 
 **Platform & theme**
 
-- Portrait only on phones. Light + dark follow the system; clean neutral UI so photos carry the colour, with one octopus-inspired accent.
+- Portrait only on phones. Light + dark follow the system. Bright, airy, light-blue base with minimal clutter; the signature accent is Wandro blue.
+- **Colour-coded categories:** each category has an ink colour (pins, chips, headings) and a light tint (its pages). Beaches & coast = Wandro blue, Nature = forest green, Heritage = terracotta, Culture = violet, Music & events = magenta, Curiosities = deep teal. Undiscovered pins stay grey. All inks pass WCAG AA (tested in `theme.test.ts`).
+- **Discover:** a hub of interests plus a page per category (Overview, Places, Learn) styled in that category's colour. Illustrated category covers stand in wherever a place has no licensed photo yet.
+- **Times and days** show for places that need them (venues, events): "Open now · until 00:30", "Thu–Sat · 21:30–00:30".
 - Tone: warm and respectful in all copy and community guidelines.
 - English only at launch, all strings in the i18n layer.
 

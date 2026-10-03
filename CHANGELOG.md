@@ -2,6 +2,21 @@
 
 All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/releases/).
 
+## [Unreleased]
+
+### Added
+
+- Beaches & coast category (database enum, importer mapping for beaches, bays and capes, demo and
+  seed places, and a coastal daily challenge).
+- Opening days and times for places that need them, shown on cards and the place sheet.
+- Discover hub and colour-coded category pages with Overview, Places and Learn tabs.
+- Illustrated category covers used for challenges, collections and places without a photo.
+
+### Changed
+
+- Brighter light-blue theme with Wandro blue as the accent and a colour per category.
+- The check-in tab is now labelled "Check in" so "Discover" can name the new learning area.
+
 ## [2.0.0] — 2026-10-04
 
 The full game loop (Phases 3–8). See [`docs/releases/v2.0.0.md`](docs/releases/v2.0.0.md).

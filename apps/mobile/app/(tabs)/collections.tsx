@@ -1,13 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { CATEGORY_META } from '@/categories';
 import { useCollections } from '@/data/collections';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
-import { radius, space, useColors } from '@/theme';
+import { radius, shadow, space, useColors } from '@/theme';
 
 export default function Collections() {
   const c = useColors();
@@ -37,18 +38,26 @@ export default function Collections() {
           return (
             <View
               key={col.id}
-              style={[styles.card, { backgroundColor: c.card, borderColor: c.border }]}
+              style={[styles.card, shadow, { backgroundColor: c.card }]}
               accessible
               accessibilityLabel={`${col.title}, ${t('collections.progress', { done: col.done, total: col.total })}`}
             >
-              <LinearGradient colors={col.colors} style={styles.cover}>
-                <Text style={styles.coverTitle}>{col.title}</Text>
-                <Text style={styles.coverMeta}>
+              <Image
+                source={CATEGORY_META[col.theme].art}
+                style={styles.cover}
+                contentFit="cover"
+                accessible={false}
+              />
+              <View style={[styles.coverText, { backgroundColor: c.categoryTint[col.theme] }]}>
+                <Text style={[styles.coverTitle, { color: c.category[col.theme] }]}>
+                  {col.title}
+                </Text>
+                <Text style={{ color: c.text, fontWeight: '600' }}>
                   {col.completed
                     ? `🏆 ${t('collections.completed')}`
                     : `🪙 ${t('collections.bonus', { coins: col.bonus })}`}
                 </Text>
-              </LinearGradient>
+              </View>
               <View style={{ padding: space.md, gap: space.sm }}>
                 <Text style={{ color: c.textMuted }}>{col.description}</Text>
                 <Text style={{ color: c.text, fontWeight: '700' }}>
@@ -56,7 +65,10 @@ export default function Collections() {
                 </Text>
                 <View style={[styles.track, { backgroundColor: c.border }]}>
                   <View
-                    style={[styles.bar, { width: `${fraction * 100}%`, backgroundColor: c.accent }]}
+                    style={[
+                      styles.bar,
+                      { width: `${fraction * 100}%`, backgroundColor: c.category[col.theme] },
+                    ]}
                   />
                 </View>
                 {col.placeIds.map((id) => {
@@ -74,7 +86,7 @@ export default function Collections() {
                       <Ionicons
                         name={ids.has(id) ? 'checkmark-circle' : 'ellipse-outline'}
                         size={18}
-                        color={ids.has(id) ? c.accent : c.textMuted}
+                        color={ids.has(id) ? c.category[col.theme] : c.textMuted}
                       />
                       <Text style={{ color: c.text }}>{p.name}</Text>
                     </Pressable>
@@ -93,10 +105,10 @@ const styles = StyleSheet.create({
   container: { padding: space.lg, gap: space.lg },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   title: { fontSize: 28, fontWeight: '900' },
-  card: { borderRadius: radius.lg, overflow: 'hidden', borderWidth: StyleSheet.hairlineWidth },
-  cover: { height: 120, padding: space.lg, justifyContent: 'flex-end' },
-  coverTitle: { color: '#fff', fontSize: 22, fontWeight: '900' },
-  coverMeta: { color: 'rgba(255,255,255,0.95)', fontWeight: '700' },
+  card: { borderRadius: radius.lg, overflow: 'hidden' },
+  cover: { height: 120 },
+  coverText: { paddingHorizontal: space.lg, paddingVertical: space.md, gap: 2 },
+  coverTitle: { fontSize: 22, fontWeight: '900' },
   track: { height: 6, borderRadius: 3, overflow: 'hidden' },
   bar: { height: 6 },
   item: { flexDirection: 'row', gap: space.sm, alignItems: 'center', minHeight: 32 },

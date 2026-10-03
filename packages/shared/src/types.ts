@@ -1,4 +1,17 @@
-export type Category = 'culture' | 'heritage' | 'nature' | 'music_events' | 'other';
+export type Category = 'coast' | 'nature' | 'heritage' | 'culture' | 'music_events' | 'other';
+
+/** 0 = Sunday … 6 = Saturday, matching Date#getDay(). */
+export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+/**
+ * A recurring opening window in the place's local time ("HH:MM", 24 h).
+ * A close at or before the open time runs past midnight into the next day.
+ */
+export interface OpeningSlot {
+  days: Weekday[];
+  open: string;
+  close: string;
+}
 
 export interface Place {
   id: string;
@@ -12,6 +25,8 @@ export interface Place {
   uniqueVisitors: number;
   photoUrl?: string;
   photoCredit?: string;
+  /** Only for places with set times (venues, events, markets). Absent = always accessible. */
+  hours?: OpeningSlot[];
 }
 
 export interface VisitSummary {

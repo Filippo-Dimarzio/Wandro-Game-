@@ -1,10 +1,11 @@
-import type { Place } from '@wandro/shared';
+import type { Category, Place } from '@wandro/shared';
 
 export interface CollectionDef {
   id: string;
   title: string;
   description: string;
-  colors: [string, string];
+  /** Cover art and colour come from this category. */
+  theme: Category;
   placeIds: string[];
   bonus: number;
 }
@@ -15,7 +16,7 @@ export const DEMO_COLLECTIONS: CollectionDef[] = [
     id: 'demo-col-palaces',
     title: "Sintra's palaces",
     description: 'Romantic palaces, castles and estates in the hills.',
-    colors: ['#B7791F', '#3C2A0A'],
+    theme: 'heritage',
     placeIds: ['demo-pena', 'demo-regaleira', 'demo-mouros', 'demo-monserrate', 'demo-condessa'],
     bonus: 200,
   },
@@ -23,7 +24,7 @@ export const DEMO_COLLECTIONS: CollectionDef[] = [
     id: 'demo-col-coast',
     title: 'The wild coast',
     description: 'Cliffs, coves and the westernmost point of Europe.',
-    colors: ['#2B6CB0', '#0A2540'],
+    theme: 'coast',
     placeIds: ['demo-cabo', 'demo-adraga'],
     bonus: 200,
   },
@@ -31,7 +32,7 @@ export const DEMO_COLLECTIONS: CollectionDef[] = [
     id: 'demo-col-gems',
     title: 'Hidden gems',
     description: 'Places fewer than 20 explorers have found.',
-    colors: ['#2F855A', '#0B2A24'],
+    theme: 'other',
     placeIds: ['demo-condessa', 'demo-cruz-alta', 'demo-brinquedo', 'demo-music'],
     bonus: 200,
   },

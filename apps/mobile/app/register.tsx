@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import type { Category } from '@wandro/shared';
 import { Check } from '@/components/Check';
 import { t, type TranslationKey } from '@/i18n';
 import { signInWithProvider, useAuthSession } from '@/lib/auth';
@@ -20,13 +21,14 @@ import { supabase } from '@/lib/supabase';
 import { useSession } from '@/state/session';
 import { radius, space, useColors } from '@/theme';
 
-const STYLES: { id: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-  { id: 'castles', icon: 'business' },
-  { id: 'nature', icon: 'leaf' },
-  { id: 'museums', icon: 'color-palette' },
-  { id: 'music', icon: 'musical-notes' },
-  { id: 'beaches', icon: 'water' },
-  { id: 'hidden', icon: 'diamond' },
+// Each explorer style wears the colour of the category it maps to.
+const STYLES: { id: string; icon: keyof typeof Ionicons.glyphMap; category: Category }[] = [
+  { id: 'beaches', icon: 'water', category: 'coast' },
+  { id: 'nature', icon: 'leaf', category: 'nature' },
+  { id: 'castles', icon: 'business', category: 'heritage' },
+  { id: 'museums', icon: 'color-palette', category: 'culture' },
+  { id: 'music', icon: 'musical-notes', category: 'music_events' },
+  { id: 'hidden', icon: 'diamond', category: 'other' },
 ];
 
 const USERNAME = /^[a-zA-Z0-9_.]{3,24}$/;
@@ -197,6 +199,7 @@ export default function Register() {
               <View style={styles.grid}>
                 {STYLES.map((s) => {
                   const on = styles_.includes(s.id);
+                  const color = c.category[s.category];
                   return (
                     <Pressable
                       key={s.id}
@@ -208,16 +211,16 @@ export default function Register() {
                       style={[
                         styles.tile,
                         {
-                          borderColor: on ? c.accent : c.border,
-                          backgroundColor: on ? c.accent : c.card,
+                          borderColor: on ? color : c.border,
+                          backgroundColor: on ? color : c.categoryTint[s.category],
                         },
                       ]}
                       testID={`style-${s.id}`}
                     >
-                      <Ionicons name={s.icon} size={28} color={on ? c.accentOn : c.text} />
+                      <Ionicons name={s.icon} size={28} color={on ? c.onCategory : color} />
                       <Text
                         style={{
-                          color: on ? c.accentOn : c.text,
+                          color: on ? c.onCategory : c.text,
                           fontWeight: '700',
                           textAlign: 'center',
                         }}

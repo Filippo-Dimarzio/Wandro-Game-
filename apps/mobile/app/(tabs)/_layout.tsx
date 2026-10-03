@@ -25,8 +25,9 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: c.accent,
         tabBarInactiveTintColor: c.textMuted,
-        tabBarStyle: { backgroundColor: c.bg, borderTopColor: c.border },
-        tabBarLabelStyle: { fontWeight: '600' },
+        tabBarStyle: { backgroundColor: c.card, borderTopColor: c.border },
+        tabBarLabelStyle: { fontWeight: '700' },
+        sceneStyle: { backgroundColor: c.bg },
       }}
     >
       <Tabs.Screen name="index" options={{ title: t('tabs.home'), tabBarIcon: icon('home') }} />

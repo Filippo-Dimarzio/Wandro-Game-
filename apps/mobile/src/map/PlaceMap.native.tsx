@@ -2,6 +2,7 @@ import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { useEffect, useMemo, useRef } from 'react';
 import { OctopusAvatar } from '@/components/OctopusAvatar';
 import { env } from '@/lib/env';
+import { CATEGORIES } from '@wandro/shared';
 import { lightColors } from '@/theme';
 import { FallbackMap } from './FallbackMap';
 import type { PlaceMapProps } from './types';
@@ -92,7 +93,7 @@ function MapboxPlaceMap({
         }}
       />
       <ShapeSource id="fog" shape={fog}>
-        <FillLayer id="fog-fill" style={{ fillColor: '#ECE9E0', fillOpacity: 0.78 }} />
+        <FillLayer id="fog-fill" style={{ fillColor: lightColors.fogFill, fillOpacity: 0.78 }} />
       </ShapeSource>
       <ShapeSource
         id="places"
@@ -113,14 +114,7 @@ function MapboxPlaceMap({
               [
                 'match',
                 ['get', 'category'],
-                'culture',
-                lightColors.category.culture,
-                'heritage',
-                lightColors.category.heritage,
-                'nature',
-                lightColors.category.nature,
-                'music_events',
-                lightColors.category.music_events,
+                ...CATEGORIES.flatMap((cat) => [cat, lightColors.category[cat]]),
                 lightColors.category.other,
               ],
               lightColors.locked,
@@ -131,10 +125,10 @@ function MapboxPlaceMap({
         />
       </ShapeSource>
       <ShapeSource id="accuracy" shape={accuracy}>
-        <FillLayer id="accuracy-fill" style={{ fillColor: '#2B6CB0', fillOpacity: 0.12 }} />
+        <FillLayer id="accuracy-fill" style={{ fillColor: lightColors.me, fillOpacity: 0.12 }} />
         <LineLayer
           id="accuracy-edge"
-          style={{ lineColor: '#2B6CB0', lineOpacity: 0.45, lineWidth: 1.5 }}
+          style={{ lineColor: lightColors.me, lineOpacity: 0.45, lineWidth: 1.5 }}
         />
       </ShapeSource>
       <ShapeSource id="target-ring" shape={guidance.ring}>

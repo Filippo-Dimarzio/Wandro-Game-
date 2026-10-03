@@ -29,7 +29,7 @@ end $$;
 
 -- Open today's challenge first so the discovery falls inside the window.
 reset role;
-update daily_challenges set category = 'nature', place_id = null where challenge_date = lisbon_today();
+update daily_challenges set category = 'coast', place_id = null where challenge_date = lisbon_today();
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1');
 create temp table ch on commit drop as select * from open_daily_challenge();
 grant select on ch to authenticated;
