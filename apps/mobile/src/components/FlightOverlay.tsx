@@ -1,0 +1,217 @@
+import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect, useRef, useState } from 'react';
+import {
+  AccessibilityInfo,
+  Animated,
+  Easing,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { DEMO_PLACES, regionBySlug } from '@wandro/shared';
+import { t } from '@/i18n';
+import { isDemo } from '@/lib/env';
+import { useSession } from '@/state/session';
+import { radius, space } from '@/theme';
+
+const ARC_HEIGHT = 56;
+const STEPS = [0, 0.25, 0.5, 0.75, 1];
+// A parabola through the steps: the plane climbs, cruises and descends.
+const arcY = (p: number) => -ARC_HEIGHT * 4 * p * (1 - p);
+
+/** Full-screen "you've landed" moment: a plane flies from the old city's airport to the new one. */
+export function FlightOverlay() {
+  const flight = useSession((s) => s.flight);
+  const endFlight = useSession((s) => s.endFlight);
+  const progress = useRef(new Animated.Value(0)).current;
+  const [width, setWidth] = useState(0);
+  const [landed, setLanded] = useState(false);
+
+  useEffect(() => {
+    if (!flight) return;
+    setLanded(false);
+    progress.setValue(0);
+    let cancelled = false;
+    const to = regionBySlug(flight.to);
+    AccessibilityInfo.announceForAccessibility?.(t('flight.welcome', { city: to?.name ?? '' }));
+    const run = async () => {
+      const reduce = await AccessibilityInfo.isReduceMotionEnabled?.().catch(() => false);
+      if (cancelled) return;
+      if (reduce) {
+        progress.setValue(1);
+        setLanded(true);
+        return;
+      }
+      Animated.timing(progress, {
+        toValue: 1,
+        duration: 2600,
+        easing: Easing.inOut(Easing.cubic),
+        useNativeDriver: Platform.OS !== 'web',
+      }).start(({ finished }) => finished && !cancelled && setLanded(true));
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [flight, progress]);
+
+  if (!flight) return null;
+  const from = regionBySlug(flight.from);
+  const to = regionBySlug(flight.to);
+  if (!from || !to) return null;
+  const placeCount = isDemo
+    ? DEMO_PLACES.filter((p) => p.region === to.slug && !p.hidden).length
+    : null;
+  const track = Math.max(width - 2 * space.lg, 0);
+
+  return (
+    <View
+      style={StyleSheet.absoluteFill}
+      accessibilityViewIsModal
+      importantForAccessibility="yes"
+      testID="flight-overlay"
+    >
+      <LinearGradient
+        // Dark enough end to end for white text (WCAG AA).
+        colors={['#082A45', '#0B3A5E', '#0A5A96']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+      <SafeAreaView style={styles.content}>
+        <Text style={styles.kicker}>✈️ {t('flight.kicker')}</Text>
+        <Text style={styles.title} accessibilityRole="header">
+          {landed ? t('flight.welcome', { city: to.name }) : t('flight.flying', { city: to.name })}
+        </Text>
+
+        <View
+          style={styles.route}
+          onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+          accessible
+          accessibilityLabel={t('flight.routeA11y', {
+            from: `${from.name} (${from.airport.code})`,
+            to: `${to.name} (${to.airport.code})`,
+            km: Math.round(flight.km),
+          })}
+        >
+          <View style={[styles.arc, { width: track }]} pointerEvents="none">
+            {Array.from({ length: 13 }, (_, i) => i / 12).map((p) => (
+              <View
+                key={p}
+                style={[styles.dot, { left: p * track - 3, top: ARC_HEIGHT + arcY(p) - 3 }]}
+              />
+            ))}
+            <Animated.Text
+              style={[
+                styles.plane,
+                {
+                  transform: [
+                    {
+                      translateX: progress.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [-14, track - 14],
+                      }),
+                    },
+                    {
+                      translateY: progress.interpolate({
+                        inputRange: STEPS,
+                        outputRange: STEPS.map((p) => ARC_HEIGHT + arcY(p) - 16),
+                      }),
+                    },
+                    {
+                      rotate: progress.interpolate({
+                        inputRange: [0, 0.5, 1],
+                        outputRange: ['-25deg', '0deg', '25deg'],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+              accessible={false}
+            >
+              ✈️
+            </Animated.Text>
+          </View>
+          <View style={styles.ends}>
+            <Airport flag={from.flag} code={from.airport.code} city={from.name} />
+            <Airport flag={to.flag} code={to.airport.code} city={to.name} />
+          </View>
+        </View>
+
+        <Text style={styles.meta}>
+          {t('flight.distance', { km: Math.round(flight.km).toLocaleString('en') })}
+        </Text>
+
+        <View style={[styles.card, { opacity: landed ? 1 : 0.6 }]}>
+          <Text style={styles.cardTitle}>
+            {to.flag} {t('flight.newCity', { city: to.name })}
+          </Text>
+          <Text style={styles.cardText}>
+            {placeCount ? `${t('travel.placeCount', { count: placeCount })} · ` : ''}
+            {t('flight.gems')}
+          </Text>
+        </View>
+
+        <Pressable
+          onPress={endFlight}
+          accessibilityRole="button"
+          style={styles.cta}
+          testID="flight-done"
+        >
+          <Text style={styles.ctaText}>{t('flight.explore', { city: to.name })}</Text>
+        </Pressable>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+function Airport({ flag, code, city }: { flag: string; code: string; city: string }) {
+  return (
+    <View style={{ alignItems: 'center', gap: 2 }}>
+      <Text style={{ fontSize: 26 }} accessible={false}>
+        {flag}
+      </Text>
+      <Text style={styles.code}>{code}</Text>
+      <Text style={styles.city}>{city}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  content: { flex: 1, padding: space.lg, justifyContent: 'center', gap: space.lg },
+  kicker: { color: '#DDEEFF', fontWeight: '800', textAlign: 'center', letterSpacing: 1 },
+  title: { color: '#fff', fontSize: 30, fontWeight: '900', textAlign: 'center' },
+  route: { paddingHorizontal: space.lg, gap: space.sm },
+  arc: { height: ARC_HEIGHT + 24, alignSelf: 'center' },
+  dot: {
+    position: 'absolute',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.55)',
+  },
+  plane: { position: 'absolute', left: 0, top: 0, fontSize: 30 },
+  ends: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: -space.sm },
+  code: { color: '#fff', fontSize: 28, fontWeight: '900', letterSpacing: 1 },
+  city: { color: '#DDEEFF', fontWeight: '700' },
+  meta: { color: '#DDEEFF', textAlign: 'center', fontWeight: '700' },
+  card: {
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderRadius: radius.lg,
+    padding: space.lg,
+    gap: 4,
+  },
+  cardTitle: { color: '#fff', fontWeight: '900', fontSize: 18 },
+  cardText: { color: '#fff' },
+  cta: {
+    backgroundColor: '#fff',
+    borderRadius: radius.pill,
+    minHeight: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ctaText: { color: '#0B6FB8', fontWeight: '900', fontSize: 17 },
+});

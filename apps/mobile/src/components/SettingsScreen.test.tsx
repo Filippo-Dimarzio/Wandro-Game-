@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import Settings from '../../app/settings';
 import { useSession } from '@/state/session';
@@ -12,8 +13,10 @@ jest.mock('react-native-safe-area-context', () => ({
   SafeAreaView: ({ children }: { children: ReactNode }) => children,
 }));
 jest.mock('@/lib/notifications', () => ({ setDailyReminder: jest.fn(async () => true) }));
+jest.mock('@/lib/confirm', () => ({ confirmAction: jest.fn(async () => mockConfirm) }));
 jest.mock('@/lib/download', () => ({ saveJson: jest.fn(async () => undefined) }));
 
+let mockConfirm = true;
 const wrapper = queryWrapper();
 
 describe('Settings', () => {
@@ -39,5 +42,17 @@ describe('Settings', () => {
     await render(<Settings />, { wrapper });
     await fireEvent(screen.getByTestId('private-switch'), 'valueChange', true);
     expect(useSession.getState().profile?.isPrivate).toBe(true);
+  });
+
+  it('logs out after confirming and returns to the portal', async () => {
+    mockConfirm = false;
+    await render(<Settings />, { wrapper });
+    await fireEvent.press(screen.getByTestId('log-out'));
+    expect(useSession.getState().onboarded).toBe(true);
+
+    mockConfirm = true;
+    await fireEvent.press(screen.getByTestId('log-out'));
+    expect(useSession.getState().onboarded).toBe(false);
+    expect(router.replace).toHaveBeenCalledWith('/welcome');
   });
 });

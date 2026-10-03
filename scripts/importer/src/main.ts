@@ -1,19 +1,20 @@
 /**
- * Idempotent Sintra place importer.
- *   pnpm import:places --dry-run       -> prints JSON, writes nothing
- *   pnpm import:places                 -> upserts into Supabase as `draft`
+ * Idempotent place importer for any launch city (default: Sintra).
+ *   pnpm import:places --dry-run                   -> prints JSON, writes nothing
+ *   pnpm import:places                             -> upserts into Supabase as `draft`
+ *   pnpm import:places --region lisbon [--dry-run] -> another city from REGIONS
  * Needs EXPO_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (from .env) for writes.
  */
 import { createClient } from '@supabase/supabase-js';
-import { buildOverpassQuery, dedupe, toPlace, type OsmElement } from './mapping';
+import { buildOverpassQuery, dedupe, regionFromArgs, toPlace, type OsmElement } from './mapping';
 import { commonsFileUrl, fetchWikidata } from './wikidata';
 
 const OVERPASS_URL = process.env.OVERPASS_URL ?? 'https://overpass-api.de/api/interpreter';
 
-async function fetchOsm(): Promise<OsmElement[]> {
+async function fetchOsm(bbox: readonly number[]): Promise<OsmElement[]> {
   const res = await fetch(OVERPASS_URL, {
     method: 'POST',
-    body: new URLSearchParams({ data: buildOverpassQuery() }),
+    body: new URLSearchParams({ data: buildOverpassQuery(bbox) }),
     headers: { 'User-Agent': 'WandroImporter/0.1' },
   });
   if (!res.ok) throw new Error(`Overpass ${res.status}: ${await res.text()}`);
@@ -22,7 +23,9 @@ async function fetchOsm(): Promise<OsmElement[]> {
 
 async function main() {
   const dryRun = process.argv.includes('--dry-run');
-  const elements = await fetchOsm();
+  const region = regionFromArgs(process.argv);
+  console.error(`Importing ${region.name}, ${region.country}`);
+  const elements = await fetchOsm(region.bbox);
   const places = dedupe(elements.map(toPlace).filter((p) => p !== null));
   console.error(`OSM elements: ${elements.length}, importable places: ${places.length}`);
 
@@ -52,11 +55,18 @@ async function main() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) throw new Error('Set EXPO_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
   const db = createClient(url, key, { auth: { persistSession: false } });
+  const { data: reg, error: regError } = await db
+    .from('regions')
+    .select('id')
+    .eq('slug', region.slug)
+    .single();
+  if (regError) throw new Error(`Region ${region.slug} is missing; run the migrations first`);
 
   for (let i = 0; i < rows.length; i += 200) {
-    const { error } = await db
-      .from('places')
-      .upsert(rows.slice(i, i + 200), { onConflict: 'source,source_id' });
+    const { error } = await db.from('places').upsert(
+      rows.slice(i, i + 200).map((r) => ({ ...r, region_id: reg.id })),
+      { onConflict: 'source,source_id' },
+    );
     if (error) throw error;
   }
 

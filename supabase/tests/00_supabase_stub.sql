@@ -21,5 +21,8 @@ $$;
 grant usage on schema auth to anon, authenticated, service_role;
 grant execute on function auth.uid() to anon, authenticated, service_role;
 grant usage on schema public to anon, authenticated, service_role;
+-- Supabase lets every role use the extensions schema (PostGIS, citext).
+create schema if not exists extensions;
+grant usage on schema extensions to anon, authenticated, service_role;
 alter default privileges in schema public grant select, insert, update, delete on tables to anon, authenticated, service_role;
 alter default privileges in schema public grant execute on functions to anon, authenticated, service_role;

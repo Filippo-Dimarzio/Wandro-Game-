@@ -3,6 +3,7 @@ import {
   categoryFor,
   dedupe,
   exclusionReason,
+  regionFromArgs,
   toPlace,
   type OsmElement,
 } from './mapping';
@@ -83,5 +84,18 @@ describe('importer mapping', () => {
     ].map(toPlace);
     const once = dedupe(items.filter((p) => p !== null));
     expect(dedupe(once)).toEqual(once);
+  });
+});
+
+describe('regionFromArgs', () => {
+  it('defaults to Sintra and reads --region', () => {
+    expect(regionFromArgs(['node', 'main.ts']).slug).toBe('sintra');
+    expect(regionFromArgs(['node', 'main.ts', '--region', 'paris']).bbox).toEqual([
+      48.757, 2.202, 48.957, 2.502,
+    ]);
+  });
+
+  it('lists the valid slugs for an unknown region', () => {
+    expect(() => regionFromArgs(['--region', 'atlantis'])).toThrow(/lisbon/);
   });
 });

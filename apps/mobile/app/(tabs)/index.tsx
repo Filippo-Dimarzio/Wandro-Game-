@@ -19,6 +19,7 @@ import { HowToPlay } from '@/components/HowToPlay';
 import { InstallBanner } from '@/components/InstallBanner';
 import { PlaceCard } from '@/components/PlaceBits';
 import { ProgressStrip } from '@/components/ProgressStrip';
+import { useFriendChallenges, useFriends } from '@/data/friends';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { useFeed } from '@/data/social';
 import { useWallet } from '@/data/wallet';
@@ -35,6 +36,11 @@ export default function Home() {
   const { ids } = useUnlockedIds();
   const wallet = useWallet();
   const feed = useFeed();
+  const { incoming } = useFriends();
+  const friendChallenges = useFriendChallenges();
+  const friendNews =
+    incoming.length +
+    friendChallenges.filter((x) => x.direction === 'incoming' && x.status === 'pending').length;
   const list = places.data ?? [];
 
   const nearby = list
@@ -63,7 +69,7 @@ export default function Home() {
               🐙
             </Text>
           </View>
-          <Text style={[styles.greeting, { color: c.text }]}>
+          <Text style={[styles.greeting, { color: c.text }]} numberOfLines={1}>
             {t('home.greeting', { name: profile?.username ?? '' })}
           </Text>
           <View style={styles.headerIcons}>
@@ -75,6 +81,24 @@ export default function Home() {
               testID="coin-pill"
             >
               <CoinCounter coins={wallet.coins} />
+            </Pressable>
+            <Pressable
+              onPress={() => router.push('/friends')}
+              accessibilityRole="button"
+              accessibilityLabel={
+                friendNews > 0
+                  ? `${t('home.friends')}, ${t('friends.requests', { count: friendNews })}`
+                  : t('home.friends')
+              }
+              hitSlop={8}
+              testID="friends-button"
+            >
+              <Ionicons name="people-outline" size={24} color={c.text} />
+              {friendNews > 0 && (
+                <View style={[styles.badge, { backgroundColor: c.danger }]}>
+                  <Text style={styles.badgeText}>{friendNews}</Text>
+                </View>
+              )}
             </Pressable>
             <Pressable
               onPress={() => router.push('/search')}
@@ -193,6 +217,18 @@ const styles = StyleSheet.create({
   container: { padding: space.lg, gap: space.lg },
   header: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   headerIcons: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -8,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
   coinPill: { borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 6 },
   avatar: {
     width: 40,

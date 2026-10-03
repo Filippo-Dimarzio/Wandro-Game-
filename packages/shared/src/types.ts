@@ -27,6 +27,10 @@ export interface Place {
   photoCredit?: string;
   /** Only for places with set times (venues, events, markets). Absent = always accessible. */
   hours?: OpeningSlot[];
+  /** Region slug (see REGIONS), e.g. 'lisbon'. */
+  region?: string;
+  /** Hidden gem: kept off the map until the player comes within HIDDEN_REVEAL_RADIUS_M. */
+  hidden?: boolean;
 }
 
 export interface VisitSummary {
