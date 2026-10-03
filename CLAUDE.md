@@ -1,0 +1,81 @@
+# CLAUDE.md — Wandro
+
+Wandro is a photo-first, location-based exploration game and community app. Pilot region: Sintra, Portugal. See `PLAN.md` for architecture, data model and roadmap. This file is the rulebook for working in the repo.
+
+## How we work
+
+- Build **one phase at a time** (see `PLAN.md`). At the end of each phase: run tests + lint, summarise changes, list what to test manually, commit with a clear message, then **STOP for review**.
+- Prefer simple, boring solutions. Explain non-obvious decisions in 1–2 sentences.
+- Do not start work outside the current phase. Ask when something is ambiguous.
+- Do not open a PR unless asked.
+
+## Stack
+
+- App: React Native + Expo (TypeScript strict, Expo Router), iOS + Android. Needs a development build (Mapbox), not Expo Go.
+- Maps: `@rnmapbox/maps`. Client state: TanStack Query (server state) + Zustand (UI state).
+- Backend: Supabase (Postgres + PostGIS, Auth, RLS, Storage, Edge Functions in Deno).
+- Tests: Jest + React Native Testing Library; SQL/pgTAP tests for RLS and scoring; integration tests for check-in validation.
+- Tooling: pnpm workspaces, ESLint, Prettier, GitHub Actions, EAS Build.
+
+## Repo layout
+
+```
+apps/mobile/       Expo app
+supabase/          migrations, functions, seed, tests
+scripts/importer/  OSM/Wikidata importer
+packages/shared/   shared types, scoring constants, geo helpers
+```
+
+## Commands
+
+These are created in Phase 0. Update this list if they change.
+
+```
+pnpm install              install dependencies
+pnpm lint                 ESLint
+pnpm format               Prettier (check with pnpm format:check)
+pnpm typecheck            tsc --noEmit across workspaces
+pnpm test                 Jest unit tests
+pnpm test:db              SQL/RLS/scoring tests against local Supabase
+pnpm supabase start       local Supabase (needs Docker)
+pnpm --filter mobile start   Expo dev server
+pnpm import:places        run the place importer (idempotent)
+```
+
+Before reporting a phase done, run `pnpm lint && pnpm typecheck && pnpm test && pnpm test:db`.
+
+## Non-negotiable rules
+
+1. **Server decides everything that matters.** Points, XP, levels, badges, unlocks and rarity are written only by Edge Functions with the service role. Never compute or accept points from the client. Clients have no write access to `visits`, `points_ledger`, `user_badges` or `place_stats`.
+2. **One completion per user per place**, enforced by a unique constraint as well as in code.
+3. **Every table has RLS enabled.** New tables ship with policies and RLS tests in the same migration PR.
+4. **Never commit secrets.** Use `.env` (git-ignored); keep `.env.example` current. The Supabase service-role key and Mapbox secret token never go into the app bundle.
+5. **Location privacy:** foreground location only. Store only what is needed to verify a visit. Raw pings are deleted after verification (max 24 h). Never expose anyone's live location. Maintain data export and account deletion.
+6. **Safety:** no challenges on private property or in dangerous spots. Submissions are moderated before becoming places.
+7. **Civil community:** report, block and moderation ship with any user-generated content. Strip EXIF/GPS from uploaded photos.
+8. **Accessibility:** WCAG AA contrast, screen-reader labels on interactive elements, support small screens and dynamic text sizes. Fog styling must never hide place legibility.
+9. **No hard-coded user-facing strings.** Use the i18n layer (English first; PT/ES/IT/FR later).
+
+## Conventions
+
+- TypeScript `strict`; no `any` without a comment explaining why.
+- Shared constants (scoring, radii, thresholds) live in `packages/shared`, with unit tests.
+- Database changes only via migration files in `supabase/migrations`; never edit the hosted DB by hand. Migrations are forward-only and named `YYYYMMDDHHMMSS_description.sql`.
+- Edge Functions validate input (e.g. zod), are idempotent, and return typed errors.
+- Server state goes through TanStack Query; Zustand is for UI/session state only.
+- Match existing code style; Prettier and ESLint are the authority. Keep comments for the "why", not the "what".
+- Commits: imperative, clear messages. One logical change per commit.
+- Branches: `phase-N-short-description`, one per phase.
+
+## Data and attribution
+
+- OpenStreetMap data is ODbL: show attribution in the app.
+- Place photos from Wikimedia Commons: store licence, author and source URL, and show attribution.
+- The importer must stay idempotent (upsert by `(source, source_id)`), polite to Overpass, and write new places as `draft` for curator review.
+
+## Testing expectations
+
+- Scoring: unit tests for the rarity formula, bonuses, streaks and levels.
+- Check-in: integration tests for too-far, too-short, low accuracy, mock flag, impossible speed, replay and concurrent first-discoverer.
+- RLS: tests that a user cannot read private profiles' data, write another user's rows, or write server-only tables.
+- UI: component tests for map-sheet, feed and forms using React Native Testing Library.
