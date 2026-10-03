@@ -255,7 +255,7 @@ that link to the repository's **About → Website** field.
 
 ## Releases
 
-Pushing a tag such as `v1.0.0` runs `.github/workflows/release.yml`, which publishes a GitHub
+Pushing a tag such as `v1.0.0` (or running the **Release** workflow manually with the tag name) publishes a GitHub
 Release using the notes in `docs/releases/<tag>.md`. See [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Working together

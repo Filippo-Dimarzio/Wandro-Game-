@@ -1,10 +1,16 @@
 name: Release
 
-# Pushing a tag like v1.0.0 creates a GitHub Release whose notes come from
-# docs/releases/<tag>.md.
+# Publishes a GitHub Release with notes from docs/releases/<tag>.md.
+# Either push a tag like v1.0.0, or run this workflow manually with the tag name;
+# the manual run creates the tag on the selected branch's latest commit.
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release, e.g. v1.0.0 (needs docs/releases/<tag>.md)'
+        required: true
 
 permissions:
   contents: write
@@ -12,9 +18,14 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
       - uses: softprops/action-gh-release@v2
         with:
-          name: Wandro ${{ github.ref_name }}
-          body_path: docs/releases/${{ github.ref_name }}.md
+          tag_name: ${{ env.TAG }}
+          target_commitish: ${{ github.sha }}
+          name: Wandro ${{ env.TAG }}
+          body_path: docs/releases/${{ env.TAG }}.md
+          make_latest: true
