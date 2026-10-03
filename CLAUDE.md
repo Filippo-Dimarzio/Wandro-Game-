@@ -1,6 +1,6 @@
 # CLAUDE.md — Wandro
 
-Wandro is a photo-first, location-based exploration game and community app. Pilot region: Sintra, Portugal. See `PLAN.md` for architecture, data model and roadmap. This file is the rulebook for working in the repo.
+Wandro is a photo-first, location-based exploration game and community app. Pilot region: Sintra, Portugal, plus launch cities across Europe (`REGIONS` in `packages/shared`). See `PLAN.md` for architecture, data model and roadmap. This file is the rulebook for working in the repo.
 
 ## How we work
 
@@ -48,11 +48,11 @@ Before reporting a phase done, run `pnpm lint && pnpm typecheck && pnpm test && 
 
 ## Non-negotiable rules
 
-1. **Server decides everything that matters.** Points/coins, XP, levels, badges, unlocks, rarity and inventory are written only by `SECURITY DEFINER` server functions (Postgres RPCs in `supabase/migrations`). Never compute or accept points from the client. Clients have no write access to `visits`, `points_ledger`, `user_badges`, `place_stats` or `user_inventory`. Coins are never sold.
+1. **Server decides everything that matters.** Points/coins, XP, levels, badges, unlocks, rarity and inventory are written only by `SECURITY DEFINER` server functions (Postgres RPCs in `supabase/migrations`). Never compute or accept points from the client. Clients have no write access to `visits`, `points_ledger`, `user_badges`, `place_stats`, `user_inventory`, `hidden_reveals`, `friendships`, `friend_challenges` or `player_regions`. Coins are never sold.
 2. **One completion per user per place**, enforced by a unique constraint as well as in code.
 3. **Every table has RLS enabled.** New tables ship with policies and RLS tests in the same migration PR.
 4. **Never commit secrets.** Use `.env` (git-ignored); keep `.env.example` current. The Supabase service-role key and Mapbox secret token never go into the app bundle.
-5. **Location privacy:** foreground location only. Store only what is needed to verify a visit. Raw pings are deleted after verification (max 24 h). Never expose anyone's live location. Maintain data export and account deletion.
+5. **Location privacy:** foreground location only. Store only what is needed to verify a visit. Raw pings are deleted after verification (max 24 h). Never expose anyone's live location; hidden gems' locations are only sent once revealed; arrival flights store the city, never coordinates. Maintain data export and account deletion.
 6. **Safety:** no challenges on private property or in dangerous spots. Submissions are moderated before becoming places.
 7. **Civil community:** report, block and moderation ship with any user-generated content. Strip EXIF/GPS from uploaded photos.
 8. **Accessibility:** WCAG AA contrast, screen-reader labels on interactive elements, support small screens and dynamic text sizes. Fog styling must never hide place legibility.

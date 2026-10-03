@@ -120,6 +120,16 @@ export default function Explore() {
     }
   }, [pendingSelect, all]);
 
+  // After an arrival flight, fly the map from the old city to where the player landed.
+  const landedAt = useSession((s) => s.landedAt);
+  useEffect(() => {
+    if (!landedAt) return;
+    setBrowse(null);
+    setFocus({ ...loc.position });
+    // Only when a flight lands, not on every GPS update.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [landedAt]);
+
   const revealedPlace = justRevealed ? all.find((p) => p.id === justRevealed) : undefined;
   useEffect(() => {
     if (!justRevealed) return;

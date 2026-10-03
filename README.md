@@ -8,7 +8,8 @@ castles, heritage sites, parks, viewpoints, beaches, music venues and nature spo
 hidden under fog; visiting one unlocks it, clears the fog around it and earns **coins** for your
 octopus. Hidden gems are worth the most.
 
-- **Pilot region:** Sintra and its surroundings, Portugal
+- **Where:** Sintra (the pilot) plus 12 European cities — Lisbon, Porto, Madrid, Barcelona,
+  Paris, Rome, Florence, Amsterdam, Berlin, Prague, Vienna and Edinburgh
 - **Status:** v2.0 — the full game loop (Phases 0–8). See the [roadmap](#roadmap).
 - **Play in your browser:** <https://filippo-dimarzio.github.io/Wandro-Game-/> (demo mode — click
   **Install app** to put it on your desktop)
@@ -69,6 +70,15 @@ level up, your octopus evolves (Hatchling → Explorer → Navigator → Cartogr
    rank.
 9. **Play together.** Follow explorers, like their discoveries, climb the leaderboards, and
    suggest new places, which moderators **approve as new missions**.
+10. **Hunt hidden gems.** Every city hides secret places that aren't on the map at all. The
+    **Adventures** sidebar hints how close the nearest one is (_under 500 m_, _within 1 km_…);
+    walk within **200 m** and it appears on your map.
+11. **Make friends.** Send friend requests (accepted friends can see each other's activity,
+    even on private profiles) and **challenge a friend** to a place with a short idea —
+    _"Go at golden hour!"_. It's ticked off when they discover it.
+12. **Travel Europe.** Land in another city, open Wandro and a **flight animation** takes your
+    octopus from your old airport to the new one (e.g. LIS ✈ CDG) before the map flies there.
+    In the browser demo, pick a city from **Explore → Adventures → city** to fly there.
 
 ## Look and feel
 
@@ -135,7 +145,11 @@ directly, and this is covered by automated tests.
 - Only what's needed to verify a visit is stored; raw location pings are deleted once a visit is
   verified (24 hours at most).
 - Nobody's live location is ever shown to anyone.
-- Data export and account deletion are part of the plan. Minimum age: 16.
+- Data export and account deletion are built in. Minimum age: 16.
+- Hidden gems are kept out of the app until you're within 200 m: the server never sends their
+  location early, hints are coarse distance bands, and reveals are capped per day.
+- For arrival flights the server remembers only the **city** you last opened the app in, never
+  coordinates, and nobody else can see it.
 
 **Safety.** No challenges on private property or in dangerous spots — enforced in the database. Every
 suggested place goes through moderation with a safety checklist.
@@ -148,19 +162,20 @@ and alternatives to press-and-hold gestures.
 
 ## Roadmap
 
-| Phase | Scope                                                                                                                                                                                                            | Status          |
-| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
-| 0     | Monorepo, tooling, CI, environment config                                                                                                                                                                        | ✅ v1.0         |
-| 1     | Database schema + security rules, auth, profiles, Sintra seed + importer                                                                                                                                         | ✅ v1.0         |
-| 2     | Map with fog, locked/unlocked places, filters, place details, app screens                                                                                                                                        | ✅ v1.0         |
-| —     | Daily challenge (touch to confirm) and approved missions (submission moderation)                                                                                                                                 | ✅ v1.0 (early) |
-| 3     | Server-verified check-ins, coins, levels, streaks, badges                                                                                                                                                        | ✅ v2.0         |
-| 4     | Photo posts, follows, feed, likes, report/block, leaderboards, collections, place submissions, moderation                                                                                                        | ✅ v2.0         |
-| 5     | Settings, data export, account deletion, privacy page, onboarding guide, store-build config                                                                                                                      | ✅ v2.0         |
-| 6     | Desktop app (Windows, macOS, Linux) and installable web app                                                                                                                                                      | ✅ v2.0         |
-| 7     | Find-My-style walking: octopus marker, proximity guidance, Google Maps directions, keyboard walking                                                                                                              | ✅ v2.0         |
-| 8     | Coin economy: double daily coins, Store with incense trail, skins and hats                                                                                                                                       | ✅ v2.0         |
-| Later | Comments, friend dares, food & beach challenges, Instagram share cards, events, teams, offline maps, more languages, region expansions (Lisbon coast, Alentejo, Algarve), push notifications for friend activity | Ideas           |
+| Phase | Scope                                                                                                                                              | Status          |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| 0     | Monorepo, tooling, CI, environment config                                                                                                          | ✅ v1.0         |
+| 1     | Database schema + security rules, auth, profiles, Sintra seed + importer                                                                           | ✅ v1.0         |
+| 2     | Map with fog, locked/unlocked places, filters, place details, app screens                                                                          | ✅ v1.0         |
+| —     | Daily challenge (touch to confirm) and approved missions (submission moderation)                                                                   | ✅ v1.0 (early) |
+| 3     | Server-verified check-ins, coins, levels, streaks, badges                                                                                          | ✅ v2.0         |
+| 4     | Photo posts, follows, feed, likes, report/block, leaderboards, collections, place submissions, moderation                                          | ✅ v2.0         |
+| 5     | Settings, data export, account deletion, privacy page, onboarding guide, store-build config                                                        | ✅ v2.0         |
+| 6     | Desktop app (Windows, macOS, Linux) and installable web app                                                                                        | ✅ v2.0         |
+| 7     | Find-My-style walking: octopus marker, proximity guidance, Google Maps directions, keyboard walking                                                | ✅ v2.0         |
+| 8     | Coin economy: double daily coins, Store with incense trail, skins and hats                                                                         | ✅ v2.0         |
+| 9     | Europe (12 cities), hidden gems revealed at 200 m, friends and friend challenges, Adventures sidebar, arrival flights, log out, cleaner tab labels | ✅ Unreleased   |
+| Later | Comments, food challenges, Instagram share cards, events, teams, offline maps, more languages, more cities, push notifications for friend activity | Ideas           |
 
 The full plan — architecture, data model, check-in validation and every decision — is in
 [`PLAN.md`](PLAN.md). Project rules for contributors (and Claude Code) are in
@@ -210,13 +225,15 @@ cd apps/mobile && npx expo run:ios   # or: npx expo run:android
 
 ### Demo mode
 
-Without Supabase credentials the app runs in **demo mode**: sample Sintra places, progress saved
-on your device only.
+Without Supabase credentials the app runs in **demo mode**: sample places in Sintra and 12
+European cities, progress saved on your device only.
 
 - **Teleport here (demo)** in a place's sheet moves you there, so you can try a discovery from
   anywhere.
 - Dwell time is shortened to 8 seconds (the real rule is 2 minutes, enforced by the server).
-- **Profile → Reset demo progress** starts over.
+- **Explore → Adventures → city** flies your octopus to another city.
+- Demo friends (ines.wanders, mia.maps…) answer requests straight away and have sent you challenges.
+- **Profile → Log out** returns to the portal and, as there's no account in the demo, starts over.
 
 To use a real backend, copy `.env.example` to `.env`, fill in `EXPO_PUBLIC_SUPABASE_URL` and
 `EXPO_PUBLIC_SUPABASE_ANON_KEY`, and apply `supabase/migrations` to your Supabase project.
@@ -230,6 +247,11 @@ To use a real backend, copy `.env.example` to `.env`, fill in `EXPO_PUBLIC_SUPAB
    wait for the ring. Back on **Explore**, the fog has cleared around it.
 5. On **Home**, hold **Hold to confirm** on today's challenge to claim +75.
 6. Check **Profile** for your level, octopus stage and badges.
+7. On **Explore**, open the **Adventures** sidebar (the compass tab on the left edge): accept
+   ines.wanders's challenge, read the hidden-gem hint, then use **Walk** to head east from the
+   town centre until the **Moorish Fountain** gem appears.
+8. Tap the city button in the sidebar and pick **Paris** to watch the arrival flight.
+9. On **Home**, tap the people icon: accept sofia.sees's friend request and **Challenge** a friend.
 
 ## Tech stack and repository layout
 

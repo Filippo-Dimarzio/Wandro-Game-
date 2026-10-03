@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-native';
+import { renderHook, waitFor } from '@testing-library/react-native';
 import { useHiddenGems } from './hidden';
 import { usePlaces } from './places';
 import { useSession } from '@/state/session';
@@ -26,14 +26,16 @@ describe('useHiddenGems (demo)', () => {
       }),
       { wrapper, initialProps: { at: sintra } },
     );
-    await act(async () => {});
+    // Wait for the places query rather than a fixed tick: it can be slow on a busy machine.
+    await waitFor(() => expect(result.current.places.length).toBeGreaterThan(0));
     expect(result.current.places.some((p) => p.id === 'demo-sintra-fonte-mourisca')).toBe(false);
 
     await rerender({ at: nearFountain });
-    await act(async () => {});
     expect(Object.keys(useSession.getState().revealed)).toEqual(['demo-sintra-fonte-mourisca']);
     expect(useSession.getState().justRevealed).toBe('demo-sintra-fonte-mourisca');
-    expect(result.current.places.some((p) => p.id === 'demo-sintra-fonte-mourisca')).toBe(true);
+    await waitFor(() =>
+      expect(result.current.places.some((p) => p.id === 'demo-sintra-fonte-mourisca')).toBe(true),
+    );
     expect(result.current.hint.count).toBe(2);
   });
 

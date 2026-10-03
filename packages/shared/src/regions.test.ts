@@ -1,5 +1,6 @@
+import { haversineMeters } from './geo';
 import { DEMO_PLACES } from './seed-places';
-import { REGIONS, regionBySlug, regionFor } from './regions';
+import { arrivalFlight, REGIONS, regionBySlug, regionFor } from './regions';
 
 describe('regions', () => {
   it('have unique slugs and sensible boxes', () => {
@@ -45,5 +46,25 @@ describe('regions', () => {
 
   it('demo place ids are unique', () => {
     expect(new Set(DEMO_PLACES.map((p) => p.id)).size).toBe(DEMO_PLACES.length);
+  });
+});
+
+describe('arrivalFlight', () => {
+  it('flies between far-apart cities only', () => {
+    const f = arrivalFlight('lisbon', 'paris');
+    expect(f?.from.airport.code).toBe('LIS');
+    expect(f?.to.airport.code).toBe('CDG');
+    expect(f!.km).toBeGreaterThan(1400);
+    expect(arrivalFlight('sintra', 'lisbon')).toBeNull();
+    expect(arrivalFlight('paris', 'paris')).toBeNull();
+    expect(arrivalFlight(null, 'paris')).toBeNull();
+    expect(arrivalFlight('paris', null)).toBeNull();
+  });
+
+  it('every city has an airport within 40 km', () => {
+    for (const r of REGIONS) {
+      expect(r.airport.code).toMatch(/^[A-Z]{3}$/);
+      expect(haversineMeters(r.center, r.airport)).toBeLessThan(40_000);
+    }
   });
 });

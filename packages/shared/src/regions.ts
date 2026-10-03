@@ -1,12 +1,19 @@
 import { haversineMeters } from './geo';
 import type { LatLng } from './geo';
 
+export interface Airport extends LatLng {
+  /** IATA code, e.g. 'LIS'. */
+  code: string;
+}
+
 export interface Region {
   slug: string;
   name: string;
   country: string;
   flag: string;
   center: LatLng;
+  /** The city's main airport, where an arrival flight lands. */
+  airport: Airport;
   /** south, west, north, east — the area the importer pulls places from. */
   bbox: readonly [number, number, number, number];
 }
@@ -18,6 +25,7 @@ function r(
   flag: string,
   lat: number,
   lng: number,
+  airport: Airport,
   dLat = 0.1,
   dLng = 0.15,
 ): Region {
@@ -28,6 +36,7 @@ function r(
     country,
     flag,
     center: { lat, lng },
+    airport,
     bbox: [round(lat - dLat), round(lng - dLng), round(lat + dLat), round(lng + dLng)],
   };
 }
@@ -35,21 +44,65 @@ function r(
 /** Curated launch cities. Sintra stays first: it's the pilot and the demo's default. */
 export const REGIONS: readonly Region[] = [
   {
-    ...r('sintra', 'Sintra', 'Portugal', '🇵🇹', 38.7975, -9.3905),
+    ...r('sintra', 'Sintra', 'Portugal', '🇵🇹', 38.7975, -9.3905, {
+      code: 'LIS',
+      lat: 38.7742,
+      lng: -9.1342,
+    }),
     bbox: [38.73, -9.52, 38.85, -9.3],
   },
-  r('lisbon', 'Lisbon', 'Portugal', '🇵🇹', 38.7139, -9.1394),
-  r('porto', 'Porto', 'Portugal', '🇵🇹', 41.1496, -8.611),
-  r('madrid', 'Madrid', 'Spain', '🇪🇸', 40.4168, -3.7038),
-  r('barcelona', 'Barcelona', 'Spain', '🇪🇸', 41.3874, 2.1686),
-  r('paris', 'Paris', 'France', '🇫🇷', 48.8566, 2.3522),
-  r('rome', 'Rome', 'Italy', '🇮🇹', 41.8967, 12.4822),
-  r('florence', 'Florence', 'Italy', '🇮🇹', 43.7696, 11.2558),
-  r('amsterdam', 'Amsterdam', 'Netherlands', '🇳🇱', 52.3676, 4.9041),
-  r('berlin', 'Berlin', 'Germany', '🇩🇪', 52.52, 13.405),
-  r('prague', 'Prague', 'Czechia', '🇨🇿', 50.0755, 14.4378),
-  r('vienna', 'Vienna', 'Austria', '🇦🇹', 48.2082, 16.3738),
-  r('edinburgh', 'Edinburgh', 'United Kingdom', '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 55.9533, -3.1883),
+  r('lisbon', 'Lisbon', 'Portugal', '🇵🇹', 38.7139, -9.1394, {
+    code: 'LIS',
+    lat: 38.7742,
+    lng: -9.1342,
+  }),
+  r('porto', 'Porto', 'Portugal', '🇵🇹', 41.1496, -8.611, {
+    code: 'OPO',
+    lat: 41.2481,
+    lng: -8.6814,
+  }),
+  r('madrid', 'Madrid', 'Spain', '🇪🇸', 40.4168, -3.7038, {
+    code: 'MAD',
+    lat: 40.4983,
+    lng: -3.5676,
+  }),
+  r('barcelona', 'Barcelona', 'Spain', '🇪🇸', 41.3874, 2.1686, {
+    code: 'BCN',
+    lat: 41.2974,
+    lng: 2.0833,
+  }),
+  r('paris', 'Paris', 'France', '🇫🇷', 48.8566, 2.3522, { code: 'CDG', lat: 49.0097, lng: 2.5479 }),
+  r('rome', 'Rome', 'Italy', '🇮🇹', 41.8967, 12.4822, { code: 'FCO', lat: 41.8003, lng: 12.2389 }),
+  r('florence', 'Florence', 'Italy', '🇮🇹', 43.7696, 11.2558, {
+    code: 'FLR',
+    lat: 43.81,
+    lng: 11.2051,
+  }),
+  r('amsterdam', 'Amsterdam', 'Netherlands', '🇳🇱', 52.3676, 4.9041, {
+    code: 'AMS',
+    lat: 52.3105,
+    lng: 4.7683,
+  }),
+  r('berlin', 'Berlin', 'Germany', '🇩🇪', 52.52, 13.405, {
+    code: 'BER',
+    lat: 52.3667,
+    lng: 13.5033,
+  }),
+  r('prague', 'Prague', 'Czechia', '🇨🇿', 50.0755, 14.4378, {
+    code: 'PRG',
+    lat: 50.1008,
+    lng: 14.26,
+  }),
+  r('vienna', 'Vienna', 'Austria', '🇦🇹', 48.2082, 16.3738, {
+    code: 'VIE',
+    lat: 48.1103,
+    lng: 16.5697,
+  }),
+  r('edinburgh', 'Edinburgh', 'United Kingdom', '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 55.9533, -3.1883, {
+    code: 'EDI',
+    lat: 55.95,
+    lng: -3.3725,
+  }),
 ];
 
 export const DEFAULT_REGION = REGIONS[0]!;
@@ -77,4 +130,23 @@ export function regionFor(p: LatLng): Region | null {
     }
   }
   return best;
+}
+
+/** Cities closer than this are a drive or a train ride, not a flight (Sintra ↔ Lisbon). */
+export const MIN_FLIGHT_KM = 300;
+
+/**
+ * Did the player fly? True when they were last seen in another launch city at least
+ * MIN_FLIGHT_KM away. Mirrors check_arrival() in the database.
+ */
+export function arrivalFlight(
+  previous: string | null | undefined,
+  current: string | null | undefined,
+): { from: Region; to: Region; km: number } | null {
+  if (!previous || !current || previous === current) return null;
+  const from = regionBySlug(previous);
+  const to = regionBySlug(current);
+  if (!from || !to) return null;
+  const km = haversineMeters(from.center, to.center) / 1000;
+  return km >= MIN_FLIGHT_KM ? { from, to, km } : null;
 }

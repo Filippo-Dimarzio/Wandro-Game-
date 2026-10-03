@@ -11,11 +11,21 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - Opening days and times for places that need them, shown on cards and the place sheet.
 - Discover hub and colour-coded category pages with Overview, Places and Learn tabs.
 - Illustrated category covers used for challenges, collections and places without a photo.
+- Europe: 12 launch cities next to Sintra with curated places, a city picker on the map, city
+  leaderboards that follow you, and `pnpm import:places --region <city>`.
+- Hidden gems: secret places that appear on the map only within 200 m, with coarse hints.
+- Friends: mutual friend requests and "challenge a friend" to a place with a short idea.
+- Adventures sidebar on the map (slides out on phones, docked on desktop and tablets) with
+  today's challenge, the hidden-gem hint, friends' challenges and nearby places.
+- Arrival flights: opening the app in a new city plays a flight from your old airport.
+- Log out button with confirmation on Profile and Settings, also in demo mode.
 
 ### Changed
 
 - Brighter light-blue theme with Wandro blue as the accent and a colour per category.
 - The check-in tab is now labelled "Check in" so "Discover" can name the new learning area.
+- Tab labels have a proper line height and medium weight, so they no longer clip or run together.
+- The friends leaderboard and private-profile access include accepted friends.
 
 ## [2.0.0] — 2026-10-04
 

@@ -92,6 +92,12 @@ interface SessionState extends DemoProgress {
   browse: LatLng | null;
   friends: Record<string, FriendStatus>;
   friendChallenges: DemoFriendChallenge[];
+  /** Last launch city the app was opened in (city only, never coordinates). */
+  lastRegion: string | null;
+  /** An arrival flight to play, e.g. after landing in another city. */
+  flight: { from: string; to: string; km: number } | null;
+  /** Bumped when a flight lands, so the map can fly to the new city. */
+  landedAt: number;
   /** Demo-only switch so the moderation screens can be tried. */
   demoModerator: boolean;
   installPromptDismissed: boolean;
@@ -113,6 +119,9 @@ interface SessionState extends DemoProgress {
   reviewSubmission: (id: string, approve: boolean) => void;
   buy: (itemCode: string, price: number, durationMinutes?: number) => boolean;
   equip: (slot: 'skin' | 'hat', itemCode: string | undefined) => void;
+  setLastRegion: (slug: string) => void;
+  startFlight: (flight: { from: string; to: string; km: number }) => void;
+  endFlight: () => void;
   reveal: (placeId: string) => void;
   clearJustRevealed: () => void;
   setBrowse: (p: LatLng | null) => void;
@@ -146,6 +155,9 @@ const initial = {
   browse: null,
   friends: INITIAL_FRIENDS,
   friendChallenges: initialFriendChallenges(),
+  lastRegion: null,
+  flight: null,
+  landedAt: 0,
   demoModerator: false,
   installPromptDismissed: false,
   prefs: { dailyReminder: true },
@@ -231,6 +243,9 @@ export const useSession = create<SessionState>()(
               },
         ),
       clearJustRevealed: () => set({ justRevealed: null }),
+      setLastRegion: (lastRegion) => set({ lastRegion }),
+      startFlight: (flight) => set({ flight }),
+      endFlight: () => set((s) => ({ flight: null, landedAt: s.landedAt + 1 })),
       setBrowse: (browse) => set({ browse }),
       sendFriendRequest: (id) => {
         const current = get().friends[id];
@@ -331,7 +346,14 @@ export const useSession = create<SessionState>()(
       name: 'wandro-session',
       version: 2,
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: ({ justUnlocked: _j, justRevealed: _r, browse: _b, ...rest }) => rest,
+      partialize: ({
+        justUnlocked: _j,
+        justRevealed: _r,
+        browse: _b,
+        flight: _f,
+        landedAt: _l,
+        ...rest
+      }) => rest,
       // v1 kept coins in `unlocked[].points` and `bonusPoints`; rebuild a ledger from them.
       migrate: (persisted, version) => {
         const old = (persisted ?? {}) as Record<string, unknown>;

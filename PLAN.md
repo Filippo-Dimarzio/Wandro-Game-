@@ -177,6 +177,8 @@ Each phase ends with: tests + lint green, a summary of changes, a manual test li
 
 **Phase 8 — Coin economy & store:** coins (= the ledger's points) are earned only by playing; the daily challenge pays double; coins buy the incense trail (glow + guiding line to the next adventure, timed) and octopus skins and hats. Spending never lowers XP or leaderboard rank. No subscription.
 
+**Phase 9 — Europe, hidden gems & friends:** 12 launch cities next to Sintra (`REGIONS` in `packages/shared`, region rows in a migration, curated places in the demo and dev seed, importer `--region`); hidden gems excluded by RLS until revealed within 200 m (`reveal_hidden_gem`, coarse `hidden_gem_hint`, 10 reveals/day); friends (`friendships`, mutual requests, friends see private activity) and friend challenges (a place + a note up to 280 characters, reportable, completed by a visits trigger); arrival flights (`check_arrival` stores only the last city, a flight is a new city ≥ 300 km away); Explore gets a slide-out Adventures sidebar (docked on wide screens) and a city picker; log out with confirmation; cleaner tab labels.
+
 ## 11. Things I need from you, and when
 
 | By            | What                                                                                                     |
@@ -196,7 +198,7 @@ Each phase ends with: tests + lint green, a summary of changes, a manual test li
 
 ## 13. Later (designed for, not built)
 
-Comments, daily challenge (rolling 24 h from when it appears for each user), friend dares, food and beach challenges (venue QR codes for proof), Instagram sharing via the share sheet with a branded frame, time-limited events, team challenges, offline map caching, full i18n (PT, EN, ES, IT, FR), venue partnerships, region expansions (Lisbon coast, Alentejo, Algarve…).
+Comments, food challenges (venue QR codes for proof), Instagram sharing via the share sheet with a branded frame, time-limited events, team challenges, offline map caching, full i18n (PT, EN, ES, IT, FR), venue partnerships, more cities (the importer takes any city in `REGIONS`).
 
 ## 14. UX decisions (confirmed with the product owner)
 
