@@ -27,6 +27,12 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - Tab labels have a proper line height and medium weight, so they no longer clip or run together.
 - The friends leaderboard and private-profile access include accepted friends.
 
+### Fixed
+
+- `nearby_places` ignored its radius and returned every place (its `lat`/`lng` parameters were
+  shadowed by the view's columns). With Europe seeded, a signed-in app would have loaded every
+  city at once. Covered by a new test that unlocks places in Paris and Madrid.
+
 ## [2.0.0] — 2026-10-04
 
 The full game loop (Phases 3–8). See [`docs/releases/v2.0.0.md`](docs/releases/v2.0.0.md).
