@@ -10,7 +10,9 @@ import { placesGeoJson, useFog } from './useFog';
 export type { PlaceMapProps } from './types';
 
 // Served from public/maplibre (see scripts/copy-maplibre-worker.mjs).
-maplibregl.setWorkerUrl('/maplibre/maplibre-gl-worker.mjs');
+maplibregl.setWorkerUrl(
+  `${process.env.EXPO_PUBLIC_BASE_URL ?? ''}/maplibre/maplibre-gl-worker.mjs`,
+);
 
 // Free OpenStreetMap raster tiles for the web preview (with attribution).
 // Native builds use Mapbox (PlaceMap.native.tsx).
