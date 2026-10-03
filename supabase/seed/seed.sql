@@ -17,11 +17,19 @@ from r, (values
   ('mouros', 'Castle of the Moors', 'Medieval hilltop castle with walls that climb the ridge.', 'heritage', 120, 38.7917, -9.3880),
   ('monserrate', 'Monserrate Palace', 'Exotic palace surrounded by botanical gardens.', 'culture', 100, 38.7919, -9.4191),
   ('capuchos', 'Convent of the Capuchos', 'Tiny cork-lined convent hidden in the forest.', 'heritage', 120, 38.7777, -9.4469),
-  ('cabo-da-roca', 'Cabo da Roca Viewpoint', 'The westernmost point of mainland Europe.', 'nature', 80, 38.7804, -9.4989),
-  ('adraga', 'Adraga Beach', 'Wild cove with rock arches and dramatic sunsets.', 'nature', 80, 38.8236, -9.4731),
+  ('cabo-da-roca', 'Cabo da Roca Viewpoint', 'The westernmost point of mainland Europe.', 'coast', 80, 38.7804, -9.4989),
+  ('adraga', 'Adraga Beach', 'Wild cove with rock arches and dramatic sunsets.', 'coast', 80, 38.8236, -9.4731),
+  ('praia-grande', 'Praia Grande', 'Surf beach where dinosaur footprints climb the cliff at the southern end.', 'coast', 80, 38.8160, -9.4785),
+  ('azenhas', 'Azenhas do Mar', 'White village tumbling down a cliff to a tide pool.', 'coast', 80, 38.8406, -9.4618),
+  ('music-corner', 'Sintra Live Music Corner', 'Small local venue with traditional fado nights.', 'music_events', 100, 38.7985, -9.3875),
   ('cruz-alta', 'Cruz Alta Viewpoint', 'The highest point of the Sintra hills.', 'nature', 80, 38.7861, -9.3897)
 ) as v(source_id, name, description, category, base_points, lat, lng)
 on conflict (source, source_id) do nothing;
+
+-- Venues with set times (Thu–Sat, 21:30 to 00:30).
+update public.places
+set opening_hours = '[{"days": [4, 5, 6], "open": "21:30", "close": "00:30"}]'
+where source = 'seed' and source_id = 'music-corner';
 
 insert into public.place_stats (place_id)
 select id from public.places
@@ -30,10 +38,11 @@ on conflict (place_id) do nothing;
 -- 30 days of daily challenges starting today (Lisbon), rotating themes.
 insert into public.daily_challenges (challenge_date, title, description, category, bonus_points)
 select d::date,
-       (array['Find a hidden viewpoint', 'Step into history', 'Culture hunt', 'Wander anywhere new'])[1 + (i % 4)],
+       (array['Find a hidden viewpoint', 'Step into history', 'Culture hunt', 'Follow the coastline', 'Wander anywhere new'])[1 + (i % 5)],
        (array['Discover any nature spot today.', 'Discover any heritage site today.',
-              'Discover a museum or cultural place today.', 'Discover any place you have never visited.'])[1 + (i % 4)],
-       (array['nature', 'heritage', 'culture', null])[1 + (i % 4)]::public.place_category,
+              'Discover a museum or cultural place today.', 'Discover any beach or coastal spot today.',
+              'Discover any place you have never visited.'])[1 + (i % 5)],
+       (array['nature', 'heritage', 'culture', 'coast', null])[1 + (i % 5)]::public.place_category,
        75
 from generate_series(0, 29) as i,
      lateral (select (now() at time zone 'Europe/Lisbon')::date + i as d) x

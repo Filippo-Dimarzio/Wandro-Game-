@@ -5,15 +5,17 @@ export const DEFAULT_DWELL_SECONDS = 120;
 export const MAX_ACCURACY_M = 50;
 
 export const CATEGORIES: readonly Category[] = [
-  'culture',
-  'heritage',
+  'coast',
   'nature',
+  'heritage',
+  'culture',
   'music_events',
   'other',
 ];
 
 /** Base points per category; rarity multiplier is applied on top. */
 export const BASE_POINTS: Record<Category, number> = {
+  coast: 80,
   culture: 100,
   heritage: 120,
   nature: 80,

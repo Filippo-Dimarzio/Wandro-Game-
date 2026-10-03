@@ -1,5 +1,5 @@
 import { BASE_POINTS, DEFAULT_GEOFENCE_RADIUS_M } from './constants';
-import type { Category, Place } from './types';
+import type { Category, OpeningSlot, Place } from './types';
 
 function p(
   id: string,
@@ -9,6 +9,7 @@ function p(
   lng: number,
   uniqueVisitors: number,
   description: string,
+  hours?: OpeningSlot[],
 ): Place {
   return {
     id,
@@ -20,6 +21,7 @@ function p(
     geofenceRadiusM: DEFAULT_GEOFENCE_RADIUS_M,
     basePoints: BASE_POINTS[category],
     uniqueVisitors,
+    ...(hours && { hours }),
   };
 }
 
@@ -85,7 +87,7 @@ export const DEMO_PLACES: Place[] = [
   p(
     'demo-cabo',
     'Cabo da Roca Viewpoint',
-    'nature',
+    'coast',
     38.7804,
     -9.4989,
     900,
@@ -94,7 +96,7 @@ export const DEMO_PLACES: Place[] = [
   p(
     'demo-adraga',
     'Adraga Beach',
-    'nature',
+    'coast',
     38.8236,
     -9.4731,
     40,
@@ -135,5 +137,24 @@ export const DEMO_PLACES: Place[] = [
     -9.3875,
     0,
     'Small local venue with traditional fado nights.',
+    [{ days: [4, 5, 6], open: '21:30', close: '00:30' }],
+  ),
+  p(
+    'demo-praia-grande',
+    'Praia Grande',
+    'coast',
+    38.816,
+    -9.4785,
+    260,
+    'Surf beach where dinosaur footprints climb the cliff at the southern end.',
+  ),
+  p(
+    'demo-azenhas',
+    'Azenhas do Mar',
+    'coast',
+    38.8406,
+    -9.4618,
+    75,
+    'White village tumbling down a cliff to a tide pool.',
   ),
 ];
