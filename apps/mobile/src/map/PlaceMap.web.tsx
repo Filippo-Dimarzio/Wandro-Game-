@@ -1,11 +1,12 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import * as maplibregl from 'maplibre-gl';
 import type { GeoJSONSource, Map as MLMap, MapLayerMouseEvent } from 'maplibre-gl';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { View } from 'react-native';
+import { shopItem, skinColor } from '@wandro/shared';
 import { lightColors } from '@/theme';
 import type { PlaceMapProps } from './types';
-import { placesGeoJson, useFog } from './useFog';
+import { accuracyGeoJson, guidanceGeoJson, placesGeoJson, useFog } from './useFog';
 
 export type { PlaceMapProps } from './types';
 
@@ -14,7 +15,7 @@ maplibregl.setWorkerUrl(
   `${process.env.EXPO_PUBLIC_BASE_URL ?? ''}/maplibre/maplibre-gl-worker.mjs`,
 );
 
-// Free OpenStreetMap raster tiles for the web preview (with attribution).
+// Free OpenStreetMap raster tiles for the web and desktop apps (with attribution).
 // Native builds use Mapbox (PlaceMap.native.tsx).
 const STYLE: maplibregl.StyleSpecification = {
   version: 8,
@@ -44,6 +45,35 @@ const categoryColor: maplibregl.ExpressionSpecification = [
   lightColors.category.other,
 ];
 
+// Find-My-style pulse and incense glow for the octopus marker.
+const MARKER_CSS = `
+.wandro-me { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.wandro-me .pulse { position: absolute; width: 44px; height: 44px; border-radius: 50%; background: rgba(43,108,176,.35); animation: wandro-pulse 2s ease-out infinite; }
+.wandro-me .glow { position: absolute; width: 96px; height: 96px; border-radius: 50%; background: radial-gradient(circle, rgba(246,173,85,.75), rgba(246,173,85,0) 70%); animation: wandro-glow 1.8s ease-in-out infinite; }
+.wandro-me .body { position: relative; width: 36px; height: 36px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1; }
+.wandro-me .hat { position: absolute; top: -14px; font-size: 18px; line-height: 1; }
+@keyframes wandro-pulse { 0% { transform: scale(.6); opacity: .9 } 100% { transform: scale(2.2); opacity: 0 } }
+@keyframes wandro-glow { 0%,100% { transform: scale(.85); opacity: .7 } 50% { transform: scale(1.1); opacity: 1 } }
+@media (prefers-reduced-motion: reduce) { .wandro-me .pulse, .wandro-me .glow { animation: none } }
+`;
+
+function ensureMarkerCss() {
+  if (document.getElementById('wandro-marker-css')) return;
+  const style = document.createElement('style');
+  style.id = 'wandro-marker-css';
+  style.textContent = MARKER_CSS;
+  document.head.appendChild(style);
+}
+
+function markerHtml(skin: string | undefined, hat: string | undefined, glow: boolean): string {
+  const hatEmoji = shopItem(hat)?.emoji;
+  return `${glow ? '<div class="glow"></div>' : ''}<div class="pulse"></div><div class="body" style="background:${skinColor(skin)}">🐙</div>${hatEmoji ? `<div class="hat">${hatEmoji}</div>` : ''}`;
+}
+
+function setSourceData(m: MLMap | null, ready: boolean, id: string, data: GeoJSON.GeoJSON) {
+  if (ready) (m?.getSource(id) as GeoJSONSource | undefined)?.setData(data);
+}
+
 export function PlaceMap({
   places,
   unlockedIds,
@@ -51,35 +81,93 @@ export function PlaceMap({
   onSelect,
   compact,
   recenterSignal,
+  onLongPress,
+  accuracyM,
+  target,
+  trail = false,
+  avatar,
+  follow,
 }: PlaceMapProps) {
   const container = useRef<HTMLDivElement | null>(null);
   const map = useRef<MLMap | null>(null);
+  const marker = useRef<maplibregl.Marker | null>(null);
   const ready = useRef(false);
   const fog = useFog(places, unlockedIds);
-  const placesData = placesGeoJson(places, unlockedIds);
-  const latest = useRef({ places, onSelect });
-  latest.current = { places, onSelect };
+  const placesData = useMemo(() => placesGeoJson(places, unlockedIds), [places, unlockedIds]);
+  const accuracy = useMemo(
+    () => accuracyGeoJson(userPosition, accuracyM),
+    [userPosition, accuracyM],
+  );
+  const guidance = useMemo(
+    () => guidanceGeoJson(userPosition, target, trail),
+    [userPosition, target, trail],
+  );
+  const latest = useRef({ places, onSelect, onLongPress, fog, placesData, accuracy, guidance });
+  latest.current = { places, onSelect, onLongPress, fog, placesData, accuracy, guidance };
 
   useEffect(() => {
     if (!container.current) return;
+    ensureMarkerCss();
     const m = new maplibregl.Map({
       container: container.current,
       style: STYLE,
       center: [userPosition.lng, userPosition.lat],
-      zoom: compact ? 11 : 13,
+      zoom: compact ? 11 : 14,
       interactive: !compact,
       attributionControl: { compact: true },
     });
     map.current = m;
+    const el = document.createElement('div');
+    el.className = 'wandro-me';
+    el.setAttribute('aria-label', 'You');
+    marker.current = new maplibregl.Marker({ element: el })
+      .setLngLat([userPosition.lng, userPosition.lat])
+      .addTo(m);
+
     m.on('load', () => {
-      m.addSource('fog', { type: 'geojson', data: fog });
+      const d = latest.current;
+      m.addSource('fog', { type: 'geojson', data: d.fog });
       m.addLayer({
         id: 'fog',
         type: 'fill',
         source: 'fog',
         paint: { 'fill-color': '#ECE9E0', 'fill-opacity': 0.78 },
       });
-      m.addSource('places', { type: 'geojson', data: placesData });
+      m.addSource('accuracy', { type: 'geojson', data: d.accuracy });
+      m.addLayer({
+        id: 'accuracy',
+        type: 'fill',
+        source: 'accuracy',
+        paint: { 'fill-color': '#2B6CB0', 'fill-opacity': 0.12 },
+      });
+      m.addLayer({
+        id: 'accuracy-edge',
+        type: 'line',
+        source: 'accuracy',
+        paint: { 'line-color': '#2B6CB0', 'line-opacity': 0.45, 'line-width': 1.5 },
+      });
+      m.addSource('target-ring', { type: 'geojson', data: d.guidance.ring });
+      m.addLayer({
+        id: 'target-ring',
+        type: 'line',
+        source: 'target-ring',
+        paint: { 'line-color': lightColors.gold, 'line-width': 3, 'line-dasharray': [2, 1.5] },
+      });
+      m.addSource('trail', { type: 'geojson', data: d.guidance.line });
+      m.addLayer({
+        id: 'trail-glow',
+        type: 'line',
+        source: 'trail',
+        paint: { 'line-color': '#F6AD55', 'line-width': 10, 'line-opacity': 0.35, 'line-blur': 4 },
+      });
+      m.addLayer({
+        id: 'trail',
+        type: 'line',
+        source: 'trail',
+        layout: { 'line-cap': 'round' },
+        paint: { 'line-color': '#DD6B20', 'line-width': 4, 'line-dasharray': [0.5, 2] },
+      });
+      m.addSource('places', { type: 'geojson', data: d.placesData });
       m.addLayer({
         id: 'places',
         type: 'circle',
@@ -91,54 +179,66 @@ export function PlaceMap({
           'circle-stroke-width': 2.5,
         },
       });
-      m.addSource('me', {
-        type: 'geojson',
-        data: { type: 'Point', coordinates: [userPosition.lng, userPosition.lat] },
-      });
-      m.addLayer({
-        id: 'me',
-        type: 'circle',
-        source: 'me',
-        paint: {
-          'circle-radius': 7,
-          'circle-color': '#2B6CB0',
-          'circle-stroke-color': '#fff',
-          'circle-stroke-width': 3,
-        },
-      });
       m.on('click', 'places', (e: MapLayerMouseEvent) => {
         const id = e.features?.[0]?.properties?.id as string | undefined;
         const p = latest.current.places.find((x) => x.id === id);
         if (p) latest.current.onSelect?.(p);
       });
+      m.on('contextmenu', (e) =>
+        latest.current.onLongPress?.({ lat: e.lngLat.lat, lng: e.lngLat.lng }),
+      );
       m.on('mouseenter', 'places', () => (m.getCanvas().style.cursor = 'pointer'));
       m.on('mouseleave', 'places', () => (m.getCanvas().style.cursor = ''));
       ready.current = true;
     });
+
+    // Marching-ants animation on the incense trail.
+    let frame = 0;
+    let step = 0;
+    const dashes: [number, number, number][] = [
+      [0, 0.5, 2],
+      [0.5, 0.5, 1.5],
+      [1, 0.5, 1],
+      [1.5, 0.5, 0.5],
+    ];
+    const animate = () => {
+      step = (step + 1) % (dashes.length * 8);
+      if (ready.current && step % 8 === 0 && m.getLayer('trail')) {
+        m.setPaintProperty('trail', 'line-dasharray', dashes[step / 8]);
+      }
+      frame = requestAnimationFrame(animate);
+    };
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (!reduceMotion) frame = requestAnimationFrame(animate);
+
     return () => {
+      cancelAnimationFrame(frame);
       ready.current = false;
+      marker.current?.remove();
       m.remove();
     };
     // Map is created once; data updates are pushed by the effects below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => setSourceData(map.current, ready.current, 'fog', fog), [fog]);
+  useEffect(() => setSourceData(map.current, ready.current, 'places', placesData), [placesData]);
+  useEffect(() => setSourceData(map.current, ready.current, 'accuracy', accuracy), [accuracy]);
   useEffect(() => {
-    if (ready.current) (map.current?.getSource('fog') as GeoJSONSource | undefined)?.setData(fog);
-  }, [fog]);
+    setSourceData(map.current, ready.current, 'target-ring', guidance.ring);
+    setSourceData(map.current, ready.current, 'trail', guidance.line);
+  }, [guidance]);
 
   useEffect(() => {
-    if (ready.current)
-      (map.current?.getSource('places') as GeoJSONSource | undefined)?.setData(placesData);
-  }, [placesData]);
+    marker.current?.setLngLat([userPosition.lng, userPosition.lat]);
+    if (follow)
+      map.current?.easeTo({ center: [userPosition.lng, userPosition.lat], duration: 250 });
+  }, [userPosition.lat, userPosition.lng, follow]);
 
   useEffect(() => {
-    if (!ready.current) return;
-    (map.current?.getSource('me') as GeoJSONSource | undefined)?.setData({
-      type: 'Point',
-      coordinates: [userPosition.lng, userPosition.lat],
-    });
-  }, [userPosition.lat, userPosition.lng]);
+    const el = marker.current?.getElement();
+    if (el) el.innerHTML = markerHtml(avatar?.skin, avatar?.hat, trail);
+  }, [avatar?.skin, avatar?.hat, trail]);
 
   useEffect(() => {
     if (recenterSignal)

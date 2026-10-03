@@ -33,7 +33,7 @@ select pg_temp.check((select is_ready from open_daily_challenge()), 'challenge r
 select pg_temp.check((complete_daily_challenge((select challenge_id from ch)) ->> 'status') = 'completed', 'tap to confirm completes');
 select pg_temp.check((complete_daily_challenge((select challenge_id from ch)) ->> 'status') = 'already_completed', 'second tap is idempotent');
 select pg_temp.check(my_total_points() = 75, 'bonus awarded exactly once');
-select pg_temp.check((select xp from profiles where id = auth.uid()) = 75, 'xp updated server-side');
+select pg_temp.check((select xp from profiles where id = auth.uid()) = (select sum(xp) from points_ledger where user_id = auth.uid()), 'xp updated server-side from the ledger');
 
 -- Submissions
 insert into place_submissions (user_id, name, location, category, is_public_access, is_safe)

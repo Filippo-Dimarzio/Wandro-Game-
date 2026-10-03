@@ -9,6 +9,8 @@ export interface UserLocation {
   accuracy: number | null;
   /** True when the position is real GPS rather than the demo fallback/teleport. */
   isReal: boolean;
+  /** Android reports positions from mock-location apps; the server flags those check-ins. */
+  isMocked: boolean;
   permission: 'granted' | 'denied' | 'undetermined';
   request: () => Promise<void>;
 }
@@ -17,7 +19,11 @@ export interface UserLocation {
 export function useLocation(): UserLocation {
   const teleport = useSession((s) => s.teleport);
   const [permission, setPermission] = useState<UserLocation['permission']>('undetermined');
-  const [fix, setFix] = useState<{ position: LatLng; accuracy: number | null } | null>(null);
+  const [fix, setFix] = useState<{
+    position: LatLng;
+    accuracy: number | null;
+    isMocked: boolean;
+  } | null>(null);
 
   useEffect(() => {
     Location.getForegroundPermissionsAsync()
@@ -34,6 +40,7 @@ export function useLocation(): UserLocation {
         setFix({
           position: { lat: l.coords.latitude, lng: l.coords.longitude },
           accuracy: l.coords.accuracy,
+          isMocked: !!l.mocked,
         }),
     )
       .then((s) => (sub = s))
@@ -47,7 +54,14 @@ export function useLocation(): UserLocation {
   };
 
   if (isDemo && teleport)
-    return { position: teleport, accuracy: 5, isReal: false, permission, request };
+    return { position: teleport, accuracy: 5, isReal: false, isMocked: false, permission, request };
   if (fix) return { ...fix, isReal: true, permission, request };
-  return { position: SINTRA_CENTER, accuracy: null, isReal: false, permission, request };
+  return {
+    position: SINTRA_CENTER,
+    accuracy: isDemo ? 5 : null,
+    isReal: false,
+    isMocked: false,
+    permission,
+    request,
+  };
 }

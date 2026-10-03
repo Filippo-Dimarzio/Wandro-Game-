@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FOG_CLEAR_RADIUS_M, fogPolygon, type Place } from '@wandro/shared';
+import { circleRing, FOG_CLEAR_RADIUS_M, fogPolygon, type Place } from '@wandro/shared';
 import { useSession } from '@/state/session';
 
 const ANIMATION_MS = 1400;
@@ -58,4 +58,64 @@ export function placesGeoJson(places: Place[], unlockedIds: Set<string>) {
       geometry: { type: 'Point' as const, coordinates: [p.lng, p.lat] },
     })),
   };
+}
+
+type Ring = [number, number][];
+
+const emptyCollection = { type: 'FeatureCollection' as const, features: [] as GeoJSON.Feature[] };
+
+/** Accuracy circle around the explorer (Find My style); at least 12 m so it stays visible. */
+export function accuracyGeoJson(
+  user: { lat: number; lng: number },
+  accuracyM: number | null | undefined,
+) {
+  return {
+    type: 'Feature' as const,
+    properties: {},
+    geometry: {
+      type: 'Polygon' as const,
+      coordinates: [circleRing(user, Math.max(12, accuracyM ?? 12))] as Ring[],
+    },
+  };
+}
+
+/** The target's geofence ring and, with the incense trail, a guiding line from the explorer. */
+export function guidanceGeoJson(
+  user: { lat: number; lng: number },
+  target: { lat: number; lng: number; geofenceRadiusM: number } | null | undefined,
+  trail: boolean,
+) {
+  if (!target) return { ring: emptyCollection, line: emptyCollection };
+  const ring = {
+    type: 'FeatureCollection' as const,
+    features: [
+      {
+        type: 'Feature' as const,
+        properties: {},
+        geometry: {
+          type: 'LineString' as const,
+          coordinates: circleRing(target, target.geofenceRadiusM),
+        },
+      },
+    ],
+  };
+  const line = trail
+    ? {
+        type: 'FeatureCollection' as const,
+        features: [
+          {
+            type: 'Feature' as const,
+            properties: {},
+            geometry: {
+              type: 'LineString' as const,
+              coordinates: [
+                [user.lng, user.lat],
+                [target.lng, target.lat],
+              ],
+            },
+          },
+        ],
+      }
+    : emptyCollection;
+  return { ring, line };
 }

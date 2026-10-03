@@ -1,24 +1,27 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { levelProgress, octopusStage } from '@wandro/shared';
+import type { Wallet } from '@/data/wallet';
 import { t } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
 
-export function ProgressStrip({ points, discoveries }: { points: number; discoveries: number }) {
+export function ProgressStrip({ wallet }: { wallet: Wallet }) {
   const c = useColors();
-  // XP mirrors points for now; the server keeps them separately in the ledger.
-  const lp = levelProgress(points);
+  const lp = levelProgress(wallet.xp);
   return (
-    <View
+    <Pressable
+      onPress={() => router.push('/leaderboard')}
       style={[styles.strip, { backgroundColor: c.surface }]}
-      accessible
-      accessibilityLabel={`${t('home.level', { level: lp.level })}, ${octopusStage(lp.level)}, ${t('home.points', { points })}`}
+      accessibilityRole="button"
+      accessibilityLabel={`${t('home.level', { level: lp.level })}, ${octopusStage(lp.level)}, ${t('coins.a11y', { coins: wallet.coins })}, ${t('home.streak', { days: wallet.streak })}`}
+      testID="progress-strip"
     >
       <View style={styles.row}>
         <Text style={[styles.level, { color: c.text }]}>
           {'🐙 '}
           {t('home.level', { level: lp.level })} · {octopusStage(lp.level)}
         </Text>
-        <Text style={[styles.points, { color: c.accent }]}>{t('home.points', { points })}</Text>
+        <Text style={[styles.points, { color: c.gold }]}>🪙 {wallet.coins}</Text>
       </View>
       <View style={[styles.track, { backgroundColor: c.border }]}>
         <View
@@ -30,9 +33,12 @@ export function ProgressStrip({ points, discoveries }: { points: number; discove
       </View>
       <Text style={{ color: c.textMuted, fontSize: 12 }}>
         {lp.xpIntoLevel}/{lp.xpForNext} XP ·{' '}
-        {t(discoveries === 1 ? 'home.discoveryOne' : 'home.discoveryMany', { count: discoveries })}
+        {t(wallet.discoveries === 1 ? 'home.discoveryOne' : 'home.discoveryMany', {
+          count: wallet.discoveries,
+        })}
+        {wallet.streak > 0 ? ` · 🔥 ${t('home.streak', { days: wallet.streak })}` : ''}
       </Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -40,7 +46,7 @@ const styles = StyleSheet.create({
   strip: { borderRadius: radius.md, padding: space.md, gap: space.sm },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   level: { fontWeight: '700', fontSize: 15 },
-  points: { fontWeight: '800', fontSize: 15 },
+  points: { fontWeight: '900', fontSize: 16 },
   track: { height: 6, borderRadius: 3, overflow: 'hidden' },
   bar: { height: 6, borderRadius: 3 },
 });

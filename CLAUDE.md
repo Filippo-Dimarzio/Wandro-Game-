@@ -20,7 +20,8 @@ Wandro is a photo-first, location-based exploration game and community app. Pilo
 ## Repo layout
 
 ```
-apps/mobile/       Expo app
+apps/mobile/       Expo app (iOS, Android, web)
+apps/desktop/      Electron desktop app (wraps the web build)
 supabase/          migrations, functions, seed, tests
 scripts/importer/  OSM/Wikidata importer
 packages/shared/   shared types, scoring constants, geo helpers
@@ -39,13 +40,15 @@ pnpm test                        Jest unit/component tests
 pnpm test:db                     SQL/RLS/scoring tests (Postgres 16 + PostGIS on localhost)
 pnpm import:places [--dry-run]   run the place importer (idempotent)
 pnpm --filter mobile build:web   static web build
+pnpm --filter desktop start      run the desktop app (builds the web app first)
+pnpm --filter desktop dist       build a desktop installer for this OS
 ```
 
 Before reporting a phase done, run `pnpm lint && pnpm typecheck && pnpm test && pnpm test:db`.
 
 ## Non-negotiable rules
 
-1. **Server decides everything that matters.** Points, XP, levels, badges, unlocks and rarity are written only by Edge Functions with the service role. Never compute or accept points from the client. Clients have no write access to `visits`, `points_ledger`, `user_badges` or `place_stats`.
+1. **Server decides everything that matters.** Points/coins, XP, levels, badges, unlocks, rarity and inventory are written only by `SECURITY DEFINER` server functions (Postgres RPCs in `supabase/migrations`). Never compute or accept points from the client. Clients have no write access to `visits`, `points_ledger`, `user_badges`, `place_stats` or `user_inventory`. Coins are never sold.
 2. **One completion per user per place**, enforced by a unique constraint as well as in code.
 3. **Every table has RLS enabled.** New tables ship with policies and RLS tests in the same migration PR.
 4. **Never commit secrets.** Use `.env` (git-ignored); keep `.env.example` current. The Supabase service-role key and Mapbox secret token never go into the app bundle.
@@ -60,7 +63,8 @@ Before reporting a phase done, run `pnpm lint && pnpm typecheck && pnpm test && 
 - TypeScript `strict`; no `any` without a comment explaining why.
 - Shared constants (scoring, radii, thresholds) live in `packages/shared`, with unit tests.
 - Database changes only via migration files in `supabase/migrations`; never edit the hosted DB by hand. Migrations are forward-only and named `YYYYMMDDHHMMSS_description.sql`.
-- Edge Functions validate input (e.g. zod), are idempotent, and return typed errors.
+- Server functions validate input, are idempotent, raise stable error codes (e.g. `too_far`) that the app maps to i18n strings, and ship with SQL tests.
+- Demo mode mirrors server rules in `packages/shared` / `apps/mobile/src/demo`; keep both in sync (catalogue sync tests enforce codes and prices).
 - Server state goes through TanStack Query; Zustand is for UI/session state only.
 - Match existing code style; Prettier and ESLint are the authority. Keep comments for the "why", not the "what".
 - Commits: imperative, clear messages. One logical change per commit.

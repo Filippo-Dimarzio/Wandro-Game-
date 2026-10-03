@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Check } from '@/components/Check';
 import { t, type TranslationKey } from '@/i18n';
 import { signInWithProvider, useAuthSession } from '@/lib/auth';
 import { isDemo } from '@/lib/env';
@@ -40,6 +41,7 @@ export default function Register() {
   const [username, setUsername] = useState('');
   const [homeCity, setHomeCity] = useState('');
   const [styles_, setStyles] = useState<string[]>([]);
+  const [guidelines, setGuidelines] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -226,10 +228,21 @@ export default function Register() {
                   );
                 })}
               </View>
+              <View style={[styles.guidelines, { backgroundColor: c.surface }]}>
+                <Text style={{ color: c.text, fontWeight: '800' }}>
+                  {t('register.guidelinesTitle')}
+                </Text>
+                <Check
+                  label={t('register.guidelines')}
+                  value={guidelines}
+                  onChange={setGuidelines}
+                  testID="guidelines"
+                />
+              </View>
               <Primary
                 label={t('register.finish')}
                 onPress={finish}
-                disabled={busy || styles_.length === 0}
+                disabled={busy || styles_.length === 0 || !guidelines}
                 testID="finish"
               />
             </View>
@@ -320,6 +333,7 @@ const styles = StyleSheet.create({
   link: { alignItems: 'center', padding: space.sm },
   dots: { flexDirection: 'row', gap: 6 },
   dot: { width: 28, height: 5, borderRadius: 3 },
+  guidelines: { borderRadius: radius.md, padding: space.md, gap: space.xs },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.md },
   tile: {
     width: '47%',

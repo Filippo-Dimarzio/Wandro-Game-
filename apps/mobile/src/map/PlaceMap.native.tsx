@@ -1,10 +1,11 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import { OctopusAvatar } from '@/components/OctopusAvatar';
 import { env } from '@/lib/env';
 import { lightColors } from '@/theme';
 import { FallbackMap } from './FallbackMap';
 import type { PlaceMapProps } from './types';
-import { placesGeoJson, useFog } from './useFog';
+import { accuracyGeoJson, guidanceGeoJson, placesGeoJson, useFog } from './useFog';
 
 export type { PlaceMapProps } from './types';
 
@@ -29,11 +30,34 @@ function MapboxPlaceMap({
   onSelect,
   compact,
   recenterSignal,
+  onLongPress,
+  accuracyM,
+  target,
+  trail = false,
+  avatar,
+  follow,
   mb,
 }: PlaceMapProps & { mb: typeof import('@rnmapbox/maps') }) {
-  const { MapView, Camera, ShapeSource, FillLayer, CircleLayer, StyleURL } = mb;
+  const { MapView, Camera, ShapeSource, FillLayer, LineLayer, CircleLayer, MarkerView, StyleURL } =
+    mb;
   const camera = useRef<import('@rnmapbox/maps').Camera>(null);
   const fog = useFog(places, unlockedIds);
+  const accuracy = useMemo(
+    () => accuracyGeoJson(userPosition, accuracyM),
+    [userPosition, accuracyM],
+  );
+  const guidance = useMemo(
+    () => guidanceGeoJson(userPosition, target, trail),
+    [userPosition, target, trail],
+  );
+
+  useEffect(() => {
+    if (follow)
+      camera.current?.setCamera({
+        centerCoordinate: [userPosition.lng, userPosition.lat],
+        animationDuration: 250,
+      });
+  }, [follow, userPosition.lat, userPosition.lng]);
 
   useEffect(() => {
     if (recenterSignal)
@@ -55,6 +79,10 @@ function MapboxPlaceMap({
       pitchEnabled={false}
       scaleBarEnabled={false}
       accessibilityLabel="Map of places"
+      onLongPress={(f) => {
+        const [lng, lat] = (f.geometry as GeoJSON.Point).coordinates;
+        onLongPress?.({ lat, lng });
+      }}
     >
       <Camera
         ref={camera}
@@ -102,20 +130,38 @@ function MapboxPlaceMap({
           }}
         />
       </ShapeSource>
-      <ShapeSource
-        id="me"
-        shape={{ type: 'Point', coordinates: [userPosition.lng, userPosition.lat] }}
-      >
-        <CircleLayer
-          id="me-dot"
-          style={{
-            circleRadius: 7,
-            circleColor: '#2B6CB0',
-            circleStrokeColor: '#fff',
-            circleStrokeWidth: 3,
-          }}
+      <ShapeSource id="accuracy" shape={accuracy}>
+        <FillLayer id="accuracy-fill" style={{ fillColor: '#2B6CB0', fillOpacity: 0.12 }} />
+        <LineLayer
+          id="accuracy-edge"
+          style={{ lineColor: '#2B6CB0', lineOpacity: 0.45, lineWidth: 1.5 }}
         />
       </ShapeSource>
+      <ShapeSource id="target-ring" shape={guidance.ring}>
+        <LineLayer
+          id="target-ring-line"
+          style={{ lineColor: lightColors.gold, lineWidth: 3, lineDasharray: [2, 1.5] }}
+        />
+      </ShapeSource>
+      <ShapeSource id="trail" shape={guidance.line}>
+        <LineLayer
+          id="trail-glow"
+          style={{ lineColor: '#F6AD55', lineWidth: 10, lineOpacity: 0.35, lineBlur: 4 }}
+        />
+        <LineLayer
+          id="trail-line"
+          style={{ lineColor: '#DD6B20', lineWidth: 4, lineCap: 'round', lineDasharray: [0.5, 2] }}
+        />
+      </ShapeSource>
+      <MarkerView coordinate={[userPosition.lng, userPosition.lat]} allowOverlap>
+        <OctopusAvatar
+          size={compact ? 24 : 36}
+          skin={avatar?.skin}
+          hat={avatar?.hat}
+          glow={trail}
+          accessibilityLabel="You"
+        />
+      </MarkerView>
     </MapView>
   );
 }

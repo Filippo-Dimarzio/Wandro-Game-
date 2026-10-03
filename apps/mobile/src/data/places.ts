@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { DEMO_PLACES, type Place } from '@wandro/shared';
+import { useMemo } from 'react';
+import { BASE_POINTS, DEFAULT_GEOFENCE_RADIUS_M, DEMO_PLACES, type Place } from '@wandro/shared';
 import { isDemo } from '@/lib/env';
 import { supabase } from '@/lib/supabase';
 import { useSession } from '@/state/session';
@@ -37,10 +38,29 @@ export function rowToPlace(r: PlaceRow): Place {
 export function usePlaces(center: { lat: number; lng: number }) {
   // Round so small GPS jitter doesn't refetch.
   const key = [center.lat.toFixed(2), center.lng.toFixed(2)];
+  // Select the stable array and derive from it; filtering inside the selector would return a
+  // new array on every render and loop forever.
+  const submissions = useSession((s) => s.submissions);
+  const approved = useMemo(() => submissions.filter((x) => x.status === 'approved'), [submissions]);
+  const approvedKey = approved.map((x) => x.id).join(',');
   return useQuery({
-    queryKey: ['places', ...key, isDemo],
+    queryKey: ['places', ...key, isDemo, approvedKey],
     queryFn: async (): Promise<Place[]> => {
-      if (!supabase) return DEMO_PLACES;
+      if (!supabase) {
+        // Demo: approved suggestions become new missions, like approve_place_submission().
+        const extra: Place[] = approved.map((x) => ({
+          id: x.id,
+          name: x.name,
+          description: x.description,
+          category: x.category,
+          lat: x.lat,
+          lng: x.lng,
+          geofenceRadiusM: DEFAULT_GEOFENCE_RADIUS_M,
+          basePoints: BASE_POINTS[x.category],
+          uniqueVisitors: 0,
+        }));
+        return [...DEMO_PLACES, ...extra];
+      }
       const { data, error } = await supabase.rpc('nearby_places', {
         lat: center.lat,
         lng: center.lng,
@@ -53,27 +73,17 @@ export function usePlaces(center: { lat: number; lng: number }) {
 }
 
 /** IDs of places the current user has discovered. */
-export function useUnlockedIds(): { ids: Set<string>; totalPoints: number } {
+export function useUnlockedIds(): { ids: Set<string> } {
   const unlocked = useSession((s) => s.unlocked);
-  const bonus = useSession((s) => s.bonusPoints);
   const server = useQuery({
     queryKey: ['my-visits'],
     enabled: !isDemo,
     queryFn: async () => {
-      const db = supabase!;
-      const [visits, points] = await Promise.all([
-        db.from('visits').select('place_id'),
-        db.rpc('my_total_points'),
-      ]);
-      if (visits.error) throw visits.error;
-      if (points.error) throw points.error;
-      return { ids: visits.data.map((v) => v.place_id as string), total: points.data as number };
+      const { data, error } = await supabase!.from('visits').select('place_id');
+      if (error) throw error;
+      return data.map((v) => v.place_id as string);
     },
   });
-  if (!isDemo) {
-    return { ids: new Set(server.data?.ids ?? []), totalPoints: server.data?.total ?? 0 };
-  }
-  const ids = new Set(Object.keys(unlocked));
-  const totalPoints = Object.values(unlocked).reduce((s, u) => s + u.points, 0) + bonus;
-  return { ids, totalPoints };
+  if (!isDemo) return { ids: new Set(server.data ?? []) };
+  return { ids: new Set(Object.keys(unlocked)) };
 }

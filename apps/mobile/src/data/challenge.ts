@@ -16,6 +16,8 @@ export interface DailyChallenge {
   expiresAt: string;
   completedAt: string | null;
   isReady: boolean;
+  /** Demo only: discoveries in the window that satisfy the challenge. */
+  qualifyingPlaceIds: string[];
 }
 
 const ROTATION: { title: string; description: string; category: Category | null }[] = [
@@ -51,7 +53,7 @@ export function todayKey(now = new Date()): string {
 export function demoChallenge(
   now: Date,
   state: { date: string; startedAt: string; completedAt?: string } | null,
-  unlocked: Record<string, { at: string }>,
+  unlocked: Record<string, { at: string; points?: number }>,
   places: Place[],
 ): DailyChallenge {
   const date = todayKey(now);
@@ -59,20 +61,24 @@ export function demoChallenge(
   const def = ROTATION[dayIndex % ROTATION.length];
   const started = state?.date === date ? state.startedAt : now.toISOString();
   const expires = new Date(new Date(started).getTime() + DAY_MS).toISOString();
-  const isReady = Object.entries(unlocked).some(([id, u]) => {
+  const qualifying = Object.entries(unlocked).filter(([id, u]) => {
     if (u.at < started || u.at > expires) return false;
     const p = places.find((x) => x.id === id);
     return !!p && (def.category === null || p.category === def.category);
   });
+  const isReady = qualifying.length > 0;
+  // Double coins: the bonus repeats the best qualifying discovery's coins.
+  const bonus = Math.max(DAILY_CHALLENGE_BONUS, ...qualifying.map(([, u]) => u.points ?? 0));
   return {
     id: `demo-${date}`,
     ...def,
     placeId: null,
-    bonusPoints: DAILY_CHALLENGE_BONUS,
+    bonusPoints: bonus,
     startedAt: started,
     expiresAt: expires,
     completedAt: state?.date === date ? (state.completedAt ?? null) : null,
     isReady,
+    qualifyingPlaceIds: qualifying.map(([id]) => id),
   };
 }
 
@@ -94,7 +100,7 @@ export function useDailyChallenge(places: Place[]) {
   const unlocked = useSession((s) => s.unlocked);
   const demoState = useSession((s) => s.challenge);
   const setChallenge = useSession((s) => s.setChallenge);
-  const addBonus = useSession((s) => s.addBonus);
+  const completeChallenge = useSession((s) => s.completeChallenge);
 
   // Demo: computed on-device. Opening it starts the user's rolling 24 h window.
   const demo = useMemo(
@@ -125,6 +131,7 @@ export function useDailyChallenge(places: Place[]) {
         expiresAt: row.expires_at,
         completedAt: row.completed_at,
         isReady: row.is_ready,
+        qualifyingPlaceIds: [],
       };
     },
   });
@@ -139,8 +146,8 @@ export function useDailyChallenge(places: Place[]) {
           startedAt: c.startedAt,
           completedAt: new Date().toISOString(),
         });
-        addBonus(c.bonusPoints);
-        return { status: 'completed', bonus_points: c.bonusPoints };
+        const bonus = completeChallenge(c.qualifyingPlaceIds, c.id, places);
+        return { status: 'completed', bonus_points: bonus };
       }
       // The server re-validates everything; the tap only claims the bonus.
       const { data, error } = await supabase!.rpc('complete_daily_challenge', {
@@ -152,6 +159,7 @@ export function useDailyChallenge(places: Place[]) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['daily-challenge'] });
       qc.invalidateQueries({ queryKey: ['my-visits'] });
+      qc.invalidateQueries({ queryKey: ['wallet'] });
     },
   });
 

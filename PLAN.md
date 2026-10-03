@@ -1,6 +1,6 @@
 # Wandro — PLAN.md
 
-Status: **DRAFT — awaiting approval. No code has been written.**
+Status: **v2.0 — Phases 0–8 built.** This plan records the decisions; `README.md` describes the product as shipped.
 
 Wandro is a photo-first, community-driven exploration game. Players uncover real places (lesser-known museums, castles, heritage sites, parks, viewpoints, music venues, nature spots) by physically visiting them. Pilot region: **Sintra and surroundings, Portugal**. The mascot is an octopus (eight arms reaching out in every direction).
 
@@ -42,7 +42,7 @@ wandro/
 ├── apps/mobile/          Expo (React Native, TypeScript, Expo Router)
 ├── supabase/
 │   ├── migrations/       SQL schema, RLS, functions, views
-│   ├── functions/        Edge Functions (check-in, scoring, account export/delete)
+│   ├── functions/        (reserved) Edge Functions for things SQL can't do, e.g. push
 │   ├── seed/             Seed data
 │   └── tests/            pgTAP/SQL tests for RLS and scoring
 ├── scripts/importer/     Overpass + Wikidata/Wikipedia/Commons importer
@@ -53,7 +53,8 @@ wandro/
 
 - **Client:** Expo Router, TanStack Query (server state), Zustand (UI/session state), `@rnmapbox/maps`, `expo-location` (foreground only), `expo-notifications`, `expo-image` for fast photo rendering.
 - **Backend:** Supabase Postgres + PostGIS, Auth (email, Google, Apple), Row Level Security, Storage, Edge Functions (Deno).
-- **Trust boundary:** the client is never trusted. All points, unlocks, XP and badges are written only by Edge Functions using the service role. Clients cannot insert or update `visits`, `points_ledger`, `user_badges` or `place_stats`.
+- **Trust boundary:** the client is never trusted. All points, unlocks, XP and badges are written only by server functions: `SECURITY DEFINER` Postgres functions called over RPC (chosen over Deno Edge Functions so validation and scoring run in one transaction and are covered by the SQL test suite). Clients cannot insert or update `visits`, `points_ledger`, `user_badges`, `place_stats`, inventory or coins.
+- **Desktop:** `apps/desktop` wraps the web build in Electron (Windows, macOS, Linux installers built by the Release workflow). The web app is also installable from the browser.
 - **Expo + Mapbox:** `@rnmapbox/maps` needs a development build (not Expo Go). EAS Build is set up in Phase 0.
 
 ## 4. Data model
@@ -138,7 +139,7 @@ Honest limits: GPS can always be spoofed by a determined user, especially on roo
 - Location requested only while the app is in use (no background location).
 - Only the verified visit summary is stored; raw pings are deleted (section 5).
 - Nobody's live location is ever exposed. Feeds show "visited X" after the fact, with an option to hide the exact time.
-- **Data export** and **account deletion** are Edge Functions: deletion removes profile, visits, posts and photos, and anonymises content that must remain.
+- **Data export** (`export_my_data`) and **account deletion** (`delete_my_account`) are server functions: deletion removes profile, visits, posts and photos (the app removes stored photos first); anonymous visitor counts remain.
 - Data minimisation: no analytics SDK in the MVP; add one later with consent.
 - Place photos from Wikimedia Commons keep their licence and attribution. OpenStreetMap data requires ODbL attribution in the app.
 
@@ -162,13 +163,19 @@ Each phase ends with: tests + lint green, a summary of changes, a manual test li
 
 **Phase 2 — Map:** Mapbox map with fog styling, user location (foreground), nearby places, locked/unlocked styling, category filters, place sheet. _Manual check:_ map performance, contrast, small-screen layout, screen-reader labels.
 
-**Phase 3 — Check-in & scoring:** Edge Functions (`start_checkin`, `complete_checkin`), scoring, levels, streaks, badges, integration tests for scoring/validation/RLS. _Manual check:_ real-world walk to a Sintra place; negative tests (too far, too short, mock location).
+**Phase 3 — Check-in & scoring:** server functions (`start_checkin`, `add_checkin_ping`, `complete_checkin`), scoring, levels, streaks, badges, integration tests for scoring/validation/RLS. _Manual check:_ real-world walk to a Sintra place; negative tests (too far, too short, mock location).
 
 **Phase 4a — Photos, feed & safety:** posts with optional proof photo, follow/unfollow (with private-profile requests), home feed, likes, report/block, guidelines. _Manual check:_ two test accounts following each other; report and block flows.
 
 **Phase 4b — Leaderboards, collections, submissions:** leaderboards (friends/region/global/weekly), collections with completion bonus, place submissions, moderation queue. _Manual check:_ collection completion; submission approved in Studio shows on the map.
 
 **Phase 5 — Polish & release:** onboarding, empty/error/offline states, accessibility pass, test coverage, privacy policy and data export/delete flows verified, store-ready EAS builds. _Manual check:_ full end-to-end on iOS and Android.
+
+**Phase 6 — Desktop app:** Electron shell for Windows/macOS/Linux, installers attached to every release, installable web app (manifest + service worker) with an Install / Download banner.
+
+**Phase 7 — Find-My-style walking:** the octopus marks your position with a pulse and accuracy circle; Guide me shows distance, walking time and closeness ('On your way' → 'You're here!') with Google Maps directions; demo/desktop walking with WASD, arrow keys or an on-screen pad.
+
+**Phase 8 — Coin economy & store:** coins (= the ledger's points) are earned only by playing; the daily challenge pays double; coins buy the incense trail (glow + guiding line to the next adventure, timed) and octopus skins and hats. Spending never lowers XP or leaderboard rank. No subscription.
 
 ## 11. Things I need from you, and when
 
@@ -228,4 +235,6 @@ Comments, daily challenge (rolling 24 h from when it appears for each user), fri
 
 **Notifications (default on, user-configurable):** friend activity, daily challenge, streak reminders. Nearby alerts are in-app only.
 
-**Monetisation:** a subscription is the intended direction. Not built in the MVP. Constraints to keep in mind: digital subscriptions on iOS and Android must use the stores' in-app purchase systems; premium should never buy points or leaderboard advantage, only extras such as regions, stats and cosmetics.
+**Monetisation (decided for v2.0):** coins only, no subscription and no payments. Coins are earned by playing and spent in the in-game store on equipment (incense trail) and cosmetics. Coins can never be bought, so leaderboards stay fair. If paid features come later, digital purchases on iOS/Android must use the stores' in-app purchase systems.
+
+**Walking (decided for v2.0):** your octopus is you on the map (Find-My-style). Real discoveries need real GPS with a backend; in demo mode and on desktop you can walk virtually with the keyboard or on-screen pad, and those virtual visits count on that device.

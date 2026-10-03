@@ -5,16 +5,15 @@
 Wandro is a photo-first, location-based exploration game and community app. It gives you the
 "map reveal" feeling of open-world games, but the missions are real places: lesser-known museums,
 castles, heritage sites, parks, viewpoints, beaches, music venues and nature spots. Places start
-hidden under fog; physically visiting one unlocks it, clears the fog around it and earns points.
-Hidden gems are worth the most.
+hidden under fog; visiting one unlocks it, clears the fog around it and earns **coins** for your
+octopus. Hidden gems are worth the most.
 
 - **Pilot region:** Sintra and its surroundings, Portugal
-- **Status:** v1.0 — foundation, backend and app preview (Phases 0–2). See the [roadmap](#roadmap).
-- **Try it in your browser:** <https://filippo-dimarzio.github.io/Wandro-Game-/> (demo mode,
-  see [Hosting](#hosting-the-web-app))
-
----------------------------- | --------------------------- | -------------------------- | --------------------- |
-| Hold to clear the fog | Feed-first, progress strip | Google Maps-style sheet | "Map of you", badges |
+- **Status:** v2.0 — the full game loop (Phases 0–8). See the [roadmap](#roadmap).
+- **Play in your browser:** <https://filippo-dimarzio.github.io/Wandro-Game-/> (demo mode — click
+  **Install app** to put it on your desktop)
+- **Download for desktop:** Windows, macOS and Linux installers on the
+  [latest release](https://github.com/Filippo-Dimarzio/Wandro-Game-/releases/latest)
 
 ---
 
@@ -48,21 +47,28 @@ level up, your octopus evolves (Hatchling → Explorer → Navigator → Cartogr
 
 ## How it plays
 
-1. **Explore the map.** Places near you are fogged and greyed out until you discover them.
-2. **Go there for real.** When you're inside a place's geofence (75 m by default), the app offers
-   _"You're at X — start discovery"_.
-3. **Stay a moment.** A ring fills during the dwell time (2 minutes by default). The server checks
-   your location, accuracy and timing; it never trusts the phone for points.
-4. **Unlock it.** The fog clears in a circle around the place, you earn points, and you can add a
-   photo.
-5. **Daily challenge — touch to confirm.** Each day brings a new challenge (e.g. _"Step into
-   history: discover any heritage site"_). It lasts a rolling 24 hours from when you first see it.
-   After a matching discovery, **press and hold** to claim the bonus. Releasing early cancels, so
-   it can't be claimed by accident; screen-reader users get a normal "activate" action instead.
-6. **Collect.** Collections like _"Sintra's palaces"_ or _"Hidden gems"_ track progress and give a
-   completion bonus.
-7. **Suggest places.** Players can drop a pin and suggest a place. Moderators review it (public
-   access, safe to visit) and **approve it as a new mission** on the map.
+1. **Explore the map.** Places near you are fogged and greyed out until you discover them. Your
+   octopus marks where you are, with a pulsing accuracy circle like _Find My_.
+2. **Pick an adventure.** Tap a place and **Guide me**: a card shows the distance, walking time and
+   how close you are (_On your way → Getting warmer → Almost there → You're here!_), with
+   **Directions in Google Maps**. When a hidden gem is within 150 m, the app nudges you.
+3. **Go there.** On a phone you walk there for real. In the browser or the desktop app (demo
+   mode) you can walk your octopus with **WASD / arrow keys** (Shift = slow) or the on-screen pad.
+4. **Stay a moment.** Hold **Start discovery** and stay inside the place's geofence (75 m) while
+   the ring fills (2 minutes; 8 seconds in demo). The server checks location, accuracy, timing,
+   mock locations and impossible speed — it never trusts the phone for coins.
+5. **Unlock it.** The fog clears in a circle, coins land in your octopus's pouch, you may earn
+   badges, and you can share a photo (its location data is stripped first).
+6. **Daily challenge — double coins.** Each day brings a new challenge (e.g. _"Step into history:
+   discover any heritage site"_), open for 24 hours from when you first see it. After a matching
+   discovery, **press and hold** to claim it: you get that discovery's coins **again**.
+7. **Collect.** Collections like _"Sintra's palaces"_ pay a 200-coin bonus when complete.
+8. **Spend coins in the Store.** The **incense trail** wraps your octopus in a glowing circle and
+   draws a guiding line to your next adventure for 30 minutes or 2 hours. Octopus skins and hats
+   are forever. Coins are only earned by playing — never bought — and spending never lowers your
+   rank.
+9. **Play together.** Follow explorers, like their discoveries, climb the leaderboards, and
+   suggest new places, which moderators **approve as new missions**.
 
 ## Look and feel
 
@@ -94,16 +100,28 @@ Navigation is a bottom tab bar like Instagram: Home · Explore · Discover · Co
 
 | Rule                  | Value                                                                                                         |
 | --------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Base points           | Culture 100 · Heritage 120 · Nature 80 · Music & events 100 · Other 60                                        |
+| Base coins            | Culture 100 · Heritage 120 · Nature 80 · Music & events 100 · Other 60                                        |
 | Rarity multiplier     | `1 + 4 / (1 + n/10)`, where _n_ = unique visitors so far (0 → 5×, 10 → 3×, 100 → ~1.4×)                       |
-| First discoverer      | +50 points                                                                                                    |
-| Daily challenge       | +75 points, once per day, inside your 24 h window                                                             |
-| Collection completion | +200 points                                                                                                   |
+| First discoverer      | +50 coins                                                                                                     |
+| Daily challenge       | Double coins: the qualifying discovery pays again (at least 75), once a day                                   |
+| Collection completion | +200 coins                                                                                                    |
 | Levels                | `level = floor(sqrt(xp / 100)) + 1`; streaks give XP only                                                     |
 | Badges                | Category ("3 heritage sites"), region ("Sintra complete"), rarity ("Hidden gem hunter"), streak and community |
 
-Points are frozen when awarded (an append-only ledger), so later changes in rarity never change
-past scores. Each player can complete each place **once**.
+Coins and XP are written to an append-only ledger, so later changes in rarity never change past
+rewards. Each player can complete each place **once**. XP comes with every coin earned (plus
+streaks and badges) and never goes down; leaderboards rank by coins **earned**, so shopping
+doesn't cost you rank.
+
+## The Store
+
+| Item                            | Price     | What it does                                                                                                    |
+| ------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------- |
+| 🪔 Incense trail · 30 min / 2 h | 150 / 400 | Glowing circle around your octopus and a guiding line to the nearest undiscovered place; buying again adds time |
+| 🌊🪸🌙✨ Octopus skins          | 300–1200  | Change your octopus's colour on the map, profile and store                                                      |
+| 🌺🧢🎩👑 Hats                   | 200–1500  | A hat for your octopus                                                                                          |
+
+There is no subscription and no way to buy coins.
 
 ## Fair play, privacy and a civil community
 
@@ -130,17 +148,19 @@ and alternatives to press-and-hold gestures.
 
 ## Roadmap
 
-| Phase | Scope                                                                                                                                                                                                  | Status          |
-| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
-| 0     | Monorepo, tooling, CI, environment config                                                                                                                                                              | ✅ v1.0         |
-| 1     | Database schema + security rules, auth, profiles, Sintra seed + importer                                                                                                                               | ✅ v1.0         |
-| 2     | Map with fog, locked/unlocked places, filters, place details, app screens                                                                                                                              | ✅ v1.0         |
-| —     | Daily challenge (touch to confirm) and approved missions (submission moderation)                                                                                                                       | ✅ v1.0 (early) |
-| 3     | Server check-in validation, scoring, levels, streaks, badges                                                                                                                                           | ⏭ next (v2.0)   |
-| 4a    | Photo posts, follows, feed, likes, report/block, guidelines                                                                                                                                            | Planned         |
-| 4b    | Leaderboards, collections, place submissions UI, moderation                                                                                                                                            | Planned         |
-| 5     | Onboarding polish, empty/error states, test coverage, store-ready builds                                                                                                                               | Planned         |
-| Later | Comments, friend dares, food & beach challenges, Instagram share cards, events, teams, offline maps, more languages, region expansions (Lisbon coast, Alentejo, Algarve), subscription with fair perks | Ideas           |
+| Phase | Scope                                                                                                                                                                                                            | Status          |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| 0     | Monorepo, tooling, CI, environment config                                                                                                                                                                        | ✅ v1.0         |
+| 1     | Database schema + security rules, auth, profiles, Sintra seed + importer                                                                                                                                         | ✅ v1.0         |
+| 2     | Map with fog, locked/unlocked places, filters, place details, app screens                                                                                                                                        | ✅ v1.0         |
+| —     | Daily challenge (touch to confirm) and approved missions (submission moderation)                                                                                                                                 | ✅ v1.0 (early) |
+| 3     | Server-verified check-ins, coins, levels, streaks, badges                                                                                                                                                        | ✅ v2.0         |
+| 4     | Photo posts, follows, feed, likes, report/block, leaderboards, collections, place submissions, moderation                                                                                                        | ✅ v2.0         |
+| 5     | Settings, data export, account deletion, privacy page, onboarding guide, store-build config                                                                                                                      | ✅ v2.0         |
+| 6     | Desktop app (Windows, macOS, Linux) and installable web app                                                                                                                                                      | ✅ v2.0         |
+| 7     | Find-My-style walking: octopus marker, proximity guidance, Google Maps directions, keyboard walking                                                                                                              | ✅ v2.0         |
+| 8     | Coin economy: double daily coins, Store with incense trail, skins and hats                                                                                                                                       | ✅ v2.0         |
+| Later | Comments, friend dares, food & beach challenges, Instagram share cards, events, teams, offline maps, more languages, region expansions (Lisbon coast, Alentejo, Algarve), push notifications for friend activity | Ideas           |
 
 The full plan — architecture, data model, check-in validation and every decision — is in
 [`PLAN.md`](PLAN.md). Project rules for contributors (and Claude Code) are in
@@ -172,6 +192,13 @@ pnpm --filter mobile start
 
 Scan the QR code with the **Expo Go** app. Expo Go can't load the Mapbox module, so the map shows a
 simplified schematic view; everything else works.
+
+**Desktop app from source:**
+
+```bash
+pnpm --filter desktop start   # builds the web app, then opens the Electron window
+pnpm --filter desktop dist    # builds an installer for your OS into apps/desktop/dist
+```
 
 **Full native build with the real Mapbox map:** needs a Mapbox account
 (`EXPO_PUBLIC_MAPBOX_TOKEN` and `RNMAPBOX_MAPS_DOWNLOAD_TOKEN` in `.env`) and Xcode/Android Studio
@@ -216,6 +243,7 @@ To use a real backend, copy `.env.example` to `.env`, fill in `EXPO_PUBLIC_SUPAB
 
 ```
 apps/mobile/        Expo app: screens (app/), components, map, data hooks, i18n
+apps/desktop/       Electron desktop app wrapping the web build
 packages/shared/    scoring, levels, geo and fog helpers shared by app and server
 supabase/           database migrations, seed data and SQL tests
 scripts/importer/   OpenStreetMap + Wikidata place importer
@@ -233,6 +261,7 @@ pnpm test            # unit and component tests
 pnpm test:db         # SQL tests: schema, security rules, daily challenge, submissions
 pnpm import:places   # OSM + Wikidata importer (add --dry-run to only print)
 pnpm --filter mobile build:web   # static web build in apps/mobile/dist
+pnpm --filter desktop dist       # desktop installer for this OS
 ```
 
 `pnpm test:db` needs Postgres 16 with PostGIS on `localhost:5432` (user and password `postgres`):
@@ -255,8 +284,11 @@ that link to the repository's **About → Website** field.
 
 ## Releases
 
-Pushing a tag such as `v1.0.0` (or running the **Release** workflow manually with the tag name) publishes a GitHub
-Release using the notes in `docs/releases/<tag>.md`. See [`CHANGELOG.md`](CHANGELOG.md).
+Pushing a tag such as `v2.0.0` (or running the **Release** workflow manually with the tag name) publishes a GitHub
+Release using the notes in `docs/releases/<tag>.md`, then builds the Windows (`.exe`), macOS
+(`.dmg`) and Linux (`.AppImage`) installers and attaches them. The installers are unsigned for
+now, so Windows SmartScreen and macOS Gatekeeper will warn on first launch (macOS: right-click →
+Open). See [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Working together
 

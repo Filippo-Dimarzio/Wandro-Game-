@@ -42,7 +42,9 @@ export function DailyChallengeCard({ places }: { places: Place[] }) {
         <Ionicons name="flash" size={18} color={c.gold} accessibilityElementsHidden />
         <Text style={[styles.kicker, { color: c.gold }]}>{t('challenge.title')}</Text>
         <Text style={[styles.bonus, { color: c.text }]}>
-          {t('challenge.bonus', { points: challenge.bonusPoints })}
+          {challenge.isReady || challenge.completedAt
+            ? `${t('challenge.bonus', { points: challenge.bonusPoints })} · ${t('challenge.double')}`
+            : `🪙 ${t('challenge.double')}`}
         </Text>
       </View>
       <Text style={[styles.title, { color: c.text }]} accessibilityRole="header">

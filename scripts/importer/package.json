@@ -1,6 +1,6 @@
 {
   "name": "importer",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "start": "tsx --env-file-if-exists=../../.env src/main.ts",
