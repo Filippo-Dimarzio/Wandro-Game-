@@ -37,7 +37,7 @@ describe('Category page', () => {
   it('shows the coast overview, its places and things to learn', async () => {
     await render(<CategoryPage />, { wrapper });
     expect(await screen.findByRole('header', { name: 'Beaches & coast' })).toBeOnTheScreen();
-    expect(screen.getByText(/Sintra's coast is wild Atlantic/)).toBeOnTheScreen();
+    expect(screen.getByText(/Golden sand, salty air/)).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Places' }));
     expect(screen.getByRole('button', { name: /Adraga Beach/ })).toBeOnTheScreen();
@@ -45,7 +45,7 @@ describe('Category page', () => {
     expect(screen.queryByRole('button', { name: /Pena Palace/ })).toBeNull();
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Learn' }));
-    expect(screen.getByText(/westernmost point of mainland Europe/)).toBeOnTheScreen();
+    expect(screen.getByText(/explore rock pools/)).toBeOnTheScreen();
     expect(screen.getByText(/Check the tide/)).toBeOnTheScreen();
 
     // The bottom call to action (the hero also has a map button).

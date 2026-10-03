@@ -103,7 +103,7 @@ export const en = {
   'day.6': 'Sat',
 
   'discover.title': 'Discover',
-  'discover.subtitle': 'Learn about Sintra through what you love.',
+  'discover.subtitle': 'Explore the world through what you love.',
   'discover.back': 'Back',
   'discover.placeCount': '{count} places',
   'discover.tabOverview': 'Overview',
@@ -119,42 +119,47 @@ export const en = {
   'discover.challengeMatch': "Today's challenge is in this category",
 
   'learn.coast.intro':
-    "Sintra's coast is wild Atlantic: cliff-backed coves, surf beaches and villages perched above the sea, all inside the Sintra-Cascais Natural Park.",
-  'learn.coast.fact1': 'Cabo da Roca is the westernmost point of mainland Europe.',
+    'Golden sand, salty air and waves rolling in. Find hidden coves, sunset viewpoints and the best spots for a swim, a surf or a long barefoot walk.',
+  'learn.coast.fact1':
+    'Low tide is the best time to explore rock pools for crabs, anemones and starfish.',
   'learn.coast.fact2':
-    'At the southern end of Praia Grande, dinosaur footprints are preserved in the cliff face.',
-  'learn.coast.fact3': 'Azenhas do Mar has a sea-water pool in the rocks below the village.',
+    'The "golden hour" just before sunset gives the warmest, softest light for photos.',
+  'learn.coast.fact3': 'Tides rise and fall about twice a day, so a beach can change by the hour.',
   'learn.coast.tip':
     'Check the tide and keep well back from cliff edges. Some coves are cut off at high tide.',
   'learn.nature.intro':
-    'The Sintra hills catch the Atlantic mist, which keeps their forests green all year. Trails link viewpoints, gardens and hidden springs.',
-  'learn.nature.fact1': 'The Sintra-Cascais Natural Park was created in 1994.',
-  'learn.nature.fact2': 'Cruz Alta, at about 528 m, is the highest point of the Sintra hills.',
-  'learn.nature.fact3': "Monserrate's gardens hold plants from around the world.",
+    'Lush forests, winding trails and peaks with views that go on forever. Breathe in the fresh air and find waterfalls, wildflowers and quiet picnic spots.',
+  'learn.nature.fact1': 'Early morning is often the best time to spot birds and wildlife.',
+  'learn.nature.fact2':
+    'Many trails are waymarked with coloured signs so you can follow the route.',
+  'learn.nature.fact3': 'Time among trees is linked to lower stress and a brighter mood.',
   'learn.nature.tip': 'Stay on marked trails and take your litter home.',
   'learn.heritage.intro':
-    'Moors, kings and Romantic dreamers all built here. Palaces, castles and convents sit within a few kilometres of each other.',
+    'Fairytale castles, grand palaces and ancient ruins full of stories. Step back in time through towers, gates and secret gardens.',
   'learn.heritage.fact1':
-    'The Cultural Landscape of Sintra became a UNESCO World Heritage Site in 1995.',
-  'learn.heritage.fact2': 'The Castle of the Moors was first built in the 8th and 9th centuries.',
-  'learn.heritage.fact3': 'Pena Palace was built in the 19th century for King Ferdinand II.',
-  'learn.heritage.tip': 'Old stairs and walls get slippery in the mist. Wear good shoes.',
+    'Many castles were built on hilltops so guards could see visitors coming from far away.',
+  'learn.heritage.fact2':
+    'Carvings and coats of arms on old buildings often reveal who built them.',
+  'learn.heritage.fact3':
+    'UNESCO protects World Heritage Sites for their value to everyone, everywhere.',
+  'learn.heritage.tip': 'Old stairs and walls can be slippery. Wear good shoes.',
   'learn.culture.intro':
-    "From toy collections to exotic palaces, Sintra's museums and cultural houses are small, personal and often quiet.",
-  'learn.culture.fact1': 'Monserrate Palace mixes Gothic, Indian and Moorish styles.',
-  'learn.culture.fact2': 'Lord Byron called Sintra a "glorious Eden".',
-  'learn.culture.fact3': 'Seteais Palace was built in the late 18th century.',
+    'Vibrant galleries, quirky museums and street art around every corner. Get inspired by paintings, sculptures and stories from every era.',
+  'learn.culture.fact1': 'Many museums have a free entry day or evening each month.',
+  'learn.culture.fact2':
+    'Murals and street art can turn a whole neighbourhood into an open-air gallery.',
+  'learn.culture.fact3': "Audio guides and tours reveal stories you'd never spot on your own.",
   'learn.culture.tip': 'Check opening times before you go. Many places close one day a week.',
   'learn.music_events.intro':
-    "Evenings in Sintra mean fado in small rooms, festival nights and live sets. These places have set times, so check when they're on.",
+    "Live gigs, open-air concerts and dance floors that come alive after dark. Find the beats, the crowds and the nights you'll remember.",
   'learn.music_events.fact1':
-    "Fado joined UNESCO's list of the Intangible Cultural Heritage of Humanity in 2011.",
-  'learn.music_events.fact2': 'Fado is usually played with a 12-string Portuguese guitar.',
-  'learn.music_events.fact3':
-    "The Sintra Festival has brought classical music to the town's palaces since the 1950s.",
-  'learn.music_events.tip': 'Venues are neighbours too. Keep it down on the way out.',
+    'Open-air concerts and festivals are some of the best-loved summer outings.',
+  'learn.music_events.fact2': 'Singing along with a crowd is a proven mood booster.',
+  'learn.music_events.fact3': 'Many venues host open-mic nights where anyone can take the stage.',
+  'learn.music_events.tip':
+    "These places have set times, so check when they're on. Keep it down on the way out.",
   'learn.other.intro':
-    "Fountains, odd corners and things that don't fit a box. Curiosities are where hidden gems hide.",
+    "Hidden fountains, odd corners and wonderful surprises that don't fit a box. Curiosities are where the real hidden gems hide.",
   'learn.other.fact1': 'Places with fewer explorers are worth more points.',
   'learn.other.fact2': 'A place nobody has discovered yet is worth five times its base points.',
   'learn.other.fact3': 'The first explorer to discover a place earns an extra bonus.',
