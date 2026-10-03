@@ -25,10 +25,12 @@ interface Props {
   unlocked: boolean;
   onClose: () => void;
   onTeleport?: () => void;
+  /** Start Find-My-style guidance to this place. */
+  onGuide?: () => void;
 }
 
 /** Google Maps-style sheet: a peek card that expands to full details, coloured by category. */
-export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport }: Props) {
+export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport, onGuide }: Props) {
   const c = useColors();
   const [expanded, setExpanded] = useState(false);
   const pts = pointsForVisit(place.category, place.uniqueVisitors, place.basePoints);
@@ -170,6 +172,17 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport 
           <Ionicons name="navigate" size={16} color={c.onCategory} />
           <Text style={{ color: c.onCategory, fontWeight: '800' }}>{t('place.directions')}</Text>
         </Pressable>
+        {!unlocked && onGuide && (
+          <Pressable
+            onPress={onGuide}
+            accessibilityRole="button"
+            style={[styles.action, { backgroundColor: c.gold }]}
+            testID="guide-me"
+          >
+            <Ionicons name="compass" size={16} color="#1C1404" />
+            <Text style={{ color: '#1C1404', fontWeight: '800' }}>{t('hud.guide')}</Text>
+          </Pressable>
+        )}
         {isDemo && onTeleport && (
           <Pressable
             onPress={onTeleport}

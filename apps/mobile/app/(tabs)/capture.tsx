@@ -1,19 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDistance } from '@wandro/shared';
 import { placeImage } from '@/categories';
 import { HoldToConfirm } from '@/components/HoldToConfirm';
 import { CategoryPill, HoursChip } from '@/components/PlaceBits';
-import { demoVisitPoints, nearestLocked } from '@/data/discovery';
+import { RewardCard } from '@/components/RewardCard';
+import { useCheckin } from '@/data/checkin';
+import { nearestLocked } from '@/data/discovery';
 import { usePlaces, useUnlockedIds } from '@/data/places';
-import { t } from '@/i18n';
+import { t, type TranslationKey } from '@/i18n';
 import { DEMO_DWELL_SECONDS, isDemo } from '@/lib/env';
 import { useLocation } from '@/lib/useLocation';
-import { useSession } from '@/state/session';
 import { radius, shadow, space, useColors } from '@/theme';
 
 export default function Capture() {
@@ -21,56 +21,18 @@ export default function Capture() {
   const loc = useLocation();
   const places = usePlaces(loc.position);
   const { ids } = useUnlockedIds();
-  const unlock = useSession((s) => s.unlock);
-  const nearest = nearestLocked(loc.position, loc.accuracy, places.data ?? [], ids);
-
-  const [dwellLeft, setDwellLeft] = useState<number | null>(null);
-  const [success, setSuccess] = useState<{ name: string; points: number } | null>(null);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const inRangeRef = useRef(false);
-  inRangeRef.current = !!nearest?.inRange;
-
-  useEffect(
-    () => () => {
-      if (timer.current) clearInterval(timer.current);
-    },
-    [],
-  );
-
-  const startDiscovery = () => {
-    if (!nearest || !isDemo) return;
-    const place = nearest.place;
-    setSuccess(null);
-    setDwellLeft(DEMO_DWELL_SECONDS);
-    timer.current = setInterval(() => {
-      // Leaving the geofence cancels the dwell, like the server rule.
-      if (!inRangeRef.current) {
-        clearInterval(timer.current!);
-        setDwellLeft(null);
-        return;
-      }
-      setDwellLeft((s) => {
-        if (s === null) return null;
-        if (s <= 1) {
-          clearInterval(timer.current!);
-          const points = demoVisitPoints(place);
-          unlock(place.id, points);
-          setSuccess({ name: place.name, points });
-          return null;
-        }
-        return s - 1;
-      });
-    }, 1000);
-  };
+  const list = places.data ?? [];
+  const nearest = nearestLocked(loc.position, loc.accuracy, list, ids);
+  const { phase, start, reset } = useCheckin(loc, list);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <Text style={[styles.title, { color: c.text }]} accessibilityRole="header">
           {t('capture.title')}
         </Text>
 
-        {loc.permission !== 'granted' && (
+        {!isDemo && loc.permission !== 'granted' && (
           <View style={[styles.card, { backgroundColor: c.surface }]}>
             <Text style={{ color: c.text }}>{t('capture.locationOff')}</Text>
             <Pressable
@@ -83,27 +45,38 @@ export default function Capture() {
           </View>
         )}
 
-        {success && (
+        {phase.kind === 'done' && (
+          <RewardCard
+            placeName={phase.place.name}
+            outcome={phase.outcome}
+            onDone={reset}
+            onShare={
+              phase.outcome.status === 'verified'
+                ? () => router.push({ pathname: '/post/new', params: { place: phase.place.id } })
+                : undefined
+            }
+          />
+        )}
+
+        {phase.kind === 'error' && (
           <View
-            style={[styles.card, { backgroundColor: c.accent }]}
-            accessibilityLiveRegion="assertive"
+            style={[styles.card, { backgroundColor: c.surface }]}
+            accessibilityLiveRegion="polite"
           >
-            <Ionicons name="sparkles" size={28} color={c.accentOn} />
-            <Text style={{ color: c.accentOn, fontSize: 20, fontWeight: '800' }}>
-              {t('capture.success', { points: success.points })}
+            <Text style={{ color: c.danger, fontWeight: '700' }}>
+              {t(`checkin.error.${phase.code}` as TranslationKey)}
             </Text>
-            <Text style={{ color: c.accentOn }}>{success.name}</Text>
-            <Text
-              style={{ color: c.accentOn, textDecorationLine: 'underline' }}
-              onPress={() => router.push('/(tabs)/explore')}
-              accessibilityRole="link"
+            <Pressable
+              onPress={reset}
+              accessibilityRole="button"
+              style={[styles.button, { backgroundColor: c.accent }]}
             >
-              {t('tabs.explore')} →
-            </Text>
+              <Text style={{ color: c.accentOn, fontWeight: '800' }}>{t('checkin.tryAgain')}</Text>
+            </Pressable>
           </View>
         )}
 
-        {nearest && (
+        {phase.kind !== 'done' && phase.kind !== 'error' && nearest && (
           <View style={[styles.card, shadow, { backgroundColor: c.card }]}>
             <Image
               source={placeImage(nearest.place)}
@@ -132,25 +105,36 @@ export default function Capture() {
               </Text>
             )}
 
-            {dwellLeft !== null ? (
-              <View style={styles.dwell} accessibilityLiveRegion="polite">
+            {phase.kind === 'dwelling' && (
+              <View style={styles.dwell} accessibilityLiveRegion="polite" testID="dwell">
                 <View style={[styles.ring, { borderColor: c.accent }]}>
                   <Text style={{ color: c.text, fontSize: 28, fontWeight: '900' }}>
-                    {dwellLeft}
+                    {phase.secondsLeft}
                   </Text>
                 </View>
-                <Text style={{ color: c.text }}>{t('capture.dwell', { seconds: dwellLeft })}</Text>
+                <Text style={{ color: c.text }}>
+                  {t('capture.dwell', { seconds: phase.secondsLeft })}
+                </Text>
+                <Pressable onPress={reset} accessibilityRole="button">
+                  <Text style={{ color: c.textMuted, textDecorationLine: 'underline' }}>
+                    {t('checkin.cancel')}
+                  </Text>
+                </Pressable>
               </View>
-            ) : isDemo ? (
+            )}
+            {(phase.kind === 'starting' || phase.kind === 'completing') && (
+              <Text style={{ color: c.textMuted }} accessibilityLiveRegion="polite">
+                <Ionicons name="cloud-upload" /> {t('checkin.verifying')}
+              </Text>
+            )}
+            {phase.kind === 'idle' && (
               <HoldToConfirm
                 testID="start-discovery"
                 label={t('capture.start')}
                 accessibilityLabel={t('capture.startA11y')}
                 disabled={!nearest.inRange}
-                onConfirm={startDiscovery}
+                onConfirm={() => start(nearest.place)}
               />
-            ) : (
-              <Text style={{ color: c.textMuted }}>{t('capture.serverSoon')}</Text>
             )}
           </View>
         )}
@@ -160,7 +144,7 @@ export default function Capture() {
             {t('capture.demoNote', { seconds: DEMO_DWELL_SECONDS })}
           </Text>
         )}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -173,12 +157,17 @@ const styles = StyleSheet.create({
   photo: { height: 140, borderRadius: radius.md },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   dwell: { alignItems: 'center', gap: space.sm },
-  button: { borderRadius: 999, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
   ring: {
     width: 96,
     height: 96,
     borderRadius: 48,
     borderWidth: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  button: {
+    borderRadius: radius.pill,
+    minHeight: 48,
     alignItems: 'center',
     justifyContent: 'center',
   },

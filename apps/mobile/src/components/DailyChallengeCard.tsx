@@ -53,7 +53,9 @@ export function DailyChallengeCard({ places }: { places: Place[] }) {
         </View>
         <View style={[styles.bonusPill, { backgroundColor: accent }]}>
           <Text style={{ color: cat ? c.onCategory : c.accentOn, fontWeight: '800' }}>
-            {t('challenge.bonus', { points: challenge.bonusPoints })}
+            {challenge.isReady || challenge.completedAt
+              ? `${t('challenge.bonus', { points: challenge.bonusPoints })} · ${t('challenge.double')}`
+              : `🪙 ${t('challenge.double')}`}
           </Text>
         </View>
       </View>

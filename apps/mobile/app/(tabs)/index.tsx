@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import {
   ActivityIndicator,
@@ -12,23 +11,30 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CATEGORIES, haversineMeters } from '@wandro/shared';
-import { CATEGORY_META, placeImage } from '@/categories';
+import { CATEGORY_META } from '@/categories';
+import { CoinCounter } from '@/components/CoinCounter';
 import { DailyChallengeCard } from '@/components/DailyChallengeCard';
-import { CategoryPill, PlaceCard } from '@/components/PlaceBits';
+import { FeedCard } from '@/components/FeedCard';
+import { HowToPlay } from '@/components/HowToPlay';
+import { InstallBanner } from '@/components/InstallBanner';
+import { PlaceCard } from '@/components/PlaceBits';
 import { ProgressStrip } from '@/components/ProgressStrip';
 import { usePlaces, useUnlockedIds } from '@/data/places';
+import { useFeed } from '@/data/social';
+import { useWallet } from '@/data/wallet';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { useSession } from '@/state/session';
-import { radius, shadow, space, useColors } from '@/theme';
+import { radius, space, useColors } from '@/theme';
 
 export default function Home() {
   const c = useColors();
   const profile = useSession((s) => s.profile);
-  const unlockedMap = useSession((s) => s.unlocked);
   const loc = useLocation();
   const places = usePlaces(loc.position);
-  const { ids, totalPoints } = useUnlockedIds();
+  const { ids } = useUnlockedIds();
+  const wallet = useWallet();
+  const feed = useFeed();
   const list = places.data ?? [];
 
   const nearby = list
@@ -36,17 +42,19 @@ export default function Home() {
     .map((p) => ({ p, d: haversineMeters(loc.position, p) }))
     .sort((a, b) => a.d - b.d)
     .slice(0, 8);
-  const recent = Object.entries(unlockedMap)
-    .sort((a, b) => b[1].at.localeCompare(a[1].at))
-    .map(([id, u]) => ({ place: list.find((p) => p.id === id), ...u }))
-    .filter((r) => r.place);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
       <ScrollView
         contentContainerStyle={styles.container}
         refreshControl={
-          <RefreshControl refreshing={places.isRefetching} onRefresh={() => places.refetch()} />
+          <RefreshControl
+            refreshing={places.isRefetching}
+            onRefresh={() => {
+              places.refetch();
+              feed.refetch();
+            }}
+          />
         }
       >
         <View style={styles.header}>
@@ -58,19 +66,41 @@ export default function Home() {
           <Text style={[styles.greeting, { color: c.text }]}>
             {t('home.greeting', { name: profile?.username ?? '' })}
           </Text>
-          <View
-            style={[styles.bell, shadow, { backgroundColor: c.card }]}
-            accessible
-            accessibilityLabel={t('home.notifications')}
-          >
-            <Ionicons name="notifications-outline" size={22} color={c.text} />
+          <View style={styles.headerIcons}>
+            <Pressable
+              onPress={() => router.push('/shop')}
+              accessibilityRole="button"
+              accessibilityLabel={t('coins.a11y', { coins: wallet.coins })}
+              style={[styles.coinPill, { backgroundColor: c.surface }]}
+              testID="coin-pill"
+            >
+              <CoinCounter coins={wallet.coins} />
+            </Pressable>
+            <Pressable
+              onPress={() => router.push('/search')}
+              accessibilityRole="button"
+              accessibilityLabel={t('home.search')}
+              hitSlop={8}
+            >
+              <Ionicons name="search" size={24} color={c.text} />
+            </Pressable>
+            <Pressable
+              onPress={() => router.push('/leaderboard')}
+              accessibilityRole="button"
+              accessibilityLabel={t('home.leaderboard')}
+              hitSlop={8}
+            >
+              <Ionicons name="trophy-outline" size={24} color={c.text} />
+            </Pressable>
           </View>
         </View>
         <Text style={[styles.headline, { color: c.text }]} accessibilityRole="header">
           {t('home.headline')}
         </Text>
 
-        <ProgressStrip points={totalPoints} discoveries={ids.size} />
+        <InstallBanner />
+        {wallet.discoveries === 0 && <HowToPlay />}
+        <ProgressStrip wallet={wallet} />
 
         <View style={styles.sectionRow}>
           <Text style={[styles.section, { color: c.text }]} accessibilityRole="header">
@@ -137,37 +167,23 @@ export default function Home() {
         </ScrollView>
 
         <Text style={[styles.section, { color: c.text }]} accessibilityRole="header">
-          {t('home.recent')}
+          {t('feed.title')}
         </Text>
-        {recent.length === 0 ? (
-          <Text style={{ color: c.textMuted }}>{t('home.noRecent')}</Text>
+        {feed.isLoading && <ActivityIndicator />}
+        {feed.items.length === 0 && !feed.isLoading ? (
+          <View style={[styles.empty, { backgroundColor: c.surface }]}>
+            <Text style={{ color: c.textMuted, textAlign: 'center' }}>{t('feed.empty')}</Text>
+            <Pressable
+              onPress={() => router.push('/search')}
+              accessibilityRole="button"
+              style={[styles.emptyButton, { backgroundColor: c.accent }]}
+            >
+              <Text style={{ color: c.accentOn, fontWeight: '800' }}>{t('feed.findPeople')}</Text>
+            </Pressable>
+          </View>
         ) : (
-          recent.map((r) => (
-            <View key={r.place!.id} style={[styles.post, shadow, { backgroundColor: c.card }]}>
-              <Image
-                source={placeImage(r.place!)}
-                style={styles.postPhoto}
-                contentFit="cover"
-                accessible={false}
-              />
-              <View style={{ padding: space.md, gap: 6 }}>
-                <CategoryPill category={r.place!.category} />
-                <Text style={{ color: c.text, fontWeight: '800' }}>
-                  {t('home.discoveredBy', {
-                    name: profile?.username ?? '',
-                    place: r.place!.name,
-                  })}
-                </Text>
-                <Text style={{ color: c.category[r.place!.category], fontWeight: '800' }}>
-                  +{r.points} pts
-                </Text>
-              </View>
-            </View>
-          ))
+          feed.items.map((item) => <FeedCard key={item.id} item={item} />)
         )}
-        <Text style={{ color: c.textMuted, textAlign: 'center', marginVertical: space.lg }}>
-          {t('home.friendsSoon')}
-        </Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -176,6 +192,8 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: { padding: space.lg, gap: space.lg },
   header: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  headerIcons: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  coinPill: { borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 6 },
   avatar: {
     width: 40,
     height: 40,
@@ -184,13 +202,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   greeting: { fontSize: 16, fontWeight: '700', flex: 1 },
-  bell: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   headline: { fontSize: 30, fontWeight: '900', letterSpacing: -0.5, marginTop: -space.sm },
   sectionRow: {
     flexDirection: 'row',
@@ -210,6 +221,11 @@ const styles = StyleSheet.create({
   },
   interestLabel: { fontSize: 12, fontWeight: '700', textAlign: 'center' },
   rail: { gap: space.md, paddingBottom: space.sm, paddingRight: space.lg },
-  post: { borderRadius: radius.lg, overflow: 'hidden' },
-  postPhoto: { height: 200 },
+  empty: { borderRadius: radius.md, padding: space.lg, gap: space.md, alignItems: 'center' },
+  emptyButton: {
+    borderRadius: radius.pill,
+    paddingHorizontal: 20,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
 });

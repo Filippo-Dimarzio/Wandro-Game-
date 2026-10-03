@@ -23,6 +23,7 @@ export default function Welcome() {
 
   const reveal = () => {
     revealedAt.current = Date.now();
+    fog.setValue(0);
     setRevealed(true);
     AccessibilityInfo.announceForAccessibility?.(t('portal.tagline'));
   };
@@ -35,7 +36,8 @@ export default function Welcome() {
       useNativeDriver: true,
     }).start(({ finished }) => finished && reveal());
   const release = () => {
-    if (revealed) return;
+    // Read the ref, not state: this handler was created before the reveal re-rendered.
+    if (revealedAt.current) return;
     fog.stopAnimation();
     Animated.timing(fog, { toValue: 1, duration: 400, useNativeDriver: true }).start();
   };

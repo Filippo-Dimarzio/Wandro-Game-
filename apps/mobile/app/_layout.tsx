@@ -3,6 +3,9 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { queryClient } from '@/data/queryClient';
+import { setupPwa } from '@/lib/pwa';
+
+setupPwa();
 import { useColors } from '@/theme';
 
 export default function RootLayout() {

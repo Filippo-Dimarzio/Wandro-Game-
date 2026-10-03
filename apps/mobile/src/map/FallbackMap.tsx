@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useState } from 'react';
+import { OctopusAvatar } from '@/components/OctopusAvatar';
 import { t } from '@/i18n';
-import { lightColors, useColors } from '@/theme';
+import { useColors } from '@/theme';
 import type { PlaceMapProps } from './types';
 
 /**
@@ -15,6 +16,8 @@ export function FallbackMap({
   userPosition,
   onSelect,
   compact,
+  avatar,
+  trail,
 }: PlaceMapProps) {
   const c = useColors();
   const [size, setSize] = useState({ w: 1, h: 1 });
@@ -64,7 +67,18 @@ export function FallbackMap({
           </Pressable>
         );
       })}
-      <View style={[styles.me, { left: x(userPosition.lng) - 8, top: y(userPosition.lat) - 8 }]} />
+      <View
+        style={[styles.me, { left: x(userPosition.lng) - 18, top: y(userPosition.lat) - 18 }]}
+        pointerEvents="none"
+      >
+        <OctopusAvatar
+          size={36}
+          skin={avatar?.skin}
+          hat={avatar?.hat}
+          glow={trail}
+          accessibilityLabel="You"
+        />
+      </View>
       {!compact && (
         <Text style={[styles.note, { color: c.textMuted }]}>
           Schematic map · build the app to see the real map
@@ -86,14 +100,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#fff',
   },
-  me: {
-    position: 'absolute',
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: lightColors.me,
-    borderWidth: 3,
-    borderColor: '#fff',
-  },
+  me: { position: 'absolute' },
   note: { position: 'absolute', bottom: 8, alignSelf: 'center', fontSize: 11 },
 });

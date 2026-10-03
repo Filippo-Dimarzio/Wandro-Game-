@@ -47,3 +47,26 @@ select d::date,
 from generate_series(0, 29) as i,
      lateral (select (now() at time zone 'Europe/Lisbon')::date + i as d) x
 on conflict (challenge_date) do nothing;
+
+-- Curated collections (Phase 4).
+with r as (select id from public.regions where slug = 'sintra')
+insert into public.collections (slug, title, description, region_id, completion_bonus)
+select v.slug, v.title, v.description, r.id, 200
+from r, (values
+  ('sintra-palaces', 'Sintra''s palaces', 'Romantic palaces, castles and estates in the hills.'),
+  ('wild-coast', 'The wild coast', 'Cliffs, coves and the westernmost point of Europe.'),
+  ('forest-secrets', 'Forest secrets', 'Quiet corners of the Sintra hills.')
+) as v(slug, title, description)
+on conflict (slug) do nothing;
+
+insert into public.collection_places (collection_id, place_id, position)
+select c.id, p.id, v.pos
+from (values
+  ('sintra-palaces', 'pena', 1), ('sintra-palaces', 'regaleira', 2), ('sintra-palaces', 'mouros', 3),
+  ('sintra-palaces', 'monserrate', 4),
+  ('wild-coast', 'cabo-da-roca', 1), ('wild-coast', 'adraga', 2),
+  ('forest-secrets', 'capuchos', 1), ('forest-secrets', 'cruz-alta', 2)
+) as v(slug, source_id, pos)
+join public.collections c on c.slug = v.slug
+join public.places p on p.source = 'seed' and p.source_id = v.source_id
+on conflict do nothing;

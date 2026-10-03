@@ -1,0 +1,61 @@
+{
+  "name": "desktop",
+  "productName": "Wandro",
+  "version": "2.0.0",
+  "description": "Wandro — the map collection game, for desktop.",
+  "private": true,
+  "main": "main.js",
+  "author": "Wandro",
+  "scripts": {
+    "web": "node scripts/build-web.mjs",
+    "start": "pnpm web && electron .",
+    "dist": "pnpm web && electron-builder --publish never",
+    "test": "node --test test/*.test.mjs"
+  },
+  "build": {
+    "appId": "com.wandro.app",
+    "productName": "Wandro",
+    "directories": {
+      "output": "dist",
+      "buildResources": "resources"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "protocol.js",
+      "web/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "artifactName": "Wandro-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.games",
+      "artifactName": "Wandro-${version}-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Game",
+      "artifactName": "Wandro-${version}.${ext}"
+    },
+    "electronVersion": "38.8.6",
+    "publish": null
+  },
+  "devDependencies": {
+    "electron": "38.8.6",
+    "electron-builder": "^26.0.0"
+  },
+  "repository": "https://github.com/Filippo-Dimarzio/Wandro-Game-"
+}
