@@ -4,6 +4,11 @@ import { DEMO_PLACES } from './seed-places';
 import { arrivalFlight, REGIONS, regionBySlug, regionFor } from './regions';
 
 describe('regions', () => {
+  it('are Sintra, Lisbon and Porto, with Sintra first', () => {
+    expect(REGIONS.map((r) => r.slug)).toEqual(['sintra', 'lisbon', 'porto']);
+    expect(REGIONS.every((r) => r.country === 'Portugal')).toBe(true);
+  });
+
   it('have unique slugs and sensible boxes', () => {
     expect(new Set(REGIONS.map((r) => r.slug)).size).toBe(REGIONS.length);
     for (const { bbox, center } of REGIONS) {
@@ -16,14 +21,16 @@ describe('regions', () => {
   });
 
   it('finds the region for a point inside a box', () => {
-    expect(regionFor({ lat: 48.8584, lng: 2.2945 })?.slug).toBe('paris');
+    expect(regionFor({ lat: 41.1405, lng: -8.611 })?.slug).toBe('porto');
     expect(regionFor({ lat: 38.7876, lng: -9.3906 })?.slug).toBe('sintra');
     expect(regionFor({ lat: 38.6916, lng: -9.216 })?.slug).toBe('lisbon');
   });
 
   it('falls back to the nearest centre within the catchment, else null', () => {
-    // Versailles: outside the Paris box but close to the centre.
-    expect(regionFor({ lat: 48.8049, lng: 2.1204 })?.slug).toBe('paris');
+    // Matosinhos beach: outside the Porto box but close to the centre.
+    expect(regionFor({ lat: 41.18, lng: -8.775 })?.slug).toBe('porto');
+    // Paris is no longer a launch city.
+    expect(regionFor({ lat: 48.8584, lng: 2.2945 })).toBeNull();
     // Middle of the Atlantic.
     expect(regionFor({ lat: 40, lng: -30 })).toBeNull();
   });
@@ -71,15 +78,23 @@ describe('regions', () => {
 });
 
 describe('arrivalFlight', () => {
-  it('flies between far-apart cities only', () => {
-    const f = arrivalFlight('lisbon', 'paris');
+  it('flies between cities with different airports only', () => {
+    const f = arrivalFlight('lisbon', 'porto');
     expect(f?.from.airport.code).toBe('LIS');
-    expect(f?.to.airport.code).toBe('CDG');
-    expect(f!.km).toBeGreaterThan(1400);
+    expect(f?.to.airport.code).toBe('OPO');
+    expect(f!.km).toBeGreaterThan(250);
+    expect(arrivalFlight('porto', 'sintra')?.to.airport.code).toBe('LIS');
+    // Sintra and Lisbon share LIS: a train ride, not a flight.
     expect(arrivalFlight('sintra', 'lisbon')).toBeNull();
-    expect(arrivalFlight('paris', 'paris')).toBeNull();
-    expect(arrivalFlight(null, 'paris')).toBeNull();
-    expect(arrivalFlight('paris', null)).toBeNull();
+    expect(arrivalFlight('lisbon', 'sintra')).toBeNull();
+    expect(arrivalFlight('porto', 'porto')).toBeNull();
+    expect(arrivalFlight(null, 'porto')).toBeNull();
+    expect(arrivalFlight('porto', null)).toBeNull();
+    expect(arrivalFlight('paris', 'porto')).toBeNull();
+  });
+
+  it('only Portuguese airports are used', () => {
+    expect([...new Set(REGIONS.map((r) => r.airport.code))].sort()).toEqual(['LIS', 'OPO']);
   });
 
   it('every city has an airport within 40 km', () => {

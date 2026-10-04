@@ -14,17 +14,19 @@ describe('Collections', () => {
   it('shows one card per city with its sets, and opens a city', async () => {
     await render(<Collections />, { wrapper });
     expect(screen.getByTestId('city-card-sintra')).toBeOnTheScreen();
-    expect(screen.getByTestId('city-card-paris')).toBeOnTheScreen();
+    expect(screen.getByTestId('city-card-lisbon')).toBeOnTheScreen();
+    expect(screen.getByTestId('city-card-porto')).toBeOnTheScreen();
+    expect(screen.queryByTestId('city-card-paris')).toBeNull();
     expect(
       screen.getByText('Each place in a set pays +20 coins; finish the set for +50.'),
     ).toBeOnTheScreen();
-    // Sintra (where the demo starts) is open; Paris is closed.
+    // Sintra (where the demo starts) is open; Porto is closed.
     expect(screen.getByTestId('set-demo-col-palaces')).toBeOnTheScreen();
-    expect(screen.queryByTestId('set-demo-col-paris-icons')).toBeNull();
+    expect(screen.queryByTestId('set-demo-col-porto-icons')).toBeNull();
 
-    fireEvent.press(screen.getByLabelText(/^Paris, 0\/10 places/));
-    expect(await screen.findByTestId('set-demo-col-paris-icons')).toBeOnTheScreen();
-    expect(screen.getByTestId('set-demo-col-paris-art-rails')).toBeOnTheScreen();
+    fireEvent.press(screen.getByLabelText(/^Porto, 0\/10 places/));
+    expect(await screen.findByTestId('set-demo-col-porto-icons')).toBeOnTheScreen();
+    expect(screen.getByTestId('set-demo-col-porto-art-rails')).toBeOnTheScreen();
     expect(screen.getAllByText('+20 each · +50 for the set').length).toBeGreaterThan(0);
   });
 });

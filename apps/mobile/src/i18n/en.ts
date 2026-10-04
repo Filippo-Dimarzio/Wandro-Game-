@@ -421,7 +421,8 @@ export const en = {
   'common.loading': 'Loading…',
   'home.friends': 'Friends',
   'friends.title': 'Friends',
-  'friends.intro': 'Add friends to share ideas and challenge each other to places all over Europe.',
+  'friends.intro':
+    'Add friends to share ideas and challenge each other to places all over Portugal.',
   'friends.searchPlaceholder': 'Find explorers by username',
   'friends.requests': 'Friend requests ({count})',
   'friends.accept': 'Accept',
@@ -466,7 +467,7 @@ export const en = {
   'friends.error.place_not_active': 'This place can’t be shared.',
   'friends.error.unknown': 'Couldn’t send the challenge. Please try again.',
   'travel.nearMe': 'Near me',
-  'travel.title': 'Explore Europe',
+  'travel.title': 'Explore Portugal',
   'travel.button': 'Cities',
   'travel.demoHint': 'Demo: picking a city moves your octopus there.',
   'travel.realHint': 'Look around another city. Check-ins still need you to be there.',

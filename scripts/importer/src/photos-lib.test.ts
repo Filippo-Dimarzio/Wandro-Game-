@@ -25,21 +25,21 @@ describe('generated outputs', () => {
     license: 'CC BY-SA 4.0',
     source: 'https://commons.wikimedia.org/wiki/File:X.jpg',
   };
-  const place = { id: 'demo-paris-eiffel', name: 'Eiffel Tower', region: 'paris' } as Place;
+  const place = { id: 'demo-porto-clerigos', name: 'Clérigos Tower', region: 'porto' } as Place;
 
   it('writes a typed module keyed by place id', () => {
-    const mod = photosModule({ 'demo-paris-eiffel': photo });
-    expect(mod).toContain('"demo-paris-eiffel": {"url":"https://upload.wikimedia.org/x.jpg"');
+    const mod = photosModule({ 'demo-porto-clerigos': photo });
+    expect(mod).toContain('"demo-porto-clerigos": {"url":"https://upload.wikimedia.org/x.jpg"');
     expect(mod).toContain('export const PLACE_PHOTOS');
   });
 
   it('replaces the seed block in place, escaping quotes', () => {
-    const once = photoSeedSql('-- seed\n', { 'demo-paris-eiffel': photo }, [place]);
+    const once = photoSeedSql('-- seed\n', { 'demo-porto-clerigos': photo }, [place]);
     expect(once).toContain(
-      "('paris', 'Eiffel Tower', 'https://upload.wikimedia.org/x.jpg', 'O''Brien'",
+      "('porto', 'Clérigos Tower', 'https://upload.wikimedia.org/x.jpg', 'O''Brien'",
     );
     const twice = photoSeedSql(once, {}, [place]);
-    expect(twice).not.toContain('Eiffel Tower');
+    expect(twice).not.toContain('Clérigos Tower');
     expect(twice.match(/BEGIN generated place photos/g)).toHaveLength(1);
   });
 });

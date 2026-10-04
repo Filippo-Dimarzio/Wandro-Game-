@@ -97,12 +97,16 @@ describe('importer mapping', () => {
 describe('regionFromArgs', () => {
   it('defaults to Sintra and reads --region', () => {
     expect(regionFromArgs(['node', 'main.ts']).slug).toBe('sintra');
-    expect(regionFromArgs(['node', 'main.ts', '--region', 'paris']).bbox).toEqual([
-      48.757, 2.202, 48.957, 2.502,
+    expect(regionFromArgs(['node', 'main.ts', '--region', 'porto']).bbox).toEqual([
+      41.05, -8.761, 41.25, -8.461,
     ]);
   });
 
   it('lists the valid slugs for an unknown region', () => {
     expect(() => regionFromArgs(['--region', 'atlantis'])).toThrow(/lisbon/);
+  });
+
+  it('only imports the Portuguese launch cities', () => {
+    expect(() => regionFromArgs(['--region', 'paris'])).toThrow('sintra, lisbon, porto');
   });
 });

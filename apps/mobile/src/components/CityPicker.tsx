@@ -11,7 +11,7 @@ const DEMO_COUNTS = DEMO_PLACES.reduce<Record<string, number>>((acc, p) => {
   return acc;
 }, {});
 
-/** "Explore Europe": jump the map to a launch city. */
+/** "Explore Portugal": jump the map to a launch city. */
 export function CityPicker({
   visible,
   current,
@@ -35,7 +35,7 @@ export function CityPicker({
       <SafeAreaView edges={['bottom']} style={[styles.sheet, { backgroundColor: c.card }]}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: c.text }]} accessibilityRole="header">
-            🌍 {t('travel.title')}
+            🧭 {t('travel.title')}
           </Text>
           <Pressable
             onPress={onClose}

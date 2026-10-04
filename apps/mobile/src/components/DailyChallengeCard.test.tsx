@@ -47,12 +47,12 @@ describe('DailyChallengeCard (demo mode)', () => {
 });
 
 describe('coverPlace', () => {
-  const here = { lat: 41.3874, lng: 2.1686 }; // Barcelona
+  const here = { lat: 41.1496, lng: -8.611 }; // Porto
 
   it('pictures the nearest undiscovered place that fits the challenge', () => {
     const art = coverPlace(DEMO_PLACES, 'art', new Set(), here)!;
     expect(art.category).toBe('art');
-    expect(art.region).toBe('barcelona');
+    expect(art.region).toBe('porto');
     const next = coverPlace(DEMO_PLACES, 'art', new Set([art.id]), here)!;
     expect(next.id).not.toBe(art.id);
   });
