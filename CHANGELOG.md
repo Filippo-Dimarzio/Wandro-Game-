@@ -51,12 +51,14 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
   Tapping a box zooms into the city: its sets and how close you are to its hidden gems.
 - Map pins show each category's hand-drawn art, with a lock or check badge.
 - Animated cards: they slide in and press down softly; Reduce Motion turns this off.
-- The Illumbe bullring in San Sebastián (hidden with the Basque Country for now).
 
 ### Changed
 
-- Wandro is Portugal-only for now. The other 18 cities are switched off (regions inactive, places
-  closed) but their data stays, ready to switch back on.
+- Wandro is Portugal-only for now (Phase 10): Sintra, Lisbon, Porto, Évora and Aveiro. The other
+  18 cities are switched off in the database (regions inactive, places closed, sets closed) and
+  removed from the app's code, demo, dev seed and importer; the European content is kept on the
+  `archive/europe-v2` branch. Players' visits, coins, posts and passport stay intact, and open
+  friend challenges to paused places are declined (`pause_inactive_regions()`).
 - Travel is folded into Culture; Art is now "Art & museums" with the culture illustration. The
   challenge rotation's travel day is a music & events day.
 - Check in is a full-bleed card: the place's picture, a "You're here" or distance badge, and one

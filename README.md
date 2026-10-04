@@ -10,7 +10,8 @@ hidden under fog; visiting one unlocks it, clears the fog around it and earns **
 octopus. Hidden gems are worth the most.
 
 - **Where:** Portugal — Sintra (the pilot), Lisbon, Porto, Évora and Aveiro, each with at least
-  five side quests in every category. Eighteen more European cities are written but hidden for now
+  five side quests in every category. We're focusing on Portugal until players prove they come
+  back; the earlier European cities are kept on the `archive/europe-v2` branch
 - **Status:** v2.0 — the full game loop (Phases 0–8). See the [roadmap](#roadmap).
 - **Play in your browser:** <https://filippo-dimarzio.github.io/Wandro-Game-/> (demo mode — click
   **Install app** to put it on your desktop)

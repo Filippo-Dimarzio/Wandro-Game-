@@ -6,7 +6,7 @@ Wandro is a photo-first, community-driven exploration game. Players uncover real
 
 ## 0. Business plan (agreed with the co-founders)
 
-- **Portugal first.** Sintra, Lisbon, Porto, Évora and Aveiro only, until we've proven players come back. The other European cities are paused (Phase 9.3), not deleted: their data stays in `packages/shared` behind `HIDDEN_REGIONS` and their database rows are inactive, so any city can be switched back on.
+- **Portugal first.** Sintra, Lisbon, Porto, Évora and Aveiro only, until we've proven players come back. The European cities are paused (Phase 10), not deleted; their content is kept on the `archive/europe-v2` branch.
 - **Business phases:** (1) Foundation, Oct–Nov 2026; (2) closed beta of about 200 players in Sintra and Lisbon, Dec 2026–Mar 2027; (3) public launch in Portugal, Apr–Jun 2027; (4) monetise and expand, from Jul 2027.
 - **Free and fair:** coins and rank can never be bought, and every reward stays checked on the server.
 - **Players:** city-breakers aged 22–34, plus locals and expats in Lisbon and Sintra. Locals are the year-round core.
@@ -192,6 +192,8 @@ Each phase ends with: tests + lint green, a summary of changes, a manual test li
 **Phase 9.2 — Side quests & eight more cities:** Budapest, Dublin, Cork, Stockholm, Copenhagen, Warsaw, Gdańsk and the Basque Country join (`REGIONS`, migration with region rows; `region_at` prefers the smaller box where boxes overlap). Every city has 5+ visible places in each of the 8 categories (`packages/shared/src/quests`, tested in `regions.test.ts` and `europe_unlocks.test.sql`); heritage favours lesser-known palaces. The seed's Europe block is generated from the shared data (`seed-sql.ts`). Coordinates were placed by hand without a geocoder; verify them against OpenStreetMap before real-world launch (the geofence is 75 m).
 
 **Phase 9.3 — Portugal first:** launch narrows to Sintra, Lisbon, Porto, Évora and Aveiro (`HIDDEN_REGIONS` keeps the other cities' data; a migration deactivates their regions and closes their places). Hidden gems open city-wide after 5 discoveries there (`GEMS_UNLOCK_AFTER`, `knows_place(place, region)`). Travel folds into Culture (enum value kept, check constraints stop new use). Collections become landmark boxes greyed until unlocked (`assets/cities`, `scripts/render-cities.mjs`); map pins use category art (`assets/markers`, `scripts/render-markers.mjs`). Arrival flights compare airports (`regions.airport`): Lisbon ↔ Porto (LIS ✈ OPO) is a flight, Sintra ↔ Lisbon ↔ Évora (all LIS) isn't, and nothing counts from a hidden city; friend challenges to paused places are declined.
+
+**Phase 10 — Portugal focus:** the other cities' places, side quests and sets leave the code, demo, dev seed and importer (`REGIONS` lists only the five Portuguese cities; `HIDDEN_REGIONS` is gone; the content lives on the `archive/europe-v2` branch). Nothing is deleted in the database: `pause_inactive_regions()` (server-only, `20261010090000_pause_inactive_regions`) closes paused cities' places and sets and declines open friend challenges to them, because deleting a place would cascade to its visits and posts. Visits, the coin ledger, posts, the passport and badges are kept. Tested in `regions.test.ts`, `arrivals.test.sql` and `portugal_pause.test.sql`.
 
 ## 11. Things I need from you, and when
 
