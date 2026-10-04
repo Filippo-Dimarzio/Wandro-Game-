@@ -2,7 +2,15 @@
 
 Status: **v2.0 — Phases 0–8 built.** This plan records the decisions; `README.md` describes the product as shipped.
 
-Wandro is a photo-first, community-driven exploration game. Players uncover real places (lesser-known museums, castles, heritage sites, parks, viewpoints, music venues, nature spots) by physically visiting them. Pilot region: **Sintra and surroundings, Portugal**. The mascot is an octopus (eight arms reaching out in every direction).
+Wandro is a photo-first, community-driven exploration game. Players uncover real places (lesser-known museums, castles, heritage sites, parks, viewpoints, music venues, nature spots) by physically visiting them. Launch regions: **Sintra (the pilot), Lisbon and Porto, Portugal**. The mascot is an octopus (eight arms reaching out in every direction).
+
+## 0. Business plan (agreed with the co-founders)
+
+- **Portugal first.** Sintra, Lisbon and Porto only, until we've proven players come back. The European cities are paused (Phase 10), not deleted, and can be restored from the `archive/europe-v2` snapshot.
+- **Business phases:** (1) Foundation, Oct–Nov 2026; (2) closed beta of about 200 players in Sintra and Lisbon, Dec 2026–Mar 2027; (3) public launch in Portugal, Apr–Jun 2027; (4) monetise and expand, from Jul 2027.
+- **Free and fair:** coins and rank can never be bought, and every reward stays checked on the server.
+- **Players:** city-breakers aged 22–34, plus locals and expats in Lisbon and Sintra. Locals are the year-round core.
+- **North-star metric:** verified discoveries per week.
 
 ## 1. Product direction
 
@@ -181,7 +189,9 @@ Each phase ends with: tests + lint green, a summary of changes, a manual test li
 
 **Phase 9.1 — Moments, passport & sets:** posts become daily moments: others see them for 24 h, and only once they've shared one themselves (`posted_recently` in the posts RLS policy, `moment_status`, storage policy follows the posts policy); the author keeps them forever in a private passport grouped by city (`my_passport`) instead of a calendar. Two sets of 5 places per launch city (`CITY_SETS`, seeded and checked by `sets.test.ts`); sets pay 20 coins per place (`collections.step_bonus`) and 50 on completion. Collections are city cards that open with an animation; Discover is a photo grid; coins are gold with a mascot slot.
 
-**Phase 9.2 — Side quests & eight more cities:** Budapest, Dublin, Cork, Stockholm, Copenhagen, Warsaw, Gdańsk and the Basque Country join (`REGIONS`, migration with region rows; `region_at` prefers the smaller box where boxes overlap). Every city has 5+ visible places in each of the 8 categories (`packages/shared/src/quests`, tested in `regions.test.ts` and `europe_unlocks.test.sql`); heritage favours lesser-known palaces. The seed's Europe block is generated from the shared data (`seed-sql.ts`). Coordinates were placed by hand without a geocoder; verify them against OpenStreetMap before real-world launch (the geofence is 75 m).
+**Phase 9.2 — Side quests & eight more cities:** Budapest, Dublin, Cork, Stockholm, Copenhagen, Warsaw, Gdańsk and the Basque Country join (`REGIONS`, migration with region rows; `region_at` prefers the smaller box where boxes overlap). Every city has 5+ visible places in each of the 8 categories (`packages/shared/src/quests`, tested in `regions.test.ts` and `europe_unlocks.test.sql`, now `portugal.test.sql`); heritage favours lesser-known palaces. The seed's Europe block is generated from the shared data (`seed-sql.ts`). Coordinates were placed by hand without a geocoder; verify them against OpenStreetMap before real-world launch (the geofence is 75 m).
+
+**Phase 10 — Portugal focus:** only Sintra, Lisbon and Porto stay in `REGIONS` (Sintra first and the demo default); the other 18 cities' places, side quests and sets leave the shared data, demo and dev seed. The `20261009090000_portugal_focus` migration deletes nothing: paused regions get `is_active = false`, their places `status = 'hidden'` and their sets `is_active = false`, and open friend challenges to those places are declined (`pause_inactive_regions()`, server-only). Visits, the coin ledger, posts, the passport and badges are kept, because deleting a place would cascade to its visits and posts. Arrival flights compare airports (`regions.airport`): Lisbon ↔ Porto (LIS ✈ OPO) is a flight, Sintra ↔ Lisbon (both LIS) isn't, and arriving from a paused city is never a flight. The importer only accepts the three cities. Tested in `regions.test.ts`, `portugal.test.sql` and `arrivals.test.sql`.
 
 ## 11. Things I need from you, and when
 

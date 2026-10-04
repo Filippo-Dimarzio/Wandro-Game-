@@ -9,10 +9,9 @@ trams and funiculars, and nature spots. Places start
 hidden under fog; visiting one unlocks it, clears the fog around it and earns **coins** for your
 octopus. Hidden gems are worth the most.
 
-- **Where:** Sintra (the pilot) plus 20 European cities — Lisbon, Porto, Madrid, Barcelona,
-  the Basque Country, Paris, Rome, Florence, Amsterdam, Berlin, Prague, Vienna, Budapest,
-  Edinburgh, Dublin, Cork, Stockholm, Copenhagen, Warsaw and Gdańsk, each with at least five side
-  quests in every category
+- **Where:** Portugal — Sintra (the pilot), Lisbon and Porto, each with at least five side quests
+  in every category. We're focusing on Portugal until players prove they come back; the European
+  cities are paused (snapshot: branch `archive/europe-v2`)
 - **Status:** v2.0 — the full game loop (Phases 0–8). See the [roadmap](#roadmap).
 - **Play in your browser:** <https://filippo-dimarzio.github.io/Wandro-Game-/> (demo mode — click
   **Install app** to put it on your desktop)
@@ -79,9 +78,10 @@ level up, your octopus evolves (Hatchling → Explorer → Navigator → Cartogr
 11. **Make friends.** Send friend requests (accepted friends can see each other's activity,
     even on private profiles) and **challenge a friend** to a place with a short idea —
     _"Go at golden hour!"_. It's ticked off when they discover it.
-12. **Travel Europe.** Land in another city, open Wandro and a **flight animation** takes your
-    octopus from your old airport to the new one (e.g. LIS ✈ CDG) before the map flies there.
-    In the browser demo, pick a city from **Explore → Adventures → city** to fly there.
+12. **Travel Portugal.** Land in another city, open Wandro and a **flight animation** takes your
+    octopus from your old airport to the new one (LIS ✈ OPO) before the map flies there. Sintra
+    and Lisbon share an airport, so moving between them needs no flight. In the browser demo,
+    pick a city from **Explore → Adventures → city** to go there.
 
 ## Look and feel
 
@@ -179,6 +179,7 @@ and alternatives to press-and-hold gestures.
 | 7     | Find-My-style walking: octopus marker, proximity guidance, Google Maps directions, keyboard walking                                                | ✅ v2.0         |
 | 8     | Coin economy: double daily coins, Store with incense trail, skins and hats                                                                         | ✅ v2.0         |
 | 9     | Europe (12 cities), hidden gems revealed at 200 m, friends and friend challenges, Adventures sidebar, arrival flights, log out, cleaner tab labels | ✅ Unreleased   |
+| 10    | Portugal focus: Sintra, Lisbon and Porto live; other cities paused with player history kept; flights between airports (LIS ✈ OPO)                  | ✅ Unreleased   |
 | Later | Comments, food challenges, Instagram share cards, events, teams, offline maps, more languages, more cities, push notifications for friend activity | Ideas           |
 
 The full plan — architecture, data model, check-in validation and every decision — is in
@@ -229,13 +230,13 @@ cd apps/mobile && npx expo run:ios   # or: npx expo run:android
 
 ### Demo mode
 
-Without Supabase credentials the app runs in **demo mode**: sample places in Sintra and 12
-European cities, progress saved on your device only.
+Without Supabase credentials the app runs in **demo mode**: sample places in Sintra, Lisbon and
+Porto, progress saved on your device only.
 
 - **Teleport here (demo)** in a place's sheet moves you there, so you can try a discovery from
   anywhere.
 - Dwell time is shortened to 8 seconds (the real rule is 2 minutes, enforced by the server).
-- **Explore → Adventures → city** flies your octopus to another city.
+- **Explore → Adventures → city** moves your octopus to another city (a flight between Lisbon/Sintra and Porto).
 - Demo friends (ines.wanders, mia.maps…) answer requests straight away and have sent you challenges.
 - **Profile → Log out** returns to the portal and, as there's no account in the demo, starts over.
 
@@ -254,7 +255,7 @@ To use a real backend, copy `.env.example` to `.env`, fill in `EXPO_PUBLIC_SUPAB
 7. On **Explore**, open the **Adventures** sidebar (the compass tab on the left edge): accept
    ines.wanders's challenge, read the hidden-gem hint, then use **Walk** to head east from the
    town centre until the **Moorish Fountain** gem appears.
-8. Tap the city button in the sidebar and pick **Paris** to watch the arrival flight.
+8. Tap the city button in the sidebar and pick **Porto** to watch the arrival flight (LIS ✈ OPO).
 9. On **Home**, tap the people icon: accept sofia.sees's friend request and **Challenge** a friend.
 
 ## Tech stack and repository layout

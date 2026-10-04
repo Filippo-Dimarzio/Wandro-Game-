@@ -4,6 +4,17 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ## [Unreleased]
 
+### Changed
+
+- **Portugal focus (Phase 10).** Sintra, Lisbon and Porto are the only launch cities. The other
+  18 cities' places, side quests and sets are gone from the app, demo, dev seed and importer.
+  A new migration pauses them in the database instead of deleting them, so every player's
+  visits, coins, posts and passport stay intact; open friend challenges to paused places are
+  declined. The European content is kept on the `archive/europe-v2` branch.
+- Arrival flights now trigger on a change of airport: Lisbon ↔ Porto (LIS ✈ OPO) is a flight,
+  Sintra ↔ Lisbon is not, and arriving from a paused city never is.
+- "Explore Europe" is now "Explore Portugal"; demo friends challenge you to Portuguese places.
+
 ### Added
 
 - Beaches & coast category (database enum, importer mapping for beaches, bays and capes, demo and
