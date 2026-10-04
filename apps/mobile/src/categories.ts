@@ -16,7 +16,7 @@ export const CATEGORY_META: Record<Category, CategoryMeta> = {
   heritage: { icon: 'business', art: require('../assets/art/heritage.webp') },
   culture: { icon: 'color-palette', art: require('../assets/art/culture.webp') },
   music_events: { icon: 'musical-notes', art: require('../assets/art/music_events.svg') },
-  other: { icon: 'compass', art: require('../assets/art/other.svg') },
+  other: { icon: 'compass', art: require('../assets/art/other.webp') },
 };
 
 /** Cover for "anywhere" challenges: the Wandro octopus. */
