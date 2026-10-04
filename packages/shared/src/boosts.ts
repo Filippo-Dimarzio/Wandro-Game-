@@ -1,6 +1,6 @@
 /**
  * Rules for the shop boosts beyond the incense trail. The server is the authority (award_visit,
- * light_beacon in supabase/migrations/20261012090000_boosts.sql); demo mode mirrors these.
+ * light_beacon in supabase/migrations/20261013090000_boosts.sql); demo mode mirrors these.
  */
 
 export type TimeQuest = 'golden' | 'night';

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
-import { DAILY_CHALLENGE_BONUS, type Category, type Place } from '@wandro/shared';
+import { challengeForDate, DAILY_CHALLENGE_BONUS, type Category, type Place } from '@wandro/shared';
 import { isDemo } from '@/lib/env';
 import { supabase } from '@/lib/supabase';
 import { useSession } from '@/state/session';
@@ -20,44 +20,6 @@ export interface DailyChallenge {
   qualifyingPlaceIds: string[];
 }
 
-const ROTATION: { title: string; description: string; category: Category | null }[] = [
-  {
-    title: 'Find a hidden viewpoint',
-    description: 'Discover any nature spot today.',
-    category: 'nature',
-  },
-  {
-    title: 'Step into history',
-    description: 'Discover any heritage site today.',
-    category: 'heritage',
-  },
-  {
-    title: 'Culture hunt',
-    description: 'Discover a museum or cultural place today.',
-    category: 'culture',
-  },
-  {
-    title: 'Follow the coastline',
-    description: 'Discover any beach or coastal spot today.',
-    category: 'coast',
-  },
-  {
-    title: 'Art attack',
-    description: 'Discover a gallery, mural or piece of street art today.',
-    category: 'art',
-  },
-  {
-    title: 'Catch the music',
-    description: 'Discover a concert hall, music club or event venue today.',
-    category: 'music_events',
-  },
-  {
-    title: 'Wander anywhere new',
-    description: 'Discover any place you have never visited.',
-    category: null,
-  },
-];
-
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export function todayKey(now = new Date()): string {
@@ -72,8 +34,9 @@ export function demoChallenge(
   places: Place[],
 ): DailyChallenge {
   const date = todayKey(now);
-  const dayIndex = Math.floor(now.getTime() / DAY_MS);
-  const def = ROTATION[dayIndex % ROTATION.length];
+  // Dated challenges (Santos Populares, Museum Day...) first, else the rotation; as on the server.
+  const { title, description, category } = challengeForDate(date);
+  const def = { title, description, category };
   const started = state?.date === date ? state.startedAt : now.toISOString();
   const expires = new Date(new Date(started).getTime() + DAY_MS).toISOString();
   const qualifying = Object.entries(unlocked).filter(([id, u]) => {

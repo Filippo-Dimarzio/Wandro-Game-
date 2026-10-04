@@ -27,9 +27,9 @@ select pg_temp.check(not exists (
 
 -- A player in Évora sees Évora places (and no other city's) and can unlock the Roman Temple.
 select pg_temp.as_user('00000000-0000-0000-0000-00000000ee01');
-select pg_temp.check((select count(*) from nearby_places(38.5714, -7.9135, 30000)) = 35
+select pg_temp.check((select count(*) from nearby_places(38.5714, -7.9135, 30000)) = 38
   and not exists (select 1 from nearby_places(38.5714, -7.9135, 30000) p join regions r on r.id = p.region_id where r.slug <> 'evora'),
-  'nearby places in Évora are the 35 visible Évora places');
+  'nearby places in Évora are the 38 visible Évora places');
 
 create temp table ps on commit drop as
   select (start_checkin(pg_temp.place_id('evora-roman-temple'), 38.5728, -7.9073, 8) ->> 'session_id')::uuid as id;

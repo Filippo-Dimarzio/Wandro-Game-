@@ -2,6 +2,7 @@
 // use the same codes and prices). Parses the migration SQL to compare.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { datedChallengesSql, rotationValuesSql, CHALLENGE_ROTATION } from './challenges';
 import { BADGES } from './progression';
 import { SHOP_ITEMS } from './shop';
 
@@ -40,5 +41,11 @@ describe('catalogues match the database seeds', () => {
     );
     const codes = [...block.matchAll(/\('([a-z_0-9]+)', '/g)].map((m) => m[1]);
     expect(codes).toEqual(BADGES.map((b) => b.code));
+  });
+
+  it('daily challenges: the server rotation and dated schedule come from challenges.ts', () => {
+    expect(sql).toContain(rotationValuesSql());
+    expect(sql).toContain(`where r.i = (d - date '1970-01-01') % ${CHALLENGE_ROTATION.length};`);
+    expect(sql).toContain(datedChallengesSql());
   });
 });

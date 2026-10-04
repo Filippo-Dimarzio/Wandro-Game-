@@ -12,7 +12,7 @@ import { DEMO_PLACES } from './seed-places';
 import { SHOP_ITEMS, TRAIL_ITEM_CODES } from './shop';
 
 const root = join(__dirname, '..', '..', '..', 'supabase');
-const migration = readFileSync(join(root, 'migrations', '20261012090000_boosts.sql'), 'utf8');
+const migration = readFileSync(join(root, 'migrations', '20261013090000_boosts.sql'), 'utf8');
 const seed = readFileSync(join(root, 'seed', 'seed.sql'), 'utf8');
 
 /** Lisbon is UTC+1 in summer and UTC+0 in winter. */
