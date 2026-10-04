@@ -6,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CATEGORIES, formatDistance, haversineMeters, type Category } from '@wandro/shared';
 import { CATEGORY_META, learnKey } from '@/categories';
+import { CategoryMark } from '@/components/CategoryMark';
 import { PlaceCard } from '@/components/PlaceBits';
 import { useDailyChallenge } from '@/data/challenge';
 import { usePlaces, useUnlockedIds } from '@/data/places';
@@ -83,9 +84,7 @@ function CategoryContent({ cat }: { cat: Category }) {
 
         <View style={[styles.sheet, { backgroundColor: c.card }]}>
           <View style={styles.titleRow}>
-            <View style={[styles.icon, { backgroundColor: color }]}>
-              <Ionicons name={CATEGORY_META[cat].icon} size={22} color={c.onCategory} />
-            </View>
+            <CategoryMark category={cat} size={56} />
             <View style={{ flex: 1 }}>
               <Text style={[styles.title, { color }]} accessibilityRole="header">
                 {t(`category.${cat}`)}
@@ -254,13 +253,6 @@ const styles = StyleSheet.create({
     gap: space.lg,
   },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  icon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   title: { fontSize: 26, fontWeight: '900' },
   tabs: { flexDirection: 'row', justifyContent: 'space-around' },
   tab: { alignItems: 'center', gap: 6, minHeight: 44, justifyContent: 'center', flex: 1 },
