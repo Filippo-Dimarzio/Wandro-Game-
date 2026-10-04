@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -9,7 +8,7 @@ import { t } from '@/i18n';
 import { isDemo } from '@/lib/env';
 import { timeAgo } from '@/lib/time';
 import { radius, space, useColors } from '@/theme';
-import { categoryIcon } from './PlaceSheet';
+import { CATEGORY_META } from '@/categories';
 
 export function FeedCard({ item }: { item: FeedItem }) {
   const c = useColors();
@@ -114,13 +113,19 @@ export function FeedCard({ item }: { item: FeedItem }) {
             accessibilityLabel={item.caption || item.placeName}
           />
         ) : (
-          <LinearGradient
-            colors={[c.category[item.category], '#0B2A24']}
-            style={[styles.photo, styles.placeholder]}
-          >
-            <Ionicons name={categoryIcon(item.category)} size={56} color="rgba(255,255,255,0.85)" />
-            <Text style={styles.placeholderText}>{item.placeName}</Text>
-          </LinearGradient>
+          <View style={styles.photo}>
+            <Image
+              source={CATEGORY_META[item.category].art}
+              style={StyleSheet.absoluteFill}
+              contentFit="cover"
+              accessible={false}
+            />
+            <View style={[styles.placeLabel, { backgroundColor: c.card }]}>
+              <Text style={{ color: c.category[item.category], fontWeight: '800' }}>
+                {item.placeName}
+              </Text>
+            </View>
+          </View>
         )}
       </Pressable>
 
@@ -174,7 +179,13 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   photo: { width: '100%', aspectRatio: 1 },
-  placeholder: { alignItems: 'center', justifyContent: 'center', gap: space.sm },
-  placeholderText: { color: '#fff', fontWeight: '800', fontSize: 18 },
+  placeLabel: {
+    position: 'absolute',
+    left: space.md,
+    bottom: space.md,
+    borderRadius: radius.pill,
+    paddingHorizontal: space.md,
+    paddingVertical: 6,
+  },
   actions: { flexDirection: 'row', alignItems: 'center', gap: space.sm, padding: space.md },
 });
