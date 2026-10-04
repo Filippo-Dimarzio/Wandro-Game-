@@ -42,7 +42,7 @@ export default function ChallengeFriend() {
         .filter((p) => !p.hidden)
         .map((p) => ({ p, d: haversineMeters(center, p) }))
         .sort((a, b) => a.d - b.d)
-        .slice(0, 12),
+        .slice(0, 24),
     [places.data, center],
   );
 

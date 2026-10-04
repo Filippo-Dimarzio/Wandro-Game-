@@ -107,7 +107,7 @@ export function ChallengeSidebar({
             <View style={styles.gemBody}>
               <Text style={{ color: c.text, fontWeight: '800' }} testID="gem-hint">
                 {hidden.count > 0
-                  ? `${t('hidden.count', { count: hidden.count })}. ${t(`hidden.hint.${hidden.hint ?? 'area'}`)}`
+                  ? `${hidden.count === 1 ? t('hidden.countOne') : t('hidden.count', { count: hidden.count })}. ${t(`hidden.hint.${hidden.hint ?? 'area'}`)}`
                   : t('hidden.none')}
               </Text>
               <Text style={{ color: c.textMuted, fontSize: 12 }}>{t('hidden.rule')}</Text>

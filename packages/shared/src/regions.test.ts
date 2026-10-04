@@ -1,3 +1,4 @@
+import { CATEGORIES } from './constants';
 import { haversineMeters } from './geo';
 import { DEMO_PLACES } from './seed-places';
 import { arrivalFlight, REGIONS, regionBySlug, regionFor } from './regions';
@@ -44,18 +45,14 @@ describe('regions', () => {
     }
   });
 
-  it('every city has 3 art, 2 culture, 3 nature and 2 travel challenges or more', () => {
-    for (const { slug } of REGIONS) {
-      const count = (cat: string) =>
-        DEMO_PLACES.filter((p) => p.region === slug && p.category === cat).length;
-      expect([
-        slug,
-        count('art'),
-        count('culture') >= 2,
-        count('nature') >= 3,
-        count('travel'),
-      ]).toEqual([slug, 3, true, true, 2]);
-    }
+  it('every city has at least 5 visible places in every category', () => {
+    for (const { slug } of REGIONS)
+      for (const cat of CATEGORIES) {
+        const n = DEMO_PLACES.filter(
+          (p) => p.region === slug && p.category === cat && !p.hidden,
+        ).length;
+        expect([slug, cat, n >= 5]).toEqual([slug, cat, true]);
+      }
   });
 
   it('places are at least 100 m apart, so check-ins are never ambiguous', () => {

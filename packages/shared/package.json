@@ -6,7 +6,8 @@
   "types": "src/index.ts",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "seed": "tsx scripts/seed.ts"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

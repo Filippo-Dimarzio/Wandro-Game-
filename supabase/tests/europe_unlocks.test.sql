@@ -8,10 +8,11 @@ select pg_temp.check((select count(*) from places p join regions r on r.id = p.r
                       where r.slug <> 'sintra' and p.status = 'active') >= 70,
   'every launch city has active places');
 select pg_temp.check(not exists (
-    select 1 from regions r
-    where (select count(*) from places p where p.region_id = r.id and p.category = 'art') <> 3
-       or (select count(*) from places p where p.region_id = r.id and p.category = 'travel') <> 2),
-  'every city has 3 art and 2 travel challenges');
+    select 1 from regions r, unnest(enum_range(null::place_category)) as c(category)
+    where (select count(*) from places p
+           where p.region_id = r.id and p.category = c.category and p.status = 'active' and not p.is_hidden) < 5),
+  'every city has at least 5 visible challenges in every category');
+select pg_temp.check((select count(*) from regions where is_active) = 21, 'all 21 launch cities are active');
 select pg_temp.check(not exists (
     select 1 from regions r where r.is_active
       and not exists (select 1 from places p where p.region_id = r.id and p.status = 'active' and not p.is_hidden)),
@@ -19,9 +20,9 @@ select pg_temp.check(not exists (
 
 -- A player in Paris sees Paris places (and not Sintra's) and can unlock the Eiffel Tower.
 select pg_temp.as_user('00000000-0000-0000-0000-00000000ee01');
-select pg_temp.check((select count(*) from nearby_places(48.8566, 2.3522, 30000)) = 16
+select pg_temp.check((select count(*) from nearby_places(48.8566, 2.3522, 30000)) = 41
   and not exists (select 1 from nearby_places(48.8566, 2.3522, 30000) p join regions r on r.id = p.region_id where r.slug <> 'paris'),
-  'nearby places in Paris are the 16 visible Paris places');
+  'nearby places in Paris are the 41 visible Paris places');
 
 create temp table ps on commit drop as
   select (start_checkin(pg_temp.place_id('paris-eiffel'), 48.8584, 2.2945, 8) ->> 'session_id')::uuid as id;

@@ -476,6 +476,7 @@ export const en = {
   'hidden.title': 'Hidden gem',
   'hidden.found': 'You found a hidden gem: {name}!',
   'hidden.none': 'No hidden gems left around here. Try another city!',
+  'hidden.countOne': '1 hidden gem nearby',
   'hidden.count': '{count} hidden gems nearby',
   'hidden.hint.very_close': 'One is very close, under 500 m. Look around!',
   'hidden.hint.close': 'One is less than 1 km away.',

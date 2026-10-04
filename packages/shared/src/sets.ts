@@ -29,8 +29,8 @@ export const CITY_SETS: PlaceSet[] = REGIONS.filter((r) => r.slug !== 'sintra').
     .sort(byVisitors)
     .slice(0, SET_SIZE);
   const artRails = [
-    ...inCity.filter((p) => p.category === 'art'),
-    ...inCity.filter((p) => p.category === 'travel'),
+    ...inCity.filter((p) => p.category === 'art').slice(0, 3),
+    ...inCity.filter((p) => p.category === 'travel').slice(0, 2),
   ];
   return [
     {

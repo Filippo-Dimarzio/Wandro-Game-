@@ -39,6 +39,7 @@ pnpm typecheck                   tsc --noEmit across workspaces
 pnpm test                        Jest unit/component tests
 pnpm test:db                     SQL/RLS/scoring tests (Postgres 16 + PostGIS on localhost)
 pnpm import:places [--dry-run]   run the place importer (idempotent)
+pnpm --filter @wandro/shared seed  regenerate the dev seed's Europe places and city sets
 pnpm --filter mobile build:web   static web build
 pnpm --filter desktop start      run the desktop app (builds the web app first)
 pnpm --filter desktop dist       build a desktop installer for this OS

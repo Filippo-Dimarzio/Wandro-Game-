@@ -32,6 +32,15 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - Passport: every moment you've shared, stamped onto the page of its city. Only you can see it.
 - City sets: two sets of 5 places in every launch city (its icons, and its 3 art + 2 travel
   places). Collections shows one card per city that opens with an animation.
+- Eight more cities: Budapest, Dublin, Cork, Stockholm, Copenhagen, Warsaw, Gdańsk and the
+  Basque Country (Bilbao to San Sebastián), each with a hidden gem and two sets.
+- Side quests: every city now has at least five places in each category, about 650 new ones,
+  written as a historian's brief with a task. Heritage favours quieter palaces, among them Queluz,
+  Caxias, Fronteira and the Marquis of Pombal's palace in Oeiras for Lisbon, and Quinta do
+  Relógio, Penha Verde and Chalet Biester in Sintra. Inland cities get river beaches and lakes for
+  Beaches & coast.
+- The dev seed's Europe block is generated from `packages/shared`
+  (`pnpm --filter @wandro/shared seed`), and a test keeps them in step.
 - Gold coin with a slot for the mascot artwork (`apps/mobile/src/coin.ts`).
 
 ### Changed
@@ -43,6 +52,9 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - Sets pay 20 coins for each place you find from them and 50 for finishing them (was 200 on
   completion only). The check-in reward shows the set coins.
 - The "From explorers you follow" feed moved off Home.
+- Lisbon's area reaches west to Carcavelos; Dublin's covers the bay to Howth; Cork's the harbour.
+- Challenging a friend offers the 24 nearest places (was 12).
+- "1 hidden gem nearby" instead of "1 hidden gems".
 - Discover shows the categories as a simple photo grid; details open when you tap one.
 - The daily challenge card shows a real place that fits the challenge instead of the octopus,
   and the hidden-gem card is a fog mystery instead of the octopus.

@@ -1,35 +1,9 @@
-import { BASE_POINTS, DEFAULT_GEOFENCE_RADIUS_M } from './constants';
-import type { Category, OpeningSlot, Place } from './types';
-
-function placeIn(
-  region: string,
-  id: string,
-  name: string,
-  category: Category,
-  lat: number,
-  lng: number,
-  uniqueVisitors: number,
-  description: string,
-  opts: { hidden?: boolean; hours?: OpeningSlot[] } = {},
-): Place {
-  return {
-    id: `demo-${id}`,
-    region,
-    name,
-    description,
-    category,
-    lat,
-    lng,
-    geofenceRadiusM: DEFAULT_GEOFENCE_RADIUS_M,
-    basePoints: BASE_POINTS[category],
-    uniqueVisitors,
-    ...(opts.hidden && { hidden: true }),
-    ...(opts.hours && { hours: opts.hours }),
-  };
-}
+import { placeIn } from './place-in';
+import { EUROPE_QUESTS } from './quests';
+import type { Place } from './types';
 
 /** Curated landmarks for the launch cities. `hidden` ones stay off the map until you're within 200 m. */
-export const EUROPE_PLACES: Place[] = [
+const LAUNCH_PLACES: Place[] = [
   placeIn(
     'sintra',
     'sintra-fonte-mourisca',
@@ -2191,3 +2165,6 @@ export const EUROPE_PLACES: Place[] = [
     'The royal family’s former floating palace, moored in Leith.',
   ),
 ];
+
+/** Launch places plus the side quests: 5+ per category in every city. */
+export const EUROPE_PLACES: Place[] = [...LAUNCH_PLACES, ...EUROPE_QUESTS];

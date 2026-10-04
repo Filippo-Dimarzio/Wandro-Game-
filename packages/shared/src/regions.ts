@@ -51,11 +51,15 @@ export const REGIONS: readonly Region[] = [
     }),
     bbox: [38.73, -9.52, 38.85, -9.3],
   },
-  r('lisbon', 'Lisbon', 'Portugal', '🇵🇹', 38.7139, -9.1394, {
-    code: 'LIS',
-    lat: 38.7742,
-    lng: -9.1342,
-  }),
+  {
+    ...r('lisbon', 'Lisbon', 'Portugal', '🇵🇹', 38.7139, -9.1394, {
+      code: 'LIS',
+      lat: 38.7742,
+      lng: -9.1342,
+    }),
+    // West to Carcavelos, so the palaces and beaches along the Tagus line count as Lisbon.
+    bbox: [38.614, -9.34, 38.814, -8.989],
+  },
   r('porto', 'Porto', 'Portugal', '🇵🇹', 41.1496, -8.611, {
     code: 'OPO',
     lat: 41.2481,
@@ -103,6 +107,64 @@ export const REGIONS: readonly Region[] = [
     lat: 55.95,
     lng: -3.3725,
   }),
+  r('budapest', 'Budapest', 'Hungary', '🇭🇺', 47.4979, 19.0402, {
+    code: 'BUD',
+    lat: 47.4369,
+    lng: 19.2556,
+  }),
+  {
+    ...r('dublin', 'Dublin', 'Ireland', '🇮🇪', 53.3498, -6.2603, {
+      code: 'DUB',
+      lat: 53.4264,
+      lng: -6.2499,
+    }),
+    // East to Howth and the Forty Foot, along the bay.
+    bbox: [53.25, -6.41, 53.45, -6.0],
+  },
+  {
+    ...r('cork', 'Cork', 'Ireland', '🇮🇪', 51.8985, -8.4756, {
+      code: 'ORK',
+      lat: 51.8413,
+      lng: -8.4911,
+    }),
+    // The whole harbour: Cobh, Spike Island, Fota and Crosshaven.
+    bbox: [51.77, -8.63, 52.0, -8.2],
+  },
+  r(
+    'stockholm',
+    'Stockholm',
+    'Sweden',
+    '🇸🇪',
+    59.3293,
+    18.0686,
+    { code: 'ARN', lat: 59.6498, lng: 17.9238 },
+    0.1,
+    0.22,
+  ),
+  r('copenhagen', 'Copenhagen', 'Denmark', '🇩🇰', 55.6761, 12.5683, {
+    code: 'CPH',
+    lat: 55.618,
+    lng: 12.6508,
+  }),
+  r('warsaw', 'Warsaw', 'Poland', '🇵🇱', 52.2297, 21.0122, {
+    code: 'WAW',
+    lat: 52.1657,
+    lng: 20.9671,
+  }),
+  r('gdansk', 'Gdańsk', 'Poland', '🇵🇱', 54.352, 18.6466, {
+    code: 'GDN',
+    lat: 54.3776,
+    lng: 18.4662,
+  }),
+  {
+    ...r('basque', 'Basque Country', 'Spain', '🇪🇸', 43.263, -2.935, {
+      code: 'BIO',
+      lat: 43.3011,
+      lng: -2.9106,
+    }),
+    // Bilbao to San Sebastián and the coast between them.
+    bbox: [43.15, -3.1, 43.47, -1.75],
+  },
 ];
 
 export const DEFAULT_REGION = REGIONS[0]!;

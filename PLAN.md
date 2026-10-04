@@ -181,6 +181,8 @@ Each phase ends with: tests + lint green, a summary of changes, a manual test li
 
 **Phase 9.1 — Moments, passport & sets:** posts become daily moments: others see them for 24 h, and only once they've shared one themselves (`posted_recently` in the posts RLS policy, `moment_status`, storage policy follows the posts policy); the author keeps them forever in a private passport grouped by city (`my_passport`) instead of a calendar. Two sets of 5 places per launch city (`CITY_SETS`, seeded and checked by `sets.test.ts`); sets pay 20 coins per place (`collections.step_bonus`) and 50 on completion. Collections are city cards that open with an animation; Discover is a photo grid; coins are gold with a mascot slot.
 
+**Phase 9.2 — Side quests & eight more cities:** Budapest, Dublin, Cork, Stockholm, Copenhagen, Warsaw, Gdańsk and the Basque Country join (`REGIONS`, migration with region rows; `region_at` prefers the smaller box where boxes overlap). Every city has 5+ visible places in each of the 8 categories (`packages/shared/src/quests`, tested in `regions.test.ts` and `europe_unlocks.test.sql`); heritage favours lesser-known palaces. The seed's Europe block is generated from the shared data (`seed-sql.ts`). Coordinates were placed by hand without a geocoder; verify them against OpenStreetMap before real-world launch (the geofence is 75 m).
+
 ## 11. Things I need from you, and when
 
 | By            | What                                                                                                     |
