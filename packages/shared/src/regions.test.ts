@@ -1,15 +1,8 @@
 import { CATEGORIES } from './constants';
 import { haversineMeters } from './geo';
 import { DEMO_PLACES } from './seed-places';
-import { ALL_EUROPE_PLACES } from './europe-places';
-import {
-  ALL_REGIONS,
-  arrivalFlight,
-  HIDDEN_REGIONS,
-  REGIONS,
-  regionBySlug,
-  regionFor,
-} from './regions';
+import { EUROPE_PLACES } from './europe-places';
+import { arrivalFlight, REGIONS, regionBySlug, regionFor } from './regions';
 
 describe('regions', () => {
   it('have unique slugs and sensible boxes', () => {
@@ -80,32 +73,41 @@ describe('regions', () => {
   });
 });
 
-describe('hidden cities', () => {
-  it('only Portugal is playable; the other cities stay in the data, hidden', () => {
+describe('Portugal focus', () => {
+  it('launches in five Portuguese cities, Sintra first', () => {
     expect(REGIONS.map((r) => r.slug)).toEqual(['sintra', 'lisbon', 'porto', 'evora', 'aveiro']);
-    expect(ALL_REGIONS.length).toBeGreaterThan(REGIONS.length);
-    expect(HIDDEN_REGIONS.has('paris')).toBe(true);
-    expect(ALL_EUROPE_PLACES.some((p) => p.region === 'paris')).toBe(true);
-    expect(DEMO_PLACES.some((p) => p.region && HIDDEN_REGIONS.has(p.region))).toBe(false);
+    expect(REGIONS.every((r) => r.country === 'Portugal')).toBe(true);
+  });
+
+  it('has no places outside the launch cities', () => {
+    const live = new Set(REGIONS.map((r) => r.slug));
+    expect(EUROPE_PLACES.every((p) => p.region && live.has(p.region))).toBe(true);
+    expect(DEMO_PLACES.every((p) => !p.region || live.has(p.region))).toBe(true);
+    expect(regionFor({ lat: 48.8584, lng: 2.2945 })).toBeNull();
   });
 });
 
 describe('arrivalFlight', () => {
-  it('flies between far-apart cities only', () => {
-    const f = arrivalFlight('evora', 'porto');
+  it('flies only between cities with different airports', () => {
+    const f = arrivalFlight('lisbon', 'porto');
     expect(f?.from.airport.code).toBe('LIS');
     expect(f?.to.airport.code).toBe('OPO');
-    expect(f!.km).toBeGreaterThan(200);
-    // Same airport: a drive or a train, not a flight.
+    expect(f!.km).toBeGreaterThan(250);
+    expect(arrivalFlight('evora', 'aveiro')?.to.airport.code).toBe('OPO');
+    expect(arrivalFlight('porto', 'sintra')?.to.airport.code).toBe('LIS');
+    expect(arrivalFlight('aveiro', 'lisbon')?.to.airport.code).toBe('LIS');
+    // Same airport: a train ride, not a flight.
     expect(arrivalFlight('sintra', 'lisbon')).toBeNull();
     expect(arrivalFlight('lisbon', 'evora')).toBeNull();
     expect(arrivalFlight('porto', 'aveiro')).toBeNull();
-    expect(arrivalFlight('aveiro', 'lisbon')?.to.airport.code).toBe('LIS');
-    // Hidden cities never start a flight.
-    expect(arrivalFlight('paris', 'lisbon')).toBeNull();
     expect(arrivalFlight('porto', 'porto')).toBeNull();
     expect(arrivalFlight(null, 'porto')).toBeNull();
     expect(arrivalFlight('porto', null)).toBeNull();
+    expect(arrivalFlight('paris', 'porto')).toBeNull();
+  });
+
+  it('only Portuguese airports are used', () => {
+    expect([...new Set(REGIONS.map((r) => r.airport.code))].sort()).toEqual(['LIS', 'OPO']);
   });
 
   it('every city has an airport within 120 km (Évora flies into Lisbon)', () => {

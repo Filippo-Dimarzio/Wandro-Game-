@@ -105,4 +105,10 @@ describe('regionFromArgs', () => {
   it('lists the valid slugs for an unknown region', () => {
     expect(() => regionFromArgs(['--region', 'atlantis'])).toThrow(/lisbon/);
   });
+
+  it('only imports the Portuguese launch cities', () => {
+    expect(() => regionFromArgs(['--region', 'paris'])).toThrow(
+      'sintra, lisbon, porto, evora, aveiro',
+    );
+  });
 });

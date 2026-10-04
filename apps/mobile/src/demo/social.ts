@@ -65,7 +65,7 @@ export const DEMO_USERS: DemoUser[] = [
   {
     id: 'demo-user-mia',
     username: 'mia.maps',
-    homeCity: 'Madrid',
+    homeCity: 'Porto',
     isPrivate: false,
     level: 5,
     coins: 2600,
