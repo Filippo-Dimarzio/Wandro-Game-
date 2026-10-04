@@ -263,6 +263,7 @@ export const en = {
   'post.privacy':
     'Location data is removed from your photo. Others see it for 24 h, then only you do, in your passport.',
   'post.share': 'Share',
+  'post.blankPhoto': 'That photo looks blank. Try one that shows the place.',
   'post.optional': 'A photo is optional — your discovery already counts.',
   'user.follow': 'Follow',
   'user.following': 'Following',
@@ -307,6 +308,11 @@ export const en = {
   'mod.remove': 'Remove content',
   'mod.dismiss': 'Dismiss',
   'mod.empty': 'Nothing to review. 🎉',
+  'mod.photos': 'Blank photos',
+  'mod.photosHint': 'Check shared photos and delete any that are black or empty.',
+  'mod.photosSweep': 'Check photos',
+  'mod.photosResult': 'Checked {checked} photos, removed {removed}.',
+  'mod.photosFailed': 'Could not check photos. Try again.',
   'mod.forbidden': 'Only moderators can see this page.',
   'register.guidelines':
     'I will respect places and people: no trespassing, no harassment, no spam.',

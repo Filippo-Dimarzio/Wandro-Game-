@@ -529,14 +529,23 @@ export function useCreatePost() {
           .upload(photoPath, blob, { contentType: 'image/jpeg', upsert: true });
         if (up.error) throw up.error;
       }
-      const { error } = await db.from('posts').insert({
-        user_id: me,
-        visit_id: visit.data.id,
-        place_id: placeId,
-        caption: caption || null,
-        photo_path: photoPath,
-      });
+      const { data: post, error } = await db
+        .from('posts')
+        .insert({
+          user_id: me,
+          visit_id: visit.data.id,
+          place_id: placeId,
+          caption: caption || null,
+          photo_path: photoPath,
+        })
+        .select('id')
+        .single();
       if (error) throw error;
+      // The server checks the photo before anyone else sees it (blank ones are removed).
+      if (photoPath)
+        await db.functions
+          .invoke('check-photo', { body: { post_id: post.id } })
+          .catch(() => undefined);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['feed'] });

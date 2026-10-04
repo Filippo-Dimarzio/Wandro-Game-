@@ -174,3 +174,23 @@ export function useModerationActions() {
     }),
   };
 }
+
+/**
+ * Re-checks every moment photo that hasn't been checked yet and deletes the blank ones,
+ * including photos posted before the blank-photo check existed. Runs in the check-photo
+ * Edge Function, which only moderators may sweep with.
+ */
+export function useBlankPhotoSweep() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (): Promise<{ checked: number; removed: number }> => {
+      if (isDemo) return { checked: 0, removed: 0 };
+      const { data, error } = await supabase!.functions.invoke('check-photo', {
+        body: { sweep: true },
+      });
+      if (error) throw error;
+      return { checked: Number(data?.checked ?? 0), removed: Number(data?.removed ?? 0) };
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['feed'] }),
+  });
+}

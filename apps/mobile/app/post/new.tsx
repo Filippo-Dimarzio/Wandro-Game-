@@ -8,7 +8,7 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { usePlaces } from '@/data/places';
 import { useCreatePost } from '@/data/social';
 import { t } from '@/i18n';
-import { pickCleanPhoto } from '@/lib/photo';
+import { BlankPhotoError, pickCleanPhoto } from '@/lib/photo';
 import { useLocation } from '@/lib/useLocation';
 import { radius, space, useColors } from '@/theme';
 
@@ -20,11 +20,14 @@ export default function NewPost() {
   const create = useCreatePost();
   const [caption, setCaption] = useState('');
   const [photo, setPhoto] = useState<string | null>(null);
+  const [blank, setBlank] = useState(false);
 
-  const pick = (source: 'camera' | 'library') =>
-    pickCleanPhoto(source)
+  const pick = (source: 'camera' | 'library') => {
+    setBlank(false);
+    return pickCleanPhoto(source)
       .then((uri) => uri && setPhoto(uri))
-      .catch(() => undefined);
+      .catch((e) => setBlank(e instanceof BlankPhotoError));
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
@@ -54,6 +57,15 @@ export default function NewPost() {
             )}
             <PickButton icon="images" label={t('post.library')} onPress={() => pick('library')} />
           </View>
+        )}
+        {blank && (
+          <Text
+            style={{ color: c.danger, fontWeight: '700' }}
+            accessibilityLiveRegion="polite"
+            testID="blank-photo"
+          >
+            {t('post.blankPhoto')}
+          </Text>
         )}
         <Text style={{ color: c.textMuted, fontSize: 13 }}>🔒 {t('post.privacy')}</Text>
         <TextInput

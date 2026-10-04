@@ -1,7 +1,12 @@
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { useIsModerator, useModerationActions, useModerationQueue } from '@/data/moderation';
+import {
+  useBlankPhotoSweep,
+  useIsModerator,
+  useModerationActions,
+  useModerationQueue,
+} from '@/data/moderation';
 import { t } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
 
@@ -10,6 +15,7 @@ export default function Moderation() {
   const isMod = useIsModerator();
   const queue = useModerationQueue();
   const actions = useModerationActions();
+  const sweep = useBlankPhotoSweep();
 
   if (!isMod) {
     return (
@@ -28,6 +34,26 @@ export default function Moderation() {
       <ScrollView contentContainerStyle={styles.container}>
         {queue.isLoading && <ActivityIndicator />}
         {empty && <Text style={{ color: c.textMuted }}>{t('mod.empty')}</Text>}
+
+        <View style={[styles.card, { backgroundColor: c.surface }]}>
+          <Text style={{ color: c.text, fontWeight: '800' }}>{t('mod.photos')}</Text>
+          <Text style={{ color: c.textMuted }}>{t('mod.photosHint')}</Text>
+          <Pressable
+            onPress={() => sweep.mutate()}
+            disabled={sweep.isPending}
+            accessibilityRole="button"
+            style={[styles.btn, { backgroundColor: c.accent, alignSelf: 'flex-start' }]}
+            testID="sweep-photos"
+          >
+            <Text style={{ color: c.accentOn, fontWeight: '800' }}>{t('mod.photosSweep')}</Text>
+          </Pressable>
+          {sweep.data && (
+            <Text style={{ color: c.text }} testID="sweep-result">
+              {t('mod.photosResult', sweep.data)}
+            </Text>
+          )}
+          {sweep.isError && <Text style={{ color: c.danger }}>{t('mod.photosFailed')}</Text>}
+        </View>
 
         {!!q?.submissions.length && (
           <Text style={[styles.section, { color: c.text }]}>{t('mod.submissions')}</Text>

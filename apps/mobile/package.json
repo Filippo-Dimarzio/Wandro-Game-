@@ -38,6 +38,7 @@
     "expo-splash-screen": "~57.0.9",
     "expo-status-bar": "~57.0.1",
     "expo-web-browser": "~57.0.3",
+    "jpeg-js": "^0.4.4",
     "maplibre-gl": "^6.11.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
