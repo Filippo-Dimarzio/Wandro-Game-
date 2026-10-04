@@ -15,64 +15,27 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  COLLECTION_COMPLETION_BONUS,
-  COLLECTION_STEP_BONUS,
-  DEMO_PLACES,
-  GEMS_UNLOCK_AFTER,
-  gemsLeftToUnlock,
-  REGIONS,
-  regionFor,
-  type Region,
-} from '@wandro/shared';
+import { COLLECTION_COMPLETION_BONUS, COLLECTION_STEP_BONUS, regionFor } from '@wandro/shared';
 import { CITY_ART } from '@/cityArt';
 import { AnimatedCard } from '@/components/AnimatedCard';
 import { CoinIcon } from '@/components/CoinIcon';
-import { useCollections, type CollectionProgress } from '@/data/collections';
-import { useUnlockedIds } from '@/data/places';
+import { PostageStamp } from '@/components/PostageStamp';
+import { useCities, type City } from '@/data/cities';
+import type { CollectionProgress } from '@/data/collections';
 import { t, type TranslationKey } from '@/i18n';
-import { isDemo } from '@/lib/env';
 import { useLocation } from '@/lib/useLocation';
 import { column, radius, shadow, space, useColors } from '@/theme';
-
-interface City {
-  region: Region;
-  sets: CollectionProgress[];
-  done: number;
-  total: number;
-  /** You've discovered a place here: the landmark shows in colour. */
-  unlocked: boolean;
-  /** Discoveries still needed here before its hidden gems appear. */
-  gemsLeft: number;
-}
 
 /** One box per city with its landmark, greyed out until you've discovered a place there. */
 export default function Collections() {
   const c = useColors();
   const loc = useLocation();
   const here = regionFor(loc.position)?.slug ?? null;
-  const collections = useCollections();
-  const { ids } = useUnlockedIds();
   const [open, setOpen] = useState<City | null>(null);
 
-  const cities: City[] = REGIONS.map((region) => {
-    const sets = collections.filter((s) => s.region === region.slug);
-    const done = sets.reduce((a, s) => a + s.done, 0);
-    // Demo knows every place's city; with a backend, set progress stands in for it.
-    const discoveredHere = isDemo
-      ? DEMO_PLACES.filter((p) => p.region === region.slug && ids.has(p.id)).length
-      : done;
-    return {
-      region,
-      sets,
-      done,
-      total: sets.reduce((a, s) => a + s.total, 0),
-      unlocked: discoveredHere > 0,
-      gemsLeft: isDemo
-        ? gemsLeftToUnlock(DEMO_PLACES, ids, region.slug)
-        : Math.max(0, GEMS_UNLOCK_AFTER - done),
-    };
-  }).sort((a, b) => Number(b.region.slug === here) - Number(a.region.slug === here));
+  const cities = useCities().sort(
+    (a, b) => Number(b.region.slug === here) - Number(a.region.slug === here),
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
@@ -162,7 +125,14 @@ function CityBox({
         ) : (
           <View />
         )}
-        {!city.unlocked && (
+        {city.unlocked ? (
+          <PostageStamp
+            region={city.region}
+            width={44}
+            tilt={6}
+            testID={`city-stamp-${city.region.slug}`}
+          />
+        ) : (
           <View style={styles.lock} testID={`city-locked-${city.region.slug}`}>
             <Ionicons name="lock-closed" size={14} color="#fff" />
           </View>
@@ -267,6 +237,19 @@ function CitySheet({ city, onClose }: { city: City | null; onClose: () => void }
                 </Text>
               </View>
             </View>
+            {shown.unlocked && (
+              <View style={[styles.stampRow, { backgroundColor: c.goldSoft }]}>
+                <PostageStamp
+                  region={shown.region}
+                  value={shown.done}
+                  width={104}
+                  tilt={-4}
+                  animate
+                  testID="city-sheet-stamp"
+                />
+                <Text style={[styles.stampNote, { color: c.text }]}>{t('stamp.collected')}</Text>
+              </View>
+            )}
             <View style={[styles.notes, { backgroundColor: c.surface }]}>
               {!shown.unlocked && (
                 <Row icon="lock-closed" color={c.textMuted}>
@@ -367,6 +350,16 @@ function SetRow({ set }: { set: CollectionProgress }) {
 }
 
 const styles = StyleSheet.create({
+  stampRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.lg,
+    margin: space.lg,
+    marginBottom: 0,
+    padding: space.md,
+    borderRadius: radius.lg,
+  },
+  stampNote: { flex: 1, fontSize: 18, fontWeight: '900' },
   container: { padding: space.lg, gap: space.md, paddingBottom: space.xxl },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   title: { fontSize: 28, fontWeight: '900' },

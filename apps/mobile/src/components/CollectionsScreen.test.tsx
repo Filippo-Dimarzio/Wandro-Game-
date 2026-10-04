@@ -22,6 +22,8 @@ describe('Collections', () => {
     const temple = DEMO_PLACES.find((p) => p.id === 'demo-evora-roman-temple')!;
     await act(async () => void useSession.getState().recordVisit(temple, DEMO_PLACES));
     expect(screen.queryByTestId('city-locked-evora')).toBeNull();
+    expect(screen.getByTestId('city-stamp-evora')).toBeOnTheScreen();
+    expect(screen.queryByTestId('city-stamp-aveiro')).toBeNull();
     expect(screen.getByTestId('city-locked-aveiro')).toBeOnTheScreen();
   });
 
@@ -35,5 +37,15 @@ describe('Collections', () => {
       screen.getByText('Discover 5 more places here to reveal its hidden gems.'),
     ).toBeOnTheScreen();
     expect(screen.getAllByText('+20 each · +50 for the set').length).toBeGreaterThan(0);
+    expect(screen.queryByTestId('city-sheet-stamp')).toBeNull();
+  });
+
+  it('stamps a city you have collected when you open it', async () => {
+    const temple = DEMO_PLACES.find((p) => p.id === 'demo-evora-roman-temple')!;
+    useSession.getState().recordVisit(temple, DEMO_PLACES);
+    await render(<Collections />, { wrapper });
+    fireEvent.press(screen.getByLabelText(/^Évora, /));
+    expect(await screen.findByTestId('city-sheet-stamp')).toBeOnTheScreen();
+    expect(screen.getByText('Stamp collected')).toBeOnTheScreen();
   });
 });

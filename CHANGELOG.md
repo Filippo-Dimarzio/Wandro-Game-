@@ -6,6 +6,13 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- City stamps: a perforated postage stamp with the city's landmark and a Wandro postmark for
+  every city you've collected, on its Collections box, in the city sheet and on a "City stamps"
+  page in your passport (empty dashed slots for cities still to collect).
+- Blank photos are refused: the app rejects a black or empty photo when you pick it, the
+  `check-photo` Edge Function re-checks every upload, other players only see photos that passed
+  (`posts.photo_checked_at`), and moderators can sweep older photos and delete blank ones.
+
 - Beaches & coast category (database enum, importer mapping for beaches, bays and capes, demo and
   seed places, and a coastal daily challenge).
 - Opening days and times for places that need them, shown on cards and the place sheet.

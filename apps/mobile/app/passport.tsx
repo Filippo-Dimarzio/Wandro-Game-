@@ -5,7 +5,9 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { regionBySlug } from '@wandro/shared';
 import { CATEGORY_META } from '@/categories';
+import { PostageStamp, StampSlot } from '@/components/PostageStamp';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { useCities } from '@/data/cities';
 import { usePassport, type PassportStamp } from '@/data/social';
 import { t } from '@/i18n';
 import { column, radius, shadow, space, useColors } from '@/theme';
@@ -24,6 +26,7 @@ const stampDate = (iso: string) =>
 export default function Passport() {
   const c = useColors();
   const { stamps } = usePassport();
+  const cities = useCities();
   const [open, setOpen] = useState<PassportStamp | null>(null);
 
   const pages = new Map<string, PassportStamp[]>();
@@ -36,6 +39,44 @@ export default function Passport() {
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
       <ScreenHeader title={t('passport.title')} />
       <ScrollView contentContainerStyle={[styles.container, column]}>
+        <View
+          style={[styles.page, shadow, { backgroundColor: c.goldSoft, borderColor: c.border }]}
+          testID="passport-cities"
+        >
+          <View>
+            <Text style={[styles.city, { color: c.text }]} accessibilityRole="header">
+              {t('passport.cities')}
+            </Text>
+            <Text style={{ color: c.textMuted, fontSize: 12 }}>
+              {t('passport.citiesCount', {
+                count: cities.filter((x) => x.unlocked).length,
+                total: cities.length,
+              })}
+            </Text>
+          </View>
+          <View style={styles.cityStamps}>
+            {cities.map((city, i) =>
+              city.unlocked ? (
+                <PostageStamp
+                  key={city.region.slug}
+                  region={city.region}
+                  value={city.done}
+                  width={96}
+                  tilt={parseFloat(TILT[i % TILT.length])}
+                  testID={`passport-city-${city.region.slug}`}
+                />
+              ) : (
+                <StampSlot
+                  key={city.region.slug}
+                  region={city.region}
+                  width={96}
+                  testID={`passport-slot-${city.region.slug}`}
+                />
+              ),
+            )}
+          </View>
+        </View>
+
         <Text style={{ color: c.textMuted }}>{t('passport.subtitle')}</Text>
         {stamps.length === 0 && (
           <View style={[styles.empty, { backgroundColor: c.surface }]}>
@@ -141,6 +182,12 @@ const styles = StyleSheet.create({
   },
   pageHeader: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   city: { fontSize: 20, fontWeight: '900', letterSpacing: 0.5 },
+  cityStamps: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: space.sm,
+    justifyContent: 'center',
+  },
   stamps: { flexDirection: 'row', flexWrap: 'wrap', gap: space.md, justifyContent: 'flex-start' },
   stamp: { width: 92, alignItems: 'center', gap: 4 },
   stampFrame: {
