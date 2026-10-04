@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { haversineMeters, type LatLng, type Place } from '@wandro/shared';
 import { placeImage } from '@/categories';
 import { useDailyChallenge } from '@/data/challenge';
+import { CoinIcon } from '@/components/CoinIcon';
 import { t } from '@/i18n';
 import { radius, shadow, space, useColors } from '@/theme';
 import { HoldToConfirm } from './HoldToConfirm';
@@ -90,10 +91,11 @@ export function DailyChallengeCard({
           <Text style={[styles.kicker, { color: c.gold }]}>{t('challenge.title')}</Text>
         </View>
         <View style={[styles.bonusPill, { backgroundColor: accent }]}>
+          <CoinIcon size={16} />
           <Text style={{ color: cat ? c.onCategory : c.accentOn, fontWeight: '800' }}>
             {challenge.isReady || challenge.completedAt
               ? `${t('challenge.bonus', { points: challenge.bonusPoints })} · ${t('challenge.double')}`
-              : `🪙 ${t('challenge.double')}`}
+              : t('challenge.double')}
           </Text>
         </View>
       </View>
@@ -181,7 +183,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  bonusPill: { borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 4 },
+  bonusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderRadius: radius.pill,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
   body: { padding: space.lg, gap: space.xs },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   kicker: {

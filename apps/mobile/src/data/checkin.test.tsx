@@ -32,7 +32,12 @@ describe('useCheckin (demo mode)', () => {
     await act(async () => void jest.advanceTimersByTime(9000));
     expect(result.current.phase).toMatchObject({
       kind: 'done',
-      outcome: { status: 'verified', coins: pointsForVisit('nature', adraga.uniqueVisitors).total },
+      // Adraga is in "The wild coast" set: +20 on top.
+      outcome: {
+        status: 'verified',
+        coins: pointsForVisit('nature', adraga.uniqueVisitors).total + 20,
+        setCoins: 20,
+      },
     });
     expect(useSession.getState().unlocked[adraga.id]).toBeDefined();
   });

@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DEFAULT_REGION, regionFor } from '@wandro/shared';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { ME, useLeaderboard, type LeaderboardScope } from '@/data/social';
+import { CoinAmount } from '@/components/CoinIcon';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { radius, space, useColors } from '@/theme';
@@ -58,9 +59,7 @@ export default function Leaderboard() {
               {item.username}
               {item.isMe ? ` (${t('leaderboard.you')})` : ''}
             </Text>
-            <Text style={{ color: item.isMe ? c.accentOn : c.gold, fontWeight: '900' }}>
-              🪙 {item.coins}
-            </Text>
+            <CoinAmount amount={item.coins} color={item.isMe ? c.accentOn : c.gold} />
           </Pressable>
         )}
       />

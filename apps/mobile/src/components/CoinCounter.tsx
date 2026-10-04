@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
+import { CoinAmount } from '@/components/CoinIcon';
 import { t } from '@/i18n';
 import { useColors } from '@/theme';
 
@@ -31,7 +32,7 @@ export function CoinCounter({ coins, size = 16 }: { coins: number; size?: number
 
   return (
     <View style={styles.row} accessible accessibilityLabel={t('coins.a11y', { coins })}>
-      <Text style={{ color: c.gold, fontWeight: '900', fontSize: size }}>🪙 {shown}</Text>
+      <CoinAmount amount={shown} color={c.gold} size={size} />
       {delta !== 0 && (
         <Animated.Text
           style={[

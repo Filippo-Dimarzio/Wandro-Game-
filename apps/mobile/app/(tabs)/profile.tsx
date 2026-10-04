@@ -66,6 +66,11 @@ export default function Profile() {
             onPress={() => router.push('/search')}
           />
           <LinkButton
+            icon="book"
+            label={t('passport.title')}
+            onPress={() => router.push('/passport')}
+          />
+          <LinkButton
             icon="trophy"
             label={t('leaderboard.title')}
             onPress={() => router.push('/leaderboard')}

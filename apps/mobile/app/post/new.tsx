@@ -72,7 +72,7 @@ export default function NewPost() {
           onPress={() =>
             create.mutate(
               { placeId: placeId!, caption: caption.trim(), photoUri: photo ?? undefined },
-              { onSuccess: () => router.replace('/(tabs)') },
+              { onSuccess: () => router.replace('/(tabs)/capture') },
             )
           }
           accessibilityRole="button"

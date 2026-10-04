@@ -14,14 +14,12 @@ import { CATEGORIES, haversineMeters } from '@wandro/shared';
 import { CategoryMark } from '@/components/CategoryMark';
 import { CoinCounter } from '@/components/CoinCounter';
 import { DailyChallengeCard } from '@/components/DailyChallengeCard';
-import { FeedCard } from '@/components/FeedCard';
 import { HowToPlay } from '@/components/HowToPlay';
 import { InstallBanner } from '@/components/InstallBanner';
 import { PlaceCard } from '@/components/PlaceBits';
 import { ProgressStrip } from '@/components/ProgressStrip';
 import { useFriendChallenges, useFriends } from '@/data/friends';
 import { usePlaces, useUnlockedIds } from '@/data/places';
-import { useFeed } from '@/data/social';
 import { useWallet } from '@/data/wallet';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
@@ -35,7 +33,6 @@ export default function Home() {
   const places = usePlaces(loc.position);
   const { ids } = useUnlockedIds();
   const wallet = useWallet();
-  const feed = useFeed();
   const { incoming } = useFriends();
   const friendChallenges = useFriendChallenges();
   const friendNews =
@@ -58,7 +55,6 @@ export default function Home() {
             refreshing={places.isRefetching}
             onRefresh={() => {
               places.refetch();
-              feed.refetch();
             }}
           />
         }
@@ -187,25 +183,6 @@ export default function Home() {
             />
           ))}
         </ScrollView>
-
-        <Text style={[styles.section, { color: c.text }]} accessibilityRole="header">
-          {t('feed.title')}
-        </Text>
-        {feed.isLoading && <ActivityIndicator />}
-        {feed.items.length === 0 && !feed.isLoading ? (
-          <View style={[styles.empty, { backgroundColor: c.surface }]}>
-            <Text style={{ color: c.textMuted, textAlign: 'center' }}>{t('feed.empty')}</Text>
-            <Pressable
-              onPress={() => router.push('/search')}
-              accessibilityRole="button"
-              style={[styles.emptyButton, { backgroundColor: c.accent }]}
-            >
-              <Text style={{ color: c.accentOn, fontWeight: '800' }}>{t('feed.findPeople')}</Text>
-            </Pressable>
-          </View>
-        ) : (
-          feed.items.map((item) => <FeedCard key={item.id} item={item} />)
-        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -248,11 +225,4 @@ const styles = StyleSheet.create({
   interest: { width: 80, alignItems: 'center', gap: 6 },
   interestLabel: { fontSize: 12, fontWeight: '700', textAlign: 'center' },
   rail: { gap: space.md, paddingBottom: space.sm, paddingRight: space.lg },
-  empty: { borderRadius: radius.md, padding: space.lg, gap: space.md, alignItems: 'center' },
-  emptyButton: {
-    borderRadius: radius.pill,
-    paddingHorizontal: 20,
-    minHeight: 44,
-    justifyContent: 'center',
-  },
 });

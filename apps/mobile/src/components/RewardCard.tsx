@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { BADGES } from '@wandro/shared';
 import type { CheckinOutcome } from '@/data/checkin';
+import { CoinIcon } from '@/components/CoinIcon';
 import { t, type TranslationKey } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
 
@@ -86,12 +87,15 @@ export function RewardCard({ placeName, outcome, onDone, onShare }: Props) {
         {t('reward.title')}
       </Text>
       <Text style={{ color: c.accentOn, fontSize: 16 }}>{placeName}</Text>
-      <Text
-        style={[styles.coins, { color: c.accentOn }]}
-        accessibilityLabel={t('reward.coins', { coins: outcome.coins ?? 0 })}
-      >
-        🪙 +{coins}
-      </Text>
+      <View style={styles.coinRow}>
+        <CoinIcon size={40} />
+        <Text
+          style={[styles.coins, { color: c.accentOn }]}
+          accessibilityLabel={t('reward.coins', { coins: outcome.coins ?? 0 })}
+        >
+          +{coins}
+        </Text>
+      </View>
       {!!outcome.firstDiscovererBonus && (
         <Text style={{ color: c.accentOn, fontWeight: '700' }}>
           🚩 {t('reward.pioneer', { coins: outcome.firstDiscovererBonus })}
@@ -103,6 +107,11 @@ export function RewardCard({ placeName, outcome, onDone, onShare }: Props) {
           <Chip text={`🔥 ${t('reward.streak', { days: outcome.streak })}`} />
         )}
       </View>
+      {!!outcome.setCoins && (
+        <Text style={{ color: c.accentOn, fontWeight: '700' }} testID="reward-sets">
+          🧩 {t('reward.sets', { coins: outcome.setCoins })}
+        </Text>
+      )}
       {(outcome.collectionsCompleted?.length ?? 0) > 0 && (
         <Text style={{ color: c.accentOn, fontWeight: '800' }}>🏆 {t('reward.collection')}</Text>
       )}
@@ -151,6 +160,7 @@ const styles = StyleSheet.create({
   octopus: { fontSize: 56 },
   title: { fontSize: 26, fontWeight: '900' },
   coins: { fontSize: 40, fontWeight: '900' },
+  coinRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   row: { flexDirection: 'row', gap: space.sm, flexWrap: 'wrap', justifyContent: 'center' },
   chip: {
     backgroundColor: 'rgba(0,0,0,0.22)',

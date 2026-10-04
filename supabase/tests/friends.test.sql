@@ -13,6 +13,12 @@ do $$ begin
 end $$;
 insert into posts (user_id, visit_id, place_id, caption)
 select user_id, id, place_id, 'Palace in the clouds' from visits where user_id = '00000000-0000-0000-0000-00000000aa02';
+-- Ana posts today too, so today's moments are unlocked for her.
+do $$ begin
+  perform award_visit('00000000-0000-0000-0000-00000000aa01', pg_temp.place_id('capuchos'), 38.784, -9.433, 8, 130);
+end $$;
+insert into posts (user_id, visit_id, place_id, caption)
+select user_id, id, place_id, 'Cork walls' from visits where user_id = '00000000-0000-0000-0000-00000000aa01';
 
 -- Requests
 select pg_temp.as_user('00000000-0000-0000-0000-00000000aa01');

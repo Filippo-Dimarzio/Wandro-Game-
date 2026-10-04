@@ -14,6 +14,8 @@ export interface CheckinOutcome {
   streak?: number;
   newBadges?: string[];
   collectionsCompleted?: string[];
+  /** Coins from sets (already included in `coins`). */
+  setCoins?: number;
   reason?: string;
 }
 
@@ -65,6 +67,8 @@ export function useCheckin(location: UserLocation, places: Place[]) {
       qc.invalidateQueries({ queryKey: ['my-visits'] });
       qc.invalidateQueries({ queryKey: ['places'] });
       qc.invalidateQueries({ queryKey: ['daily-challenge'] });
+      qc.invalidateQueries({ queryKey: ['collections'] });
+      qc.invalidateQueries({ queryKey: ['shareable'] });
     },
     [qc],
   );
@@ -159,7 +163,7 @@ export function useCheckin(location: UserLocation, places: Place[]) {
         streak?: number;
         new_badges?: string[];
         reason?: string;
-        breakdown?: { first_discoverer?: number };
+        breakdown?: { first_discoverer?: number; sets?: number };
       };
       if (r.status === 'pending') {
         setTimeout(
@@ -175,6 +179,7 @@ export function useCheckin(location: UserLocation, places: Place[]) {
         streak: r.streak,
         newBadges: r.new_badges ?? [],
         firstDiscovererBonus: r.breakdown?.first_discoverer,
+        setCoins: r.breakdown?.sets,
         reason: r.reason,
       });
     };

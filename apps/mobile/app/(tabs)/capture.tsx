@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDistance } from '@wandro/shared';
 import { placeImage } from '@/categories';
 import { HoldToConfirm } from '@/components/HoldToConfirm';
+import { Moments } from '@/components/Moments';
 import { CategoryPill, HoursChip } from '@/components/PlaceBits';
 import { RewardCard } from '@/components/RewardCard';
 import { useCheckin } from '@/data/checkin';
@@ -144,6 +145,8 @@ export default function Capture() {
             {t('capture.demoNote', { seconds: DEMO_DWELL_SECONDS })}
           </Text>
         )}
+
+        <Moments />
       </ScrollView>
     </SafeAreaView>
   );

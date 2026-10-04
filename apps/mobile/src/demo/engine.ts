@@ -62,6 +62,8 @@ export interface VisitResult {
   level: number;
   newBadges: string[];
   collectionsCompleted: string[];
+  /** Coins from sets: 20 per place in a set, 50 per set finished (already in `coins`). */
+  setCoins: number;
 }
 
 /** Calendar day in Lisbon (YYYY-MM-DD), matching the server's lisbon_today(). */
@@ -181,15 +183,34 @@ export function applyVisit(
       [place.id]: { at, points: visitCoins, visitorsBefore: n, firstDiscoverer: n === 0 },
     },
   };
+  let stepCoins = 0;
+  for (const c of DEMO_COLLECTIONS) {
+    if (!c.placeIds.includes(place.id) || c.stepBonus <= 0) continue;
+    afterVisit.ledger.push({
+      kind: 'collection',
+      coins: c.stepBonus,
+      xp: c.stepBonus,
+      at,
+      ref: c.id,
+    });
+    stepCoins += c.stepBonus;
+  }
   const { progress, newBadges, collectionsCompleted } = applyBadgesAndCollections(
     afterVisit,
     places,
     now,
   );
+  const setCoins =
+    stepCoins +
+    DEMO_COLLECTIONS.filter((c) => collectionsCompleted.includes(c.id)).reduce(
+      (a, c) => a + c.bonus,
+      0,
+    );
   return {
     progress,
     result: {
-      coins: pts.total,
+      coins: pts.total + setCoins,
+      setCoins,
       firstDiscovererBonus: pts.firstDiscovererBonus,
       multiplier: pts.multiplier,
       streak,

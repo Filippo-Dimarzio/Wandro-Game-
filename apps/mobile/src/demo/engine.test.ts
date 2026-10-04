@@ -15,12 +15,14 @@ describe('demo engine', () => {
   it('awards coins, pioneer bonus, streak and badges like the server', () => {
     const music = byId('demo-music'); // 0 visitors: first discoverer
     const r = applyVisit(EMPTY_PROGRESS, music, DEMO_PLACES, now)!;
-    expect(r.result.coins).toBe(100 * 5 + 50);
+    // base x 5 rarity + 50 pioneer + 20 for a place from a set (Hidden gems)
+    expect(r.result.coins).toBe(100 * 5 + 50 + 20);
     expect(r.result.firstDiscovererBonus).toBe(50);
+    expect(r.result.setCoins).toBe(20);
     expect(r.result.newBadges).toEqual(['first_step', 'hidden_gem', 'first_discoverer']);
     const w = walletOf(r.progress);
-    expect(w.coins).toBe(550);
-    expect(w.xp).toBe(550 + 10 + 3 * 50);
+    expect(w.coins).toBe(570);
+    expect(w.xp).toBe(570 + 10 + 3 * 50);
     expect(w.streak).toBe(1);
   });
 
@@ -47,7 +49,12 @@ describe('demo engine', () => {
     const r = applyVisit(p, byId('demo-adraga'), DEMO_PLACES, now)!;
     expect(r.result.collectionsCompleted).toEqual(['demo-col-coast']);
     p = r.progress;
-    expect(p.ledger.filter((e) => e.kind === 'collection')).toHaveLength(1);
+    // 20 per place from the set, 50 for finishing it, paid once.
+    expect(p.ledger.filter((e) => e.kind === 'collection').map((e) => e.coins)).toEqual([
+      20, 20, 50,
+    ]);
+    expect(r.result.setCoins).toBe(70);
+    expect(r.result.coins).toBe(r.progress.unlocked['demo-adraga'].points + 70);
   });
 
   it('doubles the coins of the qualifying discovery for the daily challenge', () => {

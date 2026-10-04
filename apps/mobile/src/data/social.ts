@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { DEMO_PLACES, type Category } from '@wandro/shared';
+import { DEMO_PLACES, MOMENT_VISIBLE_HOURS, type Category } from '@wandro/shared';
 import { DEMO_FEED, DEMO_USERS, demoUser } from '@/demo/social';
 import { walletOf } from '@/demo/engine';
 import { isDemo } from '@/lib/env';
@@ -33,17 +33,37 @@ async function signedUrls(paths: string[]): Promise<Record<string, string>> {
   return out;
 }
 
+const MOMENT_MS = MOMENT_VISIBLE_HOURS * 3_600_000;
+
+/** When a moment leaves other people's feeds. */
+export const momentExpiry = (createdAt: string) => Date.parse(createdAt) + MOMENT_MS;
+
+export interface MomentStatus {
+  /** You shared a moment in the last 24 h, so you can see everyone else's. */
+  unlocked: boolean;
+  /** When your latest moment stops being visible to others. */
+  expiresAt: string | null;
+}
+
+/**
+ * Today's moments: posts from the last 24 h by people you follow or are friends with. Other
+ * people's only show once you've shared one yourself (the server enforces the same in RLS).
+ */
 export function useFeed() {
   const s = useSession();
   const server = useQuery({
     queryKey: ['feed'],
     enabled: !isDemo,
-    queryFn: async (): Promise<FeedItem[]> => {
+    queryFn: async (): Promise<{ items: FeedItem[]; status: MomentStatus }> => {
       const db = supabase!;
       const me = (await db.auth.getUser()).data.user?.id;
-      const { data, error } = await db.rpc('feed', { p_limit: 30 });
-      if (error) throw error;
-      const rows = data as {
+      const [feed, status] = await Promise.all([
+        db.rpc('feed', { p_limit: 50 }),
+        db.rpc('moment_status'),
+      ]);
+      if (feed.error) throw feed.error;
+      if (status.error) throw status.error;
+      const rows = feed.data as {
         post_id: string;
         user_id: string;
         username: string;
@@ -56,33 +76,45 @@ export function useFeed() {
         like_count: number;
         liked_by_me: boolean;
       }[];
+      const st = status.data as { unlocked: boolean; expires_at: string | null };
       const urls = await signedUrls(rows.flatMap((r) => (r.photo_path ? [r.photo_path] : [])));
-      return rows.map((r) => ({
-        id: r.post_id,
-        userId: r.user_id,
-        username: r.username,
-        placeId: r.place_id,
-        placeName: r.place_name,
-        category: r.category,
-        caption: r.caption ?? '',
-        photoUrl: r.photo_path ? urls[r.photo_path] : undefined,
-        createdAt: r.created_at,
-        likeCount: Number(r.like_count),
-        likedByMe: r.liked_by_me,
-        isMine: r.user_id === me,
-      }));
+      return {
+        status: { unlocked: st.unlocked, expiresAt: st.expires_at },
+        items: rows.map((r) => ({
+          id: r.post_id,
+          userId: r.user_id,
+          username: r.username,
+          placeId: r.place_id,
+          placeName: r.place_name,
+          category: r.category,
+          caption: r.caption ?? '',
+          photoUrl: r.photo_path ? urls[r.photo_path] : undefined,
+          createdAt: r.created_at,
+          likeCount: Number(r.like_count),
+          likedByMe: r.liked_by_me,
+          isMine: r.user_id === me,
+        })),
+      };
     },
   });
   if (!isDemo)
     return {
-      items: server.data ?? [],
+      items: server.data?.items ?? [],
+      status: server.data?.status ?? { unlocked: false, expiresAt: null },
       isLoading: server.isLoading,
       error: server.error,
       refetch: server.refetch,
     };
 
   const now = Date.now();
-  const mine: FeedItem[] = s.posts.map((p) => ({
+  const recent = s.posts.filter((p) => now - Date.parse(p.at) < MOMENT_MS);
+  const status: MomentStatus = {
+    unlocked: recent.length > 0,
+    expiresAt: recent.length
+      ? new Date(Math.max(...recent.map((p) => momentExpiry(p.at)))).toISOString()
+      : null,
+  };
+  const mine: FeedItem[] = recent.map((p) => ({
     id: p.id,
     userId: ME,
     username: s.profile?.username ?? 'you',
@@ -96,25 +128,123 @@ export function useFeed() {
     likedByMe: !!s.liked[p.id],
     isMine: true,
   }));
-  const others: FeedItem[] = DEMO_FEED.filter(
-    (p) => s.following.includes(p.userId) && !s.blocked.includes(p.userId),
-  )
-    .filter((p) => !s.reports.some((r) => r.targetType === 'post' && r.targetId === p.id))
-    .map((p) => ({
-      id: p.id,
-      userId: p.userId,
-      username: demoUser(p.userId)?.username ?? '',
-      placeId: p.placeId,
-      placeName: placeById(p.placeId)?.name ?? '',
-      category: placeById(p.placeId)?.category ?? 'other',
-      caption: p.caption,
-      createdAt: new Date(now - p.hoursAgo * 3_600_000).toISOString(),
-      likeCount: p.likes + (s.liked[p.id] ? 1 : 0),
-      likedByMe: !!s.liked[p.id],
-      isMine: false,
-    }));
+  const others: FeedItem[] = !status.unlocked
+    ? []
+    : DEMO_FEED.filter(
+        (p) =>
+          p.hoursAgo < MOMENT_VISIBLE_HOURS &&
+          (s.following.includes(p.userId) || s.friends[p.userId] === 'friends') &&
+          !s.blocked.includes(p.userId),
+      )
+        .filter((p) => !s.reports.some((r) => r.targetType === 'post' && r.targetId === p.id))
+        .map((p) => ({
+          id: p.id,
+          userId: p.userId,
+          username: demoUser(p.userId)?.username ?? '',
+          placeId: p.placeId,
+          placeName: placeById(p.placeId)?.name ?? '',
+          category: placeById(p.placeId)?.category ?? 'other',
+          caption: p.caption,
+          createdAt: new Date(now - p.hoursAgo * 3_600_000).toISOString(),
+          likeCount: p.likes + (s.liked[p.id] ? 1 : 0),
+          likedByMe: !!s.liked[p.id],
+          isMine: false,
+        }));
   const items = [...mine, ...others].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  return { items, isLoading: false, error: null, refetch: async () => undefined };
+  return { items, status, isLoading: false, error: null, refetch: async () => undefined };
+}
+
+export interface PassportStamp {
+  id: string;
+  placeId: string;
+  placeName: string;
+  category: Category;
+  /** Launch city slug, or null for places outside them. */
+  region: string | null;
+  caption: string;
+  photoUrl?: string;
+  createdAt: string;
+}
+
+/** Every moment you've shared, kept forever but only for you. */
+export function usePassport() {
+  const posts = useSession((s) => s.posts);
+  const server = useQuery({
+    queryKey: ['passport'],
+    enabled: !isDemo,
+    queryFn: async (): Promise<PassportStamp[]> => {
+      const { data, error } = await supabase!.rpc('my_passport');
+      if (error) throw error;
+      const rows = data as {
+        post_id: string;
+        place_id: string;
+        place_name: string;
+        category: Category;
+        region_slug: string | null;
+        caption: string | null;
+        photo_path: string | null;
+        created_at: string;
+      }[];
+      const urls = await signedUrls(rows.flatMap((r) => (r.photo_path ? [r.photo_path] : [])));
+      return rows.map((r) => ({
+        id: r.post_id,
+        placeId: r.place_id,
+        placeName: r.place_name,
+        category: r.category,
+        region: r.region_slug,
+        caption: r.caption ?? '',
+        photoUrl: r.photo_path ? urls[r.photo_path] : undefined,
+        createdAt: r.created_at,
+      }));
+    },
+  });
+  if (!isDemo) return { stamps: server.data ?? [], isLoading: server.isLoading };
+  const stamps = posts
+    .map((p) => {
+      const place = placeById(p.placeId);
+      return {
+        id: p.id,
+        placeId: p.placeId,
+        placeName: place?.name ?? '',
+        category: place?.category ?? ('other' as Category),
+        region: place?.region ?? null,
+        caption: p.caption,
+        photoUrl: p.photoUri,
+        createdAt: p.at,
+      };
+    })
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return { stamps, isLoading: false };
+}
+
+/** Your most recent discovery that you haven't shared yet: what "share a moment" opens. */
+export function useShareable(): string | null {
+  const unlocked = useSession((s) => s.unlocked);
+  const posts = useSession((s) => s.posts);
+  const server = useQuery({
+    queryKey: ['shareable'],
+    enabled: !isDemo,
+    queryFn: async () => {
+      const db = supabase!;
+      const [visits, mine] = await Promise.all([
+        db
+          .from('visits')
+          .select('place_id, verified_at')
+          .order('verified_at', { ascending: false }),
+        db.rpc('my_passport'),
+      ]);
+      if (visits.error) throw visits.error;
+      const shared = new Set(((mine.data ?? []) as { place_id: string }[]).map((r) => r.place_id));
+      return visits.data.find((v) => !shared.has(v.place_id as string))?.place_id ?? null;
+    },
+  });
+  if (!isDemo) return (server.data as string | null | undefined) ?? null;
+  const shared = new Set(posts.map((p) => p.placeId));
+  return (
+    Object.entries(unlocked)
+      .filter(([id]) => !shared.has(id))
+      .sort((a, b) => b[1].at.localeCompare(a[1].at))[0]?.[0] ?? null
+  );
 }
 
 export function useToggleLike() {
@@ -130,7 +260,11 @@ export function useToggleLike() {
         : await db.from('likes').insert({ post_id: item.id, user_id: me });
       if (res.error) throw res.error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['feed'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['feed'] });
+      qc.invalidateQueries({ queryKey: ['passport'] });
+      qc.invalidateQueries({ queryKey: ['shareable'] });
+    },
   });
 }
 
@@ -251,7 +385,11 @@ export function useReport() {
       // Reporting the same thing twice is fine: the first report already counts.
       if (error && error.code !== '23505') throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['feed'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['feed'] });
+      qc.invalidateQueries({ queryKey: ['passport'] });
+      qc.invalidateQueries({ queryKey: ['shareable'] });
+    },
   });
 }
 
@@ -400,6 +538,10 @@ export function useCreatePost() {
       });
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['feed'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['feed'] });
+      qc.invalidateQueries({ queryKey: ['passport'] });
+      qc.invalidateQueries({ queryKey: ['shareable'] });
+    },
   });
 }

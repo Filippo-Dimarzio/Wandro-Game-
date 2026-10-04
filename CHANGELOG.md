@@ -25,6 +25,14 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - `pnpm --filter importer photos` finds a real, freely licensed photo for every place on
   Wikidata / Wikimedia Commons and records author, licence and source; the place sheet credits
   it and links to the source.
+- Today's moments on the Check in tab: a grid of small boxes with what the people you follow and
+  your friends shared in the last 24 h. They unlock once you share a photo of a discovery
+  yourself, and disappear from everyone else's view after 24 h (enforced by RLS and the photo
+  storage policy).
+- Passport: every moment you've shared, stamped onto the page of its city. Only you can see it.
+- City sets: two sets of 5 places in every launch city (its icons, and its 3 art + 2 travel
+  places). Collections shows one card per city that opens with an animation.
+- Gold coin with a slot for the mascot artwork (`apps/mobile/src/coin.ts`).
 
 ### Changed
 
@@ -32,6 +40,10 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - The check-in tab is now labelled "Check in" so "Discover" can name the new learning area.
 - Tab labels have a proper line height and medium weight, so they no longer clip or run together.
 - The friends leaderboard and private-profile access include accepted friends.
+- Sets pay 20 coins for each place you find from them and 50 for finishing them (was 200 on
+  completion only). The check-in reward shows the set coins.
+- The "From explorers you follow" feed moved off Home.
+- Discover shows the categories as a simple photo grid; details open when you tap one.
 - The daily challenge card shows a real place that fits the challenge instead of the octopus,
   and the hidden-gem card is a fog mystery instead of the octopus.
 

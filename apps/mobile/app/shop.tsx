@@ -8,6 +8,7 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { useLoadout } from '@/data/loadout';
 import { useBuyItem, useEquipItem } from '@/data/shop';
 import { useWallet } from '@/data/wallet';
+import { CoinIcon } from '@/components/CoinIcon';
 import { t, type TranslationKey } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
 
@@ -211,6 +212,7 @@ function Action({
   testID?: string;
 }) {
   const c = useColors();
+  const priced = /\d$/.test(label);
   return (
     <Pressable
       onPress={onPress}
@@ -225,14 +227,17 @@ function Action({
       ]}
       testID={testID}
     >
-      <Text
-        style={{
-          color: secondary ? c.text : disabled ? c.textMuted : c.accentOn,
-          fontWeight: '800',
-        }}
-      >
-        {label}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <Text
+          style={{
+            color: secondary ? c.text : disabled ? c.textMuted : c.accentOn,
+            fontWeight: '800',
+          }}
+        >
+          {label}
+        </Text>
+        {priced && <CoinIcon size={16} />}
+      </View>
     </Pressable>
   );
 }

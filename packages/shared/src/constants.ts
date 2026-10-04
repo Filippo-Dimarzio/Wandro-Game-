@@ -29,7 +29,10 @@ export const BASE_POINTS: Record<Category, number> = {
 
 export const FIRST_DISCOVERER_BONUS = 50;
 export const DAILY_CHALLENGE_BONUS = 75;
-export const COLLECTION_COMPLETION_BONUS = 200;
+/** Finishing a whole set (5–6 places). */
+export const COLLECTION_COMPLETION_BONUS = 50;
+/** Each place you discover from a set pays this on top of its own coins. */
+export const COLLECTION_STEP_BONUS = 20;
 
 /** Daily challenge pays the qualifying discovery's coins again (double coins). */
 export const DAILY_CHALLENGE_MULTIPLIER = 2;
@@ -51,3 +54,5 @@ export const NEARBY_RADIUS_M = 30_000;
 export const FRIEND_NOTE_MAX = 280;
 /** Anti-spam: challenges one player can send per day. */
 export const FRIEND_CHALLENGES_PER_DAY = 20;
+/** Others' moments disappear from the feed after this; the author keeps theirs in their passport. */
+export const MOMENT_VISIBLE_HOURS = 24;

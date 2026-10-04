@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { levelProgress, octopusStage } from '@wandro/shared';
 import type { Wallet } from '@/data/wallet';
+import { CoinAmount } from '@/components/CoinIcon';
 import { t } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
 
@@ -21,7 +22,7 @@ export function ProgressStrip({ wallet }: { wallet: Wallet }) {
           {'🐙 '}
           {t('home.level', { level: lp.level })} · {octopusStage(lp.level)}
         </Text>
-        <Text style={[styles.points, { color: c.gold }]}>🪙 {wallet.coins}</Text>
+        <CoinAmount amount={wallet.coins} color={c.gold} size={18} />
       </View>
       <View style={[styles.track, { backgroundColor: c.border }]}>
         <View

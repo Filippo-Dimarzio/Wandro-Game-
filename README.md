@@ -99,25 +99,26 @@ level up, your octopus evolves (Hatchling → Explorer → Navigator → Cartogr
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Entry portal** | Full-screen view under fog; hold to clear it and reveal Wandro.                                                                                               |
 | **Registration** | Sign-up (email, Google, Apple), username, home city, then **pick your explorer style** (castles, nature, museums, music, beaches, hidden gems).               |
-| **Home**         | Photo feed first, a slim progress strip (level, octopus stage, points), today's challenge, places near you.                                                   |
+| **Home**         | A slim progress strip (level, octopus stage, coins), interests, today's challenge, places near you.                                                           |
 | **Explore**      | Map with locked/discovered places, category chips, legend, recenter button, and a bottom sheet with photo, category, distance, points, rarity and directions. |
-| **Discover (+)** | Nearest place, "you're at X", hold to start discovery, dwell ring, success card.                                                                              |
-| **Collections**  | Maps-style lists with cover, progress bar and completion bonus.                                                                                               |
+| **Check in (+)** | Nearest place, hold to start discovery, dwell ring, reward card; below it today's moments (small boxes, unlocked by sharing your own, gone after 24 h).       |
+| **Collections**  | One card per city that opens with an animation to show its sets of 5 places and your progress.                                                                |
+| **Passport**     | Every moment you've shared, stamped by city. Only you see it.                                                                                                 |
 | **Profile**      | "Map of you" (your cleared fog), discoveries, points, level, octopus stage and badges.                                                                        |
 
-Navigation is a bottom tab bar like Instagram: Home · Explore · Discover · Collections · Profile.
+Navigation is a bottom tab bar like Instagram: Home · Explore · Check in · Collections · Profile.
 
 ## Scoring and progression
 
-| Rule                  | Value                                                                                                         |
-| --------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Base coins            | Culture 100 · Heritage 120 · Nature 80 · Music & events 100 · Other 60                                        |
-| Rarity multiplier     | `1 + 4 / (1 + n/10)`, where _n_ = unique visitors so far (0 → 5×, 10 → 3×, 100 → ~1.4×)                       |
-| First discoverer      | +50 coins                                                                                                     |
-| Daily challenge       | Double coins: the qualifying discovery pays again (at least 75), once a day                                   |
-| Collection completion | +200 coins                                                                                                    |
-| Levels                | `level = floor(sqrt(xp / 100)) + 1`; streaks give XP only                                                     |
-| Badges                | Category ("3 heritage sites"), region ("Sintra complete"), rarity ("Hidden gem hunter"), streak and community |
+| Rule              | Value                                                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------- |
+| Base coins        | Culture 100 · Heritage 120 · Nature 80 · Music & events 100 · Other 60                                        |
+| Rarity multiplier | `1 + 4 / (1 + n/10)`, where _n_ = unique visitors so far (0 → 5×, 10 → 3×, 100 → ~1.4×)                       |
+| First discoverer  | +50 coins                                                                                                     |
+| Daily challenge   | Double coins: the qualifying discovery pays again (at least 75), once a day                                   |
+| Sets              | +20 coins per place from a set, +50 for finishing the set                                                     |
+| Levels            | `level = floor(sqrt(xp / 100)) + 1`; streaks give XP only                                                     |
+| Badges            | Category ("3 heritage sites"), region ("Sintra complete"), rarity ("Hidden gem hunter"), streak and community |
 
 Coins and XP are written to an append-only ledger, so later changes in rarity never change past
 rewards. Each player can complete each place **once**. XP comes with every coin earned (plus

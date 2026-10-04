@@ -19,8 +19,14 @@ create temp table clara_visit on commit drop as
 grant select on clara_visit to authenticated;
 select pg_temp.check((select count(*) from user_collection_rewards where user_id = '00000000-0000-0000-0000-0000000000b1') = 1,
   'completing every place in a collection awards its bonus');
-select pg_temp.check((select count(*) from points_ledger where user_id = '00000000-0000-0000-0000-0000000000b1' and kind = 'collection') = 1,
-  'collection bonus is paid once');
+select pg_temp.check((select count(*) from points_ledger where user_id = '00000000-0000-0000-0000-0000000000b1'
+                      and kind = 'collection' and not breakdown ? 'step') = 1
+  and (select points from points_ledger where user_id = '00000000-0000-0000-0000-0000000000b1'
+       and kind = 'collection' and not breakdown ? 'step') = 50,
+  'finishing a set pays 50 coins, once');
+select pg_temp.check((select array_agg(points) from points_ledger where user_id = '00000000-0000-0000-0000-0000000000b1'
+                      and kind = 'collection' and breakdown ? 'step') = array[20, 20],
+  'each place from the set pays 20 coins');
 
 -- Bruno posts about his visit; Clara (private) posts too.
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b1');
@@ -44,7 +50,19 @@ insert into follows (follower_id, followee_id) values (auth.uid(), '00000000-000
 insert into follows (follower_id, followee_id) values (auth.uid(), '00000000-0000-0000-0000-0000000000c1');
 select pg_temp.check((select status from follows where followee_id = '00000000-0000-0000-0000-0000000000b1' and follower_id = auth.uid()) = 'accepted', 'following a public profile is immediate');
 select pg_temp.check((select status from follows where followee_id = '00000000-0000-0000-0000-0000000000c1' and follower_id = auth.uid()) = 'pending', 'following a private profile sends a request');
-select pg_temp.check((select count(*) from feed()) = 1, 'feed shows posts from accepted follows only');
+select pg_temp.check((select count(*) from feed()) = 0 and not exists (select 1 from posts where user_id = '00000000-0000-0000-0000-0000000000b1'),
+  'today''s moments stay locked until you post yourself');
+select pg_temp.check((moment_status() ->> 'unlocked')::boolean = false, 'moment_status says locked');
+reset role;
+do $$ begin
+  perform award_visit('00000000-0000-0000-0000-0000000000a1', pg_temp.place_id('capuchos'), 38.784, -9.433, 8, 130);
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1');
+insert into posts (user_id, visit_id, place_id, caption)
+select auth.uid(), v.id, v.place_id, 'Cork walls' from visits v where v.user_id = auth.uid();
+select pg_temp.check((moment_status() ->> 'unlocked')::boolean and (moment_status() ->> 'expires_at') is not null,
+  'posting unlocks today''s moments');
+select pg_temp.check((select count(*) from feed() where not username = 'alice') = 1, 'feed shows posts from accepted follows only');
 select pg_temp.check((select count(*) from posts where user_id = '00000000-0000-0000-0000-0000000000c1') = 0, 'private posts are hidden from non-followers');
 select pg_temp.check((profile_card('00000000-0000-0000-0000-0000000000c1') ->> 'discoveries') is null, 'private profile hides discovery counts');
 do $$ begin
@@ -54,8 +72,8 @@ exception when insufficient_privilege then raise notice 'ok - followers cannot a
 end $$;
 
 -- Likes
-insert into likes (user_id, post_id) select auth.uid(), post_id from feed();
-select pg_temp.check((select liked_by_me and like_count = 1 from feed() limit 1), 'likes are counted and shown');
+insert into likes (user_id, post_id) select auth.uid(), post_id from feed() where username = 'bruno';
+select pg_temp.check((select liked_by_me and like_count = 1 from feed() where username = 'bruno'), 'likes are counted and shown');
 reset role;
 
 -- Clara accepts Alice; now her post shows up.
@@ -63,7 +81,7 @@ select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1');
 do $$ begin perform respond_follow_request('00000000-0000-0000-0000-0000000000a1', true); end $$;
 reset role;
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1');
-select pg_temp.check((select count(*) from feed()) = 2, 'accepted followers see private posts');
+select pg_temp.check((select count(*) from feed() where not username = 'alice') = 2, 'accepted followers see private posts');
 
 -- Leaderboards: private Clara is hidden globally but visible to Alice among friends.
 select pg_temp.check(not exists (select 1 from leaderboard('global') where username = 'clara'), 'private profiles stay off the global leaderboard');
@@ -102,6 +120,18 @@ reset role;
 select pg_temp.check((select status from posts where user_id = '00000000-0000-0000-0000-0000000000b1') = 'removed', 'resolved report removes the post');
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1');
 select pg_temp.check((select count(*) from posts where user_id = '00000000-0000-0000-0000-0000000000b1') = 0, 'removed posts disappear for everyone');
-select pg_temp.check((select count(*) from my_collections()) = 3, 'collections list with progress');
+select pg_temp.check((select count(*) from my_collections()) = 27, 'collections list with progress (3 in Sintra, 2 per city)');
+select pg_temp.check((select bool_and(total = 5) from my_collections() where region_slug <> 'sintra'), 'city sets have 5 places');
+reset role;
+
+-- After 24 hours a moment disappears for everyone else but stays in its author's passport.
+update posts set created_at = now() - interval '25 hours' where user_id = '00000000-0000-0000-0000-0000000000c1';
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1');
+select pg_temp.check(not exists (select 1 from posts where user_id = '00000000-0000-0000-0000-0000000000c1')
+  and not exists (select 1 from feed() where username = 'clara'), 'moments older than 24 hours disappear for others');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1');
+select pg_temp.check((select count(*) from my_passport()) = 1 and (select place_name from my_passport()) = 'Pena Palace',
+  'the author keeps the moment in their passport');
+select pg_temp.check((moment_status() ->> 'unlocked')::boolean = false, 'an old post no longer unlocks today''s moments');
 reset role;
 rollback;
