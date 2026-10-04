@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Category } from '@wandro/shared';
+import { CategoryMark } from '@/components/CategoryMark';
 import { Check } from '@/components/Check';
 import { t, type TranslationKey } from '@/i18n';
 import { signInWithProvider, useAuthSession } from '@/lib/auth';
@@ -22,13 +23,13 @@ import { useSession } from '@/state/session';
 import { radius, space, useColors } from '@/theme';
 
 // Each explorer style wears the colour of the category it maps to.
-const STYLES: { id: string; icon: keyof typeof Ionicons.glyphMap; category: Category }[] = [
-  { id: 'beaches', icon: 'water', category: 'coast' },
-  { id: 'nature', icon: 'leaf', category: 'nature' },
-  { id: 'castles', icon: 'business', category: 'heritage' },
-  { id: 'museums', icon: 'color-palette', category: 'culture' },
-  { id: 'music', icon: 'musical-notes', category: 'music_events' },
-  { id: 'hidden', icon: 'diamond', category: 'other' },
+const STYLES: { id: string; category: Category }[] = [
+  { id: 'beaches', category: 'coast' },
+  { id: 'nature', category: 'nature' },
+  { id: 'castles', category: 'heritage' },
+  { id: 'museums', category: 'culture' },
+  { id: 'music', category: 'music_events' },
+  { id: 'hidden', category: 'other' },
 ];
 
 const USERNAME = /^[a-zA-Z0-9_.]{3,24}$/;
@@ -217,7 +218,7 @@ export default function Register() {
                       ]}
                       testID={`style-${s.id}`}
                     >
-                      <Ionicons name={s.icon} size={28} color={on ? c.onCategory : color} />
+                      <CategoryMark category={s.category} size={56} />
                       <Text
                         style={{
                           color: on ? c.onCategory : c.text,

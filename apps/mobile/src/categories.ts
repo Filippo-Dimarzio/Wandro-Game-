@@ -5,18 +5,18 @@ import type { TranslationKey } from '@/i18n';
 
 interface CategoryMeta {
   icon: keyof typeof Ionicons.glyphMap;
-  /** Illustrated cover, used for category pages and as the fallback when a place has no photo. */
+  /** Illustrated cover for cards and category pages, and the fallback when a place has no photo. */
   art: ImageSource;
 }
 
 /* eslint-disable @typescript-eslint/no-require-imports -- static asset requires for Metro */
 export const CATEGORY_META: Record<Category, CategoryMeta> = {
-  coast: { icon: 'water', art: require('../assets/art/coast.svg') },
-  nature: { icon: 'leaf', art: require('../assets/art/nature.svg') },
-  heritage: { icon: 'business', art: require('../assets/art/heritage.svg') },
-  culture: { icon: 'color-palette', art: require('../assets/art/culture.svg') },
-  music_events: { icon: 'musical-notes', art: require('../assets/art/music_events.svg') },
-  other: { icon: 'compass', art: require('../assets/art/other.svg') },
+  coast: { icon: 'water', art: require('../assets/art/coast.webp') },
+  nature: { icon: 'leaf', art: require('../assets/art/nature.webp') },
+  heritage: { icon: 'business', art: require('../assets/art/heritage.webp') },
+  culture: { icon: 'color-palette', art: require('../assets/art/culture.webp') },
+  music_events: { icon: 'musical-notes', art: require('../assets/art/music_events.webp') },
+  other: { icon: 'compass', art: require('../assets/art/other.webp') },
 };
 
 /** Cover for "anywhere" challenges: the Wandro octopus. */
