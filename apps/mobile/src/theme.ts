@@ -12,7 +12,7 @@ const lightCategory = {
   heritage: { color: '#B4441A', tint: '#FBEBE3' }, // terracotta: palace walls and roofs
   culture: { color: '#7B3FC4', tint: '#F1E9FB' }, // violet: museums and art
   art: { color: '#B3261E', tint: '#FDEBEA' }, // crimson: paint and street art
-  music_events: { color: '#C2185B', tint: '#FCE6EF' }, // magenta: nights out
+  music_events: { color: '#A3195B', tint: '#F9E7EF' }, // berry: nights out (matches its cover)
   travel: { color: '#3949AB', tint: '#E9EBF8' }, // indigo: trains, trams and routes
   other: { color: '#0A706F', tint: '#E0F3F2' }, // deep teal: curiosities (the octopus)
 } satisfies Record<Category, { color: string; tint: string }>;
@@ -23,7 +23,7 @@ const darkCategory: typeof lightCategory = {
   heritage: { color: '#F08A5D', tint: '#35190E' },
   culture: { color: '#B48BF0', tint: '#24173A' },
   art: { color: '#F2817B', tint: '#3A1512' },
-  music_events: { color: '#F06A9E', tint: '#361223' },
+  music_events: { color: '#EE7AAE', tint: '#33121F' },
   travel: { color: '#9AA8FF', tint: '#171C3D' },
   other: { color: '#4FC8C4', tint: '#0F2C2C' },
 };

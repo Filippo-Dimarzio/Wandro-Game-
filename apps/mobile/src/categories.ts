@@ -5,20 +5,20 @@ import type { TranslationKey } from '@/i18n';
 
 interface CategoryMeta {
   icon: keyof typeof Ionicons.glyphMap;
-  /** Illustrated cover, used for category pages and as the fallback when a place has no photo. */
+  /** Illustrated cover for cards and category pages, and the fallback when a place has no photo. */
   art: ImageSource;
 }
 
 /* eslint-disable @typescript-eslint/no-require-imports -- static asset requires for Metro */
 export const CATEGORY_META: Record<Category, CategoryMeta> = {
-  coast: { icon: 'water', art: require('../assets/art/coast.svg') },
-  nature: { icon: 'leaf', art: require('../assets/art/nature.svg') },
-  heritage: { icon: 'business', art: require('../assets/art/heritage.svg') },
-  culture: { icon: 'color-palette', art: require('../assets/art/culture.svg') },
+  coast: { icon: 'water', art: require('../assets/art/coast.webp') },
+  nature: { icon: 'leaf', art: require('../assets/art/nature.webp') },
+  heritage: { icon: 'business', art: require('../assets/art/heritage.webp') },
+  culture: { icon: 'color-palette', art: require('../assets/art/culture.webp') },
   art: { icon: 'brush', art: require('../assets/art/art.svg') },
-  music_events: { icon: 'musical-notes', art: require('../assets/art/music_events.svg') },
+  music_events: { icon: 'musical-notes', art: require('../assets/art/music_events.webp') },
   travel: { icon: 'train', art: require('../assets/art/travel.svg') },
-  other: { icon: 'compass', art: require('../assets/art/other.svg') },
+  other: { icon: 'compass', art: require('../assets/art/other.webp') },
 };
 
 /* eslint-enable @typescript-eslint/no-require-imports */

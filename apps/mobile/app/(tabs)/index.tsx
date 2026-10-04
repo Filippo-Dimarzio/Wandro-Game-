@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CATEGORIES, haversineMeters } from '@wandro/shared';
-import { CATEGORY_META } from '@/categories';
+import { CategoryMark } from '@/components/CategoryMark';
 import { CoinCounter } from '@/components/CoinCounter';
 import { DailyChallengeCard } from '@/components/DailyChallengeCard';
 import { FeedCard } from '@/components/FeedCard';
@@ -150,9 +150,7 @@ export default function Home() {
               style={styles.interest}
               testID={`interest-${cat}`}
             >
-              <View style={[styles.interestIcon, { backgroundColor: c.categoryTint[cat] }]}>
-                <Ionicons name={CATEGORY_META[cat].icon} size={26} color={c.category[cat]} />
-              </View>
+              <CategoryMark category={cat} size={64} />
               <Text style={[styles.interestLabel, { color: c.text }]} numberOfLines={2}>
                 {t(`category.${cat}`)}
               </Text>
@@ -247,14 +245,7 @@ const styles = StyleSheet.create({
   },
   section: { fontSize: 20, fontWeight: '800' },
   interests: { gap: space.md, paddingRight: space.lg },
-  interest: { width: 76, alignItems: 'center', gap: 6 },
-  interestIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  interest: { width: 80, alignItems: 'center', gap: 6 },
   interestLabel: { fontSize: 12, fontWeight: '700', textAlign: 'center' },
   rail: { gap: space.md, paddingBottom: space.sm, paddingRight: space.lg },
   empty: { borderRadius: radius.md, padding: space.lg, gap: space.md, alignItems: 'center' },

@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CATEGORIES } from '@wandro/shared';
 import { CATEGORY_META, learnKey } from '@/categories';
+import { CategoryMark } from '@/components/CategoryMark';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
@@ -57,7 +58,7 @@ export default function DiscoverHub() {
               />
               <View style={[styles.body, { backgroundColor: c.categoryTint[cat] }]}>
                 <View style={styles.row}>
-                  <Ionicons name={CATEGORY_META[cat].icon} size={20} color={color} />
+                  <CategoryMark category={cat} size={40} />
                   <Text style={[styles.cardTitle, { color }]}>{t(`category.${cat}`)}</Text>
                   <Text style={{ color: c.text, fontWeight: '700' }}>
                     {found}/{inCat.length}
