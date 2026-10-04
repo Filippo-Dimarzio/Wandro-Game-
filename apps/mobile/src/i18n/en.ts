@@ -145,12 +145,15 @@ export const en = {
     'UNESCO protects World Heritage Sites for their value to everyone, everywhere.',
   'learn.heritage.tip': 'Old stairs and walls can be slippery. Wear good shoes.',
   'learn.culture.intro':
-    'Vibrant galleries, quirky museums and street art around every corner. Get inspired by paintings, sculptures and stories from every era.',
-  'learn.culture.fact1': 'Many museums have a free entry day or evening each month.',
+    'Everyday life is culture too: buzzing food markets and old cafés, festivals and traditions handed down for centuries, and the neighbourhoods where locals live, chat and celebrate.',
+  'learn.culture.fact1':
+    'Food, markets and cafés: market halls open early and are liveliest in the morning, when the stallholders still have the best of the day.',
   'learn.culture.fact2':
-    'Murals and street art can turn a whole neighbourhood into an open-air gallery.',
-  'learn.culture.fact3': "Audio guides and tours reveal stories you'd never spot on your own.",
-  'learn.culture.tip': 'Check opening times before you go. Many places close one day a week.',
+    'Traditions and festivals: many towns throw street parties for their patron saints, with music, decorations and food shared on the street.',
+  'learn.culture.fact3':
+    'Neighbourhood life: the oldest quarters often keep their village feel, with corner shops, washing lines and neighbours talking on doorsteps.',
+  'learn.culture.tip':
+    'People live here: keep your voice down in residential lanes and ask before photographing someone.',
   'learn.art.intro':
     'Galleries, murals, sculpture and street art. Hunt down the painted walls, studios and statues that give a city its colour.',
   'learn.art.fact1': 'Many big museums have a free entry evening or day each week or month.',

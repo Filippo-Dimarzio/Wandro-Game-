@@ -234,7 +234,22 @@ from (values
   ('aveiro', 'aveiro-moliceiro-ride', 'Moliceiro Boat Ride', 'The boats that once gathered seaweed. Quest: take a ride.', 'other', 60, 40.6415, -8.6558, false, null),
   ('aveiro', 'aveiro-sao-jacinto-ferry', 'São Jacinto Ferry', 'A ferry across the lagoon mouth. Quest: cross.', 'other', 60, 40.665, -8.739, false, null),
   ('aveiro', 'aveiro-misericordia', 'Misericórdia Church', 'A tiled church with a lions’ portal. Quest: find the lions.', 'heritage', 120, 40.6413, -8.652, true, null),
-  ('aveiro', 'aveiro-botiroes', 'Cais dos Botirões', 'Tiles of old fishermen on the quay. Quest: find the tile.', 'other', 60, 40.6455, -8.651, true, null)
+  ('aveiro', 'aveiro-botiroes', 'Cais dos Botirões', 'Tiles of old fishermen on the quay. Quest: find the tile.', 'other', 60, 40.6455, -8.651, true, null),
+  ('sintra', 'sintra-cafe-saudade', 'Café Saudade', 'Once the Mathilde bakery, where Sintra’s queijadas were made for the day-trippers off the train. Quest: order one with a galão.', 'culture', 100, 38.7998, -9.3818, false, null),
+  ('sintra', 'sintra-santa-eufemia', 'Santa Eufémia Hermitage', 'A hilltop hermitage with a holy spring, where a pilgrimage and village festa have climbed every year for centuries. Quest: find the spring below the chapel.', 'culture', 100, 38.7838, -9.3851, false, null),
+  ('sintra', 'sintra-almocageme', 'Almoçageme Village Square', 'A village of whitewashed houses where Colares locals meet over coffee before the beach. Quest: find the old fountain.', 'culture', 100, 38.796, -9.473, false, null),
+  ('lisbon', 'lisbon-mercado-ribeira', 'Mercado da Ribeira', 'Lisbon’s market hall since 1882: fish and flowers at dawn, chefs’ stalls by lunch. Quest: find the fruit sellers who still open first.', 'culture', 100, 38.7068, -9.1458, false, null),
+  ('lisbon', 'lisbon-santo-antonio', 'Santo António Church', 'Built where Lisbon’s favourite saint was born; on 13 June the city crowns him with sardines and basil pots. Quest: find the crypt of his birthplace.', 'culture', 100, 38.7101, -9.1335, false, null),
+  ('lisbon', 'lisbon-mouraria', 'Rua do Capelão, Mouraria', 'The lane where fado was born, in the old Moorish quarter. Quest: find the plaque to the singer Maria Severa.', 'culture', 100, 38.7158, -9.1352, false, null),
+  ('porto', 'porto-bolhao', 'Mercado do Bolhão', 'Porto’s market of 1914, reopened with its stallholders back in place. Quest: find a stall selling bread from Avintes.', 'culture', 100, 41.1488, -8.6075, false, null),
+  ('porto', 'porto-fontainhas', 'Fontainhas', 'The cliffside heart of São João: on 23 June the city parties here with leeks, hammers and grilled sardines. Quest: look down on the Dom Luís bridge from the terrace.', 'culture', 100, 41.143, -8.602, false, null),
+  ('porto', 'porto-miragaia', 'Miragaia', 'Porto’s old riverside quarter of washing lines and arcades, older than the city walls. Quest: walk under the arches by the river.', 'culture', 100, 41.1425, -8.619, false, null),
+  ('evora', 'evora-quarta-feira', 'Taberna Quarta-Feira', 'An Alentejo tavern where there is no menu: the cook decides. Quest: try the pork with clams or the açorda.', 'culture', 100, 38.5735, -7.9063, false, null),
+  ('evora', 'evora-scala-coeli', 'Scala Coeli Charterhouse', 'Carthusian monks kept their vow of silence here from 1598 until 2019, and their way of life still shapes the estate’s wine and bread. Quest: photograph the church front from the gate.', 'culture', 100, 38.5803, -7.9244, false, null),
+  ('evora', 'evora-judiaria', 'Judiaria Lanes', 'The old Jewish quarter around Rua dos Mercadores, now a quiet weave of lanes and doorsteps. Quest: find the street sign for Rua dos Mercadores.', 'culture', 100, 38.5703, -7.9112, false, null),
+  ('aveiro', 'aveiro-manuel-firmino', 'Mercado Manuel Firmino', 'Aveiro’s everyday market: eels, fruit, flowers and gossip. Quest: find a stall selling local salt.', 'culture', 100, 40.6378, -8.6496, false, null),
+  ('aveiro', 'aveiro-arte-xavega', 'Arte Xávega at Vagueira', 'Fishermen still haul their nets up the beach the old way, with boats launched into the surf. Quest: watch a net come in (mornings, spring to autumn).', 'culture', 100, 40.559, -8.7685, false, null),
+  ('aveiro', 'aveiro-beira-mar', 'Beira-Mar Quarter', 'The fishermen’s quarter between the canals, with tiled houses and front-door chats. Quest: find a house tiled in green.', 'culture', 100, 40.6452, -8.6538, false, null)
 ) as v(region, source_id, name, description, category, base_points, lat, lng, hidden, hours)
 join public.regions r on r.slug = v.region
 on conflict (source, source_id) do nothing;
