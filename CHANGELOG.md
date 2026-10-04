@@ -57,7 +57,7 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - Wandro is Portugal-only for now (Phase 10): Sintra, Lisbon, Porto, Évora and Aveiro. The other
   18 cities are switched off in the database (regions inactive, places closed, sets closed) and
   removed from the app's code, demo, dev seed and importer; the European content is kept on the
-  `archive/europe-v2` branch. Players' visits, coins, posts and passport stay intact, and open
+  `archive/europe-v3` branch (`archive/europe-v2` is an older snapshot). Players' visits, coins, posts and passport stay intact, and open
   friend challenges to paused places are declined (`pause_inactive_regions()`).
 - Travel is folded into Culture; Art is now "Art & museums" with the culture illustration. The
   challenge rotation's travel day is a music & events day.
