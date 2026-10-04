@@ -15,7 +15,7 @@ export const CATEGORY_META: Record<Category, CategoryMeta> = {
   nature: { icon: 'leaf', art: require('../assets/art/nature.webp') },
   heritage: { icon: 'business', art: require('../assets/art/heritage.webp') },
   culture: { icon: 'color-palette', art: require('../assets/art/culture.webp') },
-  music_events: { icon: 'musical-notes', art: require('../assets/art/music_events.svg') },
+  music_events: { icon: 'musical-notes', art: require('../assets/art/music_events.webp') },
   other: { icon: 'compass', art: require('../assets/art/other.webp') },
 };
 
