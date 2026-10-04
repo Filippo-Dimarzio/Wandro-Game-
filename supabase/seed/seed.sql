@@ -323,21 +323,14 @@ insert into public.place_stats (place_id)
 select id from public.places
 on conflict (place_id) do nothing;
 
--- 30 days of daily challenges starting today (Lisbon), rotating themes.
-insert into public.daily_challenges (challenge_date, title, description, category, bonus_points)
-select d::date,
-       (array['Find a hidden viewpoint', 'Step into history', 'Culture hunt', 'Follow the coastline',
-              'Art attack', 'Catch the music', 'Wander anywhere new'])[1 + (i % 7)],
-       (array['Discover any nature spot today.', 'Discover any heritage site today.',
-              'Discover a museum or cultural place today.', 'Discover any beach or coastal spot today.',
-              'Discover a gallery, mural or piece of street art today.',
-              'Discover a concert hall, music club or event venue today.',
-              'Discover any place you have never visited.'])[1 + (i % 7)],
-       (array['nature', 'heritage', 'culture', 'coast', 'art', 'music_events', null])[1 + (i % 7)]::public.place_category,
-       75
-from generate_series(0, 29) as i,
-     lateral (select (now() at time zone 'Europe/Lisbon')::date + i as d) x
-on conflict (challenge_date) do nothing;
+-- 30 days of daily challenges from today (Lisbon): dated ones come from the migrations, the
+-- rest from the shared rotation.
+do $$
+begin
+  perform public.ensure_daily_challenge((now() at time zone 'Europe/Lisbon')::date + i)
+  from generate_series(0, 29) as i;
+end;
+$$;
 
 -- Curated collections (Phase 4).
 with r as (select id from public.regions where slug = 'sintra')

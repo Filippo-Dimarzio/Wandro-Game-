@@ -63,8 +63,10 @@ level up, your octopus evolves (Hatchling → Explorer → Navigator → Cartogr
 5. **Unlock it.** The fog clears in a circle, coins land in your octopus's pouch, you may earn
    badges, and you can share a photo (its location data is stripped first).
 6. **Daily challenge — double coins.** Each day brings a new challenge (e.g. _"Step into history:
-   discover any heritage site"_), open for 24 hours from when you first see it. After a matching
-   discovery, **press and hold** to claim it: you get that discovery's coins **again**.
+   discover any heritage site"_), open for 24 hours from when you first see it. Every category
+   gets a day, and set dates bring special ones (Santos Populares in June, Museum Day on 18 May,
+   Car-Free Day on 22 September). After a matching discovery, **press and hold** to claim it: you
+   get that discovery's coins **again**.
 7. **Collect.** Collections like _"Sintra's palaces"_ pay a 200-coin bonus when complete.
 8. **Spend coins in the Store.** The **incense trail** wraps your octopus in a glowing circle and
    draws a guiding line to your next adventure for 30 minutes or 2 hours. Octopus skins and hats
@@ -181,6 +183,7 @@ and alternatives to press-and-hold gestures.
 | 8     | Coin economy: double daily coins, Store with incense trail, skins and hats                                                                         | ✅ v2.0         |
 | 9     | Europe (12 cities), hidden gems revealed at 200 m, friends and friend challenges, Adventures sidebar, arrival flights, log out, cleaner tab labels | ✅ Unreleased   |
 | 10    | Portugal focus: Sintra, Lisbon, Porto, Évora, Aveiro; other cities paused; gems after 5 discoveries; landmark city cards; flights by airport       | ✅ Unreleased   |
+| 10.1  | Culture themes (food, traditions, neighbourhoods); daily challenge calendar with dated challenges                                                  | ✅ Unreleased   |
 | Later | Comments, food challenges, Instagram share cards, events, teams, offline maps, more languages, more cities, push notifications for friend activity | Ideas           |
 
 The full plan — architecture, data model, check-in validation and every decision — is in

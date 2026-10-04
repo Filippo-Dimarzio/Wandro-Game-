@@ -4,8 +4,9 @@ import { demoChallenge, todayKey } from './challenge';
 const heritage = DEMO_PLACES.find((p) => p.category === 'heritage')!;
 const nature = DEMO_PLACES.find((p) => p.category === 'nature')!;
 const DAY = 86_400_000;
-// Day 20006 is a multiple of 7, the length of the rotation, so dateFor(n) is rotation entry n.
-const dateFor = (rotation: number) => new Date((20006 + rotation) * DAY + 10 * 3_600_000);
+// Day 20007 (2024-10-11) is a multiple of 9, the length of the rotation, and has no dated
+// challenges nearby, so dateFor(n) is rotation entry n.
+const dateFor = (rotation: number) => new Date((20007 + rotation) * DAY + 10 * 3_600_000);
 
 describe('demoChallenge', () => {
   it('starts a rolling 24 h window when first opened', () => {
@@ -38,7 +39,7 @@ describe('demoChallenge', () => {
   });
 
   it('coast days need a beach or coastal spot', () => {
-    const now = dateFor(3);
+    const now = dateFor(4);
     const state = { date: todayKey(now), startedAt: new Date(now.getTime() - 1000).toISOString() };
     const coast = DEMO_PLACES.find((p) => p.category === 'coast')!;
     const at = now.toISOString();
@@ -47,10 +48,12 @@ describe('demoChallenge', () => {
     expect(demoChallenge(now, state, { [coast.id]: { at } }, DEMO_PLACES).isReady).toBe(true);
   });
 
-  it('art and music days need an art or music place', () => {
+  it('art, music and curiosity days need a place of that category', () => {
     for (const [rotation, category] of [
-      [4, 'art'],
-      [5, 'music_events'],
+      [6, 'art'],
+      [2, 'music_events'],
+      [7, 'music_events'],
+      [5, 'other'],
     ] as const) {
       const now = dateFor(rotation);
       const state = {
@@ -66,11 +69,20 @@ describe('demoChallenge', () => {
   });
 
   it('"any place" days accept every category', () => {
-    const now = dateFor(6);
+    const now = dateFor(8);
     const state = { date: todayKey(now), startedAt: new Date(now.getTime() - 1000).toISOString() };
     const c = demoChallenge(now, state, { [nature.id]: { at: now.toISOString() } }, DEMO_PLACES);
     expect(c.category).toBeNull();
     expect(c.isReady).toBe(true);
+  });
+
+  it('dated challenges replace the rotation on their days', () => {
+    const on = (iso: string) => new Date(`${iso}T10:00:00Z`);
+    expect(demoChallenge(on('2027-05-18'), null, {}, DEMO_PLACES).title).toBe(
+      'International Museum Day',
+    );
+    expect(demoChallenge(on('2027-06-10'), null, {}, DEMO_PLACES).title).toBe('Santos Populares');
+    expect(demoChallenge(on('2027-06-21'), null, {}, DEMO_PLACES).title).toBe('World Music Day');
   });
 
   it('keeps completion for the same day only', () => {

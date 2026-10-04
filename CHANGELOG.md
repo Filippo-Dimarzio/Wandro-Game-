@@ -12,6 +12,12 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - Blank photos are refused: the app rejects a black or empty photo when you pick it, the
   `check-photo` Edge Function re-checks every upload, other players only see photos that passed
   (`posts.photo_checked_at`), and moderators can sweep older photos and delete blank ones.
+- Culture themes: Culture now covers food, markets and cafés; traditions and festivals; and
+  neighbourhood life, with new Learn copy and 15 new places (one per theme in each city).
+- Daily challenge calendar: "Sound check" and "Oddity of the day" join the rotation, so every
+  category gets a day (9-day cycle). Dated challenges for a date or a date range, with twelve
+  months scheduled (autumn and winter campaigns, São Martinho, Carnaval, Monuments and Sites Day,
+  25 de Abril, Museum Day, Santos Populares, World Music Day, Car-Free Day, Heritage Days).
 
 - Beaches & coast category (database enum, importer mapping for beaches, bays and capes, demo and
   seed places, and a coastal daily challenge).
