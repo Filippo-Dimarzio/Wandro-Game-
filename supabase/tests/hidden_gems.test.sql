@@ -1,11 +1,11 @@
--- Europe regions and hidden gems: secret until you're within 200 m, coarse hints, no early check-ins.
+-- Launch regions and hidden gems: secret until you're within 200 m, coarse hints, no early check-ins.
 begin;
 insert into auth.users (id, raw_user_meta_data) values
   ('00000000-0000-0000-0000-0000000000f1', '{"username":"gem_hunter"}'),
   ('00000000-0000-0000-0000-0000000000f2', '{"username":"bystander"}');
 
-select pg_temp.check((select count(*) from regions where is_active) >= 13, 'European launch cities are seeded');
-select pg_temp.check(region_at(48.8584, 2.2945) = 'paris' and region_at(38.7876, -9.3906) = 'sintra',
+select pg_temp.check((select count(*) from regions where is_active) = 3, 'the three Portuguese launch cities are live');
+select pg_temp.check(region_at(41.1457, -8.6146) = 'porto' and region_at(38.7876, -9.3906) = 'sintra',
   'region_at finds the city for a point');
 
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000f1');
@@ -60,11 +60,12 @@ select pg_temp.as_user('00000000-0000-0000-0000-0000000000f2');
 select pg_temp.check(not exists (select 1 from places_public where id = pg_temp.place_id('sintra-fonte-mourisca')),
   'one player''s reveal does not show the gem to others');
 
--- Daily cap stops a spoofed position from sweeping a city.
+-- Daily cap stops a spoofed position from sweeping a city. The cap counts today's reveal rows,
+-- so ten rows on any places fill it (there are fewer than ten gems in the three cities).
 reset role;
 insert into hidden_reveals (user_id, place_id)
 select '00000000-0000-0000-0000-0000000000f2', id from places
-where is_hidden and source_id not in ('sintra-fonte-mourisca') limit 10;
+where source_id not in ('sintra-fonte-mourisca') order by is_hidden desc, source_id limit 10;
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000f2');
 do $$ begin
   perform reveal_hidden_gem(38.7983, -9.3870);
