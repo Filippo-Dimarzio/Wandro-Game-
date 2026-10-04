@@ -215,12 +215,10 @@ export function regionFor(p: LatLng): Region | null {
   return best;
 }
 
-/** Cities closer than this are a drive or a train ride, not a flight (Sintra ↔ Lisbon). */
-export const MIN_FLIGHT_KM = 200;
-
 /**
- * Did the player fly? True when they were last seen in another launch city at least
- * MIN_FLIGHT_KM away. Mirrors check_arrival() in the database.
+ * Did the player fly? True when they were last seen in another launch city served by a different
+ * airport: Lisbon ↔ Porto (LIS ✈ OPO) is a flight, Sintra ↔ Lisbon ↔ Évora (all LIS) is not, and
+ * nothing counts from a hidden city. Mirrors check_arrival() in the database.
  */
 export function arrivalFlight(
   previous: string | null | undefined,
@@ -229,7 +227,6 @@ export function arrivalFlight(
   if (!previous || !current || previous === current) return null;
   const from = regionBySlug(previous);
   const to = regionBySlug(current);
-  if (!from || !to) return null;
-  const km = haversineMeters(from.center, to.center) / 1000;
-  return km >= MIN_FLIGHT_KM ? { from, to, km } : null;
+  if (!from || !to || from.airport.code === to.airport.code) return null;
+  return { from, to, km: haversineMeters(from.center, to.center) / 1000 };
 }

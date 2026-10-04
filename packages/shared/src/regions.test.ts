@@ -96,7 +96,13 @@ describe('arrivalFlight', () => {
     expect(f?.from.airport.code).toBe('LIS');
     expect(f?.to.airport.code).toBe('OPO');
     expect(f!.km).toBeGreaterThan(200);
+    // Same airport: a drive or a train, not a flight.
     expect(arrivalFlight('sintra', 'lisbon')).toBeNull();
+    expect(arrivalFlight('lisbon', 'evora')).toBeNull();
+    expect(arrivalFlight('porto', 'aveiro')).toBeNull();
+    expect(arrivalFlight('aveiro', 'lisbon')?.to.airport.code).toBe('LIS');
+    // Hidden cities never start a flight.
+    expect(arrivalFlight('paris', 'lisbon')).toBeNull();
     expect(arrivalFlight('porto', 'porto')).toBeNull();
     expect(arrivalFlight(null, 'porto')).toBeNull();
     expect(arrivalFlight('porto', null)).toBeNull();

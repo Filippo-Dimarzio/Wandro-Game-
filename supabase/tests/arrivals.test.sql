@@ -1,4 +1,4 @@
--- Arrival flights: only the city is remembered; a flight is a new city at least 200 km away.
+-- Arrival flights: only the city is remembered; a flight is a new city with a different airport.
 begin;
 insert into auth.users (id, raw_user_meta_data) values
   ('00000000-0000-0000-0000-00000000bb01', '{"username":"flyer"}'),
@@ -11,6 +11,10 @@ select pg_temp.check((check_arrival(38.7975, -9.3905) ->> 'arrived')::boolean = 
   'opening the app again in the same city is not a flight');
 select pg_temp.check(check_arrival(38.7139, -9.1394) @> '{"arrived": false, "from": "sintra", "to": "lisbon"}',
   'Sintra to Lisbon is a short hop, not a flight');
+select pg_temp.check(check_arrival(38.5714, -7.9135) @> '{"arrived": false, "from": "lisbon", "to": "evora"}',
+  'Lisbon to Évora shares the LIS airport: no flight');
+select pg_temp.check(check_arrival(38.7139, -9.1394) @> '{"arrived": false, "from": "evora", "to": "lisbon"}',
+  'and back again');
 
 create temp table fl on commit drop as select check_arrival(41.1496, -8.611) as r;
 grant select on fl to authenticated;

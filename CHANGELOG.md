@@ -61,7 +61,10 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
   challenge rotation's travel day is a music & events day.
 - Check in is a full-bleed card: the place's picture, a "You're here" or distance badge, and one
   clear next step. Screens keep a phone-width column on wide windows.
-- Discover is a two-column grid; arrival flights start at 200 km (Lisbon ↔ Porto).
+- Discover is a two-column grid. Arrival flights compare airports: Lisbon ↔ Porto (LIS ✈ OPO) is a
+  flight, Sintra ↔ Lisbon ↔ Évora is not, and nothing counts from a paused city. Open friend
+  challenges to paused places are declined.
+- Plan: a business-plan section (Portugal first, phases, players, north-star metric).
 
 - Brighter light-blue theme with Wandro blue as the accent and a colour per category.
 - The check-in tab is now labelled "Check in" so "Discover" can name the new learning area.

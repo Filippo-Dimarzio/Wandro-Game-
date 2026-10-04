@@ -77,9 +77,11 @@ level up, your octopus evolves (Hatchling → Explorer → Navigator → Cartogr
 11. **Make friends.** Send friend requests (accepted friends can see each other's activity,
     even on private profiles) and **challenge a friend** to a place with a short idea —
     _"Go at golden hour!"_. It's ticked off when they discover it.
-12. **Travel Europe.** Land in another city, open Wandro and a **flight animation** takes your
-    octopus from your old airport to the new one (e.g. LIS ✈ CDG) before the map flies there.
-    In the browser demo, pick a city from **Explore → Adventures → city** to fly there.
+12. **Travel Portugal.** Land in a city served by another airport, open Wandro and a **flight
+    animation** takes your octopus from your old airport to the new one (LIS ✈ OPO) before the
+    map flies there. Sintra, Lisbon and Évora share Lisbon's airport, Aveiro shares Porto's, so
+    moving between those needs no flight. In the browser demo, pick a city from
+    **Explore → Adventures → city** to go there.
 
 ## Look and feel
 
@@ -177,6 +179,7 @@ and alternatives to press-and-hold gestures.
 | 7     | Find-My-style walking: octopus marker, proximity guidance, Google Maps directions, keyboard walking                                                | ✅ v2.0         |
 | 8     | Coin economy: double daily coins, Store with incense trail, skins and hats                                                                         | ✅ v2.0         |
 | 9     | Europe (12 cities), hidden gems revealed at 200 m, friends and friend challenges, Adventures sidebar, arrival flights, log out, cleaner tab labels | ✅ Unreleased   |
+| 10    | Portugal focus: Sintra, Lisbon, Porto, Évora, Aveiro; other cities paused; gems after 5 discoveries; landmark city cards; flights by airport       | ✅ Unreleased   |
 | Later | Comments, food challenges, Instagram share cards, events, teams, offline maps, more languages, more cities, push notifications for friend activity | Ideas           |
 
 The full plan — architecture, data model, check-in validation and every decision — is in
@@ -227,13 +230,14 @@ cd apps/mobile && npx expo run:ios   # or: npx expo run:android
 
 ### Demo mode
 
-Without Supabase credentials the app runs in **demo mode**: sample places in Sintra and 12
-European cities, progress saved on your device only.
+Without Supabase credentials the app runs in **demo mode**: sample places in Sintra, Lisbon, Porto,
+Évora and Aveiro, progress saved on your device only. The other players you see are fictional demo
+explorers; real players appear once a Supabase project is connected.
 
 - **Teleport here (demo)** in a place's sheet moves you there, so you can try a discovery from
   anywhere.
 - Dwell time is shortened to 8 seconds (the real rule is 2 minutes, enforced by the server).
-- **Explore → Adventures → city** flies your octopus to another city.
+- **Explore → Adventures → city** moves your octopus to another city (a flight between Lisbon and Porto).
 - Demo friends (ines.wanders, mia.maps…) answer requests straight away and have sent you challenges.
 - **Profile → Log out** returns to the portal and, as there's no account in the demo, starts over.
 
@@ -252,7 +256,7 @@ To use a real backend, copy `.env.example` to `.env`, fill in `EXPO_PUBLIC_SUPAB
 7. On **Explore**, open the **Adventures** sidebar (the compass tab on the left edge): accept
    ines.wanders's challenge, read the hidden-gem hint, then use **Walk** to head east from the
    town centre until the **Moorish Fountain** gem appears.
-8. Tap the city button in the sidebar and pick **Paris** to watch the arrival flight.
+8. Tap the city button in the sidebar and pick **Porto** to watch the arrival flight (LIS ✈ OPO).
 9. On **Home**, tap the people icon: accept sofia.sees's friend request and **Challenge** a friend.
 
 ## Tech stack and repository layout
