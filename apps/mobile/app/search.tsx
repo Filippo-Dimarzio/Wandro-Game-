@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useSearchProfiles } from '@/data/social';
 import { t } from '@/i18n';
-import { radius, space, useColors } from '@/theme';
+import { column, radius, space, useColors } from '@/theme';
 
 export default function Search() {
   const c = useColors();
@@ -29,7 +29,7 @@ export default function Search() {
       <FlatList
         data={results}
         keyExtractor={(u) => u.id}
-        contentContainerStyle={{ padding: space.lg, gap: space.sm }}
+        contentContainerStyle={[{ padding: space.lg, gap: space.sm }, column]}
         ListEmptyComponent={<Text style={{ color: c.textMuted }}>{t('search.empty')}</Text>}
         renderItem={({ item }) => (
           <Pressable

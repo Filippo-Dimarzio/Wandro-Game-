@@ -47,10 +47,10 @@ describe('demoChallenge', () => {
     expect(demoChallenge(now, state, { [coast.id]: { at } }, DEMO_PLACES).isReady).toBe(true);
   });
 
-  it('art and travel days need an art or travel place', () => {
+  it('art and music days need an art or music place', () => {
     for (const [rotation, category] of [
       [4, 'art'],
-      [5, 'travel'],
+      [5, 'music_events'],
     ] as const) {
       const now = dateFor(rotation);
       const state = {

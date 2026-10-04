@@ -8,7 +8,7 @@ import { ME, useLeaderboard, type LeaderboardScope } from '@/data/social';
 import { CoinAmount } from '@/components/CoinIcon';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
-import { radius, space, useColors } from '@/theme';
+import { column, radius, space, useColors } from '@/theme';
 
 const SCOPES: LeaderboardScope[] = ['friends', 'region', 'global', 'weekly'];
 const MEDALS = ['🥇', '🥈', '🥉'];
@@ -43,7 +43,7 @@ export default function Leaderboard() {
       <FlatList
         data={rows}
         keyExtractor={(r) => r.userId}
-        contentContainerStyle={{ padding: space.lg, gap: space.sm }}
+        contentContainerStyle={[{ padding: space.lg, gap: space.sm }, column]}
         ListEmptyComponent={<Text style={{ color: c.textMuted }}>{t('leaderboard.empty')}</Text>}
         renderItem={({ item }) => (
           <Pressable

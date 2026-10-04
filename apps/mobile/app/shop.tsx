@@ -10,7 +10,7 @@ import { useBuyItem, useEquipItem } from '@/data/shop';
 import { useWallet } from '@/data/wallet';
 import { CoinIcon } from '@/components/CoinIcon';
 import { t, type TranslationKey } from '@/i18n';
-import { radius, space, useColors } from '@/theme';
+import { column, radius, space, useColors } from '@/theme';
 
 const SECTIONS: { kind: ShopItemKind; title: TranslationKey }[] = [
   { kind: 'boost', title: 'shop.boosts' },
@@ -43,7 +43,7 @@ export default function Shop() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
       <ScreenHeader title={t('shop.title')} />
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={[styles.container, column]}>
         <View style={[styles.hero, { backgroundColor: c.surface }]}>
           <OctopusAvatar
             size={88}

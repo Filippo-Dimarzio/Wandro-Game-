@@ -47,9 +47,9 @@ const ROTATION: { title: string; description: string; category: Category | null 
     category: 'art',
   },
   {
-    title: 'All aboard',
-    description: 'Discover a famous station, tram, funicular or cable car today.',
-    category: 'travel',
+    title: 'Catch the music',
+    description: 'Discover a concert hall, music club or event venue today.',
+    category: 'music_events',
   },
   {
     title: 'Wander anywhere new',

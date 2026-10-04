@@ -20,18 +20,15 @@ const byVisitors = (a: Place, b: Place) =>
 
 /**
  * Two sets per launch city (Sintra has its own curated ones): the city's best-known landmarks,
- * and its 3 art + 2 travel places. The seed mirrors these (sets.test.ts checks).
+ * and five of its art places. The seed mirrors these (sets.test.ts checks).
  */
 export const CITY_SETS: PlaceSet[] = REGIONS.filter((r) => r.slug !== 'sintra').flatMap((r) => {
   const inCity = EUROPE_PLACES.filter((p) => p.region === r.slug && !p.hidden);
   const icons = inCity
-    .filter((p) => p.category !== 'art' && p.category !== 'travel')
+    .filter((p) => p.category !== 'art')
     .sort(byVisitors)
     .slice(0, SET_SIZE);
-  const artRails = [
-    ...inCity.filter((p) => p.category === 'art').slice(0, 3),
-    ...inCity.filter((p) => p.category === 'travel').slice(0, 2),
-  ];
+  const art = inCity.filter((p) => p.category === 'art').slice(0, SET_SIZE);
   return [
     {
       slug: `${r.slug}-icons`,
@@ -42,12 +39,12 @@ export const CITY_SETS: PlaceSet[] = REGIONS.filter((r) => r.slug !== 'sintra').
       placeIds: icons.map((p) => p.id),
     },
     {
-      slug: `${r.slug}-art-rails`,
+      slug: `${r.slug}-art`,
       region: r.slug,
-      title: `${r.name} art & rails`,
-      description: 'Three works of art and two rides worth taking.',
+      title: `${r.name} art & museums`,
+      description: 'Five galleries, studios and works of art.',
       theme: 'art',
-      placeIds: artRails.map((p) => p.id),
+      placeIds: art.map((p) => p.id),
     },
   ];
 });

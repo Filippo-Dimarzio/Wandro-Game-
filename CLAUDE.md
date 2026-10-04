@@ -1,6 +1,6 @@
 # CLAUDE.md — Wandro
 
-Wandro is a photo-first, location-based exploration game and community app. Pilot region: Sintra, Portugal, plus launch cities across Europe (`REGIONS` in `packages/shared`). See `PLAN.md` for architecture, data model and roadmap. This file is the rulebook for working in the repo.
+Wandro is a photo-first, location-based exploration game and community app. Pilot region: Sintra, Portugal, plus Lisbon, Porto, Évora and Aveiro (`REGIONS` in `packages/shared`; other European cities are kept but hidden via `HIDDEN_REGIONS`). See `PLAN.md` for architecture, data model and roadmap. This file is the rulebook for working in the repo.
 
 ## How we work
 

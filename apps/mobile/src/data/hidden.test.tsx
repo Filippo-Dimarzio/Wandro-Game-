@@ -14,7 +14,7 @@ beforeEach(() => useSession.getState().reset());
 describe('useHiddenGems (demo)', () => {
   it('hints at nearby gems without revealing them', async () => {
     const { result } = await renderHook(() => useHiddenGems(sintra, true), { wrapper });
-    expect(result.current).toEqual({ count: 3, hint: 'very_close' });
+    expect(result.current).toEqual({ count: 4, hint: 'very_close' });
     expect(useSession.getState().revealed).toEqual({});
   });
 
@@ -36,7 +36,7 @@ describe('useHiddenGems (demo)', () => {
     await waitFor(() =>
       expect(result.current.places.some((p) => p.id === 'demo-sintra-fonte-mourisca')).toBe(true),
     );
-    expect(result.current.hint.count).toBe(2);
+    expect(result.current.hint.count).toBe(3);
   });
 
   it('does not reveal from a position that is not real', async () => {

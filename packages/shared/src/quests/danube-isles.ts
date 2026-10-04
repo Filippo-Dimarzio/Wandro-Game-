@@ -167,7 +167,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'tram-22',
       'Tram 22 at Malostranské náměstí',
-      'travel',
+      'culture',
       50.088,
       14.4035,
       500,
@@ -176,7 +176,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'ntm',
       'National Technical Museum',
-      'travel',
+      'culture',
       50.0975,
       14.425,
       200,
@@ -185,7 +185,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'masaryk',
       'Masaryk Station',
-      'travel',
+      'culture',
       50.089,
       14.4345,
       200,
@@ -404,7 +404,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'hauptbahnhof',
       'Wien Hauptbahnhof',
-      'travel',
+      'culture',
       48.1855,
       16.376,
       400,
@@ -413,7 +413,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'remise',
       'Remise Transport Museum',
-      'travel',
+      'culture',
       48.2005,
       16.413,
       100,
@@ -422,7 +422,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'hofpavillon',
       'Hofpavillon Hietzing',
-      'travel',
+      'culture',
       48.187,
       16.303,
       50,
@@ -605,7 +605,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'trams',
       'St Andrew Square Tram Stop',
-      'travel',
+      'culture',
       55.9545,
       -3.1925,
       300,
@@ -614,7 +614,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'union-canal',
       'Union Canal at Edinburgh Quay',
-      'travel',
+      'culture',
       55.944,
       -3.208,
       150,
@@ -623,7 +623,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'scotsman-steps',
       'Scotsman Steps',
-      'travel',
+      'culture',
       55.951,
       -3.1895,
       300,
@@ -959,7 +959,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'chain-bridge',
       'Széchenyi Chain Bridge',
-      'travel',
+      'culture',
       47.499,
       19.0435,
       3000,
@@ -968,7 +968,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'funicular',
       'Buda Castle Funicular',
-      'travel',
+      'culture',
       47.4975,
       19.0395,
       1000,
@@ -977,7 +977,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'childrens-railway',
       'Children’s Railway',
-      'travel',
+      'culture',
       47.4935,
       18.972,
       200,
@@ -986,7 +986,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'keleti',
       'Keleti Station',
-      'travel',
+      'culture',
       47.5,
       19.0835,
       300,
@@ -995,7 +995,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'millennium',
       'Millennium Underground',
-      'travel',
+      'culture',
       47.497,
       19.0505,
       400,
@@ -1332,7 +1332,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'hapenny',
       'Ha’penny Bridge',
-      'travel',
+      'culture',
       53.3463,
       -6.2631,
       2000,
@@ -1341,7 +1341,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'beckett',
       'Samuel Beckett Bridge',
-      'travel',
+      'culture',
       53.347,
       -6.2415,
       500,
@@ -1350,7 +1350,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'heuston',
       'Heuston Station',
-      'travel',
+      'culture',
       53.3465,
       -6.293,
       300,
@@ -1359,7 +1359,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'jeanie-johnston',
       'Jeanie Johnston',
-      'travel',
+      'culture',
       53.3475,
       -6.245,
       200,
@@ -1368,7 +1368,7 @@ export const DANUBE_ISLES_QUESTS = [
     [
       'grand-canal-dock',
       'Grand Canal Dock',
-      'travel',
+      'culture',
       53.3395,
       -6.2375,
       300,

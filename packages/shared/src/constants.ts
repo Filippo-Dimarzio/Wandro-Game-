@@ -11,7 +11,6 @@ export const CATEGORIES: readonly Category[] = [
   'culture',
   'art',
   'music_events',
-  'travel',
   'other',
 ];
 
@@ -20,7 +19,6 @@ export const BASE_POINTS: Record<Category, number> = {
   coast: 80,
   culture: 100,
   art: 100,
-  travel: 80,
   heritage: 120,
   nature: 80,
   music_events: 100,
@@ -46,6 +44,8 @@ export const ACCURACY_TOLERANCE_CAP_M = 25;
 /** On foot, anything faster than this between pings is a teleport. */
 export const MAX_PING_SPEED_MPS = 50;
 
+/** A city's hidden gems all appear once you've discovered this many places there. */
+export const GEMS_UNLOCK_AFTER = 5;
 /** Hidden gems appear on the map once the player is this close. */
 export const HIDDEN_REVEAL_RADIUS_M = 200;
 /** Places further than this aren't loaded or hinted at (matches nearby_places). */

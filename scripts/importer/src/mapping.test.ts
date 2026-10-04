@@ -33,9 +33,9 @@ describe('importer mapping', () => {
     expect(categoryFor({ tourism: 'attraction' })).toBe('other');
     expect(categoryFor({ tourism: 'gallery' })).toBe('art');
     expect(categoryFor({ tourism: 'artwork', artwork_type: 'mural' })).toBe('art');
-    expect(categoryFor({ railway: 'funicular' })).toBe('travel');
-    expect(categoryFor({ historic: 'railway_station' })).toBe('travel');
-    expect(categoryFor({ railway: 'station', heritage: '2' })).toBe('travel');
+    expect(categoryFor({ railway: 'funicular' })).toBe('culture');
+    expect(categoryFor({ historic: 'railway_station' })).toBe('culture');
+    expect(categoryFor({ railway: 'station', heritage: '2' })).toBe('culture');
     // Ordinary stations aren't adventures.
     expect(categoryFor({ railway: 'station' })).toBe('other');
   });
@@ -97,8 +97,8 @@ describe('importer mapping', () => {
 describe('regionFromArgs', () => {
   it('defaults to Sintra and reads --region', () => {
     expect(regionFromArgs(['node', 'main.ts']).slug).toBe('sintra');
-    expect(regionFromArgs(['node', 'main.ts', '--region', 'paris']).bbox).toEqual([
-      48.757, 2.202, 48.957, 2.502,
+    expect(regionFromArgs(['node', 'main.ts', '--region', 'evora']).bbox).toEqual([
+      38.471, -8.063, 38.671, -7.763,
     ]);
   });
 

@@ -91,14 +91,14 @@ export function categoryFor(tags: Record<string, string>): Category {
   if (['music_venue', 'theatre', 'arts_centre'].includes(tags.amenity ?? '')) return 'music_events';
   if (tags.tourism === 'gallery' || tags.tourism === 'artwork') return 'art';
   if (tags.tourism === 'museum') return 'culture';
-  // Historic stations, funiculars and cable cars: the journey is the attraction.
+  // Historic stations, funiculars and cable cars are part of a city's culture.
   if (
     tags.historic === 'railway_station' ||
     tags.railway === 'funicular' ||
     tags.aerialway === 'station' ||
     (tags.railway === 'station' && (tags.heritage || tags.tourism === 'attraction'))
   )
-    return 'travel';
+    return 'culture';
   if (tags.historic) return 'heritage';
   if (['beach', 'bay', 'cape'].includes(tags.natural ?? '') || tags.leisure === 'beach_resort')
     return 'coast';

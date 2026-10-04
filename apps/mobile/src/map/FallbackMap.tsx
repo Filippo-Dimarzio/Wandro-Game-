@@ -1,7 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useState } from 'react';
 import { OctopusAvatar } from '@/components/OctopusAvatar';
+import { MARKERS } from './markers';
 import { t } from '@/i18n';
 import { useColors } from '@/theme';
 import type { PlaceMapProps } from './types';
@@ -50,19 +51,12 @@ export function FallbackMap({
             onPress={() => onSelect?.(p)}
             accessibilityRole="button"
             accessibilityLabel={`${p.name}, ${unlocked ? t('explore.unlocked') : t('explore.locked')}`}
-            style={[
-              styles.pin,
-              {
-                left: x(p.lng) - 16,
-                top: y(p.lat) - 16,
-                backgroundColor: unlocked ? c.category[p.category] : c.locked,
-              },
-            ]}
+            style={[styles.pin, { left: x(p.lng) - 20, top: y(p.lat) - 20 }]}
           >
-            <Ionicons
-              name={unlocked ? 'checkmark' : 'lock-closed'}
-              size={compact ? 10 : 14}
-              color="#fff"
+            <Image
+              source={unlocked ? MARKERS[p.category].found : MARKERS[p.category].locked}
+              style={styles.pinImage}
+              accessible={false}
             />
           </Pressable>
         );
@@ -90,16 +84,8 @@ export function FallbackMap({
 
 const styles = StyleSheet.create({
   map: { flex: 1, overflow: 'hidden' },
-  pin: {
-    position: 'absolute',
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
+  pin: { position: 'absolute', width: 40, height: 40 },
+  pinImage: { width: 40, height: 40 },
   me: { position: 'absolute' },
   note: { position: 'absolute', bottom: 8, alignSelf: 'center', fontSize: 11 },
 });

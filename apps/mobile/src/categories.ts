@@ -15,9 +15,9 @@ export const CATEGORY_META: Record<Category, CategoryMeta> = {
   nature: { icon: 'leaf', art: require('../assets/art/nature.webp') },
   heritage: { icon: 'business', art: require('../assets/art/heritage.webp') },
   culture: { icon: 'color-palette', art: require('../assets/art/culture.webp') },
-  art: { icon: 'brush', art: require('../assets/art/art.svg') },
+  // Art & museums shares the culture illustration (one hand-drawn style across categories).
+  art: { icon: 'brush', art: require('../assets/art/culture.webp') },
   music_events: { icon: 'musical-notes', art: require('../assets/art/music_events.webp') },
-  travel: { icon: 'train', art: require('../assets/art/travel.svg') },
   other: { icon: 'compass', art: require('../assets/art/other.webp') },
 };
 

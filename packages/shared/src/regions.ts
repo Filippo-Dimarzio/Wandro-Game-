@@ -41,8 +41,8 @@ function r(
   };
 }
 
-/** Curated launch cities. Sintra stays first: it's the pilot and the demo's default. */
-export const REGIONS: readonly Region[] = [
+/** Every city with curated places. Sintra stays first: it's the pilot and the demo's default. */
+export const ALL_REGIONS: readonly Region[] = [
   {
     ...r('sintra', 'Sintra', 'Portugal', '🇵🇹', 38.7975, -9.3905, {
       code: 'LIS',
@@ -61,6 +61,16 @@ export const REGIONS: readonly Region[] = [
     bbox: [38.614, -9.34, 38.814, -8.989],
   },
   r('porto', 'Porto', 'Portugal', '🇵🇹', 41.1496, -8.611, {
+    code: 'OPO',
+    lat: 41.2481,
+    lng: -8.6814,
+  }),
+  r('evora', 'Évora', 'Portugal', '🇵🇹', 38.5714, -7.9135, {
+    code: 'LIS',
+    lat: 38.7742,
+    lng: -9.1342,
+  }),
+  r('aveiro', 'Aveiro', 'Portugal', '🇵🇹', 40.6405, -8.6538, {
     code: 'OPO',
     lat: 41.2481,
     lng: -8.6814,
@@ -167,6 +177,17 @@ export const REGIONS: readonly Region[] = [
   },
 ];
 
+/**
+ * Cities kept in the data but switched off for now: Wandro launches in Portugal. Remove a slug
+ * here (and re-activate its row in a migration) to bring a city back.
+ */
+export const HIDDEN_REGIONS: ReadonlySet<string> = new Set(
+  ALL_REGIONS.filter((r) => r.country !== 'Portugal').map((r) => r.slug),
+);
+
+/** The cities players see: the launch cities in Portugal. */
+export const REGIONS: readonly Region[] = ALL_REGIONS.filter((r) => !HIDDEN_REGIONS.has(r.slug));
+
 export const DEFAULT_REGION = REGIONS[0]!;
 
 /** How far from a city centre still counts as "in" that city when outside its box. */
@@ -195,7 +216,7 @@ export function regionFor(p: LatLng): Region | null {
 }
 
 /** Cities closer than this are a drive or a train ride, not a flight (Sintra ↔ Lisbon). */
-export const MIN_FLIGHT_KM = 300;
+export const MIN_FLIGHT_KM = 200;
 
 /**
  * Did the player fly? True when they were last seen in another launch city at least

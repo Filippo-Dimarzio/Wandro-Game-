@@ -1,5 +1,5 @@
 export type Category =
-  'coast' | 'nature' | 'heritage' | 'culture' | 'art' | 'music_events' | 'travel' | 'other';
+  'coast' | 'nature' | 'heritage' | 'culture' | 'art' | 'music_events' | 'other';
 
 /** 0 = Sunday … 6 = Saturday, matching Date#getDay(). */
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;

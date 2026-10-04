@@ -17,7 +17,7 @@ import { useSearchProfiles } from '@/data/social';
 import { t } from '@/i18n';
 import { confirmAction } from '@/lib/confirm';
 import { isDemo } from '@/lib/env';
-import { radius, space, useColors } from '@/theme';
+import { column, radius, space, useColors } from '@/theme';
 
 export default function Friends() {
   const c = useColors();
@@ -43,7 +43,10 @@ export default function Friends() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
       <ScreenHeader title={t('friends.title')} />
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={[styles.container, column]}
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={{ color: c.textMuted }}>{t('friends.intro')}</Text>
 
         <View style={[styles.search, { backgroundColor: c.surface }]}>

@@ -24,7 +24,7 @@ import { useWallet } from '@/data/wallet';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { useSession } from '@/state/session';
-import { radius, space, useColors } from '@/theme';
+import { column, radius, space, useColors } from '@/theme';
 
 export default function Home() {
   const c = useColors();
@@ -49,7 +49,7 @@ export default function Home() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[styles.container, column]}
         refreshControl={
           <RefreshControl
             refreshing={places.isRefetching}
@@ -172,8 +172,9 @@ export default function Home() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.rail}
         >
-          {nearby.map(({ p, d }) => (
+          {nearby.map(({ p, d }, i) => (
             <PlaceCard
+              index={i}
               key={p.id}
               place={p}
               distanceM={d}

@@ -267,7 +267,7 @@ export const NORTH_QUESTS = [
     [
       'kent-station',
       'Kent Station',
-      'travel',
+      'culture',
       51.9015,
       -8.458,
       200,
@@ -276,7 +276,7 @@ export const NORTH_QUESTS = [
     [
       'fota-station',
       'Fota Station',
-      'travel',
+      'culture',
       51.896,
       -8.3175,
       50,
@@ -285,7 +285,7 @@ export const NORTH_QUESTS = [
     [
       'passage-ferry',
       'Passage West Ferry',
-      'travel',
+      'culture',
       51.827,
       -8.328,
       50,
@@ -294,7 +294,7 @@ export const NORTH_QUESTS = [
     [
       'blackrock-greenway',
       'Blackrock Railway Greenway',
-      'travel',
+      'culture',
       51.898,
       -8.4155,
       100,
@@ -303,7 +303,7 @@ export const NORTH_QUESTS = [
     [
       'deepwater-quay',
       'Deepwater Quay',
-      'travel',
+      'culture',
       51.8505,
       -8.2985,
       100,
@@ -640,7 +640,7 @@ export const NORTH_QUESTS = [
     [
       'katarinahissen',
       'Katarina Elevator',
-      'travel',
+      'culture',
       59.3195,
       18.073,
       400,
@@ -649,7 +649,7 @@ export const NORTH_QUESTS = [
     [
       'slussen-ferry',
       'Djurgården Ferry at Slussen',
-      'travel',
+      'culture',
       59.32,
       18.078,
       600,
@@ -658,7 +658,7 @@ export const NORTH_QUESTS = [
     [
       'djurgardsbron',
       'Djurgårdsbron',
-      'travel',
+      'culture',
       59.3315,
       18.095,
       300,
@@ -667,7 +667,7 @@ export const NORTH_QUESTS = [
     [
       'central',
       'Stockholm Central Station',
-      'travel',
+      'culture',
       59.33,
       18.058,
       500,
@@ -676,7 +676,7 @@ export const NORTH_QUESTS = [
     [
       'af-chapman',
       'Af Chapman',
-      'travel',
+      'culture',
       59.3255,
       18.0805,
       200,
@@ -1005,7 +1005,7 @@ export const NORTH_QUESTS = [
     [
       'nyhavn',
       'Nyhavn',
-      'travel',
+      'culture',
       55.6798,
       12.5907,
       3000,
@@ -1014,7 +1014,7 @@ export const NORTH_QUESTS = [
     [
       'central',
       'Copenhagen Central Station',
-      'travel',
+      'culture',
       55.6727,
       12.5647,
       400,
@@ -1023,7 +1023,7 @@ export const NORTH_QUESTS = [
     [
       'cykelslangen',
       'Cykelslangen',
-      'travel',
+      'culture',
       55.6655,
       12.5765,
       300,
@@ -1032,7 +1032,7 @@ export const NORTH_QUESTS = [
     [
       'inderhavnsbroen',
       'Inderhavnsbroen',
-      'travel',
+      'culture',
       55.68,
       12.596,
       300,
@@ -1041,7 +1041,7 @@ export const NORTH_QUESTS = [
     [
       'knippelsbro',
       'Knippelsbro',
-      'travel',
+      'culture',
       55.674,
       12.5895,
       200,
@@ -1370,7 +1370,7 @@ export const NORTH_QUESTS = [
     [
       'central-station',
       'Warsaw Central',
-      'travel',
+      'culture',
       52.2285,
       21.003,
       400,
@@ -1379,7 +1379,7 @@ export const NORTH_QUESTS = [
     [
       'swietokrzyski',
       'Świętokrzyski Bridge',
-      'travel',
+      'culture',
       52.242,
       21.038,
       200,
@@ -1388,7 +1388,7 @@ export const NORTH_QUESTS = [
     [
       'railway-museum',
       'Railway Museum',
-      'travel',
+      'culture',
       52.229,
       20.99,
       200,
@@ -1397,7 +1397,7 @@ export const NORTH_QUESTS = [
     [
       'vistula-ferry',
       'Vistula Ferry',
-      'travel',
+      'culture',
       52.219,
       21.06,
       100,
@@ -1406,7 +1406,7 @@ export const NORTH_QUESTS = [
     [
       'tram-museum',
       'Tram Depot Museum',
-      'travel',
+      'culture',
       52.26,
       21.051,
       50,
@@ -1735,7 +1735,7 @@ export const NORTH_QUESTS = [
     [
       'zuraw',
       'Żuraw',
-      'travel',
+      'culture',
       54.3505,
       18.6575,
       1000,
@@ -1744,7 +1744,7 @@ export const NORTH_QUESTS = [
     [
       'main-station',
       'Gdańsk Main Station',
-      'travel',
+      'culture',
       54.3555,
       18.644,
       300,
@@ -1753,7 +1753,7 @@ export const NORTH_QUESTS = [
     [
       'soldek',
       'SS Sołdek',
-      'travel',
+      'culture',
       54.351,
       18.661,
       200,
@@ -1762,7 +1762,7 @@ export const NORTH_QUESTS = [
     [
       'shipyard-cranes',
       'Shipyard Cranes',
-      'travel',
+      'culture',
       54.364,
       18.656,
       300,
@@ -1771,7 +1771,7 @@ export const NORTH_QUESTS = [
     [
       'brzezno-pier',
       'Brzeźno Pier',
-      'travel',
+      'culture',
       54.412,
       18.6315,
       200,

@@ -158,7 +158,7 @@ export const CENTRAL_QUESTS = [
     [
       'gare-du-nord',
       'Gare du Nord',
-      'travel',
+      'culture',
       48.8809,
       2.3553,
       900,
@@ -167,7 +167,7 @@ export const CENTRAL_QUESTS = [
     [
       'alexandre-iii',
       'Pont Alexandre III',
-      'travel',
+      'culture',
       48.8639,
       2.3136,
       1500,
@@ -176,7 +176,7 @@ export const CENTRAL_QUESTS = [
     [
       'arts-et-metiers',
       'Arts et Métiers Station',
-      'travel',
+      'culture',
       48.8655,
       2.3565,
       200,
@@ -395,7 +395,7 @@ export const CENTRAL_QUESTS = [
     [
       'san-sebastiano',
       'Porta San Sebastiano',
-      'travel',
+      'culture',
       41.8735,
       12.5015,
       200,
@@ -404,7 +404,7 @@ export const CENTRAL_QUESTS = [
     [
       'ponte-sant-angelo',
       'Ponte Sant’Angelo',
-      'travel',
+      'culture',
       41.9015,
       12.4665,
       2000,
@@ -413,7 +413,7 @@ export const CENTRAL_QUESTS = [
     [
       'vatican-station',
       'Vatican Railway Station',
-      'travel',
+      'culture',
       41.901,
       12.451,
       50,
@@ -623,7 +623,7 @@ export const CENTRAL_QUESTS = [
     [
       'leopolda',
       'Stazione Leopolda',
-      'travel',
+      'culture',
       43.779,
       11.238,
       200,
@@ -632,7 +632,7 @@ export const CENTRAL_QUESTS = [
     [
       'porta-romana',
       'Porta Romana',
-      'travel',
+      'culture',
       43.76,
       11.244,
       300,
@@ -641,7 +641,7 @@ export const CENTRAL_QUESTS = [
     [
       'carraia',
       'Ponte alla Carraia',
-      'travel',
+      'culture',
       43.771,
       11.2465,
       200,
@@ -842,7 +842,7 @@ export const CENTRAL_QUESTS = [
     [
       'magere-brug',
       'Magere Brug',
-      'travel',
+      'culture',
       52.3632,
       4.9023,
       800,
@@ -851,7 +851,7 @@ export const CENTRAL_QUESTS = [
     [
       'tram-museum',
       'Electric Museum Tramline',
-      'travel',
+      'culture',
       52.3485,
       4.858,
       50,
@@ -860,7 +860,7 @@ export const CENTRAL_QUESTS = [
     [
       'seven-bridges',
       'Seven Bridges of Reguliersgracht',
-      'travel',
+      'culture',
       52.3635,
       4.899,
       600,
@@ -1070,7 +1070,7 @@ export const CENTRAL_QUESTS = [
     [
       'tempelhof-terminal',
       'Tempelhof Airport Terminal',
-      'travel',
+      'culture',
       52.484,
       13.388,
       300,
@@ -1079,7 +1079,7 @@ export const CENTRAL_QUESTS = [
     [
       'technikmuseum',
       'German Museum of Technology',
-      'travel',
+      'culture',
       52.4985,
       13.3775,
       300,
@@ -1088,7 +1088,7 @@ export const CENTRAL_QUESTS = [
     [
       'tranenpalast',
       'Palace of Tears',
-      'travel',
+      'culture',
       52.5205,
       13.387,
       200,

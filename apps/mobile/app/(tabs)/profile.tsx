@@ -14,7 +14,7 @@ import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { PlaceMap } from '@/map/PlaceMap';
 import { useSession } from '@/state/session';
-import { radius, space, useColors } from '@/theme';
+import { column, radius, space, useColors } from '@/theme';
 
 export default function Profile() {
   const c = useColors();
@@ -31,7 +31,7 @@ export default function Profile() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={[styles.container, column]}>
         <View style={styles.header}>
           <Pressable
             onPress={() => router.push('/shop')}

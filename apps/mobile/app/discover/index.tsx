@@ -5,10 +5,11 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CATEGORIES } from '@wandro/shared';
 import { CATEGORY_META } from '@/categories';
+import { AnimatedCard } from '@/components/AnimatedCard';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
-import { radius, shadow, space, useColors } from '@/theme';
+import { column, radius, shadow, space, useColors } from '@/theme';
 
 /** All interests at a glance; each opens its colour-coded category page. */
 export default function DiscoverHub() {
@@ -19,7 +20,7 @@ export default function DiscoverHub() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={[styles.container, column]}>
         <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"
@@ -35,18 +36,20 @@ export default function DiscoverHub() {
         <Text style={{ color: c.textMuted, fontSize: 16 }}>{t('discover.subtitle')}</Text>
 
         <View style={styles.grid}>
-          {CATEGORIES.map((cat) => {
+          {CATEGORIES.map((cat, i) => {
             const inCat = places.filter((p) => p.category === cat);
             const found = inCat.filter((p) => ids.has(p.id)).length;
             return (
-              <Pressable
+              <AnimatedCard
                 key={cat}
+                index={i}
                 onPress={() =>
                   router.push({ pathname: '/discover/[category]', params: { category: cat } })
                 }
                 accessibilityRole="button"
                 accessibilityLabel={`${t(`category.${cat}`)}, ${t('discover.placeCount', { count: inCat.length })}`}
                 style={[styles.tile, shadow, { backgroundColor: c.card }]}
+                contentStyle={styles.tileContent}
                 testID={`discover-${cat}`}
               >
                 <Image
@@ -56,14 +59,14 @@ export default function DiscoverHub() {
                   accessible={false}
                 />
                 <View style={[styles.label, { backgroundColor: c.card }]}>
-                  <Text style={[styles.name, { color: c.category[cat] }]} numberOfLines={1}>
+                  <Text style={[styles.name, { color: c.category[cat] }]} numberOfLines={2}>
                     {t(`category.${cat}`)}
                   </Text>
                   <Text style={{ color: c.textMuted, fontSize: 12, fontWeight: '700' }}>
                     {found}/{inCat.length}
                   </Text>
                 </View>
-              </Pressable>
+              </AnimatedCard>
             );
           })}
         </View>
@@ -82,23 +85,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: { fontSize: 30, fontWeight: '900' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.md },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: space.md,
+  },
   tile: {
-    flexGrow: 1,
-    flexBasis: '45%',
+    width: '48%',
     aspectRatio: 1,
     borderRadius: radius.lg,
-    overflow: 'hidden',
-    justifyContent: 'flex-end',
-    padding: space.sm,
   },
+  tileContent: { justifyContent: 'flex-end', padding: space.sm },
   label: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.xs,
     borderRadius: radius.pill,
     paddingHorizontal: space.md,
+    paddingVertical: 6,
     minHeight: 34,
   },
-  name: { flex: 1, fontSize: 14, fontWeight: '900' },
+  name: { flex: 1, fontSize: 14, fontWeight: '900', lineHeight: 17 },
 });

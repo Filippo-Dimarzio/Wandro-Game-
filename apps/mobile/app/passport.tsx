@@ -8,7 +8,7 @@ import { CATEGORY_META } from '@/categories';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { usePassport, type PassportStamp } from '@/data/social';
 import { t } from '@/i18n';
-import { radius, shadow, space, useColors } from '@/theme';
+import { column, radius, shadow, space, useColors } from '@/theme';
 
 const TILT = ['-4deg', '3deg', '-2deg', '5deg', '-3deg'];
 
@@ -35,7 +35,7 @@ export default function Passport() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
       <ScreenHeader title={t('passport.title')} />
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={[styles.container, column]}>
         <Text style={{ color: c.textMuted }}>{t('passport.subtitle')}</Text>
         {stamps.length === 0 && (
           <View style={[styles.empty, { backgroundColor: c.surface }]}>

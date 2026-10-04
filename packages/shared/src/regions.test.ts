@@ -1,7 +1,15 @@
 import { CATEGORIES } from './constants';
 import { haversineMeters } from './geo';
 import { DEMO_PLACES } from './seed-places';
-import { arrivalFlight, REGIONS, regionBySlug, regionFor } from './regions';
+import { ALL_EUROPE_PLACES } from './europe-places';
+import {
+  ALL_REGIONS,
+  arrivalFlight,
+  HIDDEN_REGIONS,
+  REGIONS,
+  regionBySlug,
+  regionFor,
+} from './regions';
 
 describe('regions', () => {
   it('have unique slugs and sensible boxes', () => {
@@ -16,14 +24,16 @@ describe('regions', () => {
   });
 
   it('finds the region for a point inside a box', () => {
-    expect(regionFor({ lat: 48.8584, lng: 2.2945 })?.slug).toBe('paris');
+    expect(regionFor({ lat: 41.1407, lng: -8.6131 })?.slug).toBe('porto');
+    expect(regionFor({ lat: 38.5728, lng: -7.9073 })?.slug).toBe('evora');
+    expect(regionFor({ lat: 40.6405, lng: -8.6538 })?.slug).toBe('aveiro');
     expect(regionFor({ lat: 38.7876, lng: -9.3906 })?.slug).toBe('sintra');
     expect(regionFor({ lat: 38.6916, lng: -9.216 })?.slug).toBe('lisbon');
   });
 
   it('falls back to the nearest centre within the catchment, else null', () => {
-    // Versailles: outside the Paris box but close to the centre.
-    expect(regionFor({ lat: 48.8049, lng: 2.1204 })?.slug).toBe('paris');
+    // Setúbal: outside the Lisbon box but within reach of its centre.
+    expect(regionFor({ lat: 38.5244, lng: -8.8882 })?.slug).toBe('lisbon');
     // Middle of the Atlantic.
     expect(regionFor({ lat: 40, lng: -30 })).toBeNull();
   });
@@ -70,22 +80,32 @@ describe('regions', () => {
   });
 });
 
+describe('hidden cities', () => {
+  it('only Portugal is playable; the other cities stay in the data, hidden', () => {
+    expect(REGIONS.map((r) => r.slug)).toEqual(['sintra', 'lisbon', 'porto', 'evora', 'aveiro']);
+    expect(ALL_REGIONS.length).toBeGreaterThan(REGIONS.length);
+    expect(HIDDEN_REGIONS.has('paris')).toBe(true);
+    expect(ALL_EUROPE_PLACES.some((p) => p.region === 'paris')).toBe(true);
+    expect(DEMO_PLACES.some((p) => p.region && HIDDEN_REGIONS.has(p.region))).toBe(false);
+  });
+});
+
 describe('arrivalFlight', () => {
   it('flies between far-apart cities only', () => {
-    const f = arrivalFlight('lisbon', 'paris');
+    const f = arrivalFlight('evora', 'porto');
     expect(f?.from.airport.code).toBe('LIS');
-    expect(f?.to.airport.code).toBe('CDG');
-    expect(f!.km).toBeGreaterThan(1400);
+    expect(f?.to.airport.code).toBe('OPO');
+    expect(f!.km).toBeGreaterThan(200);
     expect(arrivalFlight('sintra', 'lisbon')).toBeNull();
-    expect(arrivalFlight('paris', 'paris')).toBeNull();
-    expect(arrivalFlight(null, 'paris')).toBeNull();
-    expect(arrivalFlight('paris', null)).toBeNull();
+    expect(arrivalFlight('porto', 'porto')).toBeNull();
+    expect(arrivalFlight(null, 'porto')).toBeNull();
+    expect(arrivalFlight('porto', null)).toBeNull();
   });
 
-  it('every city has an airport within 40 km', () => {
+  it('every city has an airport within 120 km (Évora flies into Lisbon)', () => {
     for (const r of REGIONS) {
       expect(r.airport.code).toMatch(/^[A-Z]{3}$/);
-      expect(haversineMeters(r.center, r.airport)).toBeLessThan(40_000);
+      expect(haversineMeters(r.center, r.airport)).toBeLessThan(120_000);
     }
   });
 });

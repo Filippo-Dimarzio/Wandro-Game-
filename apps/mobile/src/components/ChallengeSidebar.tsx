@@ -3,6 +3,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import {
+  GEMS_UNLOCK_AFTER,
+  gemsLeftToUnlock,
   haversineMeters,
   type HiddenHint,
   type LatLng,
@@ -48,6 +50,8 @@ export function ChallengeSidebar({
   const challenges = useFriendChallenges().filter(
     (x) => x.direction === 'incoming' && (x.status === 'pending' || x.status === 'accepted'),
   );
+  // Discoveries in this city still needed before all its gems appear (GEMS_UNLOCK_AFTER).
+  const gemsLeft = region ? gemsLeftToUnlock(places, unlockedIds, region.slug) : GEMS_UNLOCK_AFTER;
   const next = places
     .filter((p) => !unlockedIds.has(p.id))
     .map((p) => ({ p, d: haversineMeters(position, p) }))
@@ -110,7 +114,11 @@ export function ChallengeSidebar({
                   ? `${hidden.count === 1 ? t('hidden.countOne') : t('hidden.count', { count: hidden.count })}. ${t(`hidden.hint.${hidden.hint ?? 'area'}`)}`
                   : t('hidden.none')}
               </Text>
-              <Text style={{ color: c.textMuted, fontSize: 12 }}>{t('hidden.rule')}</Text>
+              <Text style={{ color: c.textMuted, fontSize: 12 }}>
+                {gemsLeft === 0
+                  ? t('collections.gemsOpen')
+                  : t('hidden.ruleUnlock', { count: gemsLeft })}
+              </Text>
             </View>
           </View>
         </Section>
@@ -136,8 +144,9 @@ export function ChallengeSidebar({
 
         <Section title={t('sidebar.nearby')}>
           {next.length === 0 && <Text style={{ color: c.textMuted }}>{t('sidebar.allDone')}</Text>}
-          {next.map(({ p, d }) => (
+          {next.map(({ p, d }, i) => (
             <PlaceCard
+              index={i}
               key={p.id}
               place={p}
               distanceM={d}

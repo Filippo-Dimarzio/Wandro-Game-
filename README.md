@@ -9,10 +9,8 @@ trams and funiculars, and nature spots. Places start
 hidden under fog; visiting one unlocks it, clears the fog around it and earns **coins** for your
 octopus. Hidden gems are worth the most.
 
-- **Where:** Sintra (the pilot) plus 20 European cities — Lisbon, Porto, Madrid, Barcelona,
-  the Basque Country, Paris, Rome, Florence, Amsterdam, Berlin, Prague, Vienna, Budapest,
-  Edinburgh, Dublin, Cork, Stockholm, Copenhagen, Warsaw and Gdańsk, each with at least five side
-  quests in every category
+- **Where:** Portugal — Sintra (the pilot), Lisbon, Porto, Évora and Aveiro, each with at least
+  five side quests in every category. Eighteen more European cities are written but hidden for now
 - **Status:** v2.0 — the full game loop (Phases 0–8). See the [roadmap](#roadmap).
 - **Play in your browser:** <https://filippo-dimarzio.github.io/Wandro-Game-/> (demo mode — click
   **Install app** to put it on your desktop)

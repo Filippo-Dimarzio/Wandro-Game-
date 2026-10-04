@@ -19,7 +19,7 @@ import { t } from '@/i18n';
 import { isDemo } from '@/lib/env';
 import { setDailyReminder } from '@/lib/notifications';
 import { useSession } from '@/state/session';
-import { radius, space, useColors } from '@/theme';
+import { column, radius, space, useColors } from '@/theme';
 
 export default function Settings() {
   const c = useColors();
@@ -42,7 +42,7 @@ export default function Settings() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
       <ScreenHeader title={t('settings.title')} />
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={[styles.container, column]}>
         <Section title={t('settings.privacy')}>
           <Row label={t('settings.private')} hint={t('settings.privateHint')}>
             <Switch

@@ -120,7 +120,7 @@ reset role;
 select pg_temp.check((select status from posts where user_id = '00000000-0000-0000-0000-0000000000b1') = 'removed', 'resolved report removes the post');
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1');
 select pg_temp.check((select count(*) from posts where user_id = '00000000-0000-0000-0000-0000000000b1') = 0, 'removed posts disappear for everyone');
-select pg_temp.check((select count(*) from my_collections()) = 43, 'collections list with progress (3 in Sintra, 2 per city)');
+select pg_temp.check((select count(*) from my_collections()) = 11, 'collections list with progress (3 in Sintra, 2 per city)');
 select pg_temp.check((select bool_and(total = 5) from my_collections() where region_slug <> 'sintra'), 'city sets have 5 places');
 reset role;
 

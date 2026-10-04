@@ -13,7 +13,6 @@ const lightCategory = {
   culture: { color: '#7B3FC4', tint: '#F1E9FB' }, // violet: museums and art
   art: { color: '#B3261E', tint: '#FDEBEA' }, // crimson: paint and street art
   music_events: { color: '#A3195B', tint: '#F9E7EF' }, // berry: nights out (matches its cover)
-  travel: { color: '#3949AB', tint: '#E9EBF8' }, // indigo: trains, trams and routes
   other: { color: '#0A706F', tint: '#E0F3F2' }, // deep teal: curiosities (the octopus)
 } satisfies Record<Category, { color: string; tint: string }>;
 
@@ -24,7 +23,6 @@ const darkCategory: typeof lightCategory = {
   culture: { color: '#B48BF0', tint: '#24173A' },
   art: { color: '#F2817B', tint: '#3A1512' },
   music_events: { color: '#EE7AAE', tint: '#33121F' },
-  travel: { color: '#9AA8FF', tint: '#171C3D' },
   other: { color: '#4FC8C4', tint: '#0F2C2C' },
 };
 
@@ -86,6 +84,9 @@ export function useColors(): Colors {
 }
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
+
+/** Screens read like a phone even on a wide window: one centred column. */
+export const column = { width: '100%', maxWidth: 600, alignSelf: 'center' } as const;
 export const radius = { sm: 8, md: 14, lg: 22, xl: 28, pill: 999 };
 
 /** Soft card shadow used across screens. */

@@ -52,7 +52,9 @@ describe('ChallengeSidebar', () => {
 
     await fireEvent.press(screen.getByRole('button', { name: /mia\.maps challenged you/ }));
     expect(props.onShowChallenge).toHaveBeenCalledWith(
-      expect.objectContaining({ place: expect.objectContaining({ id: 'demo-madrid-retiro' }) }),
+      expect.objectContaining({
+        place: expect.objectContaining({ id: 'demo-aveiro-moliceiro-ride' }),
+      }),
     );
 
     await fireEvent.press(screen.getByTestId('open-cities'));

@@ -11,7 +11,7 @@ const DEMO_COUNTS = DEMO_PLACES.reduce<Record<string, number>>((acc, p) => {
   return acc;
 }, {});
 
-/** "Explore Europe": jump the map to a launch city. */
+/** "Explore Portugal": jump the map to a launch city. */
 export function CityPicker({
   visible,
   current,

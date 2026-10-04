@@ -183,6 +183,8 @@ Each phase ends with: tests + lint green, a summary of changes, a manual test li
 
 **Phase 9.2 — Side quests & eight more cities:** Budapest, Dublin, Cork, Stockholm, Copenhagen, Warsaw, Gdańsk and the Basque Country join (`REGIONS`, migration with region rows; `region_at` prefers the smaller box where boxes overlap). Every city has 5+ visible places in each of the 8 categories (`packages/shared/src/quests`, tested in `regions.test.ts` and `europe_unlocks.test.sql`); heritage favours lesser-known palaces. The seed's Europe block is generated from the shared data (`seed-sql.ts`). Coordinates were placed by hand without a geocoder; verify them against OpenStreetMap before real-world launch (the geofence is 75 m).
 
+**Phase 9.3 — Portugal first:** launch narrows to Sintra, Lisbon, Porto, Évora and Aveiro (`HIDDEN_REGIONS` keeps the other cities' data; a migration deactivates their regions and closes their places). Hidden gems open city-wide after 5 discoveries there (`GEMS_UNLOCK_AFTER`, `knows_place(place, region)`). Travel folds into Culture (enum value kept, check constraints stop new use). Collections become landmark boxes greyed until unlocked (`assets/cities`, `scripts/render-cities.mjs`); map pins use category art (`assets/markers`, `scripts/render-markers.mjs`).
+
 ## 11. Things I need from you, and when
 
 | By            | What                                                                                                     |

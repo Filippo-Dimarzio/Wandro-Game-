@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { haversineMeters, type LatLng, type Place } from '@wandro/shared';
 import { placeImage } from '@/categories';
 import { useDailyChallenge } from '@/data/challenge';
+import { AnimatedCard } from '@/components/AnimatedCard';
 import { CoinIcon } from '@/components/CoinIcon';
 import { t } from '@/i18n';
 import { radius, shadow, space, useColors } from '@/theme';
@@ -67,7 +68,10 @@ export function DailyChallengeCard({
   const pictured = coverPlace(places, cat, unlocked, near);
 
   return (
-    <View style={[styles.card, shadow, { backgroundColor: c.card }]} testID="daily-challenge">
+    <AnimatedCard
+      style={[styles.card, shadow, { backgroundColor: c.card }]}
+      testID="daily-challenge"
+    >
       <View style={styles.cover}>
         {pictured ? (
           <Image
@@ -151,7 +155,7 @@ export function DailyChallengeCard({
           )}
         </View>
       </View>
-    </View>
+    </AnimatedCard>
   );
 }
 
@@ -169,7 +173,7 @@ const styles = StyleSheet.create({
   picturedText: { color: '#fff', fontWeight: '700', fontSize: 12 },
   card: { borderRadius: radius.lg, overflow: 'hidden' },
   cover: {
-    height: 130,
+    height: 150,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',

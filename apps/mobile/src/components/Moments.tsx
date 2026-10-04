@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CATEGORY_META } from '@/categories';
+import { AnimatedCard } from '@/components/AnimatedCard';
 import { FeedCard } from '@/components/FeedCard';
 import { momentExpiry, useFeed, useShareable, type FeedItem } from '@/data/social';
 import { t } from '@/i18n';
@@ -52,7 +53,7 @@ export function Moments() {
             {[0, 1, 2].map((i) => (
               <View
                 key={i}
-                style={styles.tile}
+                style={styles.lockedTile}
                 accessible
                 accessibilityLabel={t('moments.lockedTile')}
               >
@@ -85,8 +86,8 @@ export function Moments() {
         <>
           <Text style={{ color: c.textMuted, fontSize: 13 }}>{t('moments.rule')}</Text>
           <View style={styles.grid}>
-            {[...mine, ...others].map((item) => (
-              <Tile key={item.id} item={item} onPress={() => setOpen(item)} />
+            {[...mine, ...others].map((item, i) => (
+              <Tile key={item.id} item={item} index={i} onPress={() => setOpen(item)} />
             ))}
           </View>
           {others.length === 0 && (
@@ -125,12 +126,13 @@ export function Moments() {
   );
 }
 
-function Tile({ item, onPress }: { item: FeedItem; onPress: () => void }) {
+function Tile({ item, index, onPress }: { item: FeedItem; index: number; onPress: () => void }) {
   const c = useColors();
   const hoursLeft = Math.max(1, Math.ceil((momentExpiry(item.createdAt) - Date.now()) / 3_600_000));
   const who = item.isMine ? t('moments.yours') : item.username;
   return (
-    <Pressable
+    <AnimatedCard
+      index={index}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${who}, ${item.placeName}`}
@@ -155,7 +157,7 @@ function Tile({ item, onPress }: { item: FeedItem; onPress: () => void }) {
           {item.isMine ? t('moments.timeLeft', { hours: hoursLeft }) : timeAgo(item.createdAt)}
         </Text>
       </LinearGradient>
-    </Pressable>
+    </AnimatedCard>
   );
 }
 
@@ -172,7 +174,8 @@ const styles = StyleSheet.create({
   },
   locked: { borderRadius: radius.lg, padding: space.md, gap: space.md, alignItems: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, alignSelf: 'stretch' },
-  tile: {
+  tile: { width: '31.5%', aspectRatio: 1, borderRadius: radius.md },
+  lockedTile: {
     width: '31.5%',
     aspectRatio: 1,
     borderRadius: radius.md,

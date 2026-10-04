@@ -5,7 +5,16 @@ import { env } from '@/lib/env';
 import { CATEGORIES } from '@wandro/shared';
 import { lightColors } from '@/theme';
 import { FallbackMap } from './FallbackMap';
+import { MARKERS, markerName } from './markers';
 import type { PlaceMapProps } from './types';
+
+// 84 px pins at scale 2 (42 pt on screen).
+const MARKER_IMAGES = Object.fromEntries(
+  CATEGORIES.flatMap((cat) => [
+    [markerName(cat, false), { image: MARKERS[cat].found, scale: 2 }],
+    [markerName(cat, true), { image: MARKERS[cat].locked, scale: 2 }],
+  ]),
+);
 import { accuracyGeoJson, guidanceGeoJson, placesGeoJson, useFog } from './useFog';
 
 export type { PlaceMapProps } from './types';
@@ -40,8 +49,17 @@ function MapboxPlaceMap({
   focus,
   mb,
 }: PlaceMapProps & { mb: typeof import('@rnmapbox/maps') }) {
-  const { MapView, Camera, ShapeSource, FillLayer, LineLayer, CircleLayer, MarkerView, StyleURL } =
-    mb;
+  const {
+    MapView,
+    Camera,
+    ShapeSource,
+    FillLayer,
+    LineLayer,
+    SymbolLayer,
+    Images,
+    MarkerView,
+    StyleURL,
+  } = mb;
   const camera = useRef<import('@rnmapbox/maps').Camera>(null);
   const fog = useFog(places, unlockedIds);
   const accuracy = useMemo(
@@ -105,6 +123,7 @@ function MapboxPlaceMap({
       <ShapeSource id="fog" shape={fog}>
         <FillLayer id="fog-fill" style={{ fillColor: lightColors.fogFill, fillOpacity: 0.78 }} />
       </ShapeSource>
+      <Images images={MARKER_IMAGES} />
       <ShapeSource
         id="places"
         shape={placesGeoJson(places, unlockedIds)}
@@ -114,23 +133,19 @@ function MapboxPlaceMap({
           if (p) onSelect?.(p);
         }}
       >
-        <CircleLayer
-          id="places-circle"
+        <SymbolLayer
+          id="places-pins"
           style={{
-            circleRadius: compact ? 5 : 10,
-            circleColor: [
-              'case',
-              ['get', 'unlocked'],
-              [
-                'match',
-                ['get', 'category'],
-                ...CATEGORIES.flatMap((cat) => [cat, lightColors.category[cat]]),
-                lightColors.category.other,
-              ],
-              lightColors.locked,
+            iconImage: [
+              'concat',
+              'marker-',
+              ['get', 'category'],
+              ['case', ['get', 'unlocked'], '', '-locked'],
             ],
-            circleStrokeColor: '#ffffff',
-            circleStrokeWidth: 2.5,
+            iconSize: compact ? 0.45 : 1,
+            iconAllowOverlap: true,
+            iconIgnorePlacement: true,
+            symbolSortKey: ['case', ['get', 'unlocked'], 1, 0],
           }}
         />
       </ShapeSource>

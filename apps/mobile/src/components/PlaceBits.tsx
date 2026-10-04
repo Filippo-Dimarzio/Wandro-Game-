@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { formatDistance, pointsForVisit, type Category, type Place } from '@wandro/shared';
 import { categoryIcon, placeImage } from '@/categories';
+import { AnimatedCard } from '@/components/AnimatedCard';
 import { t } from '@/i18n';
 import { hoursStatus } from '@/lib/hours';
 import { radius, shadow, space, useColors } from '@/theme';
@@ -44,14 +45,17 @@ interface CardProps {
   onPress: () => void;
   /** Fixed width for horizontal rails; omit to fill the row. */
   width?: number;
+  /** Position in a list, to stagger the entrance animation. */
+  index?: number;
 }
 
 /** Photo-first place card: image, category, name, distance, points and times. */
-export function PlaceCard({ place, distanceM, unlocked, onPress, width }: CardProps) {
+export function PlaceCard({ place, distanceM, unlocked, onPress, width, index }: CardProps) {
   const c = useColors();
   const points = pointsForVisit(place.category, place.uniqueVisitors, place.basePoints).total;
   return (
-    <Pressable
+    <AnimatedCard
+      index={index}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${place.name}, ${t(`category.${place.category}`)}, ${formatDistance(distanceM)}, ${
@@ -85,7 +89,7 @@ export function PlaceCard({ place, distanceM, unlocked, onPress, width }: CardPr
         </Text>
         <HoursChip place={place} />
       </View>
-    </Pressable>
+    </AnimatedCard>
   );
 }
 

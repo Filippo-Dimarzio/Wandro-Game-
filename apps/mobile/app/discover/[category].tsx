@@ -174,8 +174,9 @@ function CategoryContent({ cat }: { cat: Category }) {
               {places.length === 0 && (
                 <Text style={{ color: c.textMuted }}>{t('discover.empty')}</Text>
               )}
-              {places.map(({ p, d }) => (
+              {places.map(({ p, d }, i) => (
                 <PlaceCard
+                  index={i}
                   key={p.id}
                   place={p}
                   distanceM={d}

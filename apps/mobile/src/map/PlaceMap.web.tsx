@@ -5,7 +5,9 @@ import { useEffect, useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { CATEGORIES } from '@wandro/shared';
 import { shopItem, skinColor } from '@wandro/shared';
+import { Asset } from 'expo-asset';
 import { lightColors } from '@/theme';
+import { MARKERS, markerName } from './markers';
 import type { PlaceMapProps } from './types';
 import { accuracyGeoJson, guidanceGeoJson, placesGeoJson, useFog } from './useFog';
 
@@ -33,12 +35,19 @@ const STYLE: maplibregl.StyleSpecification = {
 };
 
 // Spread pairs don't fit MapLibre's tuple types, hence the cast.
-const categoryColor = [
-  'match',
-  ['get', 'category'],
-  ...CATEGORIES.flatMap((cat) => [cat, lightColors.category[cat]]),
-  lightColors.category.other,
-] as unknown as maplibregl.ExpressionSpecification;
+/** Loads the round category pins (see map/markers.ts); 84 px images shown at 42 pt. */
+function loadMarkerImages(m: MLMap) {
+  for (const cat of CATEGORIES)
+    for (const locked of [false, true]) {
+      const name = markerName(cat, locked);
+      const uri = Asset.fromModule(locked ? MARKERS[cat].locked : MARKERS[cat].found).uri;
+      m.loadImage(uri)
+        .then(({ data }) => {
+          if (!m.hasImage(name)) m.addImage(name, data, { pixelRatio: 2 });
+        })
+        .catch(() => undefined);
+    }
+}
 
 // Find-My-style pulse and incense glow for the octopus marker.
 const MARKER_CSS = `
@@ -166,15 +175,23 @@ export function PlaceMap({
       m.addSource('places', { type: 'geojson', data: d.placesData });
       m.addLayer({
         id: 'places',
-        type: 'circle',
+        type: 'symbol',
         source: 'places',
-        paint: {
-          'circle-radius': compact ? 5 : 10,
-          'circle-color': ['case', ['get', 'unlocked'], categoryColor, lightColors.locked],
-          'circle-stroke-color': '#ffffff',
-          'circle-stroke-width': 2.5,
+        layout: {
+          'icon-image': [
+            'concat',
+            'marker-',
+            ['get', 'category'],
+            ['case', ['get', 'unlocked'], '', '-locked'],
+          ],
+          'icon-size': compact ? 0.45 : 1,
+          'icon-allow-overlap': true,
+          'icon-ignore-placement': true,
+          // Discovered places sit on top of locked ones.
+          'symbol-sort-key': ['case', ['get', 'unlocked'], 1, 0],
         },
       });
+      loadMarkerImages(m);
       m.on('click', 'places', (e: MapLayerMouseEvent) => {
         const id = e.features?.[0]?.properties?.id as string | undefined;
         const p = latest.current.places.find((x) => x.id === id);

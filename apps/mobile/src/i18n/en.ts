@@ -73,9 +73,8 @@ export const en = {
   'category.nature': 'Nature',
   'category.heritage': 'Heritage',
   'category.culture': 'Culture',
-  'category.art': 'Art',
+  'category.art': 'Art & museums',
   'category.music_events': 'Music & events',
-  'category.travel': 'Travel',
   'category.other': 'Curiosities',
 
   'place.points': '{points} pts',
@@ -160,14 +159,6 @@ export const en = {
   'learn.art.fact3': 'Looking slowly at one artwork for a few minutes helps you notice far more.',
   'learn.art.tip':
     'Photos are often allowed without flash in galleries; check the signs, and never touch the art.',
-  'learn.travel.intro':
-    'Grand stations, rattling trams, funiculars, cable cars and harbour ferries. The journey is part of the adventure.',
-  'learn.travel.fact1': 'Some of the oldest trams and funiculars in Europe still run every day.',
-  'learn.travel.fact2':
-    'Railway stations were built as "cathedrals of travel", so many are worth a visit for the architecture alone.',
-  'learn.travel.fact3': 'A day pass is often cheaper than two or three single tickets.',
-  'learn.travel.tip':
-    'Validate your ticket before boarding, mind the gap, and keep your bag in front of you in crowds.',
   'learn.music_events.intro':
     "Live gigs, open-air concerts and dance floors that come alive after dark. Find the beats, the crowds and the nights you'll remember.",
   'learn.music_events.fact1':
@@ -184,9 +175,12 @@ export const en = {
   'learn.other.tip': 'Respect the place and the people around you.',
 
   'capture.title': 'Check in',
+  'capture.subtitle': 'Stand at a place, hold the button and stay a moment to discover it.',
   'capture.nearest': 'Nearest place',
-  'capture.atPlace': "You're at {name}",
-  'capture.tooFar': '{distance} away — get within {radius} m',
+  'capture.here': 'You’re here',
+  'capture.away': '{distance} away',
+  'capture.ready': 'You’re close enough. Hold the button to start.',
+  'capture.getCloser': 'Walk a little closer: within {radius} m.',
   'capture.start': 'Hold to start discovery',
   'capture.startA11y': 'Press and hold to start discovering this place',
   'capture.dwell': 'Stay here… {seconds}s',
@@ -421,7 +415,8 @@ export const en = {
   'common.loading': 'Loading…',
   'home.friends': 'Friends',
   'friends.title': 'Friends',
-  'friends.intro': 'Add friends to share ideas and challenge each other to places all over Europe.',
+  'friends.intro':
+    'Add friends to share ideas and challenge each other to places all over Portugal.',
   'friends.searchPlaceholder': 'Find explorers by username',
   'friends.requests': 'Friend requests ({count})',
   'friends.accept': 'Accept',
@@ -466,7 +461,7 @@ export const en = {
   'friends.error.place_not_active': 'This place can’t be shared.',
   'friends.error.unknown': 'Couldn’t send the challenge. Please try again.',
   'travel.nearMe': 'Near me',
-  'travel.title': 'Explore Europe',
+  'travel.title': 'Explore Portugal',
   'travel.button': 'Cities',
   'travel.demoHint': 'Demo: picking a city moves your octopus there.',
   'travel.realHint': 'Look around another city. Check-ins still need you to be there.',
@@ -483,6 +478,8 @@ export const en = {
   'hidden.hint.walk': 'One is a short walk away, within 3 km.',
   'hidden.hint.area': 'Somewhere in this area. Walk around to find it.',
   'hidden.rule': 'Gems appear on the map when you’re within 200 m.',
+  'hidden.ruleUnlock':
+    'Walk within 200 m to reveal one, or discover {count} more places in this city to reveal them all.',
   'place.photoCredit': 'Photo: {author} · {license} · Wikimedia Commons',
   'challenge.pictured': 'For example: {name}',
   'flight.kicker': 'NEW CITY UNLOCKED',
@@ -524,6 +521,17 @@ export const en = {
   'collections.sets': '{count} sets',
   'collections.reward': '+{step} each · +{bonus} for the set',
   'collections.here': 'You’re here',
+  'collections.locked': 'Discover a place here to bring {city} to life.',
+  'collections.unlocked': 'Unlocked',
+  'collections.gemsIn': 'Discover {count} more places here to reveal its hidden gems.',
+  'collections.gemsInOne': 'Discover 1 more place here to reveal its hidden gems.',
+  'collections.gemsOpen': 'Hidden gems revealed: look for them on the map.',
+  'collections.close': 'Close',
+  'landmark.sintra': 'Pena Palace',
+  'landmark.lisbon': 'Belém Tower',
+  'landmark.porto': 'Dom Luís I Bridge',
+  'landmark.evora': 'Roman Temple of Évora',
+  'landmark.aveiro': 'Moliceiro boats and striped houses',
 };
 
 export type TranslationKey = keyof typeof en;

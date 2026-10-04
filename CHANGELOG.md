@@ -43,7 +43,25 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
   (`pnpm --filter @wandro/shared seed`), and a test keeps them in step.
 - Gold coin with a slot for the mascot artwork (`apps/mobile/src/coin.ts`).
 
+- Évora and Aveiro, with five quests in every category and two hidden gems each.
+- Hidden gems: discovering 5 places in a city reveals all of its gems at once (as well as one by
+  one within 200 m). Every city has at least two.
+- Collections: a box per city with a drawing of its landmark (Pena Palace, Belém Tower, Dom Luís I
+  Bridge, the Roman Temple, Aveiro's moliceiros), greyed out until you discover a place there.
+  Tapping a box zooms into the city: its sets and how close you are to its hidden gems.
+- Map pins show each category's hand-drawn art, with a lock or check badge.
+- Animated cards: they slide in and press down softly; Reduce Motion turns this off.
+- The Illumbe bullring in San Sebastián (hidden with the Basque Country for now).
+
 ### Changed
+
+- Wandro is Portugal-only for now. The other 18 cities are switched off (regions inactive, places
+  closed) but their data stays, ready to switch back on.
+- Travel is folded into Culture; Art is now "Art & museums" with the culture illustration. The
+  challenge rotation's travel day is a music & events day.
+- Check in is a full-bleed card: the place's picture, a "You're here" or distance badge, and one
+  clear next step. Screens keep a phone-width column on wide windows.
+- Discover is a two-column grid; arrival flights start at 200 km (Lisbon ↔ Porto).
 
 - Brighter light-blue theme with Wandro blue as the accent and a colour per category.
 - The check-in tab is now labelled "Check in" so "Discover" can name the new learning area.

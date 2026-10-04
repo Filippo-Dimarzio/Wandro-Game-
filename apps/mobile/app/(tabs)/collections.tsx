@@ -3,57 +3,80 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Animated,
+  Easing,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   COLLECTION_COMPLETION_BONUS,
   COLLECTION_STEP_BONUS,
+  DEMO_PLACES,
+  GEMS_UNLOCK_AFTER,
+  gemsLeftToUnlock,
   REGIONS,
   regionFor,
   type Region,
 } from '@wandro/shared';
-import { CATEGORY_META } from '@/categories';
+import { CITY_ART } from '@/cityArt';
+import { AnimatedCard } from '@/components/AnimatedCard';
 import { CoinIcon } from '@/components/CoinIcon';
 import { useCollections, type CollectionProgress } from '@/data/collections';
-import { t } from '@/i18n';
+import { useUnlockedIds } from '@/data/places';
+import { t, type TranslationKey } from '@/i18n';
+import { isDemo } from '@/lib/env';
 import { useLocation } from '@/lib/useLocation';
-import { radius, shadow, space, useColors } from '@/theme';
+import { column, radius, shadow, space, useColors } from '@/theme';
 
 interface City {
   region: Region;
   sets: CollectionProgress[];
   done: number;
   total: number;
+  /** You've discovered a place here: the landmark shows in colour. */
+  unlocked: boolean;
+  /** Discoveries still needed here before its hidden gems appear. */
+  gemsLeft: number;
 }
 
-/** Sets grouped into one card per city; tapping a city opens it. */
+/** One box per city with its landmark, greyed out until you've discovered a place there. */
 export default function Collections() {
   const c = useColors();
   const loc = useLocation();
   const here = regionFor(loc.position)?.slug ?? null;
   const collections = useCollections();
-  const [open, setOpen] = useState<string | null>(here);
+  const { ids } = useUnlockedIds();
+  const [open, setOpen] = useState<City | null>(null);
 
-  const cities: City[] = REGIONS.flatMap((region) => {
+  const cities: City[] = REGIONS.map((region) => {
     const sets = collections.filter((s) => s.region === region.slug);
-    if (!sets.length) return [];
-    return [
-      {
-        region,
-        sets,
-        done: sets.reduce((a, s) => a + s.done, 0),
-        total: sets.reduce((a, s) => a + s.total, 0),
-      },
-    ];
-  }).sort(
-    (a, b) =>
-      Number(b.region.slug === here) - Number(a.region.slug === here) ||
-      Number(b.done > 0) - Number(a.done > 0),
-  );
+    const done = sets.reduce((a, s) => a + s.done, 0);
+    // Demo knows every place's city; with a backend, set progress stands in for it.
+    const discoveredHere = isDemo
+      ? DEMO_PLACES.filter((p) => p.region === region.slug && ids.has(p.id)).length
+      : done;
+    return {
+      region,
+      sets,
+      done,
+      total: sets.reduce((a, s) => a + s.total, 0),
+      unlocked: discoveredHere > 0,
+      gemsLeft: isDemo
+        ? gemsLeftToUnlock(DEMO_PLACES, ids, region.slug)
+        : Math.max(0, GEMS_UNLOCK_AFTER - done),
+    };
+  }).sort((a, b) => Number(b.region.slug === here) - Number(a.region.slug === here));
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={[styles.container, column]}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: c.text }]} accessibilityRole="header">
             {t('collections.title')}
@@ -73,126 +96,215 @@ export default function Collections() {
             bonus: COLLECTION_COMPLETION_BONUS,
           })}
         </Text>
-        {cities.map((city) => (
-          <CityCard
-            key={city.region.slug}
-            city={city}
-            isHere={city.region.slug === here}
-            open={open === city.region.slug}
-            onToggle={() => setOpen((o) => (o === city.region.slug ? null : city.region.slug))}
-          />
-        ))}
+        <View style={styles.grid}>
+          {cities.map((city, i) => (
+            <CityBox
+              key={city.region.slug}
+              city={city}
+              index={i}
+              isHere={city.region.slug === here}
+              onPress={() => setOpen(city)}
+            />
+          ))}
+        </View>
       </ScrollView>
+      <CitySheet city={open} onClose={() => setOpen(null)} />
     </SafeAreaView>
   );
 }
 
-function CityCard({
+function CityBox({
   city,
+  index,
   isHere,
-  open,
-  onToggle,
+  onPress,
 }: {
   city: City;
+  index: number;
   isHere: boolean;
-  open: boolean;
-  onToggle: () => void;
+  onPress: () => void;
 }) {
   const c = useColors();
-  const anim = useRef(new Animated.Value(open ? 1 : 0)).current;
-  // Keep the sets mounted while the card closes so they can animate out.
-  const [shown, setShown] = useState(open);
-
-  useEffect(() => {
-    if (open) setShown(true);
-    Animated.timing(anim, {
-      toValue: open ? 1 : 0,
-      duration: 380,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: false,
-    }).start(({ finished }) => finished && !open && setShown(false));
-  }, [open, anim]);
-
-  const coverHeight = anim.interpolate({ inputRange: [0, 1], outputRange: [96, 150] });
-  const zoom = anim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.12] });
-  const chevron = anim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
-  // A mosaic of the city's own categories, so each city card looks different.
-  const mosaic = [...new Set(city.sets.flatMap((s) => s.places.map((p) => p.category)))].slice(
-    0,
-    3,
-  );
+  const art = CITY_ART[city.region.slug];
   const fraction = city.total ? city.done / city.total : 0;
-
   return (
-    <View
-      style={[styles.card, shadow, { backgroundColor: c.card }]}
+    <AnimatedCard
+      index={index}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${city.region.name}, ${t('collections.places', { done: city.done, total: city.total })}${
+        city.unlocked ? '' : `, ${t('explore.locked')}`
+      }`}
+      style={[styles.box, shadow, { backgroundColor: c.card }]}
+      contentStyle={styles.boxContent}
       testID={`city-card-${city.region.slug}`}
     >
-      <Pressable
-        onPress={onToggle}
-        accessibilityRole="button"
-        accessibilityState={{ expanded: open }}
-        accessibilityLabel={`${city.region.name}, ${t('collections.places', { done: city.done, total: city.total })}`}
-      >
-        <Animated.View style={[styles.cover, { height: coverHeight }]}>
-          <Animated.View style={[styles.mosaic, { transform: [{ scale: zoom }] }]}>
-            {mosaic.map((cat) => (
-              <Image
-                key={cat}
-                source={CATEGORY_META[cat].art}
-                style={styles.mosaicPart}
-                contentFit="cover"
-                accessible={false}
-              />
-            ))}
-          </Animated.View>
-          <LinearGradient
-            colors={['rgba(0,0,0,0.05)', 'rgba(0,0,0,0.65)']}
-            style={StyleSheet.absoluteFill}
-          />
-          {isHere && (
-            <View style={[styles.here, { backgroundColor: c.accent }]}>
-              <Ionicons name="location" size={12} color={c.accentOn} />
-              <Text style={{ color: c.accentOn, fontSize: 12, fontWeight: '800' }}>
-                {t('collections.here')}
-              </Text>
-            </View>
-          )}
-          <View style={styles.coverRow}>
-            <Text style={{ fontSize: 28 }} accessible={false}>
-              {city.region.flag}
-            </Text>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.city}>{city.region.name}</Text>
-              <Text style={styles.cityMeta}>
-                {t('collections.places', { done: city.done, total: city.total })} ·{' '}
-                {t('collections.sets', { count: city.sets.length })}
-              </Text>
-            </View>
-            <Animated.View style={{ transform: [{ rotate: chevron }] }}>
-              <Ionicons name="chevron-down" size={24} color="#fff" />
-            </Animated.View>
-          </View>
-          <View style={styles.cityTrack}>
-            <View style={[styles.cityBar, { width: `${fraction * 100}%` }]} />
-          </View>
-        </Animated.View>
-      </Pressable>
-
-      {shown && (
-        <Animated.View
-          style={{
-            opacity: anim,
-            transform: [
-              { translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [-12, 0] }) },
-            ],
-          }}
-        >
-          {city.sets.map((set) => (
-            <SetRow key={set.id} set={set} />
-          ))}
-        </Animated.View>
+      {art && (
+        <Image
+          source={city.unlocked ? art.found : art.locked}
+          style={StyleSheet.absoluteFill}
+          contentFit="cover"
+          transition={400}
+          accessibilityLabel={t(`landmark.${city.region.slug}` as TranslationKey)}
+        />
       )}
+      <LinearGradient
+        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)']}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+      <View style={styles.boxTop}>
+        {isHere ? (
+          <View style={[styles.badge, { backgroundColor: c.accent }]}>
+            <Ionicons name="location" size={12} color={c.accentOn} />
+            <Text style={[styles.badgeText, { color: c.accentOn }]}>{t('collections.here')}</Text>
+          </View>
+        ) : (
+          <View />
+        )}
+        {!city.unlocked && (
+          <View style={styles.lock} testID={`city-locked-${city.region.slug}`}>
+            <Ionicons name="lock-closed" size={14} color="#fff" />
+          </View>
+        )}
+      </View>
+      <View style={{ gap: 4 }}>
+        <Text style={styles.boxName} numberOfLines={1}>
+          {city.region.flag} {city.region.name}
+        </Text>
+        <Text style={styles.boxMeta}>
+          {t('collections.places', { done: city.done, total: city.total })}
+        </Text>
+        <View style={styles.boxTrack}>
+          <View style={[styles.boxBar, { width: `${fraction * 100}%` }]} />
+        </View>
+      </View>
+    </AnimatedCard>
+  );
+}
+
+const native = Platform.OS !== 'web';
+
+/** The city opened up: its landmark, hidden-gem progress and sets, zooming in from the grid. */
+function CitySheet({ city, onClose }: { city: City | null; onClose: () => void }) {
+  const c = useColors();
+  const anim = useRef(new Animated.Value(0)).current;
+  const [shown, setShown] = useState<City | null>(city);
+
+  useEffect(() => {
+    if (city) {
+      setShown(city);
+      anim.setValue(0);
+      Animated.timing(anim, {
+        toValue: 1,
+        duration: 320,
+        easing: Easing.out(Easing.back(1.1)),
+        useNativeDriver: native,
+      }).start();
+    }
+  }, [city, anim]);
+
+  const close = () =>
+    Animated.timing(anim, { toValue: 0, duration: 180, useNativeDriver: native }).start(() => {
+      setShown(null);
+      onClose();
+    });
+
+  if (!shown) return null;
+  const art = CITY_ART[shown.region.slug];
+  return (
+    <Modal visible transparent animationType="none" onRequestClose={close}>
+      <Animated.View style={[styles.scrim, { opacity: anim }]}>
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={close}
+          accessibilityRole="button"
+          accessibilityLabel={t('collections.close')}
+        />
+        <Animated.View
+          style={[
+            styles.sheet,
+            { backgroundColor: c.bg },
+            {
+              transform: [
+                { scale: anim.interpolate({ inputRange: [0, 1], outputRange: [0.88, 1] }) },
+                { translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [40, 0] }) },
+              ],
+            },
+          ]}
+          testID="city-sheet"
+        >
+          <ScrollView contentContainerStyle={{ paddingBottom: space.xl }}>
+            <View style={styles.hero}>
+              {art && (
+                <Image
+                  source={shown.unlocked ? art.found : art.locked}
+                  style={StyleSheet.absoluteFill}
+                  contentFit="cover"
+                  accessibilityLabel={t(`landmark.${shown.region.slug}` as TranslationKey)}
+                />
+              )}
+              <LinearGradient
+                colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']}
+                style={StyleSheet.absoluteFill}
+              />
+              <Pressable
+                onPress={close}
+                accessibilityRole="button"
+                accessibilityLabel={t('collections.close')}
+                style={[styles.close, { backgroundColor: c.card }]}
+                testID="close-city"
+              >
+                <Ionicons name="close" size={22} color={c.text} />
+              </Pressable>
+              <View style={{ padding: space.lg, gap: 2 }}>
+                <Text style={styles.heroName} accessibilityRole="header">
+                  {shown.region.flag} {shown.region.name}
+                </Text>
+                <Text style={styles.boxMeta}>
+                  {t('collections.places', { done: shown.done, total: shown.total })} ·{' '}
+                  {t('collections.sets', { count: shown.sets.length })}
+                </Text>
+              </View>
+            </View>
+            <View style={[styles.notes, { backgroundColor: c.surface }]}>
+              {!shown.unlocked && (
+                <Row icon="lock-closed" color={c.textMuted}>
+                  {t('collections.locked', { city: shown.region.name })}
+                </Row>
+              )}
+              <Row icon="diamond" color={c.gold}>
+                {shown.gemsLeft === 0
+                  ? t('collections.gemsOpen')
+                  : shown.gemsLeft === 1
+                    ? t('collections.gemsInOne')
+                    : t('collections.gemsIn', { count: shown.gemsLeft })}
+              </Row>
+            </View>
+            {shown.sets.map((set) => (
+              <SetRow key={set.id} set={set} />
+            ))}
+          </ScrollView>
+        </Animated.View>
+      </Animated.View>
+    </Modal>
+  );
+}
+
+function Row({
+  icon,
+  color,
+  children,
+}: {
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  color: string;
+  children: React.ReactNode;
+}) {
+  const c = useColors();
+  return (
+    <View style={styles.row}>
+      <Ionicons name={icon} size={18} color={color} />
+      <Text style={{ color: c.text, flex: 1 }}>{children}</Text>
     </View>
   );
 }
@@ -258,33 +370,16 @@ const styles = StyleSheet.create({
   container: { padding: space.lg, gap: space.md, paddingBottom: space.xxl },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   title: { fontSize: 28, fontWeight: '900' },
-  card: { borderRadius: radius.lg, overflow: 'hidden' },
-  cover: { justifyContent: 'flex-end', overflow: 'hidden' },
-  mosaic: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
+  grid: {
     flexDirection: 'row',
-    gap: 2,
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: space.md,
   },
-  mosaicPart: { flex: 1 },
-  coverRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.sm,
-    paddingHorizontal: space.md,
-    paddingBottom: space.sm,
-  },
-  city: { color: '#fff', fontSize: 22, fontWeight: '900' },
-  cityMeta: { color: '#fff', fontSize: 13, fontWeight: '600' },
-  cityTrack: { height: 4, backgroundColor: 'rgba(255,255,255,0.3)' },
-  cityBar: { height: 4, backgroundColor: '#FFD34D' },
-  here: {
-    position: 'absolute',
-    top: space.sm,
-    left: space.sm,
+  box: { width: '48%', aspectRatio: 0.82, borderRadius: radius.lg },
+  boxContent: { justifyContent: 'space-between', padding: space.md },
+  boxTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  badge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
@@ -292,7 +387,59 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
-  set: { padding: space.md, gap: space.sm, borderTopWidth: StyleSheet.hairlineWidth },
+  badgeText: { fontSize: 11, fontWeight: '800' },
+  lock: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(14,26,36,0.65)',
+  },
+  boxName: { color: '#fff', fontSize: 18, fontWeight: '900' },
+  boxMeta: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  boxTrack: { height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.3)' },
+  boxBar: { height: 4, borderRadius: 2, backgroundColor: '#FFD34D' },
+  scrim: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  sheet: {
+    width: '100%',
+    maxWidth: 600,
+    maxHeight: '92%',
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    overflow: 'hidden',
+  },
+  hero: { height: 240, justifyContent: 'flex-end' },
+  heroName: { color: '#fff', fontSize: 28, fontWeight: '900' },
+  close: {
+    position: 'absolute',
+    top: space.md,
+    right: space.md,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  notes: {
+    margin: space.lg,
+    marginBottom: 0,
+    borderRadius: radius.md,
+    padding: space.md,
+    gap: space.sm,
+  },
+  row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  set: {
+    marginHorizontal: space.lg,
+    paddingVertical: space.md,
+    gap: space.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
   setHead: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   track: { height: 6, borderRadius: 3, overflow: 'hidden' },
   bar: { height: 6 },

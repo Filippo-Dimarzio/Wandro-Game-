@@ -1,4 +1,12 @@
-import { gemToReveal, hiddenGemHint, hintFor, visiblePlaces } from './hidden';
+import {
+  gemCities,
+  gemsLeftToUnlock,
+  gemToReveal,
+  hiddenGemHint,
+  hintFor,
+  visiblePlaces,
+} from './hidden';
+import { DEMO_PLACES } from './seed-places';
 import type { Place } from './types';
 
 const base = {
@@ -41,5 +49,28 @@ describe('hidden gems', () => {
       count: 0,
       hint: null,
     });
+  });
+});
+
+describe('gems open after five discoveries in a city', () => {
+  const evora = DEMO_PLACES.filter((p) => p.region === 'evora');
+  const gems = evora.filter((p) => p.hidden);
+  const five = evora
+    .filter((p) => !p.hidden)
+    .slice(0, 5)
+    .map((p) => p.id);
+
+  it('keeps gems secret until the fifth discovery, then shows them all', () => {
+    const four = new Set(five.slice(0, 4));
+    expect(gems.length).toBeGreaterThanOrEqual(2);
+    expect(gemsLeftToUnlock(DEMO_PLACES, four, 'evora')).toBe(1);
+    expect(visiblePlaces(DEMO_PLACES, new Set(), four).some((p) => p.hidden)).toBe(false);
+    const all = new Set(five);
+    expect(gemsLeftToUnlock(DEMO_PLACES, all, 'evora')).toBe(0);
+    expect(gemCities(DEMO_PLACES, all)).toEqual(new Set(['evora']));
+    const visible = visiblePlaces(DEMO_PLACES, new Set(), all);
+    for (const g of gems) expect(visible).toContainEqual(g);
+    // Other cities' gems stay hidden.
+    expect(visible.some((p) => p.hidden && p.region !== 'evora')).toBe(false);
   });
 });
