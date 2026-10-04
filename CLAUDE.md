@@ -7,7 +7,7 @@ Wandro is a photo-first, location-based exploration game and community app. Pilo
 - Build **one phase at a time** (see `PLAN.md`). At the end of each phase: run tests + lint, summarise changes, list what to test manually, commit with a clear message, then **STOP for review**.
 - Prefer simple, boring solutions. Explain non-obvious decisions in 1–2 sentences.
 - Do not start work outside the current phase. Ask when something is ambiguous.
-- Do not open a PR unless asked.
+- Ship every requested change to `main` (production): run `pnpm lint && pnpm typecheck && pnpm test && pnpm test:db`, merge into `main`, push, and confirm the CI and "Deploy web app" workflows pass so the change is live. Work on a branch first when it helps, but don't leave finished work off `main`. Do not open a PR unless asked.
 
 ## Stack
 
