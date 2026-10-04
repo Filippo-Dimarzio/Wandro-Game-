@@ -62,6 +62,7 @@ export default function Passport() {
                   region={city.region}
                   value={city.done}
                   width={96}
+                  gold={city.gold}
                   tilt={parseFloat(TILT[i % TILT.length])}
                   testID={`passport-city-${city.region.slug}`}
                 />

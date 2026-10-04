@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { isTrailActive, trailEndsAt } from '@wandro/shared';
+import { isBoostActive, isTrailActive, shopItem, TIME_KEY_CODE, trailEndsAt } from '@wandro/shared';
 import { isDemo } from '@/lib/env';
 import { supabase } from '@/lib/supabase';
 import { useSession } from '@/state/session';
@@ -11,7 +11,14 @@ export interface Loadout {
   owned: Set<string>;
   trailActive: boolean;
   trailEndsAt: number;
+  /** One-use boosts you're holding (stamp ink, friend beacon). */
+  held: Set<string>;
+  /** Timed boosts' expiry, by item code. */
+  activeUntil: Record<string, string>;
+  timeKeyActive: boolean;
 }
+
+const isConsumable = (code: string) => !!shopItem(code)?.consumable;
 
 interface ServerInventory {
   equipped_skin: string | null;
@@ -19,7 +26,7 @@ interface ServerInventory {
   items: { item_code: string; expires_at: string | null }[];
 }
 
-/** Equipped octopus cosmetics and whether the incense trail is running (re-checked every 15 s). */
+/** Equipped octopus cosmetics and which boosts are running or held (re-checked every 15 s). */
 export function useLoadout(): Loadout {
   const inventory = useSession((s) => s.inventory);
   const [now, setNow] = useState(Date.now());
@@ -41,19 +48,26 @@ export function useLoadout(): Loadout {
     const inv = server.data;
     const activeUntil: Record<string, string> = {};
     for (const i of inv?.items ?? []) if (i.expires_at) activeUntil[i.item_code] = i.expires_at;
+    const kept = (inv?.items ?? []).filter((i) => !i.expires_at).map((i) => i.item_code);
     return {
       skin: inv?.equipped_skin ?? undefined,
       hat: inv?.equipped_hat ?? undefined,
-      owned: new Set((inv?.items ?? []).filter((i) => !i.expires_at).map((i) => i.item_code)),
+      owned: new Set(kept.filter((c) => !isConsumable(c))),
+      held: new Set(kept.filter(isConsumable)),
+      activeUntil,
       trailActive: isTrailActive(activeUntil, now),
       trailEndsAt: trailEndsAt(activeUntil),
+      timeKeyActive: isBoostActive(activeUntil, TIME_KEY_CODE, now),
     };
   }
   return {
     skin: inventory.equipped.skin,
     hat: inventory.equipped.hat,
-    owned: new Set(Object.keys(inventory.owned)),
+    owned: new Set(Object.keys(inventory.owned).filter((c) => !isConsumable(c))),
+    held: new Set(Object.keys(inventory.owned).filter(isConsumable)),
+    activeUntil: inventory.activeUntil,
     trailActive: isTrailActive(inventory.activeUntil, now),
     trailEndsAt: trailEndsAt(inventory.activeUntil),
+    timeKeyActive: isBoostActive(inventory.activeUntil, TIME_KEY_CODE, now),
   };
 }

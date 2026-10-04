@@ -16,6 +16,8 @@ export interface DemoFriendChallenge {
   note: string | null;
   status: FriendChallengeStatus;
   createdAt: string;
+  /** Lisbon day a friend beacon was lit on it: done that day, you both get BEACON_BONUS. */
+  beaconDate?: string;
 }
 
 export const INITIAL_FRIENDS: Record<string, FriendStatus> = {

@@ -49,7 +49,7 @@ Before reporting a phase done, run `pnpm lint && pnpm typecheck && pnpm test && 
 
 ## Non-negotiable rules
 
-1. **Server decides everything that matters.** Points/coins, XP, levels, badges, unlocks, rarity and inventory are written only by `SECURITY DEFINER` server functions (Postgres RPCs in `supabase/migrations`). Never compute or accept points from the client. Clients have no write access to `visits`, `points_ledger`, `user_badges`, `place_stats`, `user_inventory`, `hidden_reveals`, `friendships`, `friend_challenges` or `player_regions`. Coins are never sold.
+1. **Server decides everything that matters.** Points/coins, XP, levels, badges, unlocks, rarity and inventory are written only by `SECURITY DEFINER` server functions (Postgres RPCs in `supabase/migrations`). Never compute or accept points from the client. Clients have no write access to `visits`, `points_ledger`, `user_badges`, `place_stats`, `user_inventory`, `hidden_reveals`, `friendships`, `friend_challenges`, `player_regions` or `city_stamps`. Coins are never sold.
 2. **One completion per user per place**, enforced by a unique constraint as well as in code.
 3. **Every table has RLS enabled.** New tables ship with policies and RLS tests in the same migration PR.
 4. **Never commit secrets.** Use `.env` (git-ignored); keep `.env.example` current. The Supabase service-role key and Mapbox secret token never go into the app bundle.

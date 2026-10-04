@@ -36,6 +36,8 @@ export interface FriendChallengeView {
   note: string | null;
   status: FriendChallengeStatus;
   createdAt: string;
+  /** Lisbon day a friend beacon was lit on it. */
+  beaconDate?: string;
 }
 
 const EMPTY: FriendsList = { friends: [], incoming: [], outgoing: [] };
@@ -175,6 +177,7 @@ export function useFriendChallenges(): FriendChallengeView[] {
         note: (r.note as string | null) ?? null,
         status: r.status as FriendChallengeStatus,
         createdAt: r.created_at as string,
+        beaconDate: (r.beacon_date as string | null) ?? undefined,
       }));
     },
   });
@@ -197,6 +200,7 @@ export function useFriendChallenges(): FriendChallengeView[] {
               : c.note,
             status: effectiveStatus(c, unlocked),
             createdAt: c.createdAt,
+            beaconDate: c.beaconDate,
           },
         ];
       }),
@@ -257,5 +261,26 @@ export function useRespondFriendChallenge() {
       if (error) throw error;
     },
     onSuccess,
+  });
+}
+
+export function useLightBeacon() {
+  const light = useSession((s) => s.lightBeacon);
+  const qc = useQueryClient();
+  const onSuccess = useInvalidateFriends();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      if (isDemo) {
+        const error = light(id);
+        if (error) throw new Error(error);
+        return;
+      }
+      const { error } = await supabase!.rpc('light_beacon', { p_challenge: id });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['inventory'] });
+      return onSuccess();
+    },
   });
 }

@@ -16,6 +16,11 @@ export interface CheckinOutcome {
   collectionsCompleted?: string[];
   /** Coins from sets (already included in `coins`). */
   setCoins?: number;
+  /** Time-of-day key and friend beacon bonuses (already included in `coins`). */
+  timeQuestBonus?: number;
+  beaconBonus?: number;
+  /** A city stamp this discovery collected. */
+  stamp?: { region: string; gold: boolean };
   reason?: string;
 }
 
@@ -69,6 +74,9 @@ export function useCheckin(location: UserLocation, places: Place[]) {
       qc.invalidateQueries({ queryKey: ['daily-challenge'] });
       qc.invalidateQueries({ queryKey: ['collections'] });
       qc.invalidateQueries({ queryKey: ['shareable'] });
+      qc.invalidateQueries({ queryKey: ['city-stamps'] });
+      qc.invalidateQueries({ queryKey: ['inventory'] });
+      qc.invalidateQueries({ queryKey: ['friend-challenges'] });
     },
     [qc],
   );
@@ -163,7 +171,13 @@ export function useCheckin(location: UserLocation, places: Place[]) {
         streak?: number;
         new_badges?: string[];
         reason?: string;
-        breakdown?: { first_discoverer?: number; sets?: number };
+        breakdown?: {
+          first_discoverer?: number;
+          sets?: number;
+          time_quest?: number;
+          beacon?: number;
+        };
+        stamp?: { region: string; gold: boolean } | null;
       };
       if (r.status === 'pending') {
         setTimeout(
@@ -180,6 +194,9 @@ export function useCheckin(location: UserLocation, places: Place[]) {
         newBadges: r.new_badges ?? [],
         firstDiscovererBonus: r.breakdown?.first_discoverer,
         setCoins: r.breakdown?.sets,
+        timeQuestBonus: r.breakdown?.time_quest,
+        beaconBonus: r.breakdown?.beacon,
+        stamp: r.stamp ?? undefined,
         reason: r.reason,
       });
     };

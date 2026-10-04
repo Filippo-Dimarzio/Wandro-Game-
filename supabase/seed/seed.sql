@@ -346,3 +346,14 @@ from (values
 join public.collections c on c.slug = v.slug
 join public.places p on p.source = 'seed' and p.source_id = v.source_id
 on conflict do nothing;
+
+-- Golden-hour and night quests (TIME_QUESTS in packages/shared; same list as the boosts migration).
+update public.places p set time_quest = v.kind
+from (values
+  ('adraga', 'golden'), ('cruz-alta', 'golden'), ('sintra-national-palace', 'night'),
+  ('lisbon-senhora-do-monte', 'golden'), ('lisbon-fado-alfama', 'night'),
+  ('porto-serra-pilar', 'golden'), ('porto-dom-luis', 'night'),
+  ('evora-alto-sao-bento', 'golden'), ('evora-roman-temple', 'night'),
+  ('aveiro-costa-nova', 'golden'), ('aveiro-canal-piramides', 'night')
+) as v(source_id, kind)
+where p.source = 'seed' and p.source_id = v.source_id;

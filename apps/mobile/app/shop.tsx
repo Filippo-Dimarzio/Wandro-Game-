@@ -103,11 +103,19 @@ export default function Shop() {
                 (item.kind === 'hat' && loadout.hat === item.code);
               const affordable = wallet.coins >= item.price;
               let action: React.ReactNode;
-              if (item.kind === 'boost') {
+              const running = item.durationMinutes
+                ? item.code.startsWith('incense')
+                  ? loadout.trailActive
+                  : Date.parse(loadout.activeUntil[item.code] ?? '') > Date.now()
+                : false;
+              const held = !!item.consumable && loadout.held.has(item.code);
+              if (held) {
+                action = <Badge text={t('shop.ready')} testID={`held-${item.code}`} />;
+              } else if (item.kind === 'boost') {
                 action = (
                   <Action
                     label={
-                      loadout.trailActive
+                      running
                         ? t('shop.extend', { price: item.price })
                         : t('shop.buy', { price: item.price })
                     }
@@ -153,7 +161,23 @@ export default function Shop() {
                   swatch={item.color}
                   name={item.name}
                   description={item.description}
-                  badge={equipped ? t('shop.equipped') : owned ? t('shop.owned') : undefined}
+                  badge={
+                    equipped
+                      ? t('shop.equipped')
+                      : owned
+                        ? t('shop.owned')
+                        : running && !item.code.startsWith('incense')
+                          ? t('shop.running', {
+                              hours: Math.max(
+                                1,
+                                Math.ceil(
+                                  (Date.parse(loadout.activeUntil[item.code]) - Date.now()) /
+                                    3_600_000,
+                                ),
+                              ),
+                            })
+                          : undefined
+                  }
                   action={action}
                 />
               );
@@ -242,9 +266,13 @@ function Action({
   );
 }
 
-function Badge({ text }: { text: string }) {
+function Badge({ text, testID }: { text: string; testID?: string }) {
   const c = useColors();
-  return <Text style={{ color: c.accent, fontWeight: '800' }}>{text}</Text>;
+  return (
+    <Text style={{ color: c.accent, fontWeight: '800' }} testID={testID}>
+      {text}
+    </Text>
+  );
 }
 
 const styles = StyleSheet.create({

@@ -1,18 +1,30 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { Category, LatLng, Place } from '@wandro/shared';
+import {
+  DEMO_PLACES,
+  FRIEND_BEACON_CODE,
+  isBoostActive,
+  regionFor,
+  STAMP_INK_CODE,
+  TIME_KEY_CODE,
+  type Category,
+  type LatLng,
+  type Place,
+} from '@wandro/shared';
 import {
   applyDailyChallenge,
   applyPurchase,
   applyVisit,
   EMPTY_PROGRESS,
+  lisbonDate,
   type DemoProgress,
   type DemoUnlock,
   type LedgerEntry,
   type VisitResult,
 } from '@/demo/engine';
 import {
+  effectiveStatus,
   INITIAL_FRIENDS,
   initialFriendChallenges,
   type DemoFriendChallenge,
@@ -84,6 +96,8 @@ interface SessionState extends DemoProgress {
   reports: DemoReport[];
   submissions: DemoSubmission[];
   inventory: Inventory;
+  /** City stamps collected in demo mode (the server keeps these in city_stamps). */
+  stamps: Record<string, { at: string; gold: boolean }>;
   /** Hidden gems this player has walked within range of (demo). */
   revealed: Record<string, string>;
   /** Gem that was just revealed, for the "you found a hidden gem" banner. */
@@ -130,6 +144,8 @@ interface SessionState extends DemoProgress {
   removeFriend: (userId: string) => void;
   challengeFriend: (friendId: string, placeId: string, note: string | null) => string;
   respondFriendChallenge: (id: string, accept: boolean) => void;
+  /** Same checks as light_beacon(); returns an error code, or null once lit. */
+  lightBeacon: (id: string) => 'no_beacon' | 'challenge_not_found' | null;
   setDemoModerator: (on: boolean) => void;
   dismissInstallPrompt: () => void;
   setPref: (key: 'dailyReminder', value: boolean) => void;
@@ -150,6 +166,7 @@ const initial = {
   reports: [],
   submissions: [],
   inventory: { owned: {}, activeUntil: {}, equipped: {} },
+  stamps: {},
   revealed: {},
   justRevealed: null,
   browse: null,
@@ -187,10 +204,47 @@ export const useSession = create<SessionState>()(
       updateProfile: (patch) =>
         set((s) => ({ profile: s.profile ? { ...s.profile, ...patch } : s.profile })),
       recordVisit: (place, places) => {
-        const r = applyVisit(progressOf(get()), place, places, new Date());
+        const s = get();
+        const now = new Date();
+        const today = lisbonDate(now);
+        const beacons = s.friendChallenges
+          .filter(
+            (c) =>
+              c.direction === 'incoming' &&
+              c.placeId === place.id &&
+              c.beaconDate === today &&
+              effectiveStatus(c, s.unlocked) !== 'completed' &&
+              c.status !== 'declined',
+          )
+          .map((c) => c.id);
+        const r = applyVisit(progressOf(s), place, places, now, {
+          timeKey: isBoostActive(s.inventory.activeUntil, TIME_KEY_CODE, now.getTime()),
+          beacons,
+        });
         if (!r) return null;
-        set({ ...r.progress, justUnlocked: place.id });
-        return r.result;
+
+        // First discovery in a city collects its stamp, in gold if you hold stamp ink.
+        const regionOf = (p: Place | undefined) => p && (p.region ?? regionFor(p)?.slug);
+        const region = regionOf(place);
+        const known = [...places, ...DEMO_PLACES];
+        const collected =
+          !region ||
+          !!s.stamps[region] ||
+          Object.keys(s.unlocked).some((id) => regionOf(known.find((p) => p.id === id)) === region);
+        if (collected) {
+          set({ ...r.progress, justUnlocked: place.id });
+          return r.result;
+        }
+        const gold = !!s.inventory.owned[STAMP_INK_CODE];
+        const owned = { ...s.inventory.owned };
+        delete owned[STAMP_INK_CODE];
+        set({
+          ...r.progress,
+          justUnlocked: place.id,
+          stamps: { ...s.stamps, [region]: { at: now.toISOString(), gold } },
+          inventory: { ...s.inventory, owned },
+        });
+        return { ...r.result, stamp: { region, gold } };
       },
       completeChallenge: (qualifying, challengeId, places) => {
         const r = applyDailyChallenge(
@@ -306,6 +360,27 @@ export const useSession = create<SessionState>()(
               : c,
           ),
         })),
+      lightBeacon: (id) => {
+        const s = get();
+        const c = s.friendChallenges.find((x) => x.id === id);
+        const open =
+          c &&
+          !c.beaconDate &&
+          (c.status === 'pending' || c.status === 'accepted') &&
+          effectiveStatus(c, s.unlocked) !== 'completed';
+        if (!open) return 'challenge_not_found';
+        if (!s.inventory.owned[FRIEND_BEACON_CODE]) return 'no_beacon';
+        const owned = { ...s.inventory.owned };
+        delete owned[FRIEND_BEACON_CODE];
+        const today = lisbonDate(new Date());
+        set({
+          inventory: { ...s.inventory, owned },
+          friendChallenges: s.friendChallenges.map((x) =>
+            x.id === id ? { ...x, beaconDate: today } : x,
+          ),
+        });
+        return null;
+      },
       report: (r) =>
         set((s) => ({ reports: [...s.reports, { ...r, at: new Date().toISOString() }] })),
       addSubmission: (sub) => set((s) => ({ submissions: [sub, ...s.submissions] })),

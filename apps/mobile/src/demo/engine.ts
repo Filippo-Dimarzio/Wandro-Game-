@@ -1,6 +1,7 @@
 // On-device game engine for demo mode. It mirrors the server rules in supabase/migrations so the
 // demo plays exactly like the real game; with a backend none of this runs.
 import {
+  BEACON_BONUS,
   DAILY_CHALLENGE_BONUS,
   DEMO_PLACES,
   FIRST_DISCOVERER_BONUS,
@@ -10,13 +11,24 @@ import {
   nextStreak,
   pointsForVisit,
   streakXp,
+  TIME_QUEST_BONUS,
+  timeQuestFor,
+  timeQuestOpen,
   type Category,
   type Place,
 } from '@wandro/shared';
 import { DEMO_COLLECTIONS } from './collections';
 
 export type LedgerKind =
-  'visit' | 'first_discoverer' | 'daily_challenge' | 'streak' | 'badge' | 'collection' | 'purchase';
+  | 'visit'
+  | 'first_discoverer'
+  | 'daily_challenge'
+  | 'streak'
+  | 'badge'
+  | 'collection'
+  | 'purchase'
+  | 'time_quest'
+  | 'friend_beacon';
 
 export interface LedgerEntry {
   kind: LedgerKind;
@@ -64,6 +76,19 @@ export interface VisitResult {
   collectionsCompleted: string[];
   /** Coins from sets: 20 per place in a set, 50 per set finished (already in `coins`). */
   setCoins: number;
+  /** Time-of-day key bonus (already in `coins`). */
+  timeQuestBonus: number;
+  /** Friend beacon bonus for finishing a beaconed challenge today (already in `coins`). */
+  beaconBonus: number;
+  /** Set when this visit collected a new city stamp. */
+  stamp?: { region: string; gold: boolean };
+}
+
+/** Boosts that change a visit's reward, like award_visit() reads them on the server. */
+export interface VisitBoosts {
+  timeKey?: boolean;
+  /** Beaconed friend challenges this visit completes today. */
+  beacons?: string[];
 }
 
 /** Calendar day in Lisbon (YYYY-MM-DD), matching the server's lisbon_today(). */
@@ -149,6 +174,7 @@ export function applyVisit(
   place: Place,
   places: Place[],
   now: Date,
+  boosts: VisitBoosts = {},
 ): { progress: DemoProgress; result: VisitResult } | null {
   if (p.unlocked[place.id]) return null;
   const at = now.toISOString();
@@ -168,6 +194,21 @@ export function applyVisit(
       ref: place.id,
     });
   }
+  const quest = timeQuestFor(place.id);
+  const timeQuestBonus =
+    quest && boosts.timeKey && timeQuestOpen(quest, now) ? TIME_QUEST_BONUS : 0;
+  if (timeQuestBonus)
+    ledger.push({
+      kind: 'time_quest',
+      coins: timeQuestBonus,
+      xp: timeQuestBonus,
+      at,
+      ref: place.id,
+    });
+  const beacons = boosts.beacons ?? [];
+  for (const id of beacons)
+    ledger.push({ kind: 'friend_beacon', coins: BEACON_BONUS, xp: BEACON_BONUS, at, ref: id });
+  const beaconBonus = beacons.length * BEACON_BONUS;
   const today = lisbonDate(now);
   const streak = nextStreak(p.lastActiveDate, today, p.streak);
   if (p.lastActiveDate !== today)
@@ -209,8 +250,10 @@ export function applyVisit(
   return {
     progress,
     result: {
-      coins: pts.total + setCoins,
+      coins: pts.total + setCoins + timeQuestBonus + beaconBonus,
       setCoins,
+      timeQuestBonus,
+      beaconBonus,
       firstDiscovererBonus: pts.firstDiscovererBonus,
       multiplier: pts.multiplier,
       streak,

@@ -15,3 +15,4 @@ export * from './hidden';
 export * from './place-photos';
 export * from './sets';
 export * from './photo';
+export * from './boosts';

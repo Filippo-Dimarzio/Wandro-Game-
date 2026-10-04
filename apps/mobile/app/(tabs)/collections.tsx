@@ -130,6 +130,7 @@ function CityBox({
             region={city.region}
             width={44}
             tilt={6}
+            gold={city.gold}
             testID={`city-stamp-${city.region.slug}`}
           />
         ) : (
@@ -244,10 +245,13 @@ function CitySheet({ city, onClose }: { city: City | null; onClose: () => void }
                   value={shown.done}
                   width={104}
                   tilt={-4}
+                  gold={shown.gold}
                   animate
                   testID="city-sheet-stamp"
                 />
-                <Text style={[styles.stampNote, { color: c.text }]}>{t('stamp.collected')}</Text>
+                <Text style={[styles.stampNote, { color: c.text }]}>
+                  {t(shown.gold ? 'stamp.collectedGold' : 'stamp.collected')}
+                </Text>
               </View>
             )}
             <View style={[styles.notes, { backgroundColor: c.surface }]}>

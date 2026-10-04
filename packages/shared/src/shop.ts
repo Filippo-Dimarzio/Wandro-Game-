@@ -7,8 +7,10 @@ export interface ShopItem {
   description: string;
   kind: ShopItemKind;
   price: number;
-  /** Boosts are timed; buying again extends the timer. */
+  /** Timed boosts; buying again extends the timer. */
   durationMinutes?: number;
+  /** One-use boosts: held until used up, one at a time. */
+  consumable?: boolean;
   /** Skin colour for the octopus. */
   color?: string;
   emoji: string;
@@ -105,9 +107,39 @@ export const SHOP_ITEMS: ShopItem[] = [
     price: 1500,
     emoji: '👑',
   },
+  {
+    code: 'time_key',
+    name: 'Time-of-day key · 24 h',
+    description:
+      'Opens golden-hour and night quests: discover those places in their window for +40 coins.',
+    kind: 'boost',
+    price: 200,
+    durationMinutes: 1440,
+    emoji: '🗝️',
+  },
+  {
+    code: 'stamp_ink',
+    name: 'Gold stamp ink',
+    description: 'The next new city you collect gets a rare gold postmark on its stamp.',
+    kind: 'boost',
+    price: 250,
+    consumable: true,
+    emoji: '🖋️',
+  },
+  {
+    code: 'friend_beacon',
+    name: 'Friend beacon',
+    description: 'Light it on a friend challenge: if it’s done today, you both get +50 coins.',
+    kind: 'boost',
+    price: 150,
+    consumable: true,
+    emoji: '🔥',
+  },
 ];
 
-export const TRAIL_ITEM_CODES = SHOP_ITEMS.filter((i) => i.kind === 'boost').map((i) => i.code);
+export const TRAIL_ITEM_CODES = SHOP_ITEMS.filter((i) => i.code.startsWith('incense')).map(
+  (i) => i.code,
+);
 
 export function shopItem(code: string | undefined): ShopItem | undefined {
   return SHOP_ITEMS.find((i) => i.code === code);
@@ -115,6 +147,15 @@ export function shopItem(code: string | undefined): ShopItem | undefined {
 
 export function skinColor(code: string | undefined): string {
   return shopItem(code)?.color ?? DEFAULT_SKIN_COLOR;
+}
+
+/** True while a timed boost bought with `code` is still running. */
+export function isBoostActive(
+  activeUntil: Record<string, string>,
+  code: string,
+  now = Date.now(),
+): boolean {
+  return Date.parse(activeUntil[code] ?? '') > now;
 }
 
 /** True if any trail boost is still running at `now`. */

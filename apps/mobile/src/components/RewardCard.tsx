@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
-import { BADGES } from '@wandro/shared';
+import { BADGES, regionBySlug } from '@wandro/shared';
 import type { CheckinOutcome } from '@/data/checkin';
 import { CoinIcon } from '@/components/CoinIcon';
 import { t, type TranslationKey } from '@/i18n';
@@ -110,6 +110,24 @@ export function RewardCard({ placeName, outcome, onDone, onShare }: Props) {
       {!!outcome.setCoins && (
         <Text style={{ color: c.accentOn, fontWeight: '700' }} testID="reward-sets">
           🧩 {t('reward.sets', { coins: outcome.setCoins })}
+        </Text>
+      )}
+      {!!outcome.timeQuestBonus && (
+        <Text style={{ color: c.accentOn, fontWeight: '700' }} testID="reward-time-quest">
+          🗝️ {t('reward.timeQuest', { coins: outcome.timeQuestBonus })}
+        </Text>
+      )}
+      {!!outcome.beaconBonus && (
+        <Text style={{ color: c.accentOn, fontWeight: '700' }} testID="reward-beacon">
+          🔥 {t('reward.beacon', { coins: outcome.beaconBonus })}
+        </Text>
+      )}
+      {outcome.stamp && (
+        <Text style={{ color: c.accentOn, fontWeight: '800' }} testID="reward-stamp">
+          {outcome.stamp.gold ? '✨ ' : '📮 '}
+          {t(outcome.stamp.gold ? 'reward.goldStamp' : 'reward.stamp', {
+            city: regionBySlug(outcome.stamp.region)?.name ?? outcome.stamp.region,
+          })}
         </Text>
       )}
       {(outcome.collectionsCompleted?.length ?? 0) > 0 && (

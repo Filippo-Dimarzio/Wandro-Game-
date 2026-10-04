@@ -3,8 +3,15 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { BEACON_BONUS, FRIEND_BEACON_CODE } from '@wandro/shared';
 import { CATEGORY_META } from '@/categories';
-import { useRespondFriendChallenge, type FriendChallengeView } from '@/data/friends';
+import {
+  useLightBeacon,
+  useRespondFriendChallenge,
+  type FriendChallengeView,
+} from '@/data/friends';
+import { useLoadout } from '@/data/loadout';
+import { lisbonDate } from '@/demo/engine';
 import { useReport } from '@/data/social';
 import { t } from '@/i18n';
 import { radius, shadow, space, useColors } from '@/theme';
@@ -20,6 +27,10 @@ export function FriendChallengeCard({
 }) {
   const c = useColors();
   const respond = useRespondFriendChallenge();
+  const lightBeacon = useLightBeacon();
+  const { held } = useLoadout();
+  const open = x.status === 'pending' || x.status === 'accepted';
+  const litToday = open && x.beaconDate === lisbonDate(new Date());
   const report = useReport();
   const [reported, setReported] = useState(false);
   const incoming = x.direction === 'incoming';
@@ -97,6 +108,30 @@ export function FriendChallengeCard({
           <Text style={{ color: c.accent, fontWeight: '800' }}>{t('friends.showOnMap')}</Text>
         </Pressable>
       )}
+      {litToday && (
+        <Text
+          style={[styles.beacon, { color: c.gold, backgroundColor: c.goldSoft }]}
+          testID={`beacon-lit-${x.id}`}
+        >
+          🔥 {t('beacon.lit', { coins: BEACON_BONUS })}
+        </Text>
+      )}
+      {open && !x.beaconDate && held.has(FRIEND_BEACON_CODE) && (
+        <Pressable
+          onPress={() => lightBeacon.mutate(x.id)}
+          disabled={lightBeacon.isPending}
+          accessibilityRole="button"
+          style={[
+            styles.button,
+            { backgroundColor: c.goldSoft, borderColor: c.gold, borderWidth: 1 },
+          ]}
+          testID={`light-beacon-${x.id}`}
+        >
+          <Text style={{ color: c.gold, fontWeight: '800' }}>
+            🔥 {t('beacon.light', { coins: BEACON_BONUS })}
+          </Text>
+        </Pressable>
+      )}
       {incoming && x.note && !reported && (
         <Pressable
           onPress={() => {
@@ -150,4 +185,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.md,
   },
   flag: { position: 'absolute', top: space.sm, right: space.sm },
+  beacon: {
+    borderRadius: radius.md,
+    paddingHorizontal: space.md,
+    paddingVertical: space.sm,
+    fontWeight: '800',
+  },
 });

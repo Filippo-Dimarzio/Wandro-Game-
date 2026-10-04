@@ -12,7 +12,10 @@ export function useBuyItem() {
       const item = shopItem(code);
       if (!item) throw new Error('item_not_found');
       if (isDemo) {
-        if (item.kind !== 'boost' && useSession.getState().inventory.owned[code])
+        if (
+          (item.kind !== 'boost' || item.consumable) &&
+          useSession.getState().inventory.owned[code]
+        )
           throw new Error('already_owned');
         if (!buy(code, item.price, item.durationMinutes)) throw new Error('insufficient_coins');
         return;

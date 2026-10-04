@@ -6,6 +6,16 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Three new boosts in the Store, all rewarded by the server:
+  - **Time-of-day key** (24 h, 200 coins): golden-hour and night quests at 11 places across
+    the five cities pay +40 coins when you discover them in their window; the place sheet shows
+    the window and whether your key is ready.
+  - **Gold stamp ink** (one use, 250 coins): the next new city you collect gets a gold postmark
+    and frame on its stamp.
+  - **Friend beacon** (one use, 150 coins): light it on a friend challenge; if it's finished the
+    same day, you both get +50 coins.
+- City stamps are now stored on the server (`city_stamps`) and included in the data export.
+
 - City stamps: a perforated postage stamp with the city's landmark and a Wandro postmark for
   every city you've collected, on its Collections box, in the city sheet and on a "City stamps"
   page in your passport (empty dashed slots for cities still to collect).

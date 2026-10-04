@@ -8,6 +8,8 @@ import { t } from '@/i18n';
 
 const PAPER = '#FBF7EE';
 const INK = '#1F2A44';
+/** Gold stamp ink (shop): a metallic postmark and frame. */
+const GOLD_INK = '#A8740A';
 const RATIO = 1.22;
 
 /**
@@ -52,10 +54,13 @@ export function PostageStamp({
   width = 120,
   tilt = 0,
   animate = false,
+  gold = false,
   testID,
 }: {
   region: Region;
   value?: number;
+  /** Collected with gold stamp ink. */
+  gold?: boolean;
   width?: number;
   tilt?: number;
   /** Lands with a "thunk", as if just stamped. */
@@ -84,7 +89,7 @@ export function PostageStamp({
     <Animated.View
       accessible
       accessibilityRole="image"
-      accessibilityLabel={t('stamp.label', { city: region.name })}
+      accessibilityLabel={t(gold ? 'stamp.goldLabel' : 'stamp.label', { city: region.name })}
       testID={testID}
       style={[
         styles.shadow,
@@ -100,7 +105,13 @@ export function PostageStamp({
     >
       <View style={[StyleSheet.absoluteFill, { backgroundColor: PAPER }]} />
       <Teeth width={width} height={height} r={r} />
-      <View style={[styles.face, { margin: pad }]}>
+      <View
+        style={[
+          styles.face,
+          { margin: pad },
+          gold && { borderWidth: Math.max(1.5, width * 0.02), borderColor: GOLD_INK, padding: 2 },
+        ]}
+      >
         <View style={styles.art}>
           {art && (
             <Image
@@ -125,36 +136,62 @@ export function PostageStamp({
           </View>
         )}
       </View>
-      <Postmark size={width * 0.52} name={region.name} small={small} />
+      <Postmark size={width * 0.52} name={region.name} small={small} ink={gold ? GOLD_INK : INK} />
     </Animated.View>
   );
 }
 
 /** Round cancellation ink over the stamp's top corner, with wavy-ish bars beside it. */
-function Postmark({ size, name, small }: { size: number; name: string; small: boolean }) {
+function Postmark({
+  size,
+  name,
+  small,
+  ink,
+}: {
+  size: number;
+  name: string;
+  small: boolean;
+  ink: string;
+}) {
+  const gold = ink === GOLD_INK;
   return (
     <View
       pointerEvents="none"
-      style={[styles.postmarkWrap, { top: size * 0.05, right: -size * 0.28 }]}
+      style={[
+        styles.postmarkWrap,
+        { top: size * 0.05, right: -size * 0.28, opacity: gold ? 0.9 : 0.6 },
+      ]}
+      testID={gold ? 'gold-postmark' : undefined}
     >
       <View style={styles.bars}>
         {[0, 1, 2].map((i) => (
-          <View key={i} style={[styles.bar, { width: size * 0.55 }]} />
+          <View key={i} style={[styles.bar, { width: size * 0.55, backgroundColor: ink }]} />
         ))}
       </View>
       <View
         style={[
           styles.postmark,
-          { width: size, height: size, borderRadius: size / 2, borderWidth: small ? 1 : 1.5 },
+          {
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            borderWidth: small ? 1 : gold ? 2 : 1.5,
+            borderColor: ink,
+          },
         ]}
       >
         {!small && (
           <>
-            <Text style={[styles.postmarkText, { fontSize: size * 0.13 }]} numberOfLines={1}>
+            <Text
+              style={[styles.postmarkText, { fontSize: size * 0.13, color: ink }]}
+              numberOfLines={1}
+            >
               {name.toUpperCase()}
             </Text>
-            <View style={[styles.postmarkRule, { width: size * 0.7 }]} />
-            <Text style={[styles.postmarkText, { fontSize: size * 0.11 }]}>WANDRO</Text>
+            <View style={[styles.postmarkRule, { width: size * 0.7, backgroundColor: ink }]} />
+            <Text style={[styles.postmarkText, { fontSize: size * 0.11, color: ink }]}>
+              {gold ? '★ WANDRO ★' : 'WANDRO'}
+            </Text>
           </>
         )}
       </View>

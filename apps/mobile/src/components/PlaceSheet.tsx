@@ -16,6 +16,7 @@ import { isDemo } from '@/lib/env';
 import { scheduleLines } from '@/lib/hours';
 import { radius, space, useColors } from '@/theme';
 import { CategoryPill, HoursChip } from './PlaceBits';
+import { TimeQuestBadge } from './TimeQuestBadge';
 
 export { categoryIcon } from '@/categories';
 
@@ -127,6 +128,7 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
           </View>
         )}
       </View>
+      {!unlocked && <TimeQuestBadge place={place} />}
 
       {expanded && (
         <>
