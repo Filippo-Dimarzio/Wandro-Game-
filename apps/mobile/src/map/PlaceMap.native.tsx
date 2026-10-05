@@ -3,7 +3,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import { OctopusAvatar } from '@/components/OctopusAvatar';
 import { env } from '@/lib/env';
 import { CATEGORIES } from '@wandro/shared';
-import { lightColors } from '@/theme';
+import { lightColors, useIsDark } from '@/theme';
+import { ADVENTURE } from './adventure';
 import { FallbackMap } from './FallbackMap';
 import { MARKERS, markerName } from './markers';
 import type { PlaceMapProps } from './types';
@@ -62,6 +63,7 @@ function MapboxPlaceMap({
   } = mb;
   const camera = useRef<import('@rnmapbox/maps').Camera>(null);
   const fog = useFog(places, unlockedIds);
+  const chart = useIsDark() ? ADVENTURE.dark : ADVENTURE.light;
   const accuracy = useMemo(
     () => accuracyGeoJson(userPosition, accuracyM),
     [userPosition, accuracyM],
@@ -121,7 +123,7 @@ function MapboxPlaceMap({
         }}
       />
       <ShapeSource id="fog" shape={fog}>
-        <FillLayer id="fog-fill" style={{ fillColor: lightColors.fogFill, fillOpacity: 0.78 }} />
+        <FillLayer id="fog-fill" style={{ fillColor: chart.fog, fillOpacity: 0.8 }} />
       </ShapeSource>
       <Images images={MARKER_IMAGES} />
       <ShapeSource

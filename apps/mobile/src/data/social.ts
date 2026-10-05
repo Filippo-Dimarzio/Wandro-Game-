@@ -3,6 +3,7 @@ import { DEMO_PLACES, MOMENT_VISIBLE_HOURS, type Category } from '@wandro/shared
 import { DEMO_FEED, DEMO_USERS, demoUser } from '@/demo/social';
 import { walletOf } from '@/demo/engine';
 import { isDemo } from '@/lib/env';
+import { keepPhoto } from '@/lib/photo';
 import { supabase } from '@/lib/supabase';
 import { useSession } from '@/state/session';
 
@@ -506,7 +507,7 @@ export function useCreatePost() {
           id: `post-${Date.now()}`,
           placeId,
           caption,
-          photoUri,
+          photoUri: photoUri ? await keepPhoto(photoUri) : undefined,
           at: new Date().toISOString(),
         });
         return;

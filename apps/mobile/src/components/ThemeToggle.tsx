@@ -18,11 +18,11 @@ export function ThemeToggle() {
       accessibilityRole="switch"
       accessibilityLabel={t('theme.dark')}
       accessibilityState={{ checked: dark }}
-      hitSlop={6}
+      hitSlop={{ top: 6, bottom: 6, left: 14, right: 0 }}
       style={[styles.tab, { backgroundColor: c.card, borderColor: c.border, shadowColor: '#000' }]}
       testID="theme-toggle"
     >
-      <Ionicons name={dark ? 'sunny' : 'moon'} size={20} color={dark ? '#F6C350' : c.text} />
+      <Ionicons name={dark ? 'sunny' : 'moon'} size={17} color={dark ? '#F6C350' : c.text} />
     </Pressable>
   );
 }
@@ -32,15 +32,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: '42%',
-    width: 44,
-    height: 48,
-    borderTopLeftRadius: 24,
-    borderBottomLeftRadius: 24,
+    width: 30,
+    height: 44,
+    borderTopLeftRadius: 22,
+    borderBottomLeftRadius: 22,
     borderWidth: StyleSheet.hairlineWidth,
     borderRightWidth: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingLeft: 4,
+    paddingLeft: 2,
     shadowOpacity: 0.15,
     shadowRadius: 6,
     shadowOffset: { width: -1, height: 2 },

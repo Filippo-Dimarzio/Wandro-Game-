@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" width="500" height="560">
+  <!-- Aveiro: moliceiro boats on the canal before striped houses. Vintage engraved stamp style. Ink: teal. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6CDA6"/>
+      <stop offset="0.65" stop-color="#F8E7CB"/>
+      <stop offset="1" stop-color="#F4E7CC"/>
+    </linearGradient>
+    <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#155E63" stroke-width="1.1" opacity="0.45"/>
+    </pattern>
+  </defs>
+  <rect width="500" height="560" fill="url(#sky)"/>
+  <g transform="translate(250 300)" fill="#E8964A" opacity="0.22">
+    <path d="M0 0L-26 -310L26 -310Z"/><path d="M0 0L-26 -310L26 -310Z" transform="rotate(20)"/>
+    <path d="M0 0L-26 -310L26 -310Z" transform="rotate(40)"/><path d="M0 0L-26 -310L26 -310Z" transform="rotate(60)"/>
+    <path d="M0 0L-26 -310L26 -310Z" transform="rotate(-20)"/><path d="M0 0L-26 -310L26 -310Z" transform="rotate(-40)"/>
+    <path d="M0 0L-26 -310L26 -310Z" transform="rotate(-60)"/>
+  </g>
+  <g fill="none" stroke="#155E63" stroke-width="2" stroke-linecap="round">
+    <path d="M90 90q8-8 16 0q8-8 16 0"/><path d="M380 110q8-8 16 0q8-8 16 0"/><path d="M340 70q6-6 12 0q6-6 12 0"/>
+  </g>
+  <!-- houses -->
+  <g stroke="#155E63" stroke-width="1.6" stroke-linejoin="round">
+    <g>
+      <rect x="24" y="200" width="60" height="100" fill="#FBF6EA"/>
+      <rect x="24" y="200" width="5" height="100" fill="#C8463B"/><rect x="34" y="200" width="5" height="100" fill="#C8463B"/><rect x="44" y="200" width="5" height="100" fill="#C8463B"/><rect x="54" y="200" width="5" height="100" fill="#C8463B"/><rect x="64" y="200" width="5" height="100" fill="#C8463B"/><rect x="74" y="200" width="5" height="100" fill="#C8463B"/>
+      <path d="M20 200L54.0 174L88 200Z" fill="#B5543C"/>
+      <rect x="46.0" y="222" width="16" height="20" fill="#FBF6EA"/>
+      <rect x="48.0" y="224" width="12" height="16" fill="#155E63"/>
+      <rect x="45.0" y="276" width="18" height="24" fill="#155E63"/>
+    </g>
+    <g>
+      <rect x="88" y="186" width="56" height="114" fill="#FBF6EA"/>
+      <rect x="88" y="186" width="5" height="114" fill="#2F6FA8"/><rect x="98" y="186" width="5" height="114" fill="#2F6FA8"/><rect x="108" y="186" width="5" height="114" fill="#2F6FA8"/><rect x="118" y="186" width="5" height="114" fill="#2F6FA8"/><rect x="128" y="186" width="5" height="114" fill="#2F6FA8"/><rect x="138" y="186" width="5" height="114" fill="#2F6FA8"/>
+      <path d="M84 186L116.0 160L148 186Z" fill="#B5543C"/>
+      <rect x="108.0" y="208" width="16" height="20" fill="#FBF6EA"/>
+      <rect x="110.0" y="210" width="12" height="16" fill="#155E63"/>
+      <rect x="107.0" y="276" width="18" height="24" fill="#155E63"/>
+    </g>
+    <g>
+      <rect x="148" y="206" width="64" height="94" fill="#FBF6EA"/>
+      <rect x="148" y="206" width="5" height="94" fill="#E0A422"/><rect x="158" y="206" width="5" height="94" fill="#E0A422"/><rect x="168" y="206" width="5" height="94" fill="#E0A422"/><rect x="178" y="206" width="5" height="94" fill="#E0A422"/><rect x="188" y="206" width="5" height="94" fill="#E0A422"/><rect x="198" y="206" width="5" height="94" fill="#E0A422"/><rect x="208" y="206" width="5" height="94" fill="#E0A422"/>
+      <path d="M144 206L180.0 180L216 206Z" fill="#B5543C"/>
+      <rect x="172.0" y="228" width="16" height="20" fill="#FBF6EA"/>
+      <rect x="174.0" y="230" width="12" height="16" fill="#155E63"/>
+      <rect x="171.0" y="276" width="18" height="24" fill="#155E63"/>
+    </g>
+    <g>
+      <rect x="216" y="192" width="58" height="108" fill="#FBF6EA"/>
+      <rect x="216" y="192" width="5" height="108" fill="#2E8B57"/><rect x="226" y="192" width="5" height="108" fill="#2E8B57"/><rect x="236" y="192" width="5" height="108" fill="#2E8B57"/><rect x="246" y="192" width="5" height="108" fill="#2E8B57"/><rect x="256" y="192" width="5" height="108" fill="#2E8B57"/><rect x="266" y="192" width="5" height="108" fill="#2E8B57"/>
+      <path d="M212 192L245.0 166L278 192Z" fill="#B5543C"/>
+      <rect x="237.0" y="214" width="16" height="20" fill="#FBF6EA"/>
+      <rect x="239.0" y="216" width="12" height="16" fill="#155E63"/>
+      <rect x="236.0" y="276" width="18" height="24" fill="#155E63"/>
+    </g>
+    <g>
+      <rect x="278" y="198" width="62" height="102" fill="#FBF6EA"/>
+      <rect x="278" y="198" width="5" height="102" fill="#C8463B"/><rect x="288" y="198" width="5" height="102" fill="#C8463B"/><rect x="298" y="198" width="5" height="102" fill="#C8463B"/><rect x="308" y="198" width="5" height="102" fill="#C8463B"/><rect x="318" y="198" width="5" height="102" fill="#C8463B"/><rect x="328" y="198" width="5" height="102" fill="#C8463B"/><rect x="338" y="198" width="5" height="102" fill="#C8463B"/>
+      <path d="M274 198L309.0 172L344 198Z" fill="#B5543C"/>
+      <rect x="301.0" y="220" width="16" height="20" fill="#FBF6EA"/>
+      <rect x="303.0" y="222" width="12" height="16" fill="#155E63"/>
+      <rect x="300.0" y="276" width="18" height="24" fill="#155E63"/>
+    </g>
+    <g>
+      <rect x="344" y="188" width="54" height="112" fill="#FBF6EA"/>
+      <rect x="344" y="188" width="5" height="112" fill="#2F6FA8"/><rect x="354" y="188" width="5" height="112" fill="#2F6FA8"/><rect x="364" y="188" width="5" height="112" fill="#2F6FA8"/><rect x="374" y="188" width="5" height="112" fill="#2F6FA8"/><rect x="384" y="188" width="5" height="112" fill="#2F6FA8"/><rect x="394" y="188" width="5" height="112" fill="#2F6FA8"/>
+      <path d="M340 188L371.0 162L402 188Z" fill="#B5543C"/>
+      <rect x="363.0" y="210" width="16" height="20" fill="#FBF6EA"/>
+      <rect x="365.0" y="212" width="12" height="16" fill="#155E63"/>
+      <rect x="362.0" y="276" width="18" height="24" fill="#155E63"/>
+    </g>
+    <g>
+      <rect x="402" y="204" width="64" height="96" fill="#FBF6EA"/>
+      <rect x="402" y="204" width="5" height="96" fill="#7A4FA0"/><rect x="412" y="204" width="5" height="96" fill="#7A4FA0"/><rect x="422" y="204" width="5" height="96" fill="#7A4FA0"/><rect x="432" y="204" width="5" height="96" fill="#7A4FA0"/><rect x="442" y="204" width="5" height="96" fill="#7A4FA0"/><rect x="452" y="204" width="5" height="96" fill="#7A4FA0"/><rect x="462" y="204" width="5" height="96" fill="#7A4FA0"/>
+      <path d="M398 204L434.0 178L470 204Z" fill="#B5543C"/>
+      <rect x="426.0" y="226" width="16" height="20" fill="#FBF6EA"/>
+      <rect x="428.0" y="228" width="12" height="16" fill="#155E63"/>
+      <rect x="425.0" y="276" width="18" height="24" fill="#155E63"/>
+    </g>
+  </g>
+  <!-- quay -->
+  <path d="M0 300H500V316H0Z" fill="#CDBB94" stroke="#155E63" stroke-width="2"/>
+  <!-- canal -->
+  <rect x="0" y="316" width="500" height="244" fill="#6FA6A8"/>
+  <path d="M0 316h500v40H0z" fill="url(#hatch)" opacity="0.6"/>
+  <g fill="none" stroke="#155E63" stroke-width="1.5" opacity="0.65">
+    <path d="M0 370q20-7 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+    <path d="M-20 520q20-7 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+    <path d="M0 546q20-7 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+  </g>
+  <!-- back moliceiro (small) -->
+  <g stroke="#155E63" stroke-width="1.8" stroke-linejoin="round">
+    <path d="M300 392h150q10-4 18-26q4 18-8 34q-10 10-30 10h-120q-12 0-16-10q-6-14 -4-26q8 14 10 18z" fill="#2F6FA8"/>
+    <path d="M300 392h150v8h-150z" fill="#E0A422"/>
+  </g>
+  <!-- front moliceiro with the tall swan-neck prow and painted panels -->
+  <g stroke="#155E63" stroke-width="2.2" stroke-linejoin="round">
+    <path d="M60 452C120 470 300 474 410 452C430 440 440 410 446 360C452 340 470 340 466 360C458 420 448 470 410 486C330 506 140 504 84 482C64 474 52 462 60 452Z" fill="#1E2A38"/>
+    <path d="M60 452C40 430 36 400 44 380C48 372 58 374 56 384C52 404 58 430 76 448Z" fill="#1E2A38"/>
+    <!-- painted prow panel -->
+    <path d="M412 452c14-12 24-40 30-86c2-10 10-12 14-4c-6 46-14 78-30 94z" fill="#C8463B"/>
+    <path d="M420 446c8-10 14-30 18-56" fill="none" stroke="#F2C14E" stroke-width="3"/>
+    <!-- stripe along the hull -->
+    <path d="M76 462C150 478 300 480 404 462" fill="none" stroke="#F2C14E" stroke-width="5"/>
+    <path d="M80 470C150 486 300 488 400 470" fill="none" stroke="#C8463B" stroke-width="3"/>
+    <!-- painted stern panel -->
+    <path d="M62 450c-12-16-16-38-12-60c2-8 8-8 8 0c-2 22 2 40 14 54z" fill="#2E8B57"/>
+    <!-- seats -->
+    <path d="M130 452v-10h40v12M220 454v-10h40v12M310 454v-10h40v10" fill="#C9A77A"/>
+  </g>
+  <!-- reflection -->
+  <path d="M80 492C150 512 300 514 400 494" fill="none" stroke="#1E2A38" stroke-width="3" opacity="0.25"/>
+  <rect x="10" y="10" width="480" height="540" fill="none" stroke="#155E63" stroke-width="4"/>
+  <rect x="20" y="20" width="460" height="520" fill="none" stroke="#155E63" stroke-width="1.5"/>
+</svg>

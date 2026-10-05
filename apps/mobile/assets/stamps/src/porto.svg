@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" width="500" height="560">
+  <!-- Dom Luís I Bridge over the Douro, Porto: vintage engraved stamp style. Ink: wine. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F3C9A6"/>
+      <stop offset="0.6" stop-color="#F8E4C8"/>
+      <stop offset="1" stop-color="#F4E7CC"/>
+    </linearGradient>
+    <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#6E1E2E" stroke-width="1.1" opacity="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="500" height="560" fill="url(#sky)"/>
+  <g transform="translate(250 330)" fill="#E8964A" opacity="0.22">
+    <path d="M0 0L-26 -330L26 -330Z"/><path d="M0 0L-26 -330L26 -330Z" transform="rotate(20)"/>
+    <path d="M0 0L-26 -330L26 -330Z" transform="rotate(40)"/><path d="M0 0L-26 -330L26 -330Z" transform="rotate(60)"/>
+    <path d="M0 0L-26 -330L26 -330Z" transform="rotate(-20)"/><path d="M0 0L-26 -330L26 -330Z" transform="rotate(-40)"/>
+    <path d="M0 0L-26 -330L26 -330Z" transform="rotate(-60)"/>
+  </g>
+  <!-- Serra do Pilar hill (right) and Ribeira hill (left) -->
+  <path d="M330 150C380 140 440 150 500 160V420H330Z" fill="#B88A6A"/>
+  <path d="M330 150C380 140 440 150 500 160V420H330Z" fill="url(#hatch)"/>
+  <path d="M410 150c0-24 18-34 30-34s30 10 30 34z" fill="#E7DCC2" stroke="#6E1E2E" stroke-width="2"/>
+  <path d="M0 170C60 160 120 168 170 176V420H0Z" fill="#B88A6A"/>
+  <!-- Ribeira houses, stacked up the hill -->
+  <g stroke="#6E1E2E" stroke-width="1.6" stroke-linejoin="round">
+    <path d="M0 250h34v170H0z" fill="#D9574A"/><path d="M34 236h30v184H34z" fill="#F2C14E"/>
+    <path d="M64 256h28v164H64z" fill="#7FA3C2"/><path d="M92 244h32v176H92z" fill="#E7DCC2"/>
+    <path d="M124 262h28v158h-28z" fill="#D9574A"/><path d="M152 272h26v148h-26z" fill="#9CC28A"/>
+    <path d="M0 250l17-14l17 14M34 236l15-12l15 12M64 256l14-12l14 12M92 244l16-12l16 12M124 262l14-12l14 12M152 272l13-10l13 10" fill="#8A3A2A"/>
+    <path d="M14 200h40v50H14z" fill="#F2C14E"/><path d="M60 190h44v54H60z" fill="#E7DCC2"/><path d="M110 206h40v56h-40z" fill="#7FA3C2"/>
+    <path d="M14 200l20-14l20 14M60 190l22-14l22 14M110 206l20-14l20 14" fill="#8A3A2A"/>
+  </g>
+  <g fill="#3B0F18">
+    <rect x="8" y="270" width="8" height="12"/><rect x="20" y="270" width="8" height="12"/><rect x="42" y="256" width="7" height="12"/><rect x="52" y="256" width="7" height="12"/>
+    <rect x="70" y="276" width="7" height="12"/><rect x="80" y="276" width="7" height="12"/><rect x="100" y="264" width="7" height="12"/><rect x="112" y="264" width="7" height="12"/>
+    <rect x="8" y="310" width="8" height="12"/><rect x="20" y="310" width="8" height="12"/><rect x="42" y="300" width="7" height="12"/><rect x="52" y="300" width="7" height="12"/>
+    <rect x="132" y="284" width="7" height="12"/><rect x="160" y="292" width="7" height="12"/><rect x="100" y="304" width="7" height="12"/><rect x="112" y="304" width="7" height="12"/>
+  </g>
+  <!-- BRIDGE: upper deck, arch and pylons -->
+  <g stroke="#6E1E2E" stroke-width="2.4" fill="none" stroke-linejoin="round">
+    <path d="M0 168H500" stroke-width="6"/>
+    <path d="M0 176H500" stroke-width="2"/>
+    <!-- lattice under the upper deck -->
+    <path d="M40 176l20 0M60 168l20 8M80 168l20 8M100 168l20 8M120 168l20 8M140 168l20 8M160 168l20 8M180 168l20 8M200 168l20 8M220 168l20 8M240 168l20 8M260 168l20 8M280 168l20 8M300 168l20 8M320 168l20 8M340 168l20 8M360 168l20 8M380 168l20 8M400 168l20 8M420 168l20 8M440 168l20 8" stroke-width="1.2"/>
+    <!-- the great arch: two chords with a lattice between, its crown meeting the deck -->
+    <path d="M70 420C130 100 370 100 430 420" stroke-width="5"/>
+    <path d="M98 420C150 140 350 140 402 420" stroke-width="3"/>
+    <path d="M80 374L107 380M107 380L93 334M93 334L118 344M118 344L108 298M108 298L130 313M130 313L125 266M125 266L145 286M145 286L143 240M143 240L160 262M160 262L163 218M163 218L177 244M177 244L184 202M184 202L194 229M194 229L205 190M205 190L212 218M212 218L228 182M228 182L231 212M231 212L250 180M250 180L250 210M250 210L272 182M272 182L269 212M269 212L295 190M295 190L288 218M288 218L316 202M316 202L306 229M306 229L337 218M337 218L323 244M323 244L357 240M357 240L340 262M340 262L375 266M375 266L355 286M355 286L392 298M392 298L370 313M370 313L407 334M407 334L382 344M382 344L420 374M420 374L393 380" stroke-width="1.5"/>
+    <path d="M110 176V294M140 176V244M170 176V212M330 176V212M360 176V244M390 176V294" stroke-width="2"/>
+    <!-- pylons -->
+    <path d="M60 176v244M76 176v244M424 176v244M440 176v244" stroke-width="3"/>
+    <path d="M60 210h16M60 260h16M60 310h16M60 360h16M424 210h16M424 260h16M424 310h16M424 360h16" stroke-width="1.6"/>
+    <!-- lower deck -->
+    <path d="M40 392H460" stroke-width="5"/>
+  </g>
+  <!-- metro on the upper deck -->
+  <g stroke="#6E1E2E" stroke-width="1.6">
+    <rect x="262" y="150" width="70" height="16" rx="4" fill="#F2C14E"/>
+    <rect x="268" y="154" width="10" height="6" fill="#F8E4C8"/><rect x="284" y="154" width="10" height="6" fill="#F8E4C8"/><rect x="300" y="154" width="10" height="6" fill="#F8E4C8"/><rect x="316" y="154" width="10" height="6" fill="#F8E4C8"/>
+  </g>
+  <!-- Douro with engraved waves -->
+  <rect x="0" y="420" width="500" height="140" fill="#7B9DB6"/>
+  <g fill="none" stroke="#3B2A3A" stroke-width="1.5" opacity="0.6">
+    <path d="M0 440q20-7 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+    <path d="M-20 470q20-7 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+    <path d="M0 500q20-7 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+    <path d="M-20 530q20-7 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+  </g>
+  <!-- rabelo boat with port barrels -->
+  <g stroke="#3B0F18" stroke-width="2" stroke-linejoin="round">
+    <path d="M150 470h170q-10 28-40 30H190q-30-2-40-30z" fill="#8A5A2B"/>
+    <path d="M150 470q-14-18-6-34M320 470q10-12 8-28" fill="none"/>
+    <path d="M236 470v-86" />
+    <path d="M236 388h52v58h-52z" fill="#F7F1E1"/>
+    <g fill="#6E3A1E"><ellipse cx="190" cy="462" rx="12" ry="9"/><ellipse cx="214" cy="462" rx="12" ry="9"/><ellipse cx="270" cy="462" rx="12" ry="9"/></g>
+  </g>
+  <rect x="10" y="10" width="480" height="540" fill="none" stroke="#6E1E2E" stroke-width="4"/>
+  <rect x="20" y="20" width="460" height="520" fill="none" stroke="#6E1E2E" stroke-width="1.5"/>
+</svg>

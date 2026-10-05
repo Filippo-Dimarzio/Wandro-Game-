@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" width="500" height="560">
+  <!-- Belém Tower, Lisbon: vintage engraved stamp style. Ink: navy. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#CFE0EE"/>
+      <stop offset="0.7" stop-color="#F3EBD8"/>
+      <stop offset="1" stop-color="#F4E7CC"/>
+    </linearGradient>
+    <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#1F3A6B" stroke-width="1.1" opacity="0.5"/>
+    </pattern>
+    <pattern id="stone" width="18" height="10" patternUnits="userSpaceOnUse">
+      <path d="M0 10H18M9 0V5M0 5H18M0 0V5" stroke="#1F3A6B" stroke-width="0.7" opacity="0.3" fill="none"/>
+    </pattern>
+  </defs>
+  <rect width="500" height="560" fill="url(#sky)"/>
+  <g transform="translate(250 250)" fill="#E8B04A" opacity="0.22">
+    <path d="M0 0L-28 -270L28 -270Z"/><path d="M0 0L-28 -270L28 -270Z" transform="rotate(22)"/>
+    <path d="M0 0L-28 -270L28 -270Z" transform="rotate(44)"/><path d="M0 0L-28 -270L28 -270Z" transform="rotate(66)"/>
+    <path d="M0 0L-28 -270L28 -270Z" transform="rotate(-22)"/><path d="M0 0L-28 -270L28 -270Z" transform="rotate(-44)"/>
+    <path d="M0 0L-28 -270L28 -270Z" transform="rotate(-66)"/>
+  </g>
+  <!-- gulls -->
+  <g fill="none" stroke="#1F3A6B" stroke-width="2" stroke-linecap="round">
+    <path d="M70 110q8-8 16 0q8-8 16 0"/><path d="M110 140q6-6 12 0q6-6 12 0"/><path d="M380 100q8-8 16 0q8-8 16 0"/>
+  </g>
+  <!-- far shore -->
+  <path d="M0 372C80 362 140 368 200 364C280 358 360 366 500 360V400H0Z" fill="#9BB1C4" opacity="0.7"/>
+  <!-- TOWER -->
+  <g stroke="#1F3A6B" stroke-width="2" stroke-linejoin="round">
+    <!-- main tower -->
+    <rect x="200" y="140" width="110" height="230" fill="#EDE4CC"/>
+    <rect x="200" y="140" width="110" height="230" fill="url(#stone)"/>
+    <rect x="280" y="140" width="30" height="230" fill="url(#hatch)" opacity="0.7"/>
+    <!-- crenellation with Manueline shields -->
+    <path d="M194 140h122v-16h-8v-10h-12v10h-10v-10h-12v10h-10v-10h-12v10h-10v-10h-12v10h-10v-10h-12v10h-6z" fill="#EDE4CC"/>
+    <g fill="#EDE4CC">
+      <path d="M216 114v-8l4-4l4 4v8z"/><path d="M240 114v-8l4-4l4 4v8z"/><path d="M262 114v-8l4-4l4 4v8z"/><path d="M286 114v-8l4-4l4 4v8z"/>
+    </g>
+    <!-- corner turrets (garitas) -->
+    <path d="M188 150h18v40h-18z M188 150c0-14 9-22 9-22s9 8 9 22z" fill="#EDE4CC"/>
+    <path d="M304 150h18v40h-18z M304 150c0-14 9-22 9-22s9 8 9 22z" fill="#EDE4CC"/>
+    <!-- balconies and windows -->
+    <path d="M232 214h46v8h-46z" fill="#C9B98F"/>
+    <path d="M240 214v-30a15 15 0 0 1 30 0v30z" fill="#1F3A6B"/>
+    <path d="M255 184v30" stroke="#EDE4CC" stroke-width="2"/>
+    <path d="M226 290v-24a10 10 0 0 1 20 0v24zM264 290v-24a10 10 0 0 1 20 0v24z" fill="#1F3A6B"/>
+    <!-- royal arms -->
+    <path d="M244 244h22v14l-11 8l-11-8z" fill="#E8B04A"/>
+    <!-- armillary sphere -->
+    <circle cx="255" cy="330" r="10" fill="none"/><path d="M245 330h20M255 320v20"/>
+  </g>
+  <!-- bastion -->
+  <g stroke="#1F3A6B" stroke-width="2" stroke-linejoin="round">
+    <path d="M110 300h290l12 70H98z" fill="#E4D9BC"/>
+    <path d="M110 300h290l12 70H98z" fill="url(#stone)"/>
+    <path d="M104 300h302v-12h-10v-8h-12v8h-14v-8h-12v8h-14v-8h-12v8h-14v-8h-12v8h-14v-8h-12v8h-14v-8h-12v8h-14v-8h-12v8h-14v-8h-12v8h-14v-8h-12v8h-14v-8h-12v8h-12v-8h-12v8h-8z" fill="#E4D9BC"/>
+    <path d="M100 310c0-10 6-16 6-16s6 6 6 16zM398 310c0-10 6-16 6-16s6 6 6 16z" fill="#EDE4CC"/>
+    <g fill="#1F3A6B">
+      <path d="M130 352v-18a7 7 0 0 1 14 0v18zM166 352v-18a7 7 0 0 1 14 0v18zM330 352v-18a7 7 0 0 1 14 0v18zM366 352v-18a7 7 0 0 1 14 0v18z"/>
+    </g>
+  </g>
+  <!-- river with engraved waves -->
+  <rect x="0" y="370" width="500" height="190" fill="#7FA3C2"/>
+  <g fill="none" stroke="#1F3A6B" stroke-width="1.6" opacity="0.7">
+    <path d="M0 392q20-8 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+    <path d="M-20 420q20-8 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+    <path d="M0 450q20-8 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+    <path d="M-20 482q20-8 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+    <path d="M0 514q20-8 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+  </g>
+  <!-- reflection -->
+  <path d="M200 372h110l-12 90h-86z" fill="#EDE4CC" opacity="0.22"/>
+  <!-- caravel -->
+  <g stroke="#1F3A6B" stroke-width="2" stroke-linejoin="round">
+    <path d="M370 438h84l-12 18h-62z" fill="#8A5A2B"/>
+    <path d="M412 438v-62M394 438v-44" />
+    <path d="M412 380q22 14 0 44z" fill="#F7F1E1"/>
+    <path d="M394 398q16 10 0 34z" fill="#F7F1E1"/>
+    <path d="M408 396h8v8h-8zM404 398l12 4" stroke="#B3261E" stroke-width="2"/>
+  </g>
+  <rect x="10" y="10" width="480" height="540" fill="none" stroke="#1F3A6B" stroke-width="4"/>
+  <rect x="20" y="20" width="460" height="520" fill="none" stroke="#1F3A6B" stroke-width="1.5"/>
+</svg>

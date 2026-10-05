@@ -7,6 +7,7 @@ import { CATEGORIES } from '@wandro/shared';
 import { shopItem, skinColor } from '@wandro/shared';
 import { Asset } from 'expo-asset';
 import { lightColors, useIsDark } from '@/theme';
+import { ADVENTURE, hatchPattern } from './adventure';
 import { MARKERS, markerName } from './markers';
 import type { PlaceMapProps } from './types';
 import { accuracyGeoJson, guidanceGeoJson, placesGeoJson, useFog } from './useFog';
@@ -31,18 +32,17 @@ const STYLE: maplibregl.StyleSpecification = {
       maxzoom: 19,
     },
   },
-  // RPG look: the tiles sit on a meadow green and are warmed up, so parks and countryside read
-  // as grass. Roads and labels stay legible (no overlay on top of the map).
+  // Adventure map: sepia tiles on old paper (see map/adventure.ts). Roads and labels stay legible.
   layers: [
-    { id: 'meadow', type: 'background', paint: { 'background-color': '#8CCB6B' } },
+    { id: 'paper', type: 'background', paint: { 'background-color': ADVENTURE.light.paper } },
     {
       id: 'osm',
       type: 'raster',
       source: 'osm',
       paint: {
-        'raster-opacity': 0.88,
-        'raster-saturation': 0.35,
-        'raster-contrast': 0.08,
+        'raster-opacity': ADVENTURE.light.tiles.opacity,
+        'raster-saturation': ADVENTURE.light.tiles.saturation,
+        'raster-contrast': ADVENTURE.light.tiles.contrast,
       },
     },
   ],
@@ -145,12 +145,15 @@ export function PlaceMap({
 
     m.on('load', () => {
       const d = latest.current;
+      if (!m.hasImage('hatch'))
+        m.addImage('hatch', { width: 16, height: 16, data: hatchPattern(ADVENTURE.light) });
       m.addSource('fog', { type: 'geojson', data: d.fog });
       m.addLayer({
         id: 'fog',
         type: 'fill',
         source: 'fog',
-        paint: { 'fill-color': lightColors.fogFill, 'fill-opacity': 0.78 },
+        // Uncharted land: hatched parchment.
+        paint: { 'fill-pattern': 'hatch', 'fill-opacity': 0.82 },
       });
       m.addSource('accuracy', { type: 'geojson', data: d.accuracy });
       m.addLayer({
@@ -267,14 +270,20 @@ export function PlaceMap({
     if (el) el.innerHTML = markerHtml(avatar?.skin, avatar?.hat, trail);
   }, [avatar?.skin, avatar?.hat, trail]);
 
-  // Night-time meadow in dark mode.
+  // The same chart by lamplight in dark mode.
   const dark = useIsDark();
   useEffect(() => {
     const m = map.current;
     if (!m) return;
     const apply = () => {
-      m.setPaintProperty('meadow', 'background-color', dark ? '#1F3B22' : '#8CCB6B');
-      m.setPaintProperty('osm', 'raster-brightness-max', dark ? 0.62 : 1);
+      const p = dark ? ADVENTURE.dark : ADVENTURE.light;
+      m.setPaintProperty('paper', 'background-color', p.paper);
+      m.setPaintProperty('osm', 'raster-opacity', p.tiles.opacity);
+      m.setPaintProperty('osm', 'raster-saturation', p.tiles.saturation);
+      m.setPaintProperty('osm', 'raster-brightness-max', p.tiles.brightnessMax);
+      const hatch = { width: 16, height: 16, data: hatchPattern(p) };
+      if (m.hasImage('hatch')) m.updateImage('hatch', hatch);
+      else m.addImage('hatch', hatch);
     };
     if (m.isStyleLoaded()) apply();
     else m.once('load', apply);

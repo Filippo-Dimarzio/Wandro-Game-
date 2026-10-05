@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" width="500" height="560">
+  <!-- Roman Temple of Évora: vintage engraved stamp style. Ink: sepia. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#A9C7DF"/>
+      <stop offset="0.65" stop-color="#F3E6CC"/>
+      <stop offset="1" stop-color="#F4E7CC"/>
+    </linearGradient>
+    <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#6B3E1F" stroke-width="1.1" opacity="0.5"/>
+    </pattern>
+    <pattern id="blocks" width="24" height="14" patternUnits="userSpaceOnUse">
+      <path d="M0 14H24M12 0V7M0 7H24M0 0V7" stroke="#6B3E1F" stroke-width="0.9" opacity="0.45" fill="none"/>
+    </pattern>
+    <pattern id="grassH" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-30)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#4E5A26" stroke-width="1.2" opacity="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="500" height="560" fill="url(#sky)"/>
+  <g transform="translate(380 120)" fill="#E8B04A" opacity="0.3">
+    <path d="M0 0L-18 -200L18 -200Z"/><path d="M0 0L-18 -200L18 -200Z" transform="rotate(30)"/>
+    <path d="M0 0L-18 -200L18 -200Z" transform="rotate(60)"/><path d="M0 0L-18 -200L18 -200Z" transform="rotate(90)"/>
+    <path d="M0 0L-18 -200L18 -200Z" transform="rotate(120)"/><path d="M0 0L-18 -200L18 -200Z" transform="rotate(150)"/>
+    <path d="M0 0L-18 -200L18 -200Z" transform="rotate(-30)"/><path d="M0 0L-18 -200L18 -200Z" transform="rotate(-60)"/>
+    <path d="M0 0L-18 -200L18 -200Z" transform="rotate(-90)"/><path d="M0 0L-18 -200L18 -200Z" transform="rotate(-120)"/>
+  </g>
+  <circle cx="380" cy="120" r="34" fill="#F2C14E" stroke="#6B3E1F" stroke-width="2"/>
+  <!-- cathedral towers behind -->
+  <g stroke="#6B3E1F" stroke-width="1.8" fill="#E2D2AE" opacity="0.85">
+    <path d="M30 380V170h40v210z"/><path d="M26 170l24-40l24 40z" fill="#C9A77A"/>
+    <path d="M440 380V200h36v180z"/><path d="M436 200l22-34l22 34z" fill="#C9A77A"/>
+  </g>
+  <!-- entablature remains -->
+  <g stroke="#6B3E1F" stroke-width="2" stroke-linejoin="round">
+    <path d="M96 152h300v26H96z" fill="#E7D7B2"/>
+    <path d="M96 152h300v26H96z" fill="url(#blocks)"/>
+    <path d="M100 140h292v12H100z" fill="#D9C79E"/>
+    <path d="M120 140l10-10h40l8 10z" fill="#D9C79E"/>
+  </g>
+  <!-- columns -->
+  <g stroke="#6B3E1F" stroke-width="1.8" stroke-linejoin="round">
+    <g>
+      <rect x="112" y="196" width="30" height="172" fill="#EFE3C6"/>
+      <rect x="130" y="196" width="12" height="172" fill="url(#hatch)"/>
+      <path d="M118 200V364M124 200V364M130 200V364M136 200V364" stroke-width="0.9" opacity="0.6"/>
+      <path d="M106 178h42l-6 18h-30z" fill="#F4ECD6"/>
+      <path d="M110 184c4-8 12-6 10 0M144 184c-4-8-12-6-10 0M116 190h22" fill="none" stroke-width="1.4"/>
+      <path d="M108 368h38v10h-38z" fill="#D9C79E"/>
+    </g>
+    <g>
+      <rect x="160" y="196" width="30" height="172" fill="#EFE3C6"/>
+      <rect x="178" y="196" width="12" height="172" fill="url(#hatch)"/>
+      <path d="M166 200V364M172 200V364M178 200V364M184 200V364" stroke-width="0.9" opacity="0.6"/>
+      <path d="M154 178h42l-6 18h-30z" fill="#F4ECD6"/>
+      <path d="M158 184c4-8 12-6 10 0M192 184c-4-8-12-6-10 0M164 190h22" fill="none" stroke-width="1.4"/>
+      <path d="M156 368h38v10h-38z" fill="#D9C79E"/>
+    </g>
+    <g>
+      <rect x="208" y="196" width="30" height="172" fill="#EFE3C6"/>
+      <rect x="226" y="196" width="12" height="172" fill="url(#hatch)"/>
+      <path d="M214 200V364M220 200V364M226 200V364M232 200V364" stroke-width="0.9" opacity="0.6"/>
+      <path d="M202 178h42l-6 18h-30z" fill="#F4ECD6"/>
+      <path d="M206 184c4-8 12-6 10 0M240 184c-4-8-12-6-10 0M212 190h22" fill="none" stroke-width="1.4"/>
+      <path d="M204 368h38v10h-38z" fill="#D9C79E"/>
+    </g>
+    <g>
+      <rect x="256" y="196" width="30" height="172" fill="#EFE3C6"/>
+      <rect x="274" y="196" width="12" height="172" fill="url(#hatch)"/>
+      <path d="M262 200V364M268 200V364M274 200V364M280 200V364" stroke-width="0.9" opacity="0.6"/>
+      <path d="M250 178h42l-6 18h-30z" fill="#F4ECD6"/>
+      <path d="M254 184c4-8 12-6 10 0M288 184c-4-8-12-6-10 0M260 190h22" fill="none" stroke-width="1.4"/>
+      <path d="M252 368h38v10h-38z" fill="#D9C79E"/>
+    </g>
+    <g>
+      <rect x="304" y="196" width="30" height="172" fill="#EFE3C6"/>
+      <rect x="322" y="196" width="12" height="172" fill="url(#hatch)"/>
+      <path d="M310 200V364M316 200V364M322 200V364M328 200V364" stroke-width="0.9" opacity="0.6"/>
+      <path d="M298 178h42l-6 18h-30z" fill="#F4ECD6"/>
+      <path d="M302 184c4-8 12-6 10 0M336 184c-4-8-12-6-10 0M308 190h22" fill="none" stroke-width="1.4"/>
+      <path d="M300 368h38v10h-38z" fill="#D9C79E"/>
+    </g>
+    <g>
+      <rect x="352" y="196" width="30" height="172" fill="#EFE3C6"/>
+      <rect x="370" y="196" width="12" height="172" fill="url(#hatch)"/>
+      <path d="M358 200V364M364 200V364M370 200V364M376 200V364" stroke-width="0.9" opacity="0.6"/>
+      <path d="M346 178h42l-6 18h-30z" fill="#F4ECD6"/>
+      <path d="M350 184c4-8 12-6 10 0M384 184c-4-8-12-6-10 0M356 190h22" fill="none" stroke-width="1.4"/>
+      <path d="M348 368h38v10h-38z" fill="#D9C79E"/>
+    </g>
+  </g>
+  <!-- podium -->
+  <g stroke="#6B3E1F" stroke-width="2.2" stroke-linejoin="round">
+    <path d="M78 378h336v14H78z" fill="#D9C79E"/>
+    <path d="M86 392h320v74H86z" fill="#C8B184"/>
+    <path d="M86 392h320v74H86z" fill="url(#blocks)"/>
+    <path d="M76 466h340v12H76z" fill="#D9C79E"/>
+  </g>
+  <!-- cypresses -->
+  <g stroke="#2E3A16" stroke-width="1.6">
+    <path d="M44 478c-6-40 4-110 14-130c10 20 20 90 14 130z" fill="#4E6A2E"/>
+    <path d="M440 478c-6-36 4-96 12-114c8 18 18 78 12 114z" fill="#4E6A2E"/>
+  </g>
+  <!-- square -->
+  <path d="M0 478H500V560H0Z" fill="#D8C59A"/>
+  <g stroke="#6B3E1F" stroke-width="1" opacity="0.45">
+    <path d="M0 498H500M0 520H500M0 542H500M40 478L10 560M120 478L100 560M200 478L190 560M300 478L310 560M380 478L400 560M460 478L490 560"/>
+  </g>
+  <!-- storks -->
+  <g fill="none" stroke="#6B3E1F" stroke-width="2" stroke-linecap="round">
+    <path d="M80 90q10-10 20 0q10-10 20 0"/><path d="M140 70q8-8 16 0q8-8 16 0"/>
+  </g>
+  <rect x="10" y="10" width="480" height="540" fill="none" stroke="#6B3E1F" stroke-width="4"/>
+  <rect x="20" y="20" width="460" height="520" fill="none" stroke="#6B3E1F" stroke-width="1.5"/>
+</svg>

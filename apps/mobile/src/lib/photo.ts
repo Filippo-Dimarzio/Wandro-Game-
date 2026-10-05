@@ -66,3 +66,21 @@ export async function pickCleanPhoto(source: 'camera' | 'library'): Promise<stri
   if (await isBlankPhoto(saved.uri)) throw new BlankPhotoError();
   return saved.uri;
 }
+
+/** Width kept for photos saved on the device in demo mode: sharp on phones, small to store. */
+export const KEPT_PHOTO_WIDTH = 800;
+
+/**
+ * A copy of the photo that survives reloads, app updates and new deploys. Picked photos live in a
+ * temporary file (or a blob: URL on the web) that's gone after a reload, so demo mode stores the
+ * photo itself, re-encoded as a compact JPEG data URI. The server keeps photos in Storage instead.
+ */
+export async function keepPhoto(uri: string): Promise<string> {
+  if (uri.startsWith('data:')) return uri;
+  const ref = await ImageManipulator.manipulate(uri)
+    .resize({ width: KEPT_PHOTO_WIDTH })
+    .renderAsync();
+  const { base64 } = await ref.saveAsync({ format: SaveFormat.JPEG, compress: 0.7, base64: true });
+  if (!base64) throw new Error('photo_not_saved');
+  return `data:image/jpeg;base64,${base64}`;
+}

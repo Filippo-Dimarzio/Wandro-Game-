@@ -3,7 +3,7 @@ import { Image } from 'expo-image';
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native';
 import type { Region } from '@wandro/shared';
-import { CITY_ART } from '@/cityArt';
+import { CITY_ART, STAMP_ART } from '@/cityArt';
 import { t } from '@/i18n';
 
 const PAPER = '#FBF7EE';
@@ -70,7 +70,7 @@ export function PostageStamp({
   const height = Math.round(width * RATIO);
   const r = Math.max(2.5, width * 0.04);
   const pad = r * 2;
-  const art = CITY_ART[region.slug];
+  const art = STAMP_ART[region.slug] ?? CITY_ART[region.slug]?.found;
   const land = useRef(new Animated.Value(animate ? 0 : 1)).current;
 
   useEffect(() => {
@@ -115,7 +115,7 @@ export function PostageStamp({
         <View style={styles.art}>
           {art && (
             <Image
-              source={art.found}
+              source={art}
               style={StyleSheet.absoluteFill}
               contentFit="cover"
               accessible={false}

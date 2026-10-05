@@ -6,12 +6,22 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- New hand-drawn city stamp pictures: vintage engravings of Pena Palace, Belém Tower, the
+  Dom Luís I Bridge, the Roman Temple of Évora and Aveiro's moliceiros
+  (`assets/stamps/src`, rendered by `scripts/render-stamps.mjs`).
+
+### Fixed
+
+- Demo photos survive reloads, app updates and new deploys: the photo itself is saved (a compact
+  JPEG) instead of a temporary link. Every photo from the last 24 h is always kept.
+
 - Trips between cities: a flight only when both cities have their own airport (Lisbon ↔ Porto);
   otherwise the quicker of train or a green coach, with its own animation and travel time. Every
   move between launch cities is now an arrival (`20261014090000_trips`).
 - A light/dark switch on the right edge of every screen (follows the phone until you choose).
-- RPG-style map: meadow-green map, grass tufts swaying along the bottom, leaves drifting across
-  by day and fireflies at night (off when the phone asks for reduced motion).
+- Adventure map: sepia tiles on old paper, unexplored land drawn as hatched parchment, burnt
+  chart edges, a compass rose, and leaves drifting across by day (fireflies at night). Off when
+  the phone asks for reduced motion.
 - City celebrations: a new city stamp slams onto the screen with fireworks, and claiming every
   place in a city's sets gets the bigger show.
 

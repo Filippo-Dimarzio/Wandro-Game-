@@ -28,4 +28,16 @@ export const CITY_ART: Record<string, { found: ImageSource; locked: ImageSource 
     locked: require('../assets/cities/aveiro-locked.jpg'),
   },
 };
+
+/**
+ * The picture on each city's postage stamp: hand-drawn engravings in assets/stamps/src, rendered
+ * by scripts/render-stamps.mjs.
+ */
+export const STAMP_ART: Record<string, ImageSource> = {
+  sintra: require('../assets/stamps/sintra.jpg'),
+  lisbon: require('../assets/stamps/lisbon.jpg'),
+  porto: require('../assets/stamps/porto.jpg'),
+  evora: require('../assets/stamps/evora.jpg'),
+  aveiro: require('../assets/stamps/aveiro.jpg'),
+};
 /* eslint-enable @typescript-eslint/no-require-imports */

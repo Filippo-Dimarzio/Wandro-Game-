@@ -1,18 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, Platform, StyleSheet, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useIsDark } from '@/theme';
+import { ADVENTURE } from './adventure';
 
 const native = Platform.OS !== 'web';
 const LEAVES = 9;
-const TUFTS = 14;
 const LEAF_COLORS = ['#5FA83A', '#7DBB3F', '#A7C43D', '#D9A23A', '#4E9A47'];
 
 /** Deterministic spread so leaves don't all fall in a line (no Math.random: stable renders). */
 const spread = (i: number, salt: number) => ((i * 9301 + salt * 49297) % 233280) / 233280;
 
 /**
- * RPG-style outdoors on top of the map: grass tufts swaying along the bottom and leaves drifting
- * across (fireflies at night). Small, see-through and untouchable so places stay legible and
+ * The adventure-map dressing on top of the map: darkened chart edges, a compass rose, and leaves
+ * drifting across by day (fireflies at night). Small, see-through and untouchable so places stay legible and
  * tappable; switched off when the phone asks for reduced motion.
  */
 export function MapAmbience() {
@@ -35,16 +36,74 @@ export function MapAmbience() {
       onLayout={(e) => setSize(e.nativeEvent.layout)}
       testID="map-ambience"
     >
+      <Vignette dark={dark} />
+      <Compass dark={dark} />
       {size.width > 0 &&
         !still &&
         Array.from({ length: LEAVES }, (_, i) =>
           dark ? <Firefly key={i} index={i} {...size} /> : <Leaf key={i} index={i} {...size} />,
         )}
-      <View style={styles.grass}>
-        {Array.from({ length: TUFTS }, (_, i) => (
-          <Tuft key={i} index={i} still={still} dark={dark} />
-        ))}
-      </View>
+    </View>
+  );
+}
+
+/** Darker, burnt edges like an old chart. */
+function Vignette({ dark }: { dark: boolean }) {
+  const edge = dark ? 'rgba(0,0,0,0.55)' : 'rgba(90,58,20,0.32)';
+  const clear = 'rgba(0,0,0,0)';
+  return (
+    <>
+      <LinearGradient colors={[edge, clear]} style={[styles.edge, styles.top]} />
+      <LinearGradient colors={[clear, edge]} style={[styles.edge, styles.bottom]} />
+      <LinearGradient
+        colors={[edge, clear]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.side, { left: 0 }]}
+      />
+      <LinearGradient
+        colors={[clear, edge]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.side, { right: 0 }]}
+      />
+    </>
+  );
+}
+
+/** A compass rose in the corner of the chart. */
+function Compass({ dark }: { dark: boolean }) {
+  const ink = dark ? ADVENTURE.dark.ink : ADVENTURE.light.ink;
+  const paper = dark ? ADVENTURE.dark.paper : ADVENTURE.light.paper;
+  return (
+    <View style={styles.compass} testID="compass">
+      <View style={[styles.ring, { borderColor: ink, backgroundColor: paper }]} />
+      {[0, 90, 180, 270].map((deg) => (
+        <View
+          key={deg}
+          style={[
+            styles.point,
+            {
+              backgroundColor: deg === 0 ? '#B3261E' : ink,
+              transform: [{ rotate: `${deg}deg` }, { translateY: -13 }, { rotate: '45deg' }],
+            },
+          ]}
+        />
+      ))}
+      {[45, 135, 225, 315].map((deg) => (
+        <View
+          key={deg}
+          style={[
+            styles.minor,
+            {
+              backgroundColor: ink,
+              transform: [{ rotate: `${deg}deg` }, { translateY: -9 }, { rotate: '45deg' }],
+            },
+          ]}
+        />
+      ))}
+      <View style={[styles.hub, { backgroundColor: ink }]} />
+      <Animated.Text style={[styles.north, { color: ink }]}>N</Animated.Text>
     </View>
   );
 }
@@ -139,34 +198,33 @@ function Firefly({ index, width, height }: { index: number; width: number; heigh
   );
 }
 
-/** Three blades of grass that sway in the wind. */
-function Tuft({ index, still, dark }: { index: number; still: boolean; dark: boolean }) {
-  const t = useLoop(2400 + spread(index, 6) * 1600, 0);
-  const sway = still
-    ? '0deg'
-    : t.interpolate({ inputRange: [0, 0.5, 1], outputRange: ['-7deg', '7deg', '-7deg'] });
-  const green = dark ? ['#2F5E2A', '#3B7034', '#28502A'] : ['#4E9A3A', '#6DB548', '#3F8A34'];
-  const tall = 14 + spread(index, 7) * 12;
-  return (
-    <Animated.View style={[styles.tuft, { transform: [{ rotate: sway }] }]}>
-      {[-1, 0, 1].map((b, i) => (
-        <View
-          key={b}
-          style={[
-            styles.blade,
-            {
-              height: tall * (i === 1 ? 1 : 0.75),
-              backgroundColor: green[i],
-              transform: [{ rotate: `${b * 14}deg` }],
-            },
-          ]}
-        />
-      ))}
-    </Animated.View>
-  );
-}
-
 const styles = StyleSheet.create({
+  edge: { position: 'absolute', left: 0, right: 0, height: 70 },
+  top: { top: 0 },
+  bottom: { bottom: 0 },
+  side: { position: 'absolute', top: 0, bottom: 0, width: 40 },
+  compass: {
+    position: 'absolute',
+    right: 18,
+    top: 150,
+    width: 64,
+    height: 64,
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.85,
+  },
+  ring: {
+    position: 'absolute',
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 1.5,
+    opacity: 0.9,
+  },
+  point: { position: 'absolute', width: 12, height: 12 },
+  minor: { position: 'absolute', width: 7, height: 7, opacity: 0.8 },
+  hub: { position: 'absolute', width: 6, height: 6, borderRadius: 3 },
+  north: { position: 'absolute', top: -6, fontSize: 11, fontWeight: '900' },
   leaf: { position: 'absolute', top: 0, borderRadius: 999, borderTopRightRadius: 2 },
   firefly: {
     position: 'absolute',
@@ -179,16 +237,4 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 0 },
   },
-  grass: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    paddingHorizontal: 6,
-  },
-  tuft: { flexDirection: 'row', alignItems: 'flex-end', gap: 1, transformOrigin: 'bottom' },
-  blade: { width: 4, borderTopLeftRadius: 4, borderTopRightRadius: 4 },
 });

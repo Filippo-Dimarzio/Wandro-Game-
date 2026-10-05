@@ -196,6 +196,23 @@ function progressOf(s: SessionState): DemoProgress {
   };
 }
 
+/** Photos kept on the device beyond the last 24 h, so the saved state stays small. */
+export const MAX_KEPT_PHOTOS = 30;
+
+/**
+ * Every photo from the last 24 hours is always kept; older ones stay too, newest first, up to
+ * MAX_KEPT_PHOTOS. Beyond that an old post keeps its caption and place but not its photo.
+ */
+export function keepRecentPhotos(posts: DemoPost[], now = Date.now()): DemoPost[] {
+  let kept = 0;
+  return posts.map((p) => {
+    if (!p.photoUri) return p;
+    kept += 1;
+    const fresh = now - Date.parse(p.at) < 24 * 3_600_000;
+    return fresh || kept <= MAX_KEPT_PHOTOS ? p : { ...p, photoUri: undefined };
+  });
+}
+
 function demoIsPrivate(id: string) {
   return DEMO_USERS.find((u) => u.id === id)?.isPrivate ?? true;
 }
@@ -277,7 +294,7 @@ export const useSession = create<SessionState>()(
           else liked[id] = true;
           return { liked };
         }),
-      addPost: (post) => set((s) => ({ posts: [post, ...s.posts] })),
+      addPost: (post) => set((s) => ({ posts: keepRecentPhotos([post, ...s.posts]) })),
       block: (id) =>
         set((s) => {
           const friends = { ...s.friends };
@@ -424,7 +441,7 @@ export const useSession = create<SessionState>()(
     }),
     {
       name: 'wandro-session',
-      version: 2,
+      version: 3,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: ({
         justUnlocked: _j,
@@ -464,7 +481,16 @@ export const useSession = create<SessionState>()(
               firstDiscoverer: false,
             };
           }
-          return { ...initial, ...old, unlocked: upgraded, ledger } as unknown as SessionState;
+          Object.assign(old, { ...initial, ...old, unlocked: upgraded, ledger });
+        }
+        // v2 kept the picked photo's temporary URL, which is dead after a reload or a new
+        // deploy; posts now store the photo itself (keepPhoto). Drop the dead links.
+        if (version < 3 && Array.isArray(old.posts)) {
+          old.posts = (old.posts as DemoPost[]).map((p) =>
+            p.photoUri && !p.photoUri.startsWith('data:') && !p.photoUri.startsWith('file:')
+              ? { ...p, photoUri: undefined }
+              : p,
+          );
         }
         return old as unknown as SessionState;
       },

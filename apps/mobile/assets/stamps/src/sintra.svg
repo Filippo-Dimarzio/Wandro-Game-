@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" width="500" height="560">
+  <!-- Pena Palace, Sintra: vintage engraved stamp style. Ink: crimson. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6D9A8"/>
+      <stop offset="0.6" stop-color="#F9E9C8"/>
+      <stop offset="1" stop-color="#F4E7CC"/>
+    </linearGradient>
+    <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#8E1F2B" stroke-width="1.1" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatchG" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#1E3B26" stroke-width="1.3" opacity="0.6"/>
+    </pattern>
+    <pattern id="brick" width="16" height="8" patternUnits="userSpaceOnUse">
+      <path d="M0 8H16M8 0V4M0 4H16M0 0V4" stroke="#6E1620" stroke-width="0.8" opacity="0.35" fill="none"/>
+    </pattern>
+  </defs>
+  <rect width="500" height="560" fill="url(#sky)"/>
+  <!-- sunburst -->
+  <g transform="translate(250 230)" fill="#E8B04A" opacity="0.28">
+    <path d="M0 0L-30 -260L30 -260Z"/><path d="M0 0L-30 -260L30 -260Z" transform="rotate(24)"/>
+    <path d="M0 0L-30 -260L30 -260Z" transform="rotate(48)"/><path d="M0 0L-30 -260L30 -260Z" transform="rotate(72)"/>
+    <path d="M0 0L-30 -260L30 -260Z" transform="rotate(-24)"/><path d="M0 0L-30 -260L30 -260Z" transform="rotate(-48)"/>
+    <path d="M0 0L-30 -260L30 -260Z" transform="rotate(-72)"/>
+  </g>
+  <circle cx="250" cy="230" r="58" fill="#F2C14E" opacity="0.55"/>
+  <!-- distant hills -->
+  <path d="M0 360C60 330 120 345 170 330C230 312 300 335 350 322C410 306 460 330 500 320V560H0Z" fill="#7C9A6A" opacity="0.55"/>
+  <!-- clouds -->
+  <g fill="#FFF8EA" stroke="#8E1F2B" stroke-width="1.2" opacity="0.9">
+    <path d="M40 120c10-18 34-20 44-6c10-12 34-8 36 8c16 0 20 18 6 22H44c-18 0-20-18-4-24z"/>
+    <path d="M360 90c8-14 28-16 36-4c8-10 28-6 30 6c12 0 16 14 4 18H366c-14 0-16-14-6-20z"/>
+  </g>
+  <!-- PALACE -->
+  <!-- left yellow tower with onion dome -->
+  <g stroke="#8E1F2B" stroke-width="2" stroke-linejoin="round">
+    <rect x="118" y="196" width="70" height="170" fill="#E9B23A"/>
+    <rect x="118" y="196" width="70" height="170" fill="url(#hatch)" opacity="0.5"/>
+    <path d="M114 196h78v-12h-8v-8h-10v8h-10v-8h-12v8h-10v-8h-10v8h-10v-8h-8z" fill="#E9B23A"/>
+    <path d="M124 176c0-30 18-46 29-56c11 10 29 26 29 56z" fill="#D99A2B"/>
+    <path d="M124 176c0-30 18-46 29-56c11 10 29 26 29 56z" fill="url(#hatch)" opacity="0.6"/>
+    <line x1="153" y1="120" x2="153" y2="100"/>
+    <circle cx="153" cy="98" r="4" fill="#8E1F2B"/>
+    <path d="M136 230v-14a8 8 0 0 1 16 0v14zM156 230v-14a8 8 0 0 1 16 0v14z" fill="#5A1219"/>
+    <path d="M136 290v-14a8 8 0 0 1 16 0v14zM156 290v-14a8 8 0 0 1 16 0v14z" fill="#5A1219"/>
+  </g>
+  <!-- central red block with arcades -->
+  <g stroke="#8E1F2B" stroke-width="2" stroke-linejoin="round">
+    <rect x="188" y="246" width="150" height="120" fill="#B8323E"/>
+    <rect x="188" y="246" width="150" height="120" fill="url(#brick)"/>
+    <path d="M184 246h158v-10h-9v-8h-11v8h-11v-8h-11v8h-11v-8h-11v8h-11v-8h-11v8h-11v-8h-11v8h-11v-8h-11v8h-11v-8h-11v8h-9z" fill="#B8323E"/>
+    <g fill="#4A0E14">
+      <path d="M200 366v-36a12 12 0 0 1 24 0v36zM234 366v-36a12 12 0 0 1 24 0v36zM268 366v-36a12 12 0 0 1 24 0v36zM302 366v-36a12 12 0 0 1 24 0v36z"/>
+      <path d="M204 290v-18a8 8 0 0 1 16 0v18zM238 290v-18a8 8 0 0 1 16 0v18zM272 290v-18a8 8 0 0 1 16 0v18zM306 290v-18a8 8 0 0 1 16 0v18z"/>
+    </g>
+  </g>
+  <!-- clock tower (lilac/red) -->
+  <g stroke="#8E1F2B" stroke-width="2" stroke-linejoin="round">
+    <rect x="232" y="150" width="58" height="96" fill="#C9A6C9"/>
+    <rect x="232" y="150" width="58" height="96" fill="url(#hatch)" opacity="0.45"/>
+    <path d="M226 150h70v-12h-8v-9h-10v9h-9v-9h-9v9h-9v-9h-10v9h-8z" fill="#C9A6C9"/>
+    <circle cx="261" cy="190" r="15" fill="#F9E9C8"/>
+    <path d="M261 190v-10M261 190l7 5" stroke-width="2.2"/>
+    <path d="M250 236v-14a11 11 0 0 1 22 0v14z" fill="#4A0E14"/>
+  </g>
+  <!-- right grey tower -->
+  <g stroke="#8E1F2B" stroke-width="2" stroke-linejoin="round">
+    <rect x="338" y="226" width="56" height="140" fill="#D9CDB4"/>
+    <rect x="338" y="226" width="56" height="140" fill="url(#hatch)" opacity="0.35"/>
+    <path d="M334 226h64v-11h-8v-8h-9v8h-9v-8h-10v8h-9v-8h-9v8h-10z" fill="#D9CDB4"/>
+    <path d="M346 207c0 0 4-32 20-40c16 8 20 40 20 40z" fill="#B8323E"/>
+    <path d="M350 270v-16a8 8 0 0 1 16 0v16zM368 270v-16a8 8 0 0 1 16 0v16z" fill="#4A0E14"/>
+  </g>
+  <!-- forest hill -->
+  <path d="M0 400C40 372 90 360 140 366C200 372 230 356 280 360C350 366 400 350 460 362C480 366 492 372 500 378V560H0Z" fill="#3F6B48"/>
+  <path d="M0 400C40 372 90 360 140 366C200 372 230 356 280 360C350 366 400 350 460 362C480 366 492 372 500 378V560H0Z" fill="url(#hatchG)"/>
+  <g fill="#2C4E34" stroke="#1E3B26" stroke-width="1.5">
+    <path d="M30 420l18-40l18 40z"/><path d="M60 430l22-52l22 52z"/><path d="M100 424l16-36l16 36z"/>
+    <path d="M380 430l20-46l20 46z"/><path d="M414 424l18-40l18 40z"/><path d="M448 432l22-50l22 50z"/>
+    <path d="M200 440l16-34l16 34z"/><path d="M290 444l18-38l18 38z"/>
+  </g>
+  <path d="M0 470C80 450 160 476 250 462C340 448 420 470 500 458V560H0Z" fill="#2C4E34"/>
+  <path d="M0 470C80 450 160 476 250 462C340 448 420 470 500 458V560H0Z" fill="url(#hatchG)"/>
+  <!-- engraved frame -->
+  <rect x="10" y="10" width="480" height="540" fill="none" stroke="#8E1F2B" stroke-width="4"/>
+  <rect x="20" y="20" width="460" height="520" fill="none" stroke="#8E1F2B" stroke-width="1.5"/>
+</svg>
