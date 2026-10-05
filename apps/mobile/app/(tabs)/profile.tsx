@@ -1,9 +1,12 @@
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { octopusStage } from '@wandro/shared';
+import { explorerStage } from '@wandro/shared';
 import { Ionicons } from '@expo/vector-icons';
-import { OctopusAvatar } from '@/components/OctopusAvatar';
+import { ExplorerAvatar } from '@/components/ExplorerAvatar';
+import { ExplorerPicker } from '@/components/ExplorerPicker';
+import { useMyExplorer, useSetExplorer } from '@/data/explorer';
 import { useBadges } from '@/data/badges';
 import { useLoadout } from '@/data/loadout';
 import { useIsModerator } from '@/data/moderation';
@@ -27,6 +30,9 @@ export default function Profile() {
   const loadout = useLoadout();
   const profile = useSession((s) => s.profile);
   const level = wallet.level;
+  const explorer = useMyExplorer();
+  const setExplorer = useSetExplorer();
+  const [picking, setPicking] = useState(false);
   const discovered = places.filter((p) => ids.has(p.id));
 
   return (
@@ -38,12 +44,14 @@ export default function Profile() {
             accessibilityRole="button"
             accessibilityLabel={t('profile.store')}
           >
-            <OctopusAvatar
+            <ExplorerAvatar
+              explorer={explorer}
+              level={level}
               size={76}
               skin={loadout.skin}
               hat={loadout.hat}
               glow={loadout.trailActive}
-              accessibilityLabel={t('profile.stage', { stage: octopusStage(level) })}
+              accessibilityLabel={t('profile.stage', { stage: explorerStage(level) })}
             />
           </Pressable>
           <View style={{ flex: 1 }}>
@@ -54,10 +62,30 @@ export default function Profile() {
               <Text style={{ color: c.textMuted }}>{profile.homeCity}</Text>
             ) : null}
             <Text style={{ color: c.accent, fontWeight: '700' }}>
-              {t('profile.stage', { stage: octopusStage(level) })}
+              {t('profile.stage', { stage: explorerStage(level) })}
             </Text>
+            <Pressable
+              onPress={() => setPicking((v) => !v)}
+              accessibilityRole="button"
+              accessibilityState={{ expanded: picking }}
+              testID="change-explorer"
+            >
+              <Text style={{ color: c.textMuted, fontWeight: '700', marginTop: 4 }}>
+                {t('profile.changeExplorer')}
+              </Text>
+            </Pressable>
           </View>
         </View>
+
+        {picking && (
+          <View style={[styles.picker, { backgroundColor: c.surface }]}>
+            <ExplorerPicker
+              value={explorer}
+              skin={loadout.skin}
+              onChange={(id) => setExplorer.mutate(id, { onSuccess: () => setPicking(false) })}
+            />
+          </View>
+        )}
 
         <View style={styles.links}>
           <LinkButton
@@ -142,6 +170,7 @@ export default function Profile() {
 
 const styles = StyleSheet.create({
   links: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  picker: { borderRadius: radius.lg, padding: space.md },
   link: {
     flexDirection: 'row',
     alignItems: 'center',

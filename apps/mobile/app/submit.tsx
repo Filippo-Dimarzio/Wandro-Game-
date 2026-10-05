@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CATEGORIES, type Category } from '@wandro/shared';
 import { Check } from '@/components/Check';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { WandroLogo } from '@/components/WandroLogo';
 import { useSubmitPlace } from '@/data/moderation';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
@@ -31,7 +32,9 @@ export default function Submit() {
       <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
         <ScreenHeader title={t('submit.title')} />
         <View style={styles.container}>
-          <Text style={{ fontSize: 48, textAlign: 'center' }}>🐙</Text>
+          <View style={{ alignItems: 'center' }}>
+            <WandroLogo size={64} />
+          </View>
           <Text
             style={{ color: c.text, fontSize: 18, textAlign: 'center' }}
             accessibilityLiveRegion="polite"

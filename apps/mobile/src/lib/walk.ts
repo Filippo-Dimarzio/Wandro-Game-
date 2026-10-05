@@ -44,7 +44,7 @@ export function stepPosition(from: LatLng, held: Set<Direction>, metres: number)
 }
 
 /**
- * One step that keeps to the streets: the octopus is pulled onto the nearest road, and doesn't
+ * One step that keeps to the streets: your explorer is pulled onto the nearest road, and doesn't
  * move if there's none close by (no walking through buildings). Free movement if the map has
  * no street data.
  */
@@ -57,7 +57,7 @@ export function walkStep(from: LatLng, held: Set<Direction>, metres: number): La
 }
 
 /**
- * Walk the octopus in demo mode: WASD / arrow keys on web and desktop, or the on-screen pad.
+ * Walk your explorer in demo mode: WASD / arrow keys on web and desktop, or the on-screen pad.
  * Moves the demo position, which the map, check-ins and proximity all read.
  */
 export function useWalkControls(enabled: boolean, start: LatLng) {

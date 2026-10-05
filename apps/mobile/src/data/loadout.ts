@@ -26,7 +26,7 @@ interface ServerInventory {
   items: { item_code: string; expires_at: string | null }[];
 }
 
-/** Equipped octopus cosmetics and which boosts are running or held (re-checked every 15 s). */
+/** Your explorer's equipped outfit and hat, and which boosts are running or held (re-checked every 15 s). */
 export function useLoadout(): Loadout {
   const inventory = useSession((s) => s.inventory);
   const [now, setNow] = useState(Date.now());

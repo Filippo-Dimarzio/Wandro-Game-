@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FriendButton } from '@/components/FriendButton';
+import { PlayerAvatar } from '@/components/PlayerAvatar';
 import { FriendChallengeCard } from '@/components/FriendChallengeCard';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import {
@@ -65,7 +66,7 @@ export default function Friends() {
         </View>
         {searching &&
           results.map((r) => (
-            <Row key={r.id} name={r.username} onPress={() => openProfile(r.id)}>
+            <Row key={r.id} userId={r.id} name={r.username} onPress={() => openProfile(r.id)}>
               <FriendButton userId={r.id} compact />
             </Row>
           ))}
@@ -73,7 +74,13 @@ export default function Friends() {
         {incoming.length > 0 && (
           <Section title={t('friends.requests', { count: incoming.length })}>
             {incoming.map((f) => (
-              <Row key={f.id} name={f.username} sub={f.homeCity} onPress={() => openProfile(f.id)}>
+              <Row
+                key={f.id}
+                userId={f.id}
+                name={f.username}
+                sub={f.homeCity}
+                onPress={() => openProfile(f.id)}
+              >
                 <Pressable
                   onPress={() => respond.mutate({ userId: f.id, accept: true })}
                   accessibilityRole="button"
@@ -102,6 +109,7 @@ export default function Friends() {
           {friends.map((f) => (
             <Row
               key={f.id}
+              userId={f.id}
               name={f.username}
               sub={[t('friends.level', { level: f.level }), f.homeCity].filter(Boolean).join(' · ')}
               onPress={() => openProfile(f.id)}
@@ -132,7 +140,13 @@ export default function Friends() {
         {outgoing.length > 0 && (
           <Section title={t('friends.pending')}>
             {outgoing.map((f) => (
-              <Row key={f.id} name={f.username} sub={f.homeCity} onPress={() => openProfile(f.id)}>
+              <Row
+                key={f.id}
+                userId={f.id}
+                name={f.username}
+                sub={f.homeCity}
+                onPress={() => openProfile(f.id)}
+              >
                 <FriendButton userId={f.id} compact />
               </Row>
             ))}
@@ -166,11 +180,13 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function Row({
+  userId,
   name,
   sub,
   onPress,
   children,
 }: {
+  userId: string;
   name: string;
   sub?: string | null;
   onPress: () => void;
@@ -185,11 +201,7 @@ function Row({
         style={styles.who}
         accessibilityLabel={sub ? `${name}, ${sub}` : name}
       >
-        <View style={[styles.avatar, { backgroundColor: c.accentSoft }]}>
-          <Text style={{ fontSize: 20 }} accessible={false}>
-            🐙
-          </Text>
-        </View>
+        <PlayerAvatar userId={userId} size={40} />
         <View style={{ flex: 1 }}>
           <Text style={{ color: c.text, fontWeight: '800' }} numberOfLines={1}>
             {name}
@@ -228,13 +240,6 @@ const styles = StyleSheet.create({
     paddingLeft: space.md,
   },
   who: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 44 },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   actions: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   pill: {
     borderRadius: radius.pill,

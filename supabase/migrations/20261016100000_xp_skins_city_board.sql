@@ -48,10 +48,10 @@ update public.shop_items s
 set unlock_kind = v.kind, unlock_category = v.category::public.place_category,
     unlock_count = v.count, description = v.description
 from (values
-  ('skin_ocean', 'category', 'coast', 3, 'Deep Atlantic blue, with sea-foam suckers.'),
-  ('skin_coral', 'category', 'heritage', 5, 'Warm coral, the colour of Pena Palace’s walls.'),
-  ('skin_midnight', 'category', 'music_events', 2, 'Ink-dark night blue that glows under the stars.'),
-  ('skin_gold', 'stamps', null, 3, 'Polished gold from tentacle to tip.')
+  ('skin_ocean', 'category', 'coast', 3, 'Deep Atlantic blue.'),
+  ('skin_coral', 'category', 'heritage', 5, 'Warm coral, like Pena Palace at sunset.'),
+  ('skin_midnight', 'category', 'music_events', 2, 'For night walks and fado.'),
+  ('skin_gold', 'stamps', null, 3, 'Shiny. Very shiny.')
 ) as v(code, kind, category, count, description)
 where s.code = v.code;
 

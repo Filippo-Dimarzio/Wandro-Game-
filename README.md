@@ -1,4 +1,4 @@
-# 🐙 Wandro — the map collection game
+# Wandro — the map collection game
 
 **Lift the fog. Find the places most people walk past.**
 
@@ -7,7 +7,7 @@ Wandro is a photo-first, location-based exploration game and community app. It g
 castles, galleries and street art, parks, viewpoints, beaches, music venues, historic stations,
 trams and funiculars, and nature spots. Places start
 hidden under fog; visiting one unlocks it, clears the fog around it and earns **coins** for your
-octopus. Hidden gems are worth the most.
+explorer. Hidden gems are worth the most.
 
 - **Where:** Portugal — Sintra (the pilot), Lisbon, Porto, Évora and Aveiro, each with at least
   five side quests in every category. We're focusing on Portugal until players prove they come
@@ -46,23 +46,26 @@ inversely with how often a place has been visited**, so a quiet convent in the f
 more than the most famous palace. Around the game sits a community layer: profiles, following
 friends, a photo feed of discoveries, leaderboards and curated collections.
 
-**Why "Wandro" and the octopus?** The name comes from "wander": short, easy to say in any language
-and memorable. The octopus mascot reaches in eight directions at once, like an explorer. As you
-level up, your octopus evolves (Hatchling → Explorer → Navigator → Cartographer).
+**Why "Wandro"?** The name comes from "wander": short, easy to say in any language and
+memorable. The logo is a **W** drawn as a wandering route with a "you are here" dot. Each player
+picks one of eight drawn **explorers** as their avatar, and as you level up your explorer's kit
+grows: **Wanderer → Explorer** (a map) **→ Navigator** (a backpack) **→ Cartographer** (a camera).
+**Wandro** himself is the brand's host, a wandering street musician who appears in marketing and at
+key moments; the player is always the hero.
 
 ## How it plays
 
 1. **Explore the map.** Places near you are fogged and greyed out until you discover them. Your
-   octopus marks where you are, with a pulsing accuracy circle like _Find My_.
+   explorer marks where you are, with a pulsing accuracy circle like _Find My_.
 2. **Pick an adventure.** Tap a place and **Guide me**: a card shows the distance, walking time and
    how close you are (_On your way → Getting warmer → Almost there → You're here!_), with
    **Directions in Google Maps**. When a hidden gem is within 150 m, the app nudges you.
 3. **Go there.** On a phone you walk there for real. In the browser or the desktop app (demo
-   mode) you can walk your octopus with **WASD / arrow keys** (Shift = slow) or the on-screen pad.
+   mode) you can walk your explorer with **WASD / arrow keys** (Shift = slow) or the on-screen pad.
 4. **Stay a moment.** Hold **Start discovery** and stay inside the place's geofence (75 m) while
    the ring fills (2 minutes; 8 seconds in demo). The server checks location, accuracy, timing,
    mock locations and impossible speed — it never trusts the phone for coins.
-5. **Unlock it.** The fog clears in a circle, coins land in your octopus's pouch, you may earn
+5. **Unlock it.** The fog clears in a circle, coins land in your explorer's pouch, you may earn
    badges, and you can share a photo (its location data is stripped first).
 6. **Daily challenge — double coins.** Each day brings a new challenge (e.g. _"Step into history:
    discover any heritage site"_), open for 24 hours from when you first see it. Every category
@@ -70,8 +73,8 @@ level up, your octopus evolves (Hatchling → Explorer → Navigator → Cartogr
    Car-Free Day on 22 September). After a matching discovery, **press and hold** to claim it: you
    get that discovery's coins **again**.
 7. **Collect.** Collections like _"Sintra's palaces"_ pay a 200-coin bonus when complete.
-8. **Spend coins in the Store.** The **incense trail** wraps your octopus in a glowing circle and
-   draws a guiding line to your next adventure for 30 minutes or 2 hours. Octopus skins and hats
+8. **Spend coins in the Store.** The **incense trail** wraps your explorer in a glowing circle and
+   draws a guiding line to your next adventure for 30 minutes or 2 hours. Outfits and hats
    are forever. Coins are only earned by playing — never bought — and spending never lowers your
    rank.
 9. **Play together.** Follow explorers, like their discoveries, climb the leaderboards, and
@@ -83,7 +86,7 @@ level up, your octopus evolves (Hatchling → Explorer → Navigator → Cartogr
     even on private profiles) and **challenge a friend** to a place with a short idea —
     _"Go at golden hour!"_. It's ticked off when they discover it.
 12. **Travel Portugal.** Land in a city served by another airport, open Wandro and a **flight
-    animation** takes your octopus from your old airport to the new one (LIS ✈ OPO) before the
+    animation** takes your explorer from your old airport to the new one (LIS ✈ OPO) before the
     map flies there. Sintra, Lisbon and Évora share Lisbon's airport, Aveiro shares Porto's, so
     moving between those needs no flight. In the browser demo, pick a city from
     **Explore → Adventures → city** to go there.
@@ -95,7 +98,7 @@ level up, your octopus evolves (Hatchling → Explorer → Navigator → Cartogr
 - **Fog of war.** Locked areas sit under a soft, muted fog; discovered places are in full colour.
   The fog never hides place names or pins (accessibility first).
 - **Portrait only**, light and dark mode following the phone, clean neutral UI so photos carry the
-  colour, one teal accent inspired by the octopus.
+  colour, one teal accent from the W logo.
 - **Warm, respectful tone** in all copy and community guidelines.
 - **English first**, with every string in an i18n layer so Portuguese, Spanish, Italian and French
   can follow without refactoring.
@@ -106,12 +109,12 @@ level up, your octopus evolves (Hatchling → Explorer → Navigator → Cartogr
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Entry portal** | Full-screen view under fog; hold to clear it and reveal Wandro.                                                                                               |
 | **Registration** | Sign-up (email, Google, Apple), username, home city, then **pick your explorer style** (castles, nature, museums, music, beaches, hidden gems).               |
-| **Home**         | A slim progress strip (level, octopus stage, coins), interests, today's challenge, places near you.                                                           |
+| **Home**         | A slim progress strip (level, explorer rank, coins), interests, today's challenge, places near you.                                                           |
 | **Explore**      | Map with locked/discovered places, category chips, legend, recenter button, and a bottom sheet with photo, category, distance, points, rarity and directions. |
 | **Check in (+)** | Nearest place, hold to start discovery, dwell ring, reward card; below it today's moments (small boxes, unlocked by sharing your own, gone after 24 h).       |
 | **Collections**  | One card per city that opens with an animation to show its sets of 5 places and your progress.                                                                |
 | **Passport**     | Every moment you've shared, stamped by city. Only you see it.                                                                                                 |
-| **Profile**      | "Map of you" (your cleared fog), discoveries, points, level, octopus stage and badges.                                                                        |
+| **Profile**      | "Map of you" (your cleared fog), discoveries, points, level, explorer rank and badges.                                                                        |
 
 Navigation is a bottom tab bar like Instagram: Home · Explore · Check in · Collections · Profile.
 
@@ -134,11 +137,11 @@ doesn't cost you rank.
 
 ## The Store
 
-| Item                            | Price     | What it does                                                                                                    |
-| ------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------- |
-| 🪔 Incense trail · 30 min / 2 h | 150 / 400 | Glowing circle around your octopus and a guiding line to the nearest undiscovered place; buying again adds time |
-| 🌊🪸🌙✨ Octopus skins          | 300–1200  | Change your octopus's colour on the map, profile and store                                                      |
-| 🌺🧢🎩👑 Hats                   | 200–1500  | A hat for your octopus                                                                                          |
+| Item                            | Price     | What it does                                                                                                     |
+| ------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------- |
+| 🪔 Incense trail · 30 min / 2 h | 150 / 400 | Glowing circle around your explorer and a guiding line to the nearest undiscovered place; buying again adds time |
+| 🧥 Outfits                      | 300–1200  | Your explorer's jacket colour on the map, profile and store                                                      |
+| 🌺🧢🎩👑 Hats                   | 200–1500  | A hat for your explorer                                                                                          |
 
 There is no subscription and no way to buy coins.
 
@@ -181,11 +184,12 @@ and alternatives to press-and-hold gestures.
 | 4     | Photo posts, follows, feed, likes, report/block, leaderboards, collections, place submissions, moderation                                          | ✅ v2.0         |
 | 5     | Settings, data export, account deletion, privacy page, onboarding guide, store-build config                                                        | ✅ v2.0         |
 | 6     | Desktop app (Windows, macOS, Linux) and installable web app                                                                                        | ✅ v2.0         |
-| 7     | Find-My-style walking: octopus marker, proximity guidance, Google Maps directions, keyboard walking                                                | ✅ v2.0         |
+| 7     | Find-My-style walking: explorer marker, proximity guidance, Google Maps directions, keyboard walking                                               | ✅ v2.0         |
 | 8     | Coin economy: double daily coins, Store with incense trail, skins and hats                                                                         | ✅ v2.0         |
 | 9     | Europe (12 cities), hidden gems revealed at 200 m, friends and friend challenges, Adventures sidebar, arrival flights, log out, cleaner tab labels | ✅ Unreleased   |
 | 10    | Portugal focus: Sintra, Lisbon, Porto, Évora, Aveiro; other cities paused; gems after 5 discoveries; landmark city cards; flights by airport       | ✅ Unreleased   |
 | 10.1  | Culture themes (food, traditions, neighbourhoods); daily challenge calendar with dated challenges                                                  | ✅ Unreleased   |
+| 15    | Explorers replace the octopus: eight drawn explorers to choose from, outfits, kit by rank (Wanderer → Cartographer), the W logo and app icons      | ✅ Unreleased   |
 | Later | Comments, food challenges, Instagram share cards, events, teams, offline maps, more languages, more cities, push notifications for friend activity | Ideas           |
 
 The full plan — architecture, data model, check-in validation and every decision — is in
@@ -243,7 +247,7 @@ explorers; real players appear once a Supabase project is connected.
 - **Teleport here (demo)** in a place's sheet moves you there, so you can try a discovery from
   anywhere.
 - Dwell time is shortened to 8 seconds (the real rule is 2 minutes, enforced by the server).
-- **Explore → Adventures → city** moves your octopus to another city (a flight between Lisbon and Porto).
+- **Explore → Adventures → city** moves your explorer to another city (a flight between Lisbon and Porto).
 - Demo friends (ines.wanders, mia.maps…) answer requests straight away and have sent you challenges.
 - **Profile → Log out** returns to the portal and, as there's no account in the demo, starts over.
 
@@ -258,7 +262,7 @@ To use a real backend, copy `.env.example` to `.env`, fill in `EXPO_PUBLIC_SUPAB
 4. Tap **Teleport here (demo)** on a heritage place, open **Discover**, hold **Start discovery** and
    wait for the ring. Back on **Explore**, the fog has cleared around it.
 5. On **Home**, hold **Hold to confirm** on today's challenge to claim +75.
-6. Check **Profile** for your level, octopus stage and badges.
+6. Check **Profile** for your level, explorer rank and badges; tap **Change your explorer** to pick another.
 7. On **Explore**, open the **Adventures** sidebar (the compass tab on the left edge): accept
    ines.wanders's challenge, read the hidden-gem hint, then use **Walk** to head east from the
    town centre until the **Moorish Fountain** gem appears.

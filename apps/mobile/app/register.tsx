@@ -12,9 +12,10 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { Category } from '@wandro/shared';
+import { DEFAULT_EXPLORER, type Category, type ExplorerId } from '@wandro/shared';
 import { CategoryMark } from '@/components/CategoryMark';
 import { Check } from '@/components/Check';
+import { ExplorerPicker } from '@/components/ExplorerPicker';
 import { t, type TranslationKey } from '@/i18n';
 import { signInWithProvider, useAuthSession } from '@/lib/auth';
 import { isDemo } from '@/lib/env';
@@ -43,6 +44,7 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [homeCity, setHomeCity] = useState('');
+  const [explorer, setExplorer] = useState<ExplorerId>(DEFAULT_EXPLORER);
   const [styles_, setStyles] = useState<string[]>([]);
   const [guidelines, setGuidelines] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -70,14 +72,14 @@ export default function Register() {
     if (supabase && session) {
       const { error } = await supabase
         .from('profiles')
-        .update({ username, home_city: homeCity || null, explorer_styles: styles_ })
+        .update({ username, home_city: homeCity || null, explorer_styles: styles_, explorer })
         .eq('id', session.user.id);
       if (error) {
         setBusy(false);
         return setMessage(error.message);
       }
     }
-    completeOnboarding({ username, homeCity, explorerStyles: styles_ });
+    completeOnboarding({ username, homeCity, explorerStyles: styles_, explorer });
     setBusy(false);
     router.replace('/(tabs)');
   };
@@ -184,6 +186,9 @@ export default function Register() {
                 placeholder="Sintra"
                 placeholderTextColor={c.textMuted}
               />
+              <Text style={[styles.label, { color: c.text }]}>{t('register.explorerTitle')}</Text>
+              <Text style={{ color: c.textMuted, fontSize: 13 }}>{t('register.explorerHint')}</Text>
+              <ExplorerPicker value={explorer} onChange={setExplorer} size={56} />
               <Primary
                 label={t('register.next')}
                 onPress={() => setStep('style')}

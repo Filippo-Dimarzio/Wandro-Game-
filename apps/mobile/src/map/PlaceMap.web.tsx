@@ -4,7 +4,8 @@ import type { GeoJSONSource, Map as MLMap, MapLayerMouseEvent } from 'maplibre-g
 import { useEffect, useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { CATEGORIES } from '@wandro/shared';
-import { shopItem, skinColor } from '@wandro/shared';
+import { shopItem } from '@wandro/shared';
+import { explorerImage } from '@/components/ExplorerAvatar';
 import { Asset } from 'expo-asset';
 import { lightColors, useIsDark } from '@/theme';
 import { ADVENTURE } from './adventure';
@@ -137,20 +138,21 @@ function loadMarkerImages(m: MLMap) {
       load(landmarkName(city, locked), locked ? art.locked : art.found);
 }
 
-// Find-My-style pulse and incense glow for the octopus marker.
+// Find-My-style pulse and incense glow around your explorer on the map.
 const MARKER_CSS = `
 .wandro-me { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
 .wandro-me .pulse { position: absolute; width: 44px; height: 44px; border-radius: 50%; background: rgba(43,108,176,.35); animation: wandro-pulse 2s ease-out infinite; }
 .wandro-me .glow { position: absolute; width: 96px; height: 96px; border-radius: 50%; background: radial-gradient(circle, rgba(246,173,85,.75), rgba(246,173,85,0) 70%); animation: wandro-glow 1.8s ease-in-out infinite; }
-.wandro-me .body { position: relative; width: 36px; height: 36px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.35); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 22px; line-height: 1; }
-.wandro-me .body.hatted { font-size: 18px; padding-top: 6px; box-sizing: border-box; }
-.wandro-me .hat { font-size: 13px; line-height: 1; margin-bottom: -6px; position: relative; z-index: 1; }
-/* A little bounce while the octopus walks. */
-.wandro-me.walking .body { animation: wandro-walk .28s ease-in-out infinite alternate; }
+.wandro-me .body { position: relative; width: 36px; height: 36px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.35); overflow: hidden; background: #FBF1E4; }
+.wandro-me .body img { width: 100%; height: 100%; display: block; }
+/* The hat sits on the explorer's head, inside the circle. */
+.wandro-me .hat { position: absolute; top: 2px; font-size: 14px; line-height: 1; }
+/* A little bounce while your explorer walks. */
+.wandro-me.walking .body, .wandro-me.walking .hat { animation: wandro-walk .28s ease-in-out infinite alternate; }
 @keyframes wandro-walk { from { transform: translateY(0) rotate(-6deg) } to { transform: translateY(-4px) rotate(6deg) } }
 @keyframes wandro-pulse { 0% { transform: scale(.6); opacity: .9 } 100% { transform: scale(2.2); opacity: 0 } }
 @keyframes wandro-glow { 0%,100% { transform: scale(.85); opacity: .7 } 50% { transform: scale(1.1); opacity: 1 } }
-@media (prefers-reduced-motion: reduce) { .wandro-me .pulse, .wandro-me .glow, .wandro-me.walking .body { animation: none } }
+@media (prefers-reduced-motion: reduce) { .wandro-me .pulse, .wandro-me .glow, .wandro-me.walking .body, .wandro-me.walking .hat { animation: none } }
 `;
 
 function ensureMarkerCss() {
@@ -161,11 +163,15 @@ function ensureMarkerCss() {
   document.head.appendChild(style);
 }
 
-function markerHtml(skin: string | undefined, hat: string | undefined, glow: boolean): string {
+function markerHtml(
+  explorer: string | undefined,
+  skin: string | undefined,
+  hat: string | undefined,
+  glow: boolean,
+): string {
   const hatEmoji = shopItem(hat)?.emoji;
-  // The hat sits on the octopus's head, inside its circle.
-  const hatHtml = hatEmoji ? `<div class="hat">${hatEmoji}</div>` : '';
-  return `${glow ? '<div class="glow"></div>' : ''}<div class="pulse"></div><div class="body${hatEmoji ? ' hatted' : ''}" style="background:${skinColor(skin)}">${hatHtml}<div>🐙</div></div>`;
+  const src = Asset.fromModule(explorerImage(explorer, skin) as number).uri;
+  return `${glow ? '<div class="glow"></div>' : ''}<div class="pulse"></div><div class="body"><img src="${src}" alt=""></div>${hatEmoji ? `<div class="hat">${hatEmoji}</div>` : ''}`;
 }
 
 function setSourceData(m: MLMap | null, ready: boolean, id: string, data: GeoJSON.GeoJSON) {
@@ -371,8 +377,8 @@ export function PlaceMap({
 
   useEffect(() => {
     const el = marker.current?.getElement();
-    if (el) el.innerHTML = markerHtml(avatar?.skin, avatar?.hat, trail);
-  }, [avatar?.skin, avatar?.hat, trail]);
+    if (el) el.innerHTML = markerHtml(avatar?.explorer, avatar?.skin, avatar?.hat, trail);
+  }, [avatar?.explorer, avatar?.skin, avatar?.hat, trail]);
 
   // The night palette in dark mode.
   const dark = useIsDark();

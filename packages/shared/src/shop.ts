@@ -17,7 +17,7 @@ export interface ShopItem {
   durationMinutes?: number;
   /** One-use boosts: held until used up, one at a time. */
   consumable?: boolean;
-  /** Skin colour for the octopus. */
+  /** Outfit colour: your explorer's jacket. */
   color?: string;
   /** Complete this first; then the item can be bought. */
   unlock?: ShopUnlock;
@@ -34,7 +34,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     code: 'incense_30',
     name: 'Incense trail · 30 min',
     description:
-      'A glowing incense circle around your octopus and a guiding line to your next adventure.',
+      'A glowing incense circle around your explorer and a guiding line to your next adventure.',
     kind: 'boost',
     price: 150,
     durationMinutes: 30,
@@ -51,8 +51,8 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
   {
     code: 'skin_ocean',
-    name: 'Ocean octopus',
-    description: 'Deep Atlantic blue, with sea-foam suckers.',
+    name: 'Atlantic jacket',
+    description: 'Deep Atlantic blue.',
     unlock: { kind: 'category', category: 'coast', count: 3 },
     challenge: 'Discover 3 beaches & coast spots.',
     kind: 'skin',
@@ -62,8 +62,8 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
   {
     code: 'skin_coral',
-    name: 'Coral octopus',
-    description: 'Warm coral, the colour of Pena Palace’s walls.',
+    name: 'Coral jacket',
+    description: 'Warm coral, like Pena Palace at sunset.',
     unlock: { kind: 'category', category: 'heritage', count: 5 },
     challenge: 'Discover 5 heritage sites.',
     kind: 'skin',
@@ -73,8 +73,8 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
   {
     code: 'skin_midnight',
-    name: 'Midnight octopus',
-    description: 'Ink-dark night blue that glows under the stars.',
+    name: 'Midnight coat',
+    description: 'For night walks and fado.',
     unlock: { kind: 'category', category: 'music_events', count: 2 },
     challenge: 'Discover 2 music & events spots.',
     kind: 'skin',
@@ -84,8 +84,8 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
   {
     code: 'skin_gold',
-    name: 'Golden octopus',
-    description: 'Polished gold from tentacle to tip.',
+    name: 'Golden jacket',
+    description: 'Shiny. Very shiny.',
     unlock: { kind: 'stamps', count: 3 },
     challenge: 'Collect 3 city stamps.',
     kind: 'skin',

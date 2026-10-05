@@ -14,12 +14,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CATEGORIES, haversineMeters } from '@wandro/shared';
 import { CategoryMark } from '@/components/CategoryMark';
 import { CoinCounter } from '@/components/CoinCounter';
+import { ExplorerAvatar } from '@/components/ExplorerAvatar';
 import { DailyChallengeCard } from '@/components/DailyChallengeCard';
 import { HowToPlay } from '@/components/HowToPlay';
 import { InstallBanner } from '@/components/InstallBanner';
 import { PlaceCard } from '@/components/PlaceBits';
 import { ProgressStrip } from '@/components/ProgressStrip';
+import { useMyExplorer } from '@/data/explorer';
 import { useFriendChallenges, useFriends } from '@/data/friends';
+import { useLoadout } from '@/data/loadout';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { useWallet } from '@/data/wallet';
 import { t } from '@/i18n';
@@ -34,6 +37,8 @@ export default function Home() {
   const places = usePlaces(loc.position);
   const { ids } = useUnlockedIds();
   const wallet = useWallet();
+  const explorer = useMyExplorer();
+  const loadout = useLoadout();
   const { incoming } = useFriends();
   const friendChallenges = useFriendChallenges();
   const friendNews =
@@ -61,11 +66,7 @@ export default function Home() {
         }
       >
         <View style={styles.header}>
-          <View style={[styles.avatar, { backgroundColor: c.accentSoft }]}>
-            <Text style={{ fontSize: 22 }} accessible={false}>
-              🐙
-            </Text>
-          </View>
+          <ExplorerAvatar explorer={explorer} skin={loadout.skin} hat={loadout.hat} size={40} />
           <Text style={[styles.greeting, { color: c.text }]} numberOfLines={1}>
             {t('home.greeting', { name: profile?.username ?? '' })}
           </Text>
@@ -208,13 +209,6 @@ const styles = StyleSheet.create({
   },
   badgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
   coinPill: { borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 6 },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   greeting: { fontSize: 16, fontWeight: '700', flex: 1 },
   headline: { fontSize: 30, fontWeight: '900', letterSpacing: -0.5, marginTop: -space.sm },
   sectionRow: {

@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { WandroLogo } from '@/components/WandroLogo';
 import { t } from '@/i18n';
 import { radius, space } from '@/theme';
 
@@ -63,9 +64,12 @@ export default function Welcome() {
             gap: space.md,
           }}
         >
-          <Text style={styles.logo} accessibilityRole="header">
-            🐙 Wandro
-          </Text>
+          <View style={styles.brand}>
+            <WandroLogo size={64} />
+            <Text style={styles.logo} accessibilityRole="header">
+              Wandro
+            </Text>
+          </View>
           <Text style={styles.tagline}>{t('portal.tagline')}</Text>
         </Animated.View>
 
@@ -108,6 +112,7 @@ const styles = StyleSheet.create({
     padding: space.xl,
     paddingTop: 120,
   },
+  brand: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   logo: { fontSize: 46, fontWeight: '900', color: '#fff', letterSpacing: -1 },
   tagline: { fontSize: 18, color: '#fff', textAlign: 'center', fontWeight: '600', maxWidth: 320 },
   holdButton: {

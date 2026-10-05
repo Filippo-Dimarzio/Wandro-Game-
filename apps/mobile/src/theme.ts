@@ -14,7 +14,7 @@ const lightCategory = {
   culture: { color: '#3949AB', tint: '#E8EAF7' }, // azulejo indigo: tiled streets, markets, festivals
   art: { color: '#7B3FC4', tint: '#F1E9FB' }, // violet: museums and art (matches its card)
   music_events: { color: '#A3195B', tint: '#F9E7EF' }, // berry: nights out (matches its cover)
-  other: { color: '#0A706F', tint: '#E0F3F2' }, // deep teal: curiosities (the octopus)
+  other: { color: '#0A706F', tint: '#E0F3F2' }, // deep teal: curiosities (Wandro's own colour)
 } satisfies Record<Category, { color: string; tint: string }>;
 
 const darkCategory: typeof lightCategory = {
