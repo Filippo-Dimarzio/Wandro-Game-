@@ -1,4 +1,4 @@
--- Arrival flights: only the city is remembered; a flight is a new live city with another airport.
+-- Arrivals: only the city is remembered; moving to another live city is a trip (plane, train or coach).
 begin;
 insert into auth.users (id, raw_user_meta_data) values
   ('00000000-0000-0000-0000-00000000bb01', '{"username":"flyer"}'),
@@ -9,24 +9,24 @@ select pg_temp.check((check_arrival(38.7975, -9.3905) ->> 'arrived')::boolean = 
   'a first visit is not a flight');
 select pg_temp.check((check_arrival(38.7975, -9.3905) ->> 'arrived')::boolean = false,
   'opening the app again in the same city is not a flight');
-select pg_temp.check(check_arrival(38.7139, -9.1394) @> '{"arrived": false, "from": "sintra", "to": "lisbon"}',
-  'Sintra to Lisbon is a short hop, not a flight');
-select pg_temp.check(check_arrival(38.5714, -7.9135) @> '{"arrived": false, "from": "lisbon", "to": "evora"}',
-  'Lisbon to Évora shares the LIS airport: no flight');
-select pg_temp.check(check_arrival(38.7139, -9.1394) @> '{"arrived": false, "from": "evora", "to": "lisbon"}',
+select pg_temp.check(check_arrival(38.7139, -9.1394) @> '{"arrived": true, "from": "sintra", "to": "lisbon"}',
+  'Sintra to Lisbon is a trip (the train)');
+select pg_temp.check(check_arrival(38.5714, -7.9135) @> '{"arrived": true, "from": "lisbon", "to": "evora"}',
+  'Lisbon to Évora is a trip too');
+select pg_temp.check(check_arrival(38.7139, -9.1394) @> '{"arrived": true, "from": "evora", "to": "lisbon"}',
   'and back again');
 
 create temp table fl on commit drop as select check_arrival(41.1496, -8.611) as r;
 grant select on fl to authenticated;
 select pg_temp.check((select r @> '{"arrived": true, "from": "lisbon", "to": "porto"}' from fl),
-  'landing in Porto after Lisbon is an arrival flight (LIS to OPO)');
-select pg_temp.check((select (r ->> 'km')::int between 250 and 300 from fl), 'the flight distance is returned');
-select pg_temp.check(check_arrival(40.6405, -8.6538) @> '{"arrived": false, "from": "porto", "to": "aveiro"}',
-  'Porto to Aveiro shares an airport (OPO), so it is not a flight');
+  'landing in Porto after Lisbon is an arrival (a flight)');
+select pg_temp.check((select (r ->> 'km')::int between 250 and 300 from fl), 'the trip distance is returned');
+select pg_temp.check(check_arrival(40.6405, -8.6538) @> '{"arrived": true, "from": "porto", "to": "aveiro"}',
+  'Porto to Aveiro is a trip (the train)');
 select pg_temp.check(check_arrival(38.5714, -7.9135) @> '{"arrived": true, "from": "aveiro", "to": "evora"}',
-  'Aveiro to Évora is a flight (OPO to LIS)');
+  'Aveiro to Évora is a trip');
 select pg_temp.check(check_arrival(41.1496, -8.611) @> '{"arrived": true, "from": "evora", "to": "porto"}',
-  'and Évora to Porto (LIS to OPO)');
+  'and Évora to Porto');
 select pg_temp.check((check_arrival(48.8566, 2.3522) ->> 'to') is null, 'a paused city is not recorded');
 select pg_temp.check((check_arrival(40, -30) ->> 'to') is null, 'outside the launch cities nothing is recorded');
 select pg_temp.check((select region_slug from player_regions) = 'porto', 'only the city is stored, not coordinates');
@@ -36,12 +36,12 @@ select pg_temp.check(not exists (
   'the table has no coordinate columns');
 select pg_temp.check((export_my_data() -> 'last_city' ->> 'region') = 'porto', 'the export includes the remembered city');
 
--- A player last seen in a city that has since been paused arrives quietly, without a flight.
+-- A player last seen in a city that has since been paused arrives quietly, without a trip.
 reset role;
 update player_regions set region_slug = 'paris';
 select pg_temp.as_user('00000000-0000-0000-0000-00000000bb01');
 select pg_temp.check(check_arrival(41.1496, -8.611) @> '{"arrived": false, "from": "paris", "to": "porto"}',
-  'arriving from a paused city is not a flight');
+  'arriving from a paused city is not a trip');
 
 do $$ begin
   update player_regions set region_slug = 'evora';

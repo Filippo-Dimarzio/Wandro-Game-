@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react';
-import { arrivalFlight, regionFor, type LatLng } from '@wandro/shared';
+import { arrivalTrip, regionFor, type LatLng } from '@wandro/shared';
 import { isDemo } from '@/lib/env';
 import { supabase } from '@/lib/supabase';
 import { useSession } from '@/state/session';
 
 /**
- * Checks once per city whether the player has flown in from another launch city, and if so
- * queues the arrival flight. The server decides (check_arrival); the demo mirrors it.
+ * Checks once per city whether the player has travelled in from another launch city, and if so
+ * queues the arrival trip (plane, train or coach). The server decides (check_arrival); the demo mirrors it.
  * Only real positions count: never the fallback centre used when location is off.
  */
 export function useArrival(position: LatLng, canCheck: boolean) {
@@ -19,7 +19,7 @@ export function useArrival(position: LatLng, canCheck: boolean) {
   useEffect(() => {
     if (!canCheck || !region) return;
     if (isDemo) {
-      const flight = arrivalFlight(useSession.getState().lastRegion, region);
+      const flight = arrivalTrip(useSession.getState().lastRegion, region);
       setLastRegion(region);
       if (flight) startFlight({ from: flight.from.slug, to: flight.to.slug, km: flight.km });
       return;

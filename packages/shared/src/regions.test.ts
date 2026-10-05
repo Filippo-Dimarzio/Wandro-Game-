@@ -2,7 +2,14 @@ import { CATEGORIES } from './constants';
 import { haversineMeters } from './geo';
 import { DEMO_PLACES } from './seed-places';
 import { EUROPE_PLACES } from './europe-places';
-import { arrivalFlight, REGIONS, regionBySlug, regionFor } from './regions';
+import {
+  arrivalTrip,
+  FLIGHT_MINUTES,
+  groundMinutes,
+  REGIONS,
+  regionBySlug,
+  regionFor,
+} from './regions';
 
 describe('regions', () => {
   it('have unique slugs and sensible boxes', () => {
@@ -87,23 +94,31 @@ describe('Portugal focus', () => {
   });
 });
 
-describe('arrivalFlight', () => {
-  it('flies only between cities with different airports', () => {
-    const f = arrivalFlight('lisbon', 'porto');
-    expect(f?.from.airport.code).toBe('LIS');
-    expect(f?.to.airport.code).toBe('OPO');
+describe('arrivalTrip', () => {
+  it('flies only between two cities with their own airport', () => {
+    const f = arrivalTrip('lisbon', 'porto');
+    expect(f).toMatchObject({ mode: 'plane', minutes: FLIGHT_MINUTES });
     expect(f!.km).toBeGreaterThan(250);
-    expect(arrivalFlight('evora', 'aveiro')?.to.airport.code).toBe('OPO');
-    expect(arrivalFlight('porto', 'sintra')?.to.airport.code).toBe('LIS');
-    expect(arrivalFlight('aveiro', 'lisbon')?.to.airport.code).toBe('LIS');
-    // Same airport: a train ride, not a flight.
-    expect(arrivalFlight('sintra', 'lisbon')).toBeNull();
-    expect(arrivalFlight('lisbon', 'evora')).toBeNull();
-    expect(arrivalFlight('porto', 'aveiro')).toBeNull();
-    expect(arrivalFlight('porto', 'porto')).toBeNull();
-    expect(arrivalFlight(null, 'porto')).toBeNull();
-    expect(arrivalFlight('porto', null)).toBeNull();
-    expect(arrivalFlight('paris', 'porto')).toBeNull();
+    expect(REGIONS.filter((r) => r.hasAirport).map((r) => r.slug)).toEqual(['lisbon', 'porto']);
+  });
+
+  it('takes the quicker of train and coach when a city has no airport', () => {
+    expect(arrivalTrip('sintra', 'lisbon')).toMatchObject({ mode: 'train', minutes: 40 });
+    expect(arrivalTrip('porto', 'aveiro')).toMatchObject({ mode: 'train', minutes: 60 });
+    expect(arrivalTrip('evora', 'porto')).toMatchObject({ mode: 'bus', minutes: 255 });
+    expect(arrivalTrip('sintra', 'evora')).toMatchObject({ mode: 'bus', minutes: 130 });
+  });
+
+  it('knows train and coach times for every pair of cities', () => {
+    for (const a of REGIONS)
+      for (const b of REGIONS) if (a !== b) expect(groundMinutes(a.slug, b.slug)).toBeDefined();
+  });
+
+  it('every change of city is a trip; staying put or unknown cities are not', () => {
+    expect(arrivalTrip('porto', 'porto')).toBeNull();
+    expect(arrivalTrip(null, 'porto')).toBeNull();
+    expect(arrivalTrip('porto', null)).toBeNull();
+    expect(arrivalTrip('paris', 'porto')).toBeNull();
   });
 
   it('only Portuguese airports are used', () => {

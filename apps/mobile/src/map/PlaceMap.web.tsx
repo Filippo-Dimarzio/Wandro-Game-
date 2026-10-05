@@ -6,7 +6,7 @@ import { View } from 'react-native';
 import { CATEGORIES } from '@wandro/shared';
 import { shopItem, skinColor } from '@wandro/shared';
 import { Asset } from 'expo-asset';
-import { lightColors } from '@/theme';
+import { lightColors, useIsDark } from '@/theme';
 import { MARKERS, markerName } from './markers';
 import type { PlaceMapProps } from './types';
 import { accuracyGeoJson, guidanceGeoJson, placesGeoJson, useFog } from './useFog';
@@ -31,7 +31,21 @@ const STYLE: maplibregl.StyleSpecification = {
       maxzoom: 19,
     },
   },
-  layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
+  // RPG look: the tiles sit on a meadow green and are warmed up, so parks and countryside read
+  // as grass. Roads and labels stay legible (no overlay on top of the map).
+  layers: [
+    { id: 'meadow', type: 'background', paint: { 'background-color': '#8CCB6B' } },
+    {
+      id: 'osm',
+      type: 'raster',
+      source: 'osm',
+      paint: {
+        'raster-opacity': 0.88,
+        'raster-saturation': 0.35,
+        'raster-contrast': 0.08,
+      },
+    },
+  ],
 };
 
 // Spread pairs don't fit MapLibre's tuple types, hence the cast.
@@ -252,6 +266,19 @@ export function PlaceMap({
     const el = marker.current?.getElement();
     if (el) el.innerHTML = markerHtml(avatar?.skin, avatar?.hat, trail);
   }, [avatar?.skin, avatar?.hat, trail]);
+
+  // Night-time meadow in dark mode.
+  const dark = useIsDark();
+  useEffect(() => {
+    const m = map.current;
+    if (!m) return;
+    const apply = () => {
+      m.setPaintProperty('meadow', 'background-color', dark ? '#1F3B22' : '#8CCB6B');
+      m.setPaintProperty('osm', 'raster-brightness-max', dark ? 0.62 : 1);
+    };
+    if (m.isStyleLoaded()) apply();
+    else m.once('load', apply);
+  }, [dark]);
 
   useEffect(() => {
     if (focus) map.current?.flyTo({ center: [focus.lng, focus.lat], zoom: 13, duration: 1500 });

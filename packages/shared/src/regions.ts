@@ -12,8 +12,10 @@ export interface Region {
   country: string;
   flag: string;
   center: LatLng;
-  /** The city's main airport, where an arrival flight lands. */
+  /** The nearest airport, where an arrival flight lands. */
   airport: Airport;
+  /** The city has its own airport (Lisbon, Porto). Without one you arrive by train or coach. */
+  hasAirport: boolean;
   /** south, west, north, east — the area the importer pulls places from. */
   bbox: readonly [number, number, number, number];
 }
@@ -26,6 +28,7 @@ function r(
   lat: number,
   lng: number,
   airport: Airport,
+  hasAirport = false,
   dLat = 0.1,
   dLng = 0.15,
 ): Region {
@@ -37,6 +40,7 @@ function r(
     flag,
     center: { lat, lng },
     airport,
+    hasAirport,
     bbox: [round(lat - dLat), round(lng - dLng), round(lat + dLat), round(lng + dLng)],
   };
 }
@@ -55,19 +59,29 @@ export const REGIONS: readonly Region[] = [
     bbox: [38.73, -9.52, 38.85, -9.3],
   },
   {
-    ...r('lisbon', 'Lisbon', 'Portugal', '🇵🇹', 38.7139, -9.1394, {
-      code: 'LIS',
-      lat: 38.7742,
-      lng: -9.1342,
-    }),
+    ...r(
+      'lisbon',
+      'Lisbon',
+      'Portugal',
+      '🇵🇹',
+      38.7139,
+      -9.1394,
+      { code: 'LIS', lat: 38.7742, lng: -9.1342 },
+      true,
+    ),
     // West to Carcavelos, so the palaces and beaches along the Tagus line count as Lisbon.
     bbox: [38.614, -9.34, 38.814, -8.989],
   },
-  r('porto', 'Porto', 'Portugal', '🇵🇹', 41.1496, -8.611, {
-    code: 'OPO',
-    lat: 41.2481,
-    lng: -8.6814,
-  }),
+  r(
+    'porto',
+    'Porto',
+    'Portugal',
+    '🇵🇹',
+    41.1496,
+    -8.611,
+    { code: 'OPO', lat: 41.2481, lng: -8.6814 },
+    true,
+  ),
   r('evora', 'Évora', 'Portugal', '🇵🇹', 38.5714, -7.9135, {
     code: 'LIS',
     lat: 38.7742,
@@ -107,18 +121,52 @@ export function regionFor(p: LatLng): Region | null {
   return best;
 }
 
+export type TripMode = 'plane' | 'train' | 'bus';
+
+/** Door-to-door minutes by train and by coach between two launch cities (either order). */
+const GROUND_MINUTES: Record<string, { train: number; bus: number }> = {
+  'lisbon|sintra': { train: 40, bus: 50 },
+  'porto|sintra': { train: 210, bus: 240 },
+  'evora|sintra': { train: 140, bus: 130 },
+  'aveiro|sintra': { train: 180, bus: 225 },
+  'evora|lisbon': { train: 90, bus: 105 },
+  'aveiro|lisbon': { train: 135, bus: 180 },
+  'lisbon|porto': { train: 170, bus: 210 },
+  'evora|porto': { train: 285, bus: 255 },
+  'aveiro|porto': { train: 60, bus: 75 },
+  'aveiro|evora': { train: 255, bus: 225 },
+};
+/** Lisbon ↔ Porto by air. */
+export const FLIGHT_MINUTES = 55;
+
+export function groundMinutes(a: string, b: string): { train: number; bus: number } | undefined {
+  return GROUND_MINUTES[[a, b].sort().join('|')];
+}
+
 /**
- * Did the player fly? True when they were last seen in another launch city served by a different
- * airport: Lisbon or Évora (LIS) ↔ Porto or Aveiro (OPO). Sintra ↔ Lisbon and Porto ↔ Aveiro are
- * train rides. Mirrors check_arrival() in the database.
+ * How you'd get between two cities: a flight when both have their own airport, otherwise
+ * whichever of train or coach is quicker.
  */
-export function arrivalFlight(
+export function tripMode(from: Region, to: Region): { mode: TripMode; minutes: number } {
+  const ground = groundMinutes(from.slug, to.slug);
+  if (from.hasAirport && to.hasAirport) return { mode: 'plane', minutes: FLIGHT_MINUTES };
+  if (!ground) return { mode: 'train', minutes: 0 };
+  return ground.bus < ground.train
+    ? { mode: 'bus', minutes: ground.bus }
+    : { mode: 'train', minutes: ground.train };
+}
+
+/**
+ * Did the player travel? True whenever they were last seen in another launch city: they fly,
+ * take the train or the coach there (tripMode). Mirrors check_arrival() in the database.
+ */
+export function arrivalTrip(
   previous: string | null | undefined,
   current: string | null | undefined,
-): { from: Region; to: Region; km: number } | null {
+): { from: Region; to: Region; km: number; mode: TripMode; minutes: number } | null {
   if (!previous || !current || previous === current) return null;
   const from = regionBySlug(previous);
   const to = regionBySlug(current);
-  if (!from || !to || from.airport.code === to.airport.code) return null;
-  return { from, to, km: haversineMeters(from.center, to.center) / 1000 };
+  if (!from || !to) return null;
+  return { from, to, km: haversineMeters(from.center, to.center) / 1000, ...tripMode(from, to) };
 }

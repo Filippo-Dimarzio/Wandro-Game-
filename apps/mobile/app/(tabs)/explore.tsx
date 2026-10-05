@@ -37,6 +37,7 @@ import { t } from '@/i18n';
 import { isDemo } from '@/lib/env';
 import { useLocation } from '@/lib/useLocation';
 import { useWalkControls } from '@/lib/walk';
+import { MapAmbience } from '@/map/MapAmbience';
 import { PlaceMap } from '@/map/PlaceMap';
 import { useSession } from '@/state/session';
 import { radius, shadow, space, useColors } from '@/theme';
@@ -223,6 +224,7 @@ export default function Explore() {
             router.push({ pathname: '/submit', params: { lat: String(p.lat), lng: String(p.lng) } })
           }
         />
+        <MapAmbience />
 
         <SafeAreaView edges={['top']} style={styles.top} pointerEvents="box-none">
           <CategoryChips value={category} onChange={setCategory} />

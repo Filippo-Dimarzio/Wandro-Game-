@@ -10,6 +10,7 @@ import { AnimatedCard } from '@/components/AnimatedCard';
 import { HoldToConfirm } from '@/components/HoldToConfirm';
 import { Moments } from '@/components/Moments';
 import { CategoryPill, HoursChip } from '@/components/PlaceBits';
+import { CityCelebration } from '@/components/CityCelebration';
 import { RewardCard } from '@/components/RewardCard';
 import { useCheckin } from '@/data/checkin';
 import { nearestLocked } from '@/data/discovery';
@@ -51,6 +52,7 @@ export default function Capture() {
           </View>
         )}
 
+        {phase.kind === 'done' && <CityCelebration place={phase.place} outcome={phase.outcome} />}
         {phase.kind === 'done' && (
           <RewardCard
             placeName={phase.place.name}

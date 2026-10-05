@@ -34,6 +34,9 @@ import { DEMO_USERS } from '@/demo/social';
 
 export type { DemoUnlock } from '@/demo/engine';
 
+/** Light, dark, or follow the phone's setting. */
+export type ThemePref = 'system' | 'light' | 'dark';
+
 export interface LocalProfile {
   username: string;
   homeCity: string;
@@ -115,7 +118,7 @@ interface SessionState extends DemoProgress {
   /** Demo-only switch so the moderation screens can be tried. */
   demoModerator: boolean;
   installPromptDismissed: boolean;
-  prefs: { dailyReminder: boolean };
+  prefs: { dailyReminder: boolean; theme?: ThemePref };
 
   completeOnboarding: (profile: LocalProfile) => void;
   updateProfile: (patch: Partial<LocalProfile>) => void;
@@ -149,6 +152,7 @@ interface SessionState extends DemoProgress {
   setDemoModerator: (on: boolean) => void;
   dismissInstallPrompt: () => void;
   setPref: (key: 'dailyReminder', value: boolean) => void;
+  setTheme: (theme: ThemePref) => void;
   reset: () => void;
 }
 
@@ -415,6 +419,7 @@ export const useSession = create<SessionState>()(
       setDemoModerator: (demoModerator) => set({ demoModerator }),
       dismissInstallPrompt: () => set({ installPromptDismissed: true }),
       setPref: (key, value) => set((s) => ({ prefs: { ...s.prefs, [key]: value } })),
+      setTheme: (theme) => set((s) => ({ prefs: { ...s.prefs, theme } })),
       reset: () => set({ ...initial, friendChallenges: initialFriendChallenges() }),
     }),
     {

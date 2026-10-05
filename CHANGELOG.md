@@ -6,6 +6,15 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Trips between cities: a flight only when both cities have their own airport (Lisbon ↔ Porto);
+  otherwise the quicker of train or a green coach, with its own animation and travel time. Every
+  move between launch cities is now an arrival (`20261014090000_trips`).
+- A light/dark switch on the right edge of every screen (follows the phone until you choose).
+- RPG-style map: meadow-green map, grass tufts swaying along the bottom, leaves drifting across
+  by day and fireflies at night (off when the phone asks for reduced motion).
+- City celebrations: a new city stamp slams onto the screen with fireworks, and claiming every
+  place in a city's sets gets the bigger show.
+
 - Three new boosts in the Store, all rewarded by the server:
   - **Time-of-day key** (24 h, 200 coins): golden-hour and night quests at 11 places across
     the five cities pay +40 coins when you discover them in their window; the place sheet shows

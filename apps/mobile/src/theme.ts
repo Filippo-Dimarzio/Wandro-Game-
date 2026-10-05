@@ -1,4 +1,5 @@
 import { useColorScheme } from 'react-native';
+import { useSession } from '@/state/session';
 import type { Category } from '@wandro/shared';
 
 /**
@@ -79,8 +80,15 @@ export const darkColors: typeof lightColors = {
 
 export type Colors = typeof lightColors;
 
+/** Dark mode: the switch on the right of the screen wins, otherwise the phone's setting. */
+export function useIsDark(): boolean {
+  const pref = useSession((s) => s.prefs.theme ?? 'system');
+  const system = useColorScheme();
+  return pref === 'system' ? system === 'dark' : pref === 'dark';
+}
+
 export function useColors(): Colors {
-  return useColorScheme() === 'dark' ? darkColors : lightColors;
+  return useIsDark() ? darkColors : lightColors;
 }
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
