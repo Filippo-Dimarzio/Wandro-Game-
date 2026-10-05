@@ -18,3 +18,4 @@ export * from './photo';
 export * from './boosts';
 export * from './challenges';
 export * from './explorers';
+export * from './waitlist';

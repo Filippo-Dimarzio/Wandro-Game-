@@ -22,6 +22,8 @@ jobs:
     env:
       EXPO_BASE_URL: /${{ github.event.repository.name }}
       EXPO_PUBLIC_BASE_URL: /${{ github.event.repository.name }}
+      # Where /join sends beta sign-ups: Settings -> Secrets and variables -> Actions -> Variables.
+      EXPO_PUBLIC_WAITLIST_URL: ${{ vars.WAITLIST_URL }}
       EXPO_NO_TELEMETRY: 1
       ELECTRON_SKIP_BINARY_DOWNLOAD: 1
     steps:

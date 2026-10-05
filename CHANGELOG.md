@@ -6,6 +6,12 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- A `/join` page for the beta waitlist, styled like the app: email, where you live, study or work,
+  how you get around, what you'd explore first, Fog Walk interest and consent. Each link can carry
+  `?src=` to tell channels apart. Sign-ups go to the `waitlist` table with a backend (insert-only;
+  nobody can read it back through the API), or to a Google Sheet on the demo site
+  (`docs/waitlist`).
+
 - Explorers replace the octopus. Players pick one of eight drawn explorers at sign-up (and can
   change it from Profile); friends and profile pages show each player's explorer. Store skins are
   now outfits (jacket colours), and your explorer's kit grows with rank: Wanderer (new name for
