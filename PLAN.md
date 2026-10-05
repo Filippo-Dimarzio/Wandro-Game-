@@ -229,7 +229,7 @@ Comments, food challenges (venue QR codes for proof), Instagram sharing via the 
 **Platform & theme**
 
 - Portrait only on phones. Light + dark follow the system. Bright, airy, light-blue base with minimal clutter; the signature accent is Wandro blue.
-- **Colour-coded categories:** each category has an ink colour (pins, chips, headings) and a light tint (its pages). Beaches & coast = Wandro blue, Nature = forest green, Heritage = terracotta, Culture = violet, Music & events = magenta, Curiosities = deep teal. Undiscovered pins stay grey. All inks pass WCAG AA (tested in `theme.test.ts`).
+- **Colour-coded categories:** each category has an ink colour (pins, chips, headings) and a light tint (its pages). Beaches & coast = Wandro blue, Nature = forest green, Heritage = terracotta, Culture = azulejo indigo, Art & museums = violet, Music & events = berry, Curiosities = deep teal. Each category has its own hand-drawn card in `apps/mobile/assets/art` (Art & museums got its own violet card when Culture moved to food, festivals and neighbourhood life). Undiscovered pins stay grey. All inks pass WCAG AA (tested in `theme.test.ts`).
 - **Discover:** a hub of interests plus a page per category (Overview, Places, Learn) styled in that category's colour. Illustrated category covers stand in wherever a place has no licensed photo yet.
 - **Times and days** show for places that need them (venues, events): "Open now · until 00:30", "Thu–Sat · 21:30–00:30".
 - Tone: warm and respectful in all copy and community guidelines.

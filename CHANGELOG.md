@@ -6,6 +6,10 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- New hand-drawn cards for Beaches & coast, Culture (a blue azulejo street with market,
+  festival and café) and a lighter Curiosities card. Art & museums gets its own violet card,
+  and Culture's colour is now azulejo indigo to match its card; map pins re-rendered.
+
 - New hand-drawn city stamp pictures: vintage engravings of Pena Palace, Belém Tower, the
   Dom Luís I Bridge, the Roman Temple of Évora and Aveiro's moliceiros
   (`assets/stamps/src`, rendered by `scripts/render-stamps.mjs`).

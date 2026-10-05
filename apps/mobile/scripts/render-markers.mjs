@@ -4,13 +4,13 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
 
 const root = new URL('../assets', import.meta.url).pathname;
-// Category colour and which illustration it uses (Art & museums shares Culture's).
+// Category colour and which illustration it uses.
 const CATS = {
   coast: ['#0B6FB8', 'coast'],
   nature: ['#2E7D32', 'nature'],
   heritage: ['#B4441A', 'heritage'],
-  culture: ['#7B3FC4', 'culture'],
-  art: ['#B3261E', 'culture'],
+  culture: ['#3949AB', 'culture'],
+  art: ['#7B3FC4', 'art'],
   music_events: ['#A3195B', 'music_events'],
   other: ['#0A706F', 'other'],
 };

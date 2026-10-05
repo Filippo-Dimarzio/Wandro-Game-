@@ -11,8 +11,8 @@ const lightCategory = {
   coast: { color: '#0B6FB8', tint: '#E5F2FC' }, // Wandro blue: sea and sky
   nature: { color: '#2E7D32', tint: '#E7F4E8' }, // forest green: Sintra hills
   heritage: { color: '#B4441A', tint: '#FBEBE3' }, // terracotta: palace walls and roofs
-  culture: { color: '#7B3FC4', tint: '#F1E9FB' }, // violet: museums and art
-  art: { color: '#B3261E', tint: '#FDEBEA' }, // crimson: paint and street art
+  culture: { color: '#3949AB', tint: '#E8EAF7' }, // azulejo indigo: tiled streets, markets, festivals
+  art: { color: '#7B3FC4', tint: '#F1E9FB' }, // violet: museums and art (matches its card)
   music_events: { color: '#A3195B', tint: '#F9E7EF' }, // berry: nights out (matches its cover)
   other: { color: '#0A706F', tint: '#E0F3F2' }, // deep teal: curiosities (the octopus)
 } satisfies Record<Category, { color: string; tint: string }>;
@@ -21,8 +21,8 @@ const darkCategory: typeof lightCategory = {
   coast: { color: '#5FB4F0', tint: '#0F2A40' },
   nature: { color: '#6CC070', tint: '#132A17' },
   heritage: { color: '#F08A5D', tint: '#35190E' },
-  culture: { color: '#B48BF0', tint: '#24173A' },
-  art: { color: '#F2817B', tint: '#3A1512' },
+  culture: { color: '#9FA8EE', tint: '#1A1F3D' },
+  art: { color: '#B48BF0', tint: '#24173A' },
   music_events: { color: '#EE7AAE', tint: '#33121F' },
   other: { color: '#4FC8C4', tint: '#0F2C2C' },
 };
