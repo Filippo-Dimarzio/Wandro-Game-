@@ -8,6 +8,7 @@ import { shopItem, skinColor } from '@wandro/shared';
 import { Asset } from 'expo-asset';
 import { lightColors, useIsDark } from '@/theme';
 import { ADVENTURE, hatchPattern } from './adventure';
+import { BASE_SOURCE, STORYBOOK, storybookPaint, storybookStyle } from './storybook';
 import { MARKERS, markerName } from './markers';
 import type { PlaceMapProps } from './types';
 import { accuracyGeoJson, guidanceGeoJson, placesGeoJson, useFog } from './useFog';
@@ -19,34 +20,35 @@ maplibregl.setWorkerUrl(
   `${process.env.EXPO_PUBLIC_BASE_URL ?? ''}/maplibre/maplibre-gl-worker.mjs`,
 );
 
-// Free OpenStreetMap raster tiles for the web and desktop apps (with attribution).
-// Native builds use Mapbox (PlaceMap.native.tsx).
-const STYLE: maplibregl.StyleSpecification = {
-  version: 8,
-  sources: {
-    osm: {
-      type: 'raster',
-      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-      tileSize: 256,
-      attribution: '© OpenStreetMap contributors',
-      maxzoom: 19,
-    },
-  },
-  // Adventure map: sepia tiles on old paper (see map/adventure.ts). Roads and labels stay legible.
-  layers: [
-    { id: 'paper', type: 'background', paint: { 'background-color': ADVENTURE.light.paper } },
+// The storybook map (map/storybook.ts) from OpenFreeMap vector tiles, same as the native apps.
+// The cast bridges our loose JSON style to MapLibre's StyleSpecification.
+const STYLE = storybookStyle(STORYBOOK.light) as unknown as maplibregl.StyleSpecification;
+
+/** If the vector tiles can't load, fall back to plain OpenStreetMap raster tiles under the game layers. */
+function addRasterFallback(m: MLMap) {
+  if (m.getSource('osm')) return;
+  m.addSource('osm', {
+    type: 'raster',
+    tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+    tileSize: 256,
+    attribution: '© OpenStreetMap contributors',
+    maxzoom: 19,
+  });
+  const p = ADVENTURE.light.tiles;
+  m.addLayer(
     {
       id: 'osm',
       type: 'raster',
       source: 'osm',
       paint: {
-        'raster-opacity': ADVENTURE.light.tiles.opacity,
-        'raster-saturation': ADVENTURE.light.tiles.saturation,
-        'raster-contrast': ADVENTURE.light.tiles.contrast,
+        'raster-opacity': p.opacity,
+        'raster-saturation': p.saturation,
+        'raster-contrast': p.contrast,
       },
     },
-  ],
-};
+    m.getLayer('fog') ? 'fog' : undefined,
+  );
+}
 
 // Spread pairs don't fit MapLibre's tuple types, hence the cast.
 /** Loads the round category pins (see map/markers.ts); 84 px images shown at 42 pt. */
@@ -143,6 +145,13 @@ export function PlaceMap({
       .setLngLat([userPosition.lng, userPosition.lat])
       .addTo(m);
 
+    // Tile errors on the storybook source (e.g. the tile host is down): switch to OSM raster.
+    m.on('error', (e) => {
+      // Tile errors carry the failing source's id (not in MapLibre's ErrorEvent type).
+      const sourceId = (e as { sourceId?: string }).sourceId;
+      if (sourceId === BASE_SOURCE && m.isStyleLoaded()) addRasterFallback(m);
+    });
+
     m.on('load', () => {
       const d = latest.current;
       if (!m.hasImage('hatch'))
@@ -152,7 +161,7 @@ export function PlaceMap({
         id: 'fog',
         type: 'fill',
         source: 'fog',
-        // Uncharted land: hatched parchment.
+        // Unexplored land: a cream hatch.
         paint: { 'fill-pattern': 'hatch', 'fill-opacity': 0.82 },
       });
       m.addSource('accuracy', { type: 'geojson', data: d.accuracy });
@@ -270,17 +279,21 @@ export function PlaceMap({
     if (el) el.innerHTML = markerHtml(avatar?.skin, avatar?.hat, trail);
   }, [avatar?.skin, avatar?.hat, trail]);
 
-  // The same chart by lamplight in dark mode.
+  // The night palette in dark mode.
   const dark = useIsDark();
   useEffect(() => {
     const m = map.current;
     if (!m) return;
     const apply = () => {
       const p = dark ? ADVENTURE.dark : ADVENTURE.light;
-      m.setPaintProperty('paper', 'background-color', p.paper);
-      m.setPaintProperty('osm', 'raster-opacity', p.tiles.opacity);
-      m.setPaintProperty('osm', 'raster-saturation', p.tiles.saturation);
-      m.setPaintProperty('osm', 'raster-brightness-max', p.tiles.brightnessMax);
+      for (const [layer, prop, value] of storybookPaint(dark ? STORYBOOK.dark : STORYBOOK.light))
+        // Our layer table is loosely typed; MapLibre wants its own property keys.
+        if (m.getLayer(layer)) m.setPaintProperty(layer, prop as 'fill-color', value);
+      if (m.getLayer('osm')) {
+        m.setPaintProperty('osm', 'raster-opacity', p.tiles.opacity);
+        m.setPaintProperty('osm', 'raster-saturation', p.tiles.saturation);
+        m.setPaintProperty('osm', 'raster-brightness-max', p.tiles.brightnessMax);
+      }
       const hatch = { width: 16, height: 16, data: hatchPattern(p) };
       if (m.hasImage('hatch')) m.updateImage('hatch', hatch);
       else m.addImage('hatch', hatch);

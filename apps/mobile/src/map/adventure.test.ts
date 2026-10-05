@@ -1,13 +1,13 @@
 import { ADVENTURE, hatchPattern } from './adventure';
 
 describe('adventure map palette', () => {
-  it('hatches uncharted land with fine diagonal lines on parchment', () => {
+  it('hatches unexplored land with fine diagonal lines on cream', () => {
     const px = hatchPattern(ADVENTURE.light, 16);
     expect(px).toHaveLength(16 * 16 * 4);
     const at = (x: number, y: number) =>
       Array.from(px.slice((y * 16 + x) * 4, (y * 16 + x) * 4 + 4));
-    expect(at(0, 0)).toEqual([0xc6, 0xa4, 0x67, 255]); // a line
-    expect(at(4, 0)).toEqual([0xd8, 0xbf, 0x86, 255]); // parchment
+    expect(at(0, 0)).toEqual([0xe9, 0xcd, 0xb0, 255]); // a line
+    expect(at(4, 0)).toEqual([0xf8, 0xec, 0xdd, 255]); // cream
   });
 
   it('keeps the tiles readable in both themes', () => {

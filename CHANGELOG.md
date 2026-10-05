@@ -6,6 +6,12 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Storybook map: the map now looks like a hand-painted city map, with peach ground, mint parks
+  and gardens, periwinkle water with a coral shore, soft cream streets and only a few labels
+  (avenues, water, neighbourhoods). Same look on web and phones, with a night palette in dark
+  mode; unexplored land is a light cream hatch. Falls back to plain OpenStreetMap tiles if the map
+  tiles can't load.
+
 - Oddity of the day now has 23 different quests ("Look up!", "Local legend", "Water wonders",
   "Sweet secret"...), one per Curiosities day; any curiosity still counts.
 

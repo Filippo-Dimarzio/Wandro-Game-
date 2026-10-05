@@ -1,7 +1,7 @@
 /**
- * The adventure-map look: a sepia, treasure-map palette. Explored ground shows the real map
- * (roads and names stay readable); unexplored ground is hatched parchment, like the uncharted
- * edges of an old chart.
+ * The game layer over the storybook map (map/storybook.ts): unexplored ground is a cream hatch,
+ * like the unpainted edges of an illustrated map, while explored ground shows the full colours.
+ * `tiles` styles the plain OpenStreetMap fallback used if the storybook tiles can't load.
  */
 export interface AdventurePalette {
   paper: string;
@@ -13,17 +13,17 @@ export interface AdventurePalette {
 
 export const ADVENTURE: Record<'light' | 'dark', AdventurePalette> = {
   light: {
-    paper: '#E9D7AE',
-    fog: '#D8BF86',
-    hatch: '#C6A467',
-    ink: '#5A3A14',
+    paper: '#F5D9BE',
+    fog: '#F8ECDD',
+    hatch: '#E9CDB0',
+    ink: '#2F3E7A',
     tiles: { opacity: 0.74, saturation: -0.45, contrast: 0.12, brightnessMax: 1 },
   },
   dark: {
-    paper: '#2B2116',
-    fog: '#1D1610',
-    hatch: '#4A3820',
-    ink: '#E3C48A',
+    paper: '#2A2236',
+    fog: '#1F1A29',
+    hatch: '#3A3048',
+    ink: '#F2D9BE',
     tiles: { opacity: 0.7, saturation: -0.5, contrast: 0.1, brightnessMax: 0.55 },
   },
 };
