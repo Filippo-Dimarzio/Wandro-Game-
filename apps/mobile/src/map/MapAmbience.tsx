@@ -12,7 +12,7 @@ const LEAF_COLORS = ['#5FA83A', '#7DBB3F', '#A7C43D', '#D9A23A', '#4E9A47'];
 const spread = (i: number, salt: number) => ((i * 9301 + salt * 49297) % 233280) / 233280;
 
 /**
- * The adventure-map dressing on top of the map: darkened chart edges, a compass rose, and leaves
+ * The map dressing on top of the storybook map: soft painted edges, a compass rose, and leaves
  * drifting across by day (fireflies at night). Small, see-through and untouchable so places stay legible and
  * tappable; switched off when the phone asks for reduced motion.
  */
@@ -47,9 +47,9 @@ export function MapAmbience() {
   );
 }
 
-/** Darker, burnt edges like an old chart. */
+/** Soft painted edges, like the margin of an illustrated map. */
 function Vignette({ dark }: { dark: boolean }) {
-  const edge = dark ? 'rgba(0,0,0,0.4)' : 'rgba(90,58,20,0.16)';
+  const edge = dark ? 'rgba(0,0,0,0.4)' : 'rgba(232,128,106,0.18)';
   const clear = 'rgba(0,0,0,0)';
   return (
     <>

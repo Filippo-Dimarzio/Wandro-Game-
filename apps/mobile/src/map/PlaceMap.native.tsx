@@ -1,10 +1,11 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { OctopusAvatar } from '@/components/OctopusAvatar';
 import { env } from '@/lib/env';
 import { CATEGORIES } from '@wandro/shared';
 import { lightColors, useIsDark } from '@/theme';
 import { ADVENTURE } from './adventure';
+import { STORYBOOK, storybookStyle } from './storybook';
 import { FallbackMap } from './FallbackMap';
 import {
   LANDMARK_MARKERS,
@@ -74,7 +75,14 @@ function MapboxPlaceMap({
   } = mb;
   const camera = useRef<import('@rnmapbox/maps').Camera>(null);
   const fog = useFog(places, unlockedIds);
-  const chart = useIsDark() ? ADVENTURE.dark : ADVENTURE.light;
+  const dark = useIsDark();
+  const chart = dark ? ADVENTURE.dark : ADVENTURE.light;
+  // The storybook map (same style as the web); Mapbox's own style if its tiles fail to load.
+  const [fallback, setFallback] = useState(false);
+  const styleJSON = useMemo(
+    () => JSON.stringify(storybookStyle(dark ? STORYBOOK.dark : STORYBOOK.light)),
+    [dark],
+  );
   const accuracy = useMemo(
     () => accuracyGeoJson(userPosition, accuracyM),
     [userPosition, accuracyM],
@@ -114,7 +122,8 @@ function MapboxPlaceMap({
   return (
     <MapView
       style={{ flex: 1 }}
-      styleURL={StyleURL.Outdoors}
+      {...(fallback ? { styleURL: StyleURL.Outdoors } : { styleJSON })}
+      onMapLoadingError={() => setFallback(true)}
       scrollEnabled={!compact}
       zoomEnabled={!compact}
       rotateEnabled={false}
@@ -164,6 +173,8 @@ function MapboxPlaceMap({
           minZoomLevel={compact ? 24 : 12.5}
           style={{
             textField: ['get', 'name'],
+            // The storybook style serves this font (map/storybook.ts).
+            textFont: ['Noto Sans Bold'],
             textSize: 12,
             textColor: '#1A2238',
             textHaloColor: '#FFFFFF',

@@ -1,7 +1,7 @@
 /**
- * The game-map look, after illustrated tourist maps: a clean, bright street map (blue water, green
- * parks) on warm paper, a light mist over places you haven't explored yet, and bold pins with
- * names so the landmarks to explore stand out. Fog never hides a place or its name.
+ * The game layer over the storybook map (map/storybook.ts): a light mist over places you haven't
+ * explored yet (it never hides a place or its name), bold pins and name labels. `tiles` styles
+ * the plain OpenStreetMap fallback used if the storybook tiles can't load.
  */
 export interface AdventurePalette {
   paper: string;
@@ -13,17 +13,17 @@ export interface AdventurePalette {
 
 export const ADVENTURE: Record<'light' | 'dark', AdventurePalette> = {
   light: {
-    paper: '#F4EBD6',
-    fog: '#EFE3C4',
+    paper: '#F5D9BE',
+    fog: '#F8ECDD',
     fogOpacity: 0.35,
-    ink: '#5A3A14',
+    ink: '#2F3E7A',
     tiles: { saturation: 0.2, contrast: 0.05, brightnessMax: 1 },
   },
   dark: {
-    paper: '#1C232E',
-    fog: '#0E1520',
+    paper: '#2A2236',
+    fog: '#1F1A29',
     fogOpacity: 0.4,
-    ink: '#E3C48A',
+    ink: '#F2D9BE',
     tiles: { saturation: -0.2, contrast: 0, brightnessMax: 0.6 },
   },
 };

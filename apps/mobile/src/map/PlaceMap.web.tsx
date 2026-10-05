@@ -8,6 +8,7 @@ import { shopItem, skinColor } from '@wandro/shared';
 import { Asset } from 'expo-asset';
 import { lightColors, useIsDark } from '@/theme';
 import { ADVENTURE, LABEL } from './adventure';
+import { BASE_SOURCE, STORYBOOK, storybookPaint, storybookStyle } from './storybook';
 import {
   LANDMARK_MARKERS,
   landmarkName,
@@ -26,36 +27,50 @@ maplibregl.setWorkerUrl(
   `${process.env.EXPO_PUBLIC_BASE_URL ?? ''}/maplibre/maplibre-gl-worker.mjs`,
 );
 
-// A clean, colourful street map (CARTO Voyager, built on OpenStreetMap data, with attribution) for
-// the web and desktop apps. Native builds use Mapbox (PlaceMap.native.tsx).
-const STYLE: maplibregl.StyleSpecification = {
-  version: 8,
-  sources: {
-    streets: {
-      type: 'raster',
-      tiles: ['a', 'b', 'c', 'd'].map(
-        (s) => `https://${s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png`,
-      ),
-      tileSize: 256,
-      attribution: '© OpenStreetMap contributors © CARTO',
-      maxzoom: 20,
-    },
-  },
-  layers: [
-    { id: 'paper', type: 'background', paint: { 'background-color': ADVENTURE.light.paper } },
-    {
-      id: 'streets',
-      type: 'raster',
-      source: 'streets',
-      paint: {
-        'raster-saturation': ADVENTURE.light.tiles.saturation,
-        'raster-contrast': ADVENTURE.light.tiles.contrast,
-      },
-    },
-  ],
-};
+// The storybook map (map/storybook.ts) from OpenFreeMap vector tiles, same as the native apps.
+// The cast bridges our loose JSON style to MapLibre's StyleSpecification.
+const STYLE = storybookStyle(STORYBOOK.light) as unknown as maplibregl.StyleSpecification;
 
-/** Draws a place's name as a little white label (no font server needed for map text). */
+/** If the vector tiles can't load, fall back to plain OpenStreetMap raster tiles under the game layers. */
+function addRasterFallback(m: MLMap) {
+  if (m.getSource('osm')) return;
+  m.addSource('osm', {
+    type: 'raster',
+    tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+    tileSize: 256,
+    attribution: '© OpenStreetMap contributors',
+    maxzoom: 19,
+  });
+  const p = ADVENTURE.light.tiles;
+  m.addLayer(
+    {
+      id: 'osm',
+      type: 'raster',
+      source: 'osm',
+      paint: { 'raster-saturation': p.saturation, 'raster-contrast': p.contrast },
+    },
+    m.getLayer('fog') ? 'fog' : undefined,
+  );
+}
+
+/** Loads the category pins and landmark badges (see map/markers.ts), drawn at pixel ratio 2. */
+function loadMarkerImages(m: MLMap) {
+  const load = (name: string, module: number) =>
+    m
+      .loadImage(Asset.fromModule(module).uri)
+      .then(({ data }) => {
+        if (!m.hasImage(name)) m.addImage(name, data, { pixelRatio: 2 });
+      })
+      .catch(() => undefined);
+  for (const cat of CATEGORIES)
+    for (const locked of [false, true])
+      load(markerName(cat, locked), locked ? MARKERS[cat].locked : MARKERS[cat].found);
+  for (const [city, art] of Object.entries(LANDMARK_MARKERS))
+    for (const locked of [false, true])
+      load(landmarkName(city, locked), locked ? art.locked : art.found);
+}
+
+/** Draws a place's name as a little white label, so names show even without map fonts. */
 function labelImage(name: string) {
   const c = document.createElement('canvas');
   const g = c.getContext('2d')!;
@@ -76,30 +91,6 @@ function labelImage(name: string) {
   g.textBaseline = 'middle';
   g.fillText(text, LABEL.padX, LABEL.height / 2 + 1);
   return g.getImageData(0, 0, w, LABEL.height);
-}
-
-// Spread pairs don't fit MapLibre's tuple types, hence the cast.
-/** Loads the category pins and landmark badges (see map/markers.ts), drawn at pixel ratio 2. */
-function loadMarkerImages(m: MLMap) {
-  for (const cat of CATEGORIES)
-    for (const locked of [false, true]) {
-      const name = markerName(cat, locked);
-      const uri = Asset.fromModule(locked ? MARKERS[cat].locked : MARKERS[cat].found).uri;
-      m.loadImage(uri)
-        .then(({ data }) => {
-          if (!m.hasImage(name)) m.addImage(name, data, { pixelRatio: 2 });
-        })
-        .catch(() => undefined);
-    }
-  for (const [city, art] of Object.entries(LANDMARK_MARKERS))
-    for (const locked of [false, true]) {
-      const name = landmarkName(city, locked);
-      m.loadImage(Asset.fromModule(locked ? art.locked : art.found).uri)
-        .then(({ data }) => {
-          if (!m.hasImage(name)) m.addImage(name, data, { pixelRatio: 2 });
-        })
-        .catch(() => undefined);
-    }
 }
 
 // Find-My-style pulse and incense glow for the octopus marker.
@@ -182,6 +173,13 @@ export function PlaceMap({
       .setLngLat([userPosition.lng, userPosition.lat])
       .addTo(m);
 
+    // Tile errors on the storybook source (e.g. the tile host is down): switch to OSM raster.
+    m.on('error', (e) => {
+      // Tile errors carry the failing source's id (not in MapLibre's ErrorEvent type).
+      const sourceId = (e as { sourceId?: string }).sourceId;
+      if (sourceId === BASE_SOURCE && m.isStyleLoaded()) addRasterFallback(m);
+    });
+
     m.on('load', () => {
       const d = latest.current;
       m.addSource('fog', { type: 'geojson', data: d.fog });
@@ -261,16 +259,13 @@ export function PlaceMap({
         if (p) m.addImage(e.id, labelImage(p.name), { pixelRatio: 2 });
       });
       loadMarkerImages(m);
-      m.on('click', 'place-labels', (e: MapLayerMouseEvent) => {
+      const select = (e: MapLayerMouseEvent) => {
         const id = e.features?.[0]?.properties?.id as string | undefined;
         const p = latest.current.places.find((x) => x.id === id);
         if (p) latest.current.onSelect?.(p);
-      });
-      m.on('click', 'places', (e: MapLayerMouseEvent) => {
-        const id = e.features?.[0]?.properties?.id as string | undefined;
-        const p = latest.current.places.find((x) => x.id === id);
-        if (p) latest.current.onSelect?.(p);
-      });
+      };
+      m.on('click', 'places', select);
+      m.on('click', 'place-labels', select);
       m.on('contextmenu', (e) =>
         latest.current.onLongPress?.({ lat: e.lngLat.lat, lng: e.lngLat.lng }),
       );
@@ -327,16 +322,20 @@ export function PlaceMap({
     if (el) el.innerHTML = markerHtml(avatar?.skin, avatar?.hat, trail);
   }, [avatar?.skin, avatar?.hat, trail]);
 
-  // The same chart by lamplight in dark mode.
+  // The night palette in dark mode.
   const dark = useIsDark();
   useEffect(() => {
     const m = map.current;
     if (!m) return;
     const apply = () => {
       const p = dark ? ADVENTURE.dark : ADVENTURE.light;
-      m.setPaintProperty('paper', 'background-color', p.paper);
-      m.setPaintProperty('streets', 'raster-saturation', p.tiles.saturation);
-      m.setPaintProperty('streets', 'raster-brightness-max', p.tiles.brightnessMax);
+      for (const [layer, prop, value] of storybookPaint(dark ? STORYBOOK.dark : STORYBOOK.light))
+        // Our layer table is loosely typed; MapLibre wants its own property keys.
+        if (m.getLayer(layer)) m.setPaintProperty(layer, prop as 'fill-color', value);
+      if (m.getLayer('osm')) {
+        m.setPaintProperty('osm', 'raster-saturation', p.tiles.saturation);
+        m.setPaintProperty('osm', 'raster-brightness-max', p.tiles.brightnessMax);
+      }
       if (m.getLayer('fog')) {
         m.setPaintProperty('fog', 'fill-color', p.fog);
         m.setPaintProperty('fog', 'fill-opacity', p.fogOpacity);
