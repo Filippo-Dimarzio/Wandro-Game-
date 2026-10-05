@@ -6,6 +6,13 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- The app now speaks in Wandro's voice: warm, short and specific, with a little Portuguese
+  ("Bora?", "Olha!", "Obrigado") at onboarding, discoveries, challenges, empty screens, hidden
+  gems, errors and notifications. Buttons, settings and privacy text stay plain.
+- The demo now invites people to the beta: a "Join the Lisbon & Sintra beta" link on the entry
+  screen and a "Liking it so far?" card on Home, both opening `/join` (tagged `src=portal` and
+  `src=demo`).
+
 - A `/join` page for the beta waitlist, styled like the app: email, where you live, study or work,
   how you get around, what you'd explore first, Fog Walk interest and consent. Each link can carry
   `?src=` to tell channels apart. Sign-ups go to the `waitlist` table with a backend (insert-only;

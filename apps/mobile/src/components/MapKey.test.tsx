@@ -10,6 +10,6 @@ describe('MapKey', () => {
     expect(screen.getByText('Discovered 3')).toBeOnTheScreen();
     expect(screen.queryByTestId('map-key-help')).toBeNull();
     await fireEvent.press(screen.getByTestId('map-key'));
-    expect(screen.getByTestId('map-key-help')).toHaveTextContent(/Walk there and check in/);
+    expect(screen.getByTestId('map-key-help')).toHaveTextContent(/Go there and check in/);
   });
 });

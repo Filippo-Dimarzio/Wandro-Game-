@@ -34,7 +34,7 @@ describe('DailyChallengeCard (demo mode)', () => {
     );
     await act(async () => void jest.advanceTimersByTime(1000));
 
-    expect(screen.getByText(/Completed/)).toBeOnTheScreen();
+    expect(screen.getByText(/Done! .* in your pouch/)).toBeOnTheScreen();
     const state = useSession.getState();
     const daily = state.ledger.filter((e) => e.kind === 'daily_challenge');
     expect(daily).toHaveLength(1);

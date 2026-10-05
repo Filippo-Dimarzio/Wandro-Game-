@@ -18,6 +18,7 @@ import { ExplorerAvatar } from '@/components/ExplorerAvatar';
 import { DailyChallengeCard } from '@/components/DailyChallengeCard';
 import { HowToPlay } from '@/components/HowToPlay';
 import { InstallBanner } from '@/components/InstallBanner';
+import { JoinBetaCard } from '@/components/JoinBetaCard';
 import { PlaceCard } from '@/components/PlaceBits';
 import { ProgressStrip } from '@/components/ProgressStrip';
 import { useMyExplorer } from '@/data/explorer';
@@ -158,6 +159,7 @@ export default function Home() {
         </ScrollView>
 
         <DailyChallengeCard places={list} unlocked={ids} near={loc.position} />
+        <JoinBetaCard />
 
         <Text style={[styles.section, { color: c.text }]} accessibilityRole="header">
           {t('home.nearYou')}

@@ -14,7 +14,7 @@ describe('Entry portal', () => {
     await render(<Welcome />);
     await fireEvent(screen.getByTestId('portal-hold'), 'pressIn');
     await act(async () => void jest.advanceTimersByTime(1500));
-    expect(screen.getByText('Start exploring')).toBeOnTheScreen();
+    expect(screen.getByText('Bora? Start exploring')).toBeOnTheScreen();
     jest.useRealTimers();
   });
 
@@ -23,6 +23,6 @@ describe('Entry portal', () => {
     await fireEvent(screen.getByTestId('portal-hold'), 'accessibilityAction', {
       nativeEvent: { actionName: 'activate' },
     });
-    expect(screen.getByText('Start exploring')).toBeOnTheScreen();
+    expect(screen.getByText('Bora? Start exploring')).toBeOnTheScreen();
   });
 });

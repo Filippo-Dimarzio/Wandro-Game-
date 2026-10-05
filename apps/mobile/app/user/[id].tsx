@@ -49,7 +49,7 @@ export default function UserProfile() {
             <Text style={{ color: c.text, fontSize: 22, fontWeight: '900' }}>{card.username}</Text>
             {card.homeCity ? <Text style={{ color: c.textMuted }}>{card.homeCity}</Text> : null}
             <Text style={{ color: c.accent, fontWeight: '700' }}>
-              Level {card.level} · {explorerStage(card.level)}
+              {t('home.level', { level: card.level })} · {explorerStage(card.level)}
             </Text>
             {isDemo && (
               <Text style={{ color: c.textMuted, fontSize: 12 }}>{t('feed.demoBadge')}</Text>

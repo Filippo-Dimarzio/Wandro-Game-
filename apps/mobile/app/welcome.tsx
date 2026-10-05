@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WandroLogo } from '@/components/WandroLogo';
 import { t } from '@/i18n';
+import { isDemo } from '@/lib/env';
 import { radius, space } from '@/theme';
 
 /** Entry portal: hold to lift the fog over Sintra and reveal Wandro. */
@@ -97,6 +98,15 @@ export default function Welcome() {
             <Text style={styles.holdText}>{t('portal.hold')}</Text>
           </Pressable>
         )}
+        {revealed && isDemo && (
+          <Pressable
+            onPress={() => router.push('/join?src=portal')}
+            accessibilityRole="link"
+            testID="portal-join"
+          >
+            <Text style={styles.joinLink}>{t('portal.join')}</Text>
+          </Pressable>
+        )}
       </SafeAreaView>
     </View>
   );
@@ -113,6 +123,14 @@ const styles = StyleSheet.create({
     paddingTop: 120,
   },
   brand: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  joinLink: {
+    color: '#fff',
+    fontWeight: '800',
+    fontSize: 15,
+    textAlign: 'center',
+    marginTop: space.md,
+    textDecorationLine: 'underline',
+  },
   logo: { fontSize: 46, fontWeight: '900', color: '#fff', letterSpacing: -1 },
   tagline: { fontSize: 18, color: '#fff', textAlign: 'center', fontWeight: '600', maxWidth: 320 },
   holdButton: {

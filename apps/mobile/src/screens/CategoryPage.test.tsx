@@ -37,7 +37,7 @@ describe('Category page', () => {
   it('shows the coast overview, its places and things to learn', async () => {
     await render(<CategoryPage />, { wrapper });
     expect(await screen.findByRole('header', { name: 'Beaches & coast' })).toBeOnTheScreen();
-    expect(screen.getByText(/Golden sand, salty air/)).toBeOnTheScreen();
+    expect(screen.getByText(/Salt air, the sound of the waves/)).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Places' }));
     expect(screen.getByRole('button', { name: /Adraga Beach/ })).toBeOnTheScreen();
