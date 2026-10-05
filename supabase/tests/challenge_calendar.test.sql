@@ -91,4 +91,16 @@ select pg_temp.check(
   (select campaign from daily_challenges
    where challenge_date = (now() at time zone 'Europe/Lisbon')::date) is null,
   'an opened day keeps its challenge');
+-- Oddity of the day cycles through its own quests (ODDITIES in packages/shared).
+select pg_temp.check(
+  (select title from challenge_rotation(date '2024-10-16')) = 'Oddity of the day: Sweet secret'
+  and (select title from challenge_rotation(date '2024-10-25')) = 'Oddity of the day: Follow your nose'
+  and (select description from challenge_rotation(date '2024-10-16')) like 'Discover any curiosity today. %',
+  'each Curiosities day has its own quest');
+select pg_temp.check(
+  not exists (select 1 from daily_challenges c
+              where c.category = 'other' and c.campaign is null
+                and c.challenge_date > (now() at time zone 'Europe/Lisbon')::date
+                and c.title not like 'Oddity of the day: %'),
+  'upcoming Curiosities days carry their quest');
 rollback;

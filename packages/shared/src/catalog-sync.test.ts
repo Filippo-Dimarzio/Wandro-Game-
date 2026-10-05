@@ -2,7 +2,14 @@
 // use the same codes and prices). Parses the migration SQL to compare.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { datedChallengesSql, rotationValuesSql, CHALLENGE_ROTATION } from './challenges';
+import {
+  CHALLENGE_ROTATION,
+  datedChallengesSql,
+  ODDITIES,
+  ODDITY_SLOT,
+  oddityValuesSql,
+  rotationValuesSql,
+} from './challenges';
 import { BADGES } from './progression';
 import { SHOP_ITEMS } from './shop';
 
@@ -47,5 +54,10 @@ describe('catalogues match the database seeds', () => {
     expect(sql).toContain(rotationValuesSql());
     expect(sql).toContain(`where r.i = (d - date '1970-01-01') % ${CHALLENGE_ROTATION.length};`);
     expect(sql).toContain(datedChallengesSql());
+    expect(sql).toContain(oddityValuesSql());
+    expect(sql).toContain(`case when r.i = ${ODDITY_SLOT} then o.title`);
+    expect(sql).toContain(
+      `on o.j = ((d - date '1970-01-01') / ${CHALLENGE_ROTATION.length}) % ${ODDITIES.length}`,
+    );
   });
 });

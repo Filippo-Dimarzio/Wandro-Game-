@@ -68,6 +68,82 @@ export const CHALLENGE_ROTATION: readonly ChallengeDef[] = [
 ];
 
 /**
+ * The Curiosities day cycles through these, one per 9-day cycle, so each Oddity of the day has its
+ * own quest. Any curiosity discovered that day counts; the quest is a suggestion the app can't check.
+ */
+export const ODDITIES: readonly { title: string; quest: string }[] = [
+  {
+    title: 'Look up!',
+    quest:
+      'Find something odd above eye level: a carved face, a strange weathervane, a forgotten sign.',
+  },
+  {
+    title: 'Behind the door',
+    quest: 'Look for one tucked down a side street most people walk past.',
+  },
+  { title: 'The smallest thing', quest: 'Photograph its tiniest detail.' },
+  {
+    title: 'Secret staircase',
+    quest: 'Look for one reached by steps, an alley or a hidden passage.',
+  },
+  { title: 'Local legend', quest: 'Find one with a myth, ghost story or legend attached.' },
+  {
+    title: 'Lost and found',
+    quest: 'Find one that was once forgotten, abandoned or rediscovered.',
+  },
+  {
+    title: 'Saints and superstitions',
+    quest: 'Find one linked to a local belief or lucky ritual.',
+  },
+  {
+    title: 'Unsolved',
+    quest: 'Find one nobody can fully explain: why it is there, who made it, what it was for.',
+  },
+  { title: 'Royal oddity', quest: 'Find one with a story about a king, queen or noble eccentric.' },
+  {
+    title: 'Bones and stones',
+    quest: 'Find one made of something unexpected: bones, shells, bottles or cork.',
+  },
+  {
+    title: 'Tiny architecture',
+    quest: 'Hunt for the smallest building, door or chapel you can find.',
+  },
+  { title: 'Odd one out', quest: 'Find one that looks completely out of place where it stands.' },
+  {
+    title: 'Ancient puzzle',
+    quest: 'Find one older than the town around it: a standing stone, a fossil, a footprint.',
+  },
+  {
+    title: 'Mechanical marvel',
+    quest: 'Find one with old machinery: a lift, a clock, a mill or a pump.',
+  },
+  { title: 'Water wonders', quest: 'Find a curious fountain, well, spring or old washhouse.' },
+  {
+    title: 'Sweet secret',
+    quest: 'Find one with a sweet or pastry made to a centuries-old recipe.',
+  },
+  {
+    title: 'Follow your nose',
+    quest: 'Find one you can smell before you see it: a bakery, a market, the sea.',
+  },
+  {
+    title: 'Listen closely',
+    quest: 'Record five seconds of its sound: bells, trams, gulls or chatter.',
+  },
+  { title: 'Take the slow road', quest: 'Get there by tram, funicular, ferry or on foot.' },
+  { title: 'Ask a local', quest: 'Ask someone there for a story about it.' },
+  { title: 'Compass point', quest: 'Pick the one furthest north (or west) you can reach today.' },
+  {
+    title: 'Spot the octopus',
+    quest: 'Find something shaped like a tentacle, swirl or spiral there.',
+  },
+  {
+    title: 'Cabinet of curiosities',
+    quest: 'Photograph three odd objects nearby for your collection.',
+  },
+];
+
+/**
  * October 2026 to September 2027. Where dates overlap, the shorter range wins (a single day
  * inside a month-long campaign), so World Music Day beats Santos Populares on 21 June.
  */
@@ -186,8 +262,19 @@ export function epochDay(date: string): number {
   return Math.round(Date.parse(`${date}T00:00:00Z`) / DAY_MS);
 }
 
+/** Position of the Curiosities day in the rotation. */
+export const ODDITY_SLOT = CHALLENGE_ROTATION.findIndex((c) => c.category === 'other');
+
 export function rotationFor(date: string): ChallengeDef {
-  return CHALLENGE_ROTATION[epochDay(date) % CHALLENGE_ROTATION.length]!;
+  const day = epochDay(date);
+  const n = CHALLENGE_ROTATION.length;
+  if (day % n !== ODDITY_SLOT) return CHALLENGE_ROTATION[day % n]!;
+  const odd = ODDITIES[Math.floor(day / n) % ODDITIES.length]!;
+  return {
+    title: `Oddity of the day: ${odd.title}`,
+    description: `Discover any curiosity today. ${odd.quest}`,
+    category: 'other',
+  };
 }
 
 /** Range length in days; shorter ranges take precedence. */
@@ -212,6 +299,14 @@ const cat = (c: Category | null) => (c ? `${lit(c)}::public.place_category` : 'n
 export function rotationValuesSql(): string {
   return CHALLENGE_ROTATION.map(
     (c, i) => `    (${i}, ${lit(c.title)}, ${lit(c.description)}, ${cat(c.category)})`,
+  ).join(',\n');
+}
+
+/** VALUES rows for public.oddity_of_the_day(), indexed from 0. */
+export function oddityValuesSql(): string {
+  return ODDITIES.map(
+    (o, i) =>
+      `    (${i}, ${lit(`Oddity of the day: ${o.title}`)}, ${lit(`Discover any curiosity today. ${o.quest}`)})`,
   ).join(',\n');
 }
 

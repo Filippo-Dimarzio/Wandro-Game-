@@ -6,6 +6,9 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Oddity of the day now has 23 different quests ("Look up!", "Local legend", "Water wonders",
+  "Sweet secret"...), one per Curiosities day; any curiosity still counts.
+
 - New hand-drawn cards for Beaches & coast, Culture (a blue azulejo street with market,
   festival and café) and a lighter Curiosities card. Art & museums gets its own violet card,
   and Culture's colour is now azulejo indigo to match its card; map pins re-rendered.

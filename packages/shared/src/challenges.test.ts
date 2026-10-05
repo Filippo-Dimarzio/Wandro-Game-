@@ -1,5 +1,6 @@
 import {
   CHALLENGE_ROTATION,
+  ODDITIES,
   DATED_CHALLENGES,
   challengeForDate,
   epochDay,
@@ -51,5 +52,19 @@ describe('daily challenge calendar', () => {
     }
     for (const c of ['autumn-hills', 'winter-lights', 'monuments-day', 'museum-day'])
       expect(campaigns).toContain(c);
+  });
+
+  it('each Oddity of the day has its own quest, cycling through ODDITIES', () => {
+    // 2024-10-16 is day 20012: rotation slot 5 (Curiosities) of cycle 2223.
+    const first = rotationFor('2024-10-16');
+    expect(first.category).toBe('other');
+    expect(first.title).toBe(`Oddity of the day: ${ODDITIES[2223 % ODDITIES.length]!.title}`);
+    expect(first.description).toMatch(/^Discover any curiosity today\. /);
+    expect(rotationFor('2024-10-25').title).toBe(
+      `Oddity of the day: ${ODDITIES[2224 % ODDITIES.length]!.title}`,
+    );
+    const titles = new Set(ODDITIES.map((o) => o.title));
+    expect(titles.size).toBe(ODDITIES.length);
+    expect(ODDITIES.length).toBeGreaterThanOrEqual(20);
   });
 });
