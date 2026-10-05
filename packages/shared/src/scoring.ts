@@ -55,15 +55,27 @@ export function levelProgress(xp: number): LevelProgress {
   return { level, xpIntoLevel, xpForNext, fraction: xpIntoLevel / xpForNext };
 }
 
-export const OCTOPUS_STAGES = [
-  { minLevel: 1, name: 'Hatchling' },
-  { minLevel: 3, name: 'Explorer' },
-  { minLevel: 6, name: 'Navigator' },
-  { minLevel: 10, name: 'Cartographer' },
-] as const;
+/** A piece of kit your explorer carries from a rank onwards (drawn on the avatar). */
+export type ExplorerKit = 'map' | 'backpack' | 'camera';
 
-export function octopusStage(level: number): string {
-  let name: string = OCTOPUS_STAGES[0].name;
-  for (const s of OCTOPUS_STAGES) if (level >= s.minLevel) name = s.name;
-  return name;
+/** Explorer ranks: your explorer's kit grows as you level up. */
+export const EXPLORER_STAGES = [
+  { minLevel: 1, name: 'Wanderer', kit: null },
+  { minLevel: 3, name: 'Explorer', kit: 'map' },
+  { minLevel: 6, name: 'Navigator', kit: 'backpack' },
+  { minLevel: 10, name: 'Cartographer', kit: 'camera' },
+] as const satisfies readonly { minLevel: number; name: string; kit: ExplorerKit | null }[];
+
+function stageFor(level: number) {
+  let stage: (typeof EXPLORER_STAGES)[number] = EXPLORER_STAGES[0];
+  for (const s of EXPLORER_STAGES) if (level >= s.minLevel) stage = s;
+  return stage;
+}
+
+export function explorerStage(level: number): string {
+  return stageFor(level).name;
+}
+
+export function explorerKit(level: number): ExplorerKit | null {
+  return stageFor(level).kit;
 }

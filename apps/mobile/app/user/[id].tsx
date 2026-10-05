@@ -2,8 +2,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { octopusStage } from '@wandro/shared';
+import { explorerStage } from '@wandro/shared';
 import { FriendButton } from '@/components/FriendButton';
+import { PlayerAvatar } from '@/components/PlayerAvatar';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useFriendStatus } from '@/data/friends';
 import { useBlock, useFollow, useProfileCard, useReport } from '@/data/social';
@@ -43,14 +44,12 @@ export default function UserProfile() {
       <ScreenHeader title={card.username} />
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
-          <View style={[styles.avatar, { backgroundColor: c.accent }]}>
-            <Text style={{ fontSize: 34 }}>🐙</Text>
-          </View>
+          <PlayerAvatar userId={card.id} size={64} level={card.level} />
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={{ color: c.text, fontSize: 22, fontWeight: '900' }}>{card.username}</Text>
             {card.homeCity ? <Text style={{ color: c.textMuted }}>{card.homeCity}</Text> : null}
             <Text style={{ color: c.accent, fontWeight: '700' }}>
-              Level {card.level} · {octopusStage(card.level)}
+              Level {card.level} · {explorerStage(card.level)}
             </Text>
             {isDemo && (
               <Text style={{ color: c.textMuted, fontSize: 12 }}>{t('feed.demoBadge')}</Text>
@@ -140,13 +139,6 @@ function Stat({ label, value }: { label: string; value: number | string }) {
 const styles = StyleSheet.create({
   container: { padding: space.lg, gap: space.lg },
   header: { flexDirection: 'row', gap: space.lg, alignItems: 'center' },
-  avatar: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   stats: { flexDirection: 'row', gap: space.sm },
   stat: { flex: 1, borderRadius: radius.md, padding: space.md, alignItems: 'center' },
   follow: {

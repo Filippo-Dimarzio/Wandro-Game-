@@ -4,10 +4,13 @@ import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from '
 import { BADGES, regionBySlug } from '@wandro/shared';
 import type { CheckinOutcome } from '@/data/checkin';
 import { CoinIcon } from '@/components/CoinIcon';
+import { ExplorerAvatar } from '@/components/ExplorerAvatar';
+import { useMyExplorer } from '@/data/explorer';
+import { useLoadout } from '@/data/loadout';
 import { t, type TranslationKey } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
 
-/** Counts up from 0 so the coins "land" in the octopus's coin pouch. */
+/** Counts up from 0 so the coins "land" in your explorer's pouch. */
 export function useCountUp(target: number, ms = 900): number {
   const [value, setValue] = useState(0);
   useEffect(() => {
@@ -33,6 +36,8 @@ interface Props {
 
 export function RewardCard({ placeName, outcome, onDone, onShare }: Props) {
   const c = useColors();
+  const explorer = useMyExplorer();
+  const loadout = useLoadout();
   const coins = useCountUp(outcome.coins ?? 0);
   const pop = useRef(new Animated.Value(0.8)).current;
   useEffect(() => {
@@ -80,9 +85,9 @@ export function RewardCard({ placeName, outcome, onDone, onShare }: Props) {
       style={[styles.card, { backgroundColor: c.accent, transform: [{ scale: pop }] }]}
       testID="reward-card"
     >
-      <Text style={styles.octopus} accessibilityElementsHidden>
-        🐙
-      </Text>
+      <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        <ExplorerAvatar explorer={explorer} skin={loadout.skin} hat={loadout.hat} size={64} />
+      </View>
       <Text style={[styles.title, { color: c.accentOn }]} accessibilityRole="header">
         {t('reward.title')}
       </Text>
@@ -175,7 +180,6 @@ function Chip({ text }: { text: string }) {
 
 const styles = StyleSheet.create({
   card: { borderRadius: radius.lg, padding: space.xl, gap: space.sm, alignItems: 'center' },
-  octopus: { fontSize: 56 },
   title: { fontSize: 26, fontWeight: '900' },
   coins: { fontSize: 40, fontWeight: '900' },
   coinRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },

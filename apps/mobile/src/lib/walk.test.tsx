@@ -15,7 +15,7 @@ describe('walking', () => {
     expect(stepPosition(start, new Set(['up', 'down']), 10)).toEqual(start);
   });
 
-  it('walks the demo octopus while a direction is held', async () => {
+  it('walks the demo explorer while a direction is held', async () => {
     jest.useFakeTimers();
     useSession.getState().reset();
     const { result } = await renderHook(() => useWalkControls(true, start));

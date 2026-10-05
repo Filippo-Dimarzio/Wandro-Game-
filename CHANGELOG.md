@@ -6,6 +6,13 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Explorers replace the octopus. Players pick one of eight drawn explorers at sign-up (and can
+  change it from Profile); friends and profile pages show each player's explorer. Store skins are
+  now outfits (jacket colours), and your explorer's kit grows with rank: Wanderer (new name for
+  Hatchling), Explorer with a map, Navigator with a backpack, Cartographer with a camera. The
+  explorer drawings are placeholders the illustrator can replace file for file.
+- New W logo and app icons: a W drawn as a wandering route with a yellow "you are here" dot.
+
 - PR preview workflow: every pull request builds the web app and attaches screenshots of each
   main screen (`apps/mobile/scripts/screenshots.mjs`).
 - Storybook map: the map now looks like a hand-painted city map, with peach ground, mint parks

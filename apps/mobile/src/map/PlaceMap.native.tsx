@@ -1,6 +1,6 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { OctopusAvatar } from '@/components/OctopusAvatar';
+import { ExplorerAvatar } from '@/components/ExplorerAvatar';
 import { env } from '@/lib/env';
 import { CATEGORIES } from '@wandro/shared';
 import { lightColors, useIsDark } from '@/theme';
@@ -192,7 +192,8 @@ function MapboxPlaceMap({
         />
       </ShapeSource>
       <MarkerView coordinate={[userPosition.lng, userPosition.lat]} allowOverlap>
-        <OctopusAvatar
+        <ExplorerAvatar
+          explorer={avatar?.explorer}
           size={compact ? 24 : 36}
           skin={avatar?.skin}
           hat={avatar?.hat}

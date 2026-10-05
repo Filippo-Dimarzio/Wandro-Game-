@@ -32,6 +32,7 @@ import { nearestLocked } from '@/data/discovery';
 import { useFriendChallenges, type FriendChallengeView } from '@/data/friends';
 import { useHiddenGems } from '@/data/hidden';
 import { useLoadout } from '@/data/loadout';
+import { useMyExplorer } from '@/data/explorer';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t } from '@/i18n';
 import { isDemo } from '@/lib/env';
@@ -76,6 +77,7 @@ export default function Explore() {
   }, [sidebarOpen, slide]);
   const { ids } = useUnlockedIds();
   const loadout = useLoadout();
+  const explorer = useMyExplorer();
   const setTeleport = useSession((s) => s.setTeleport);
   const [category, setCategory] = useState<Category | null>(null);
   const [selected, setSelected] = useState<Place | null>(null);
@@ -216,7 +218,7 @@ export default function Explore() {
           accuracyM={loc.accuracy}
           target={target}
           trail={loadout.trailActive && !!target}
-          avatar={{ skin: loadout.skin, hat: loadout.hat }}
+          avatar={{ explorer, skin: loadout.skin, hat: loadout.hat }}
           follow={walking}
           onSelect={setSelected}
           recenterSignal={recenter}

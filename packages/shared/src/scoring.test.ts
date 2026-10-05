@@ -4,7 +4,8 @@ import {
   levelFromXp,
   levelProgress,
   xpForLevel,
-  octopusStage,
+  explorerKit,
+  explorerStage,
 } from './scoring';
 import { haversineMeters, isWithinGeofence, formatDistance } from './geo';
 
@@ -62,10 +63,16 @@ describe('levels', () => {
     expect(p.xpIntoLevel).toBe(150);
     expect(p.fraction).toBeCloseTo(0.5);
   });
-  it('maps level to octopus stage', () => {
-    expect(octopusStage(1)).toBe('Hatchling');
-    expect(octopusStage(3)).toBe('Explorer');
-    expect(octopusStage(12)).toBe('Cartographer');
+  it('maps level to explorer rank', () => {
+    expect(explorerStage(1)).toBe('Wanderer');
+    expect(explorerStage(3)).toBe('Explorer');
+    expect(explorerStage(12)).toBe('Cartographer');
+  });
+  it('grows the explorer kit with rank: map, backpack, then camera', () => {
+    expect(explorerKit(1)).toBeNull();
+    expect(explorerKit(3)).toBe('map');
+    expect(explorerKit(7)).toBe('backpack');
+    expect(explorerKit(10)).toBe('camera');
   });
 });
 

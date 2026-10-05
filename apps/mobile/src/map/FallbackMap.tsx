@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useState } from 'react';
-import { OctopusAvatar } from '@/components/OctopusAvatar';
+import { ExplorerAvatar } from '@/components/ExplorerAvatar';
 import { MARKERS } from './markers';
 import { t } from '@/i18n';
 import { useColors } from '@/theme';
@@ -65,7 +65,8 @@ export function FallbackMap({
         style={[styles.me, { left: x(userPosition.lng) - 18, top: y(userPosition.lat) - 18 }]}
         pointerEvents="none"
       >
-        <OctopusAvatar
+        <ExplorerAvatar
+          explorer={avatar?.explorer}
           size={36}
           skin={avatar?.skin}
           hat={avatar?.hat}

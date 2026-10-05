@@ -42,6 +42,8 @@ export interface LocalProfile {
   homeCity: string;
   explorerStyles: string[];
   isPrivate?: boolean;
+  /** The explorer the player chose as their avatar (EXPLORER_IDS). */
+  explorer?: string;
 }
 
 export interface DemoChallengeState {

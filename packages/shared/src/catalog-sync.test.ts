@@ -10,6 +10,7 @@ import {
   oddityValuesSql,
   rotationValuesSql,
 } from './challenges';
+import { EXPLORER_IDS } from './explorers';
 import { BADGES } from './progression';
 import { SHOP_ITEMS } from './shop';
 
@@ -20,6 +21,13 @@ const sql = readdirSync(migrations)
   .join('\n');
 
 describe('catalogues match the database seeds', () => {
+  it('explorers: the database accepts exactly the explorers the app draws', () => {
+    const check = sql.match(/check \(explorer in \(([^)]*)\)\)/);
+    expect(check).not.toBeNull();
+    const ids = [...check![1]!.matchAll(/'([a-z0-9]+)'/g)].map((m) => m[1]);
+    expect(ids).toEqual([...EXPLORER_IDS]);
+  });
+
   it('shop items: same codes, kinds, prices and durations', () => {
     const rows = [
       ...sql.matchAll(

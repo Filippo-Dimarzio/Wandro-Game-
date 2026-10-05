@@ -11,7 +11,7 @@ export interface ShopItem {
   durationMinutes?: number;
   /** One-use boosts: held until used up, one at a time. */
   consumable?: boolean;
-  /** Skin colour for the octopus. */
+  /** Outfit colour: your explorer's jacket. */
   color?: string;
   emoji: string;
 }
@@ -24,7 +24,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     code: 'incense_30',
     name: 'Incense trail · 30 min',
     description:
-      'A glowing incense circle around your octopus and a guiding line to your next adventure.',
+      'A glowing incense circle around your explorer and a guiding line to your next adventure.',
     kind: 'boost',
     price: 150,
     durationMinutes: 30,
@@ -41,7 +41,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
   {
     code: 'skin_ocean',
-    name: 'Ocean octopus',
+    name: 'Atlantic jacket',
     description: 'Deep Atlantic blue.',
     kind: 'skin',
     price: 300,
@@ -50,7 +50,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
   {
     code: 'skin_coral',
-    name: 'Coral octopus',
+    name: 'Coral jacket',
     description: 'Warm coral, like Pena Palace at sunset.',
     kind: 'skin',
     price: 450,
@@ -59,7 +59,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
   {
     code: 'skin_midnight',
-    name: 'Midnight octopus',
+    name: 'Midnight coat',
     description: 'For night walks and fado.',
     kind: 'skin',
     price: 600,
@@ -68,7 +68,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
   {
     code: 'skin_gold',
-    name: 'Golden octopus',
+    name: 'Golden jacket',
     description: 'Shiny. Very shiny.',
     kind: 'skin',
     price: 1200,

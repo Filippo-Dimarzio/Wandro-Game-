@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { levelProgress, octopusStage } from '@wandro/shared';
+import { explorerStage, levelProgress } from '@wandro/shared';
 import type { Wallet } from '@/data/wallet';
 import { CoinAmount } from '@/components/CoinIcon';
 import { t } from '@/i18n';
@@ -14,13 +14,12 @@ export function ProgressStrip({ wallet }: { wallet: Wallet }) {
       onPress={() => router.push('/leaderboard')}
       style={[styles.strip, { backgroundColor: c.surface }]}
       accessibilityRole="button"
-      accessibilityLabel={`${t('home.level', { level: lp.level })}, ${octopusStage(lp.level)}, ${t('coins.a11y', { coins: wallet.coins })}, ${t('home.streak', { days: wallet.streak })}`}
+      accessibilityLabel={`${t('home.level', { level: lp.level })}, ${explorerStage(lp.level)}, ${t('coins.a11y', { coins: wallet.coins })}, ${t('home.streak', { days: wallet.streak })}`}
       testID="progress-strip"
     >
       <View style={styles.row}>
         <Text style={[styles.level, { color: c.text }]}>
-          {'🐙 '}
-          {t('home.level', { level: lp.level })} · {octopusStage(lp.level)}
+          {t('home.level', { level: lp.level })} · {explorerStage(lp.level)}
         </Text>
         <CoinAmount amount={wallet.coins} color={c.gold} size={18} />
       </View>

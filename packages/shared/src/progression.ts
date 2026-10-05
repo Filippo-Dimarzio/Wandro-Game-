@@ -104,7 +104,7 @@ export const BADGES: BadgeDef[] = [
     code: 'sintra_complete',
     name: 'Sintra complete',
     description: 'Discover every place in Sintra.',
-    emoji: '🐙',
+    emoji: '🌄',
     criteria: { type: 'region_complete', region: 'sintra' },
     xp: BADGE_XP,
   },

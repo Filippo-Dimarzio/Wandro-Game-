@@ -1,9 +1,11 @@
+import { Image, type ImageSource } from 'expo-image';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DEFAULT_SKIN_COLOR, SHOP_ITEMS, type ShopItem, type ShopItemKind } from '@wandro/shared';
 import { CoinCounter } from '@/components/CoinCounter';
-import { OctopusAvatar } from '@/components/OctopusAvatar';
+import { ExplorerAvatar, explorerImage } from '@/components/ExplorerAvatar';
+import { useMyExplorer } from '@/data/explorer';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useLoadout } from '@/data/loadout';
 import { useBuyItem, useEquipItem } from '@/data/shop';
@@ -22,6 +24,7 @@ export default function Shop() {
   const c = useColors();
   const wallet = useWallet();
   const loadout = useLoadout();
+  const explorer = useMyExplorer();
   const buy = useBuyItem();
   const equip = useEquipItem();
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
@@ -45,12 +48,13 @@ export default function Shop() {
       <ScreenHeader title={t('shop.title')} />
       <ScrollView contentContainerStyle={[styles.container, column]}>
         <View style={[styles.hero, { backgroundColor: c.surface }]}>
-          <OctopusAvatar
+          <ExplorerAvatar
+            explorer={explorer}
             size={88}
             skin={loadout.skin}
             hat={loadout.hat}
             glow={loadout.trailActive}
-            accessibilityLabel="Your octopus"
+            accessibilityLabel={t('shop.yourExplorer')}
           />
           <View style={{ flex: 1, gap: 4 }}>
             <Text style={{ color: c.textMuted, fontWeight: '700' }}>{t('shop.balance')}</Text>
@@ -80,7 +84,8 @@ export default function Shop() {
             </Text>
             {section.kind === 'skin' && (
               <ItemRow
-                emoji="🐙"
+                emoji=""
+                image={explorerImage(explorer)}
                 swatch={DEFAULT_SKIN_COLOR}
                 name={t('shop.default')}
                 description=""
@@ -158,6 +163,7 @@ export default function Shop() {
                 <ItemRow
                   key={item.code}
                   emoji={item.emoji}
+                  image={item.kind === 'skin' ? explorerImage(explorer, item.code) : undefined}
                   swatch={item.color}
                   name={item.name}
                   description={item.description}
@@ -191,6 +197,7 @@ export default function Shop() {
 
 function ItemRow({
   emoji,
+  image,
   swatch,
   name,
   description,
@@ -198,6 +205,8 @@ function ItemRow({
   action,
 }: {
   emoji: string;
+  /** A picture instead of the emoji, e.g. your explorer wearing an outfit. */
+  image?: ImageSource;
   swatch?: string;
   name: string;
   description: string;
@@ -208,7 +217,11 @@ function ItemRow({
   return (
     <View style={[styles.item, { backgroundColor: c.card, borderColor: c.border }]}>
       <View style={[styles.icon, { backgroundColor: swatch ?? c.surface }]}>
-        <Text style={{ fontSize: 26 }}>{emoji}</Text>
+        {image ? (
+          <Image source={image} style={styles.iconImage} accessible={false} />
+        ) : (
+          <Text style={{ fontSize: 26 }}>{emoji}</Text>
+        )}
       </View>
       <View style={{ flex: 1, gap: 2 }}>
         <Text style={{ color: c.text, fontWeight: '800' }}>
@@ -293,7 +306,15 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     padding: space.md,
   },
-  icon: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center' },
+  icon: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  iconImage: { width: 52, height: 52 },
   action: {
     borderRadius: radius.pill,
     paddingHorizontal: 14,

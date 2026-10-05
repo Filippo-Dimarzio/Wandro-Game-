@@ -181,7 +181,7 @@ Each phase ends with: tests + lint green, a summary of changes, a manual test li
 
 **Phase 6 — Desktop app:** Electron shell for Windows/macOS/Linux, installers attached to every release, installable web app (manifest + service worker) with an Install / Download banner.
 
-**Phase 7 — Find-My-style walking:** the octopus marks your position with a pulse and accuracy circle; Guide me shows distance, walking time and closeness ('On your way' → 'You're here!') with Google Maps directions; demo/desktop walking with WASD, arrow keys or an on-screen pad.
+**Phase 7 — Find-My-style walking:** your explorer marks your position with a pulse and accuracy circle; Guide me shows distance, walking time and closeness ('On your way' → 'You're here!') with Google Maps directions; demo/desktop walking with WASD, arrow keys or an on-screen pad.
 
 **Phase 8 — Coin economy & store:** coins (= the ledger's points) are earned only by playing; the daily challenge pays double; coins buy the incense trail (glow + guiding line to the next adventure, timed) and octopus skins and hats. Spending never lowers XP or leaderboard rank. No subscription.
 
@@ -204,6 +204,8 @@ Each phase ends with: tests + lint green, a summary of changes, a manual test li
 **Phase 13 — Trips, theme and celebrations:** `tripMode()` in `regions.ts` picks plane (both cities have `hasAirport`), else the quicker of train and coach from a per-pair table; `check_arrival()` (`20261014090000_trips`) now reports every move between live cities and leaves the mode to the app. `prefs.theme` (system/light/dark) drives `useIsDark()`/`useColors()`; the `ThemeToggle` tab sits on the right edge. `MapAmbience` draws the chart vignette, compass rose, leaves and fireflies above the map with `pointerEvents="none"` and hidden from screen readers; the game layer (`map/adventure.ts`) sits on the storybook map (Phase 14): a light mist for unexplored land, pins from `scripts/render-markers.mjs` (category pictograms; landmark badges matched by name in `LANDMARK_NAMES`). Pins carry no text labels (names show when you tap a pin); if the storybook source can't be reached, the web map swaps to a plain raster style so the game layers always appear. Collections art is traced from the stamp engravings into terracotta sketches by `scripts/render-cities.mjs`. Stamps use their own engraved pictures (`STAMP_ART`). Demo photos are stored as JPEG data URIs (`keepPhoto`), so they outlive the temporary picker URL; photos from the last 24 h are never trimmed (`keepRecentPhotos`). `CityCelebration` shows on a new city stamp or when every set place in a city is found. Collection cover photos were generated in Canva but can't be downloaded until the environment allows Canva's download hosts.
 
 **Phase 14 — Storybook map (part 1 of the illustrated map):** the base map is drawn from OpenStreetMap vector tiles (OpenFreeMap, OpenMapTiles schema) with our own style, `map/storybook.ts`: peach ground, mint parks, gardens and cemeteries, periwinkle water with a coral shore line, cream round-capped streets, and only avenue, water and neighbourhood labels (no POIs, buildings or shields). One style object feeds MapLibre on the web and Mapbox `styleJSON` on iOS/Android; `storybookPaint()` swaps the light and night palettes live. The compass and edge vignette use the same palette; unexplored land is a light mist (the game layer). If the vector tiles fail, the web falls back to OSM raster tiles and native to Mapbox Outdoors. Tested in `storybook.test.ts` (valid style in both themes, label contrast ≥ 4.5:1). Next: landmark illustrations per city and decoration stickers as symbol layers.
+
+**Phase 15 — Explorers instead of the octopus:** players choose one of eight drawn explorers (`EXPLORER_IDS` in `packages/shared/src/explorers.ts`; `profiles.explorer`, null until chosen, then `explorerFor()` picks a steady default from the user id). Sign-up adds a picker and Profile has "Change your explorer". Art is rendered by `apps/mobile/scripts/render-explorers.mjs` into `assets/explorers` (every explorer in every outfit, plus kit badges) and listed in the generated `src/explorerArt.ts`; the illustrator's drawings replace the PNGs under the same names. Store skins are sold as outfits (same codes and prices). Ranks are Wanderer → Explorer → Navigator → Cartographer (`explorerStage`, `explorerKit`). The logo is a W drawn as a wandering route with a yellow "you are here" dot; `scripts/render-logo.mjs` renders it and every app icon. Wandro the character (a wandering street musician) is the brand's host in marketing; in the app the player's own explorer is the hero.
 
 ## 11. Things I need from you, and when
 
@@ -239,7 +241,7 @@ Comments, food challenges (venue QR codes for proof), Instagram sharing via the 
 
 **Entry & registration**
 
-- Entry portal: full-screen real photo of Sintra under fog; the user swipes or holds to clear the fog and the octopus logo appears.
+- Entry portal: full-screen real photo of Sintra under fog; the user swipes or holds to clear the fog and the W logo appears.
 - Gamified registration: **pick explorer style** (interests such as castles, nature, music) so the first suggested places match. Other gamified touches (passport stamp, starter badge) are optional and still open.
 
 **Home / map / check-in**
@@ -253,7 +255,7 @@ Comments, food challenges (venue QR codes for proof), Instagram sharing via the 
 **Profile & progression**
 
 - Profile opens with a "map of you": the cleared-fog map with stats beneath, and the photo grid below.
-- Levels are shown as **octopus evolution** (the mascot grows or gains accessories). Rank names are still open.
+- Levels are shown as **explorer ranks**: Wanderer (1), Explorer (3, a map), Navigator (6, a backpack), Cartographer (10, a camera); the kit is drawn on the player's avatar.
 - Badges at launch: category, region, rarity and streak/community badges.
 
 **Social**
@@ -268,4 +270,4 @@ Comments, food challenges (venue QR codes for proof), Instagram sharing via the 
 
 **Monetisation (decided for v2.0):** coins only, no subscription and no payments. Coins are earned by playing and spent in the in-game store on equipment (incense trail) and cosmetics. Coins can never be bought, so leaderboards stay fair. If paid features come later, digital purchases on iOS/Android must use the stores' in-app purchase systems.
 
-**Walking (decided for v2.0):** your octopus is you on the map (Find-My-style). Real discoveries need real GPS with a backend; in demo mode and on desktop you can walk virtually with the keyboard or on-screen pad, and those virtual visits count on that device.
+**Walking (decided for v2.0):** your explorer is you on the map (Find-My-style). Real discoveries need real GPS with a backend; in demo mode and on desktop you can walk virtually with the keyboard or on-screen pad, and those virtual visits count on that device.

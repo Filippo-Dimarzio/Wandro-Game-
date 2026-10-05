@@ -40,7 +40,7 @@ export function stepPosition(from: LatLng, held: Set<Direction>, metres: number)
 }
 
 /**
- * Walk the octopus in demo mode: WASD / arrow keys on web and desktop, or the on-screen pad.
+ * Walk your explorer in demo mode: WASD / arrow keys on web and desktop, or the on-screen pad.
  * Moves the demo position, which the map, check-ins and proximity all read.
  */
 export function useWalkControls(enabled: boolean, start: LatLng) {

@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { t } from '@/i18n';
 import type { Direction } from '@/lib/walk';
 import { radius, useColors } from '@/theme';
@@ -11,7 +11,7 @@ const ICONS: Record<Direction, keyof typeof Ionicons.glyphMap> = {
   right: 'caret-forward',
 };
 
-/** On-screen pad for walking the octopus in demo mode (hold a direction to keep walking). */
+/** On-screen pad for walking your explorer in demo mode (hold a direction to keep walking). */
 export function WalkPad({
   press,
   release,
@@ -38,7 +38,7 @@ export function WalkPad({
       <View style={styles.row}>
         {btn('left')}
         <View style={[styles.center, { backgroundColor: c.surface }]}>
-          <Text style={{ fontSize: 18 }}>🐙</Text>
+          <Ionicons name="walk" size={20} color={c.accent} />
         </View>
         {btn('right')}
       </View>

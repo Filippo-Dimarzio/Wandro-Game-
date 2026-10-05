@@ -16,7 +16,7 @@ export function HowToPlay() {
       testID="how-to-play"
     >
       <Text style={{ color: c.text, fontSize: 18, fontWeight: '900' }} accessibilityRole="header">
-        🐙 {t('howto.title')}
+        {t('howto.title')}
       </Text>
       {STEPS.map((k, i) => (
         <View key={k} style={styles.step}>
