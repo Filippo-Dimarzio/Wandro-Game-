@@ -6,6 +6,8 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- PR preview workflow: every pull request builds the web app and attaches screenshots of each
+  main screen (`apps/mobile/scripts/screenshots.mjs`).
 - Storybook map: the map now looks like a hand-painted city map, with peach ground, mint parks
   and gardens, periwinkle water with a coral shore, soft cream streets and only a few labels
   (avenues, water, neighbourhoods). Same look on web and phones, with a night palette in dark
