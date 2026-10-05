@@ -34,8 +34,8 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - A light/dark switch on the right edge of every screen (follows the phone until you choose).
 - Game layer on the storybook map, after illustrated tourist maps: only a light mist over
   unexplored ground (no more hatching hiding places), bold category pins with a lock (to explore)
-  or gold tick (discovered), every place's name under its pin, a big illustrated badge for each
-  city's signature landmark, a compass rose, and leaves drifting across by day (fireflies at night).
+  or gold tick (discovered; tap a pin for its name), a big illustrated badge for each city's
+  signature landmark, a compass rose, and leaves drifting across by day (fireflies at night).
 - Map key: "To explore" and "Discovered" counts; tap it for what they mean.
 - Collections city art redrawn as terracotta ink sketches of each city's landmark.
 - City celebrations: a new city stamp slams onto the screen with fireworks, and claiming every

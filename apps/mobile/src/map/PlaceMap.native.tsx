@@ -167,24 +167,6 @@ function MapboxPlaceMap({
             symbolSortKey: PIN_SORT as unknown as number,
           }}
         />
-        {/* Names under the pins, like a tourist map; overlapping ones are left out. */}
-        <SymbolLayer
-          id="places-labels"
-          minZoomLevel={compact ? 24 : 12.5}
-          style={{
-            textField: ['get', 'name'],
-            // The storybook style serves this font (map/storybook.ts).
-            textFont: ['Noto Sans Bold'],
-            textSize: 12,
-            textColor: '#1A2238',
-            textHaloColor: '#FFFFFF',
-            textHaloWidth: 2,
-            textAnchor: 'top',
-            textOffset: [0, 0.3],
-            textMaxWidth: 10,
-            symbolSortKey: PIN_SORT as unknown as number,
-          }}
-        />
       </ShapeSource>
       <ShapeSource id="accuracy" shape={accuracy}>
         <FillLayer id="accuracy-fill" style={{ fillColor: lightColors.me, fillOpacity: 0.12 }} />

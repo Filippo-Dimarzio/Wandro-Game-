@@ -7,8 +7,14 @@ import { CATEGORIES } from '@wandro/shared';
 import { shopItem, skinColor } from '@wandro/shared';
 import { Asset } from 'expo-asset';
 import { lightColors, useIsDark } from '@/theme';
-import { ADVENTURE, LABEL } from './adventure';
-import { BASE_SOURCE, STORYBOOK, storybookPaint, storybookStyle } from './storybook';
+import { ADVENTURE } from './adventure';
+import {
+  BASE_SOURCE,
+  STORYBOOK,
+  STORYBOOK_HOST,
+  storybookPaint,
+  storybookStyle,
+} from './storybook';
 import {
   LANDMARK_MARKERS,
   landmarkName,
@@ -30,6 +36,32 @@ maplibregl.setWorkerUrl(
 // The storybook map (map/storybook.ts) from OpenFreeMap vector tiles, same as the native apps.
 // The cast bridges our loose JSON style to MapLibre's StyleSpecification.
 const STYLE = storybookStyle(STORYBOOK.light) as unknown as maplibregl.StyleSpecification;
+
+/** Plain OpenStreetMap raster tiles on the storybook ground, for when the storybook source is down. */
+const FALLBACK_STYLE: maplibregl.StyleSpecification = {
+  version: 8,
+  sources: {
+    osm: {
+      type: 'raster',
+      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tileSize: 256,
+      attribution: '© OpenStreetMap contributors',
+      maxzoom: 19,
+    },
+  },
+  layers: [
+    { id: 'paper', type: 'background', paint: { 'background-color': ADVENTURE.light.paper } },
+    {
+      id: 'osm',
+      type: 'raster',
+      source: 'osm',
+      paint: {
+        'raster-saturation': ADVENTURE.light.tiles.saturation,
+        'raster-contrast': ADVENTURE.light.tiles.contrast,
+      },
+    },
+  ],
+};
 
 /** If the vector tiles can't load, fall back to plain OpenStreetMap raster tiles under the game layers. */
 function addRasterFallback(m: MLMap) {
@@ -68,29 +100,6 @@ function loadMarkerImages(m: MLMap) {
   for (const [city, art] of Object.entries(LANDMARK_MARKERS))
     for (const locked of [false, true])
       load(landmarkName(city, locked), locked ? art.locked : art.found);
-}
-
-/** Draws a place's name as a little white label, so names show even without map fonts. */
-function labelImage(name: string) {
-  const c = document.createElement('canvas');
-  const g = c.getContext('2d')!;
-  g.font = LABEL.font;
-  const text = name.length > 26 ? `${name.slice(0, 25)}…` : name;
-  const w = Math.ceil(g.measureText(text).width) + LABEL.padX * 2;
-  c.width = w;
-  c.height = LABEL.height;
-  g.font = LABEL.font;
-  g.fillStyle = 'rgba(255,255,255,0.94)';
-  g.strokeStyle = 'rgba(26,34,56,0.25)';
-  g.lineWidth = 2;
-  g.beginPath();
-  g.roundRect(1, 1, w - 2, LABEL.height - 2, 12);
-  g.fill();
-  g.stroke();
-  g.fillStyle = '#1A2238';
-  g.textBaseline = 'middle';
-  g.fillText(text, LABEL.padX, LABEL.height / 2 + 1);
-  return g.getImageData(0, 0, w, LABEL.height);
 }
 
 // Find-My-style pulse and incense glow for the octopus marker.
@@ -174,10 +183,21 @@ export function PlaceMap({
       .addTo(m);
 
     // Tile errors on the storybook source (e.g. the tile host is down): switch to OSM raster.
+    // If the storybook source can't even be reached, the style never finishes loading and the
+    // game layers would never appear: swap to the plain raster style instead (also after 8 s).
+    let fellBack = false;
+    const fallBack = () => {
+      if (fellBack || ready.current) return;
+      fellBack = true;
+      m.setStyle(FALLBACK_STYLE);
+    };
+    const slow = setTimeout(fallBack, 8000);
     m.on('error', (e) => {
       // Tile errors carry the failing source's id (not in MapLibre's ErrorEvent type).
-      const sourceId = (e as { sourceId?: string }).sourceId;
-      if (sourceId === BASE_SOURCE && m.isStyleLoaded()) addRasterFallback(m);
+      // Before the style has loaded, the only thing being fetched is the storybook source itself.
+      if (!m.isStyleLoaded()) return fallBack();
+      const { sourceId, error } = e as { sourceId?: string; error?: { url?: string } };
+      if (sourceId === BASE_SOURCE || error?.url?.includes(STORYBOOK_HOST)) addRasterFallback(m);
     });
 
     m.on('load', () => {
@@ -239,25 +259,6 @@ export function PlaceMap({
           'symbol-sort-key': PIN_SORT as maplibregl.ExpressionSpecification,
         },
       });
-      // Names under the pins, like a tourist map; ones that would overlap are left out.
-      m.addLayer({
-        id: 'place-labels',
-        type: 'symbol',
-        source: 'places',
-        minzoom: compact ? 24 : 12.5,
-        layout: {
-          'icon-image': ['concat', 'label-', ['get', 'id']],
-          'icon-anchor': 'top',
-          'icon-offset': [0, 2],
-          'icon-padding': 2,
-          'symbol-sort-key': PIN_SORT as maplibregl.ExpressionSpecification,
-        },
-      });
-      m.on('styleimagemissing', (e: { id: string }) => {
-        if (!e.id.startsWith('label-') || m.hasImage(e.id)) return;
-        const p = latest.current.places.find((x) => `label-${x.id}` === e.id);
-        if (p) m.addImage(e.id, labelImage(p.name), { pixelRatio: 2 });
-      });
       loadMarkerImages(m);
       const select = (e: MapLayerMouseEvent) => {
         const id = e.features?.[0]?.properties?.id as string | undefined;
@@ -265,7 +266,6 @@ export function PlaceMap({
         if (p) latest.current.onSelect?.(p);
       };
       m.on('click', 'places', select);
-      m.on('click', 'place-labels', select);
       m.on('contextmenu', (e) =>
         latest.current.onLongPress?.({ lat: e.lngLat.lat, lng: e.lngLat.lng }),
       );
@@ -294,6 +294,7 @@ export function PlaceMap({
     if (!reduceMotion) frame = requestAnimationFrame(animate);
 
     return () => {
+      clearTimeout(slow);
       cancelAnimationFrame(frame);
       ready.current = false;
       marker.current?.remove();

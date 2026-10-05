@@ -48,7 +48,9 @@ export const STORYBOOK: Record<'light' | 'dark', StorybookPalette> = {
 };
 
 export const BASE_SOURCE = 'base';
-const TILES_URL = 'https://tiles.openfreemap.org/planet';
+/** Where the storybook tiles and fonts come from. */
+export const STORYBOOK_HOST = 'tiles.openfreemap.org';
+const TILES_URL = `https://${STORYBOOK_HOST}/planet`;
 const GLYPHS_URL = 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf';
 const FONT_ITALIC = ['Noto Sans Italic'];
 const FONT_BOLD = ['Noto Sans Bold'];

@@ -1,6 +1,6 @@
 /**
  * The game layer over the storybook map (map/storybook.ts): a light mist over places you haven't
- * explored yet (it never hides a place or its name), bold pins and name labels. `tiles` styles
+ * explored yet (it never hides a place or its name), and bold pins (names show when you tap a pin). `tiles` styles
  * the plain OpenStreetMap fallback used if the storybook tiles can't load.
  */
 export interface AdventurePalette {
@@ -26,11 +26,4 @@ export const ADVENTURE: Record<'light' | 'dark', AdventurePalette> = {
     ink: '#F2D9BE',
     tiles: { saturation: -0.2, contrast: 0, brightnessMax: 0.6 },
   },
-};
-
-/** How a place's name is drawn under its pin on the web map (pixel ratio 2). */
-export const LABEL = {
-  font: '700 22px system-ui, -apple-system, sans-serif',
-  padX: 12,
-  height: 34,
 };
