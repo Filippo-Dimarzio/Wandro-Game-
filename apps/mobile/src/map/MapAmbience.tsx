@@ -49,7 +49,7 @@ export function MapAmbience() {
 
 /** Darker, burnt edges like an old chart. */
 function Vignette({ dark }: { dark: boolean }) {
-  const edge = dark ? 'rgba(0,0,0,0.55)' : 'rgba(90,58,20,0.32)';
+  const edge = dark ? 'rgba(0,0,0,0.4)' : 'rgba(90,58,20,0.16)';
   const clear = 'rgba(0,0,0,0)';
   return (
     <>
@@ -205,13 +205,14 @@ const styles = StyleSheet.create({
   side: { position: 'absolute', top: 0, bottom: 0, width: 40 },
   compass: {
     position: 'absolute',
-    right: 18,
-    top: 150,
+    right: 22,
+    bottom: 120,
     width: 64,
     height: 64,
     alignItems: 'center',
     justifyContent: 'center',
-    opacity: 0.85,
+    opacity: 0.7,
+    transform: [{ scale: 0.8 }],
   },
   ring: {
     position: 'absolute',

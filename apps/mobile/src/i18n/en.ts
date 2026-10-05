@@ -65,6 +65,13 @@ export const en = {
 
   'explore.filters': 'Filter by category',
   'explore.all': 'All',
+  'map.toExplore': 'To explore',
+  'map.discovered': 'Discovered',
+  'map.toExploreHelp':
+    'places in this city you haven’t found yet. Walk there and check in to discover them and earn coins.',
+  'map.discoveredHelp':
+    'places you’ve checked in at. They count towards the city’s sets, its stamp and its hidden gems.',
+  'map.landmarkHelp': 'The big gold pins are each city’s signature landmark.',
   'explore.locked': 'Locked',
   'explore.unlocked': 'Discovered',
   'explore.recenter': 'Center on me',

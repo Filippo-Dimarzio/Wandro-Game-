@@ -1,48 +1,36 @@
 /**
- * The adventure-map look: a sepia, treasure-map palette. Explored ground shows the real map
- * (roads and names stay readable); unexplored ground is hatched parchment, like the uncharted
- * edges of an old chart.
+ * The game-map look, after illustrated tourist maps: a clean, bright street map (blue water, green
+ * parks) on warm paper, a light mist over places you haven't explored yet, and bold pins with
+ * names so the landmarks to explore stand out. Fog never hides a place or its name.
  */
 export interface AdventurePalette {
   paper: string;
   fog: string;
-  hatch: string;
+  fogOpacity: number;
   ink: string;
-  tiles: { opacity: number; saturation: number; contrast: number; brightnessMax: number };
+  tiles: { saturation: number; contrast: number; brightnessMax: number };
 }
 
 export const ADVENTURE: Record<'light' | 'dark', AdventurePalette> = {
   light: {
-    paper: '#E9D7AE',
-    fog: '#D8BF86',
-    hatch: '#C6A467',
+    paper: '#F4EBD6',
+    fog: '#EFE3C4',
+    fogOpacity: 0.35,
     ink: '#5A3A14',
-    tiles: { opacity: 0.74, saturation: -0.45, contrast: 0.12, brightnessMax: 1 },
+    tiles: { saturation: 0.2, contrast: 0.05, brightnessMax: 1 },
   },
   dark: {
-    paper: '#2B2116',
-    fog: '#1D1610',
-    hatch: '#4A3820',
+    paper: '#1C232E',
+    fog: '#0E1520',
+    fogOpacity: 0.4,
     ink: '#E3C48A',
-    tiles: { opacity: 0.7, saturation: -0.5, contrast: 0.1, brightnessMax: 0.55 },
+    tiles: { saturation: -0.2, contrast: 0, brightnessMax: 0.6 },
   },
 };
 
-const hex = (c: string) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
-
-/** RGBA pixels for a small diagonal-hatch tile (fog pattern on the web map). */
-export function hatchPattern(p: AdventurePalette, size = 16): Uint8Array {
-  const [br, bg, bb] = hex(p.fog);
-  const [lr, lg, lb] = hex(p.hatch);
-  const px = new Uint8Array(size * size * 4);
-  for (let y = 0; y < size; y++)
-    for (let x = 0; x < size; x++) {
-      const line = (x + y) % 8 < 1.5;
-      const i = (y * size + x) * 4;
-      px[i] = line ? lr : br;
-      px[i + 1] = line ? lg : bg;
-      px[i + 2] = line ? lb : bb;
-      px[i + 3] = 255;
-    }
-  return px;
-}
+/** How a place's name is drawn under its pin on the web map (pixel ratio 2). */
+export const LABEL = {
+  font: '700 22px system-ui, -apple-system, sans-serif',
+  padX: 12,
+  height: 34,
+};

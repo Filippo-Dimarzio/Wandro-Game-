@@ -26,9 +26,12 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
   otherwise the quicker of train or a green coach, with its own animation and travel time. Every
   move between launch cities is now an arrival (`20261014090000_trips`).
 - A light/dark switch on the right edge of every screen (follows the phone until you choose).
-- Adventure map: sepia tiles on old paper, unexplored land drawn as hatched parchment, burnt
-  chart edges, a compass rose, and leaves drifting across by day (fireflies at night). Off when
-  the phone asks for reduced motion.
+- Game map, after illustrated tourist maps: a clean, colourful street map (CARTO Voyager) with only
+  a light mist over unexplored ground, bold category pins with a lock (to explore) or gold tick
+  (discovered), every place's name under its pin, a big illustrated badge for each city's
+  signature landmark, a compass rose, and leaves drifting across by day (fireflies at night).
+- Map key: "To explore" and "Discovered" counts; tap it for what they mean.
+- Collections city art redrawn as terracotta ink sketches of each city's landmark.
 - City celebrations: a new city stamp slams onto the screen with fireworks, and claiming every
   place in a city's sets gets the bigger show.
 

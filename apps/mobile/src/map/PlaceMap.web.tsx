@@ -7,8 +7,15 @@ import { CATEGORIES } from '@wandro/shared';
 import { shopItem, skinColor } from '@wandro/shared';
 import { Asset } from 'expo-asset';
 import { lightColors, useIsDark } from '@/theme';
-import { ADVENTURE, hatchPattern } from './adventure';
-import { MARKERS, markerName } from './markers';
+import { ADVENTURE, LABEL } from './adventure';
+import {
+  LANDMARK_MARKERS,
+  landmarkName,
+  MARKERS,
+  markerName,
+  PIN_IMAGE,
+  PIN_SORT,
+} from './markers';
 import type { PlaceMapProps } from './types';
 import { accuracyGeoJson, guidanceGeoJson, placesGeoJson, useFog } from './useFog';
 
@@ -19,28 +26,28 @@ maplibregl.setWorkerUrl(
   `${process.env.EXPO_PUBLIC_BASE_URL ?? ''}/maplibre/maplibre-gl-worker.mjs`,
 );
 
-// Free OpenStreetMap raster tiles for the web and desktop apps (with attribution).
-// Native builds use Mapbox (PlaceMap.native.tsx).
+// A clean, colourful street map (CARTO Voyager, built on OpenStreetMap data, with attribution) for
+// the web and desktop apps. Native builds use Mapbox (PlaceMap.native.tsx).
 const STYLE: maplibregl.StyleSpecification = {
   version: 8,
   sources: {
-    osm: {
+    streets: {
       type: 'raster',
-      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tiles: ['a', 'b', 'c', 'd'].map(
+        (s) => `https://${s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png`,
+      ),
       tileSize: 256,
-      attribution: '© OpenStreetMap contributors',
-      maxzoom: 19,
+      attribution: '© OpenStreetMap contributors © CARTO',
+      maxzoom: 20,
     },
   },
-  // Adventure map: sepia tiles on old paper (see map/adventure.ts). Roads and labels stay legible.
   layers: [
     { id: 'paper', type: 'background', paint: { 'background-color': ADVENTURE.light.paper } },
     {
-      id: 'osm',
+      id: 'streets',
       type: 'raster',
-      source: 'osm',
+      source: 'streets',
       paint: {
-        'raster-opacity': ADVENTURE.light.tiles.opacity,
         'raster-saturation': ADVENTURE.light.tiles.saturation,
         'raster-contrast': ADVENTURE.light.tiles.contrast,
       },
@@ -48,14 +55,46 @@ const STYLE: maplibregl.StyleSpecification = {
   ],
 };
 
+/** Draws a place's name as a little white label (no font server needed for map text). */
+function labelImage(name: string) {
+  const c = document.createElement('canvas');
+  const g = c.getContext('2d')!;
+  g.font = LABEL.font;
+  const text = name.length > 26 ? `${name.slice(0, 25)}…` : name;
+  const w = Math.ceil(g.measureText(text).width) + LABEL.padX * 2;
+  c.width = w;
+  c.height = LABEL.height;
+  g.font = LABEL.font;
+  g.fillStyle = 'rgba(255,255,255,0.94)';
+  g.strokeStyle = 'rgba(26,34,56,0.25)';
+  g.lineWidth = 2;
+  g.beginPath();
+  g.roundRect(1, 1, w - 2, LABEL.height - 2, 12);
+  g.fill();
+  g.stroke();
+  g.fillStyle = '#1A2238';
+  g.textBaseline = 'middle';
+  g.fillText(text, LABEL.padX, LABEL.height / 2 + 1);
+  return g.getImageData(0, 0, w, LABEL.height);
+}
+
 // Spread pairs don't fit MapLibre's tuple types, hence the cast.
-/** Loads the round category pins (see map/markers.ts); 84 px images shown at 42 pt. */
+/** Loads the category pins and landmark badges (see map/markers.ts), drawn at pixel ratio 2. */
 function loadMarkerImages(m: MLMap) {
   for (const cat of CATEGORIES)
     for (const locked of [false, true]) {
       const name = markerName(cat, locked);
       const uri = Asset.fromModule(locked ? MARKERS[cat].locked : MARKERS[cat].found).uri;
       m.loadImage(uri)
+        .then(({ data }) => {
+          if (!m.hasImage(name)) m.addImage(name, data, { pixelRatio: 2 });
+        })
+        .catch(() => undefined);
+    }
+  for (const [city, art] of Object.entries(LANDMARK_MARKERS))
+    for (const locked of [false, true]) {
+      const name = landmarkName(city, locked);
+      m.loadImage(Asset.fromModule(locked ? art.locked : art.found).uri)
         .then(({ data }) => {
           if (!m.hasImage(name)) m.addImage(name, data, { pixelRatio: 2 });
         })
@@ -145,15 +184,13 @@ export function PlaceMap({
 
     m.on('load', () => {
       const d = latest.current;
-      if (!m.hasImage('hatch'))
-        m.addImage('hatch', { width: 16, height: 16, data: hatchPattern(ADVENTURE.light) });
       m.addSource('fog', { type: 'geojson', data: d.fog });
       m.addLayer({
         id: 'fog',
         type: 'fill',
         source: 'fog',
-        // Uncharted land: hatched parchment.
-        paint: { 'fill-pattern': 'hatch', 'fill-opacity': 0.82 },
+        // A light mist over unexplored ground: it never hides a place or its name.
+        paint: { 'fill-color': ADVENTURE.light.fog, 'fill-opacity': ADVENTURE.light.fogOpacity },
       });
       m.addSource('accuracy', { type: 'geojson', data: d.accuracy });
       m.addLayer({
@@ -195,20 +232,40 @@ export function PlaceMap({
         type: 'symbol',
         source: 'places',
         layout: {
-          'icon-image': [
-            'concat',
-            'marker-',
-            ['get', 'category'],
-            ['case', ['get', 'unlocked'], '', '-locked'],
-          ],
-          'icon-size': compact ? 0.45 : 1,
+          // Spread pairs don't fit MapLibre's expression types, hence the casts.
+          'icon-image': PIN_IMAGE as maplibregl.ExpressionSpecification,
+          'icon-anchor': 'bottom',
+          'icon-size': compact ? 0.5 : 1,
           'icon-allow-overlap': true,
           'icon-ignore-placement': true,
-          // Discovered places sit on top of locked ones.
-          'symbol-sort-key': ['case', ['get', 'unlocked'], 1, 0],
+          'symbol-sort-key': PIN_SORT as maplibregl.ExpressionSpecification,
         },
       });
+      // Names under the pins, like a tourist map; ones that would overlap are left out.
+      m.addLayer({
+        id: 'place-labels',
+        type: 'symbol',
+        source: 'places',
+        minzoom: compact ? 24 : 12.5,
+        layout: {
+          'icon-image': ['concat', 'label-', ['get', 'id']],
+          'icon-anchor': 'top',
+          'icon-offset': [0, 2],
+          'icon-padding': 2,
+          'symbol-sort-key': PIN_SORT as maplibregl.ExpressionSpecification,
+        },
+      });
+      m.on('styleimagemissing', (e: { id: string }) => {
+        if (!e.id.startsWith('label-') || m.hasImage(e.id)) return;
+        const p = latest.current.places.find((x) => `label-${x.id}` === e.id);
+        if (p) m.addImage(e.id, labelImage(p.name), { pixelRatio: 2 });
+      });
       loadMarkerImages(m);
+      m.on('click', 'place-labels', (e: MapLayerMouseEvent) => {
+        const id = e.features?.[0]?.properties?.id as string | undefined;
+        const p = latest.current.places.find((x) => x.id === id);
+        if (p) latest.current.onSelect?.(p);
+      });
       m.on('click', 'places', (e: MapLayerMouseEvent) => {
         const id = e.features?.[0]?.properties?.id as string | undefined;
         const p = latest.current.places.find((x) => x.id === id);
@@ -278,12 +335,12 @@ export function PlaceMap({
     const apply = () => {
       const p = dark ? ADVENTURE.dark : ADVENTURE.light;
       m.setPaintProperty('paper', 'background-color', p.paper);
-      m.setPaintProperty('osm', 'raster-opacity', p.tiles.opacity);
-      m.setPaintProperty('osm', 'raster-saturation', p.tiles.saturation);
-      m.setPaintProperty('osm', 'raster-brightness-max', p.tiles.brightnessMax);
-      const hatch = { width: 16, height: 16, data: hatchPattern(p) };
-      if (m.hasImage('hatch')) m.updateImage('hatch', hatch);
-      else m.addImage('hatch', hatch);
+      m.setPaintProperty('streets', 'raster-saturation', p.tiles.saturation);
+      m.setPaintProperty('streets', 'raster-brightness-max', p.tiles.brightnessMax);
+      if (m.getLayer('fog')) {
+        m.setPaintProperty('fog', 'fill-color', p.fog);
+        m.setPaintProperty('fog', 'fill-opacity', p.fogOpacity);
+      }
     };
     if (m.isStyleLoaded()) apply();
     else m.once('load', apply);

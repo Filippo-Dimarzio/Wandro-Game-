@@ -6,16 +6,27 @@ import { CATEGORIES } from '@wandro/shared';
 import { lightColors, useIsDark } from '@/theme';
 import { ADVENTURE } from './adventure';
 import { FallbackMap } from './FallbackMap';
-import { MARKERS, markerName } from './markers';
+import {
+  LANDMARK_MARKERS,
+  landmarkName,
+  MARKERS,
+  markerName,
+  PIN_IMAGE,
+  PIN_SORT,
+} from './markers';
 import type { PlaceMapProps } from './types';
 
 // 84 px pins at scale 2 (42 pt on screen).
-const MARKER_IMAGES = Object.fromEntries(
-  CATEGORIES.flatMap((cat) => [
+const MARKER_IMAGES = Object.fromEntries([
+  ...CATEGORIES.flatMap((cat) => [
     [markerName(cat, false), { image: MARKERS[cat].found, scale: 2 }],
     [markerName(cat, true), { image: MARKERS[cat].locked, scale: 2 }],
   ]),
-);
+  ...Object.entries(LANDMARK_MARKERS).flatMap(([city, art]) => [
+    [landmarkName(city, false), { image: art.found, scale: 2 }],
+    [landmarkName(city, true), { image: art.locked, scale: 2 }],
+  ]),
+]);
 import { accuracyGeoJson, guidanceGeoJson, placesGeoJson, useFog } from './useFog';
 
 export type { PlaceMapProps } from './types';
@@ -123,7 +134,7 @@ function MapboxPlaceMap({
         }}
       />
       <ShapeSource id="fog" shape={fog}>
-        <FillLayer id="fog-fill" style={{ fillColor: chart.fog, fillOpacity: 0.8 }} />
+        <FillLayer id="fog-fill" style={{ fillColor: chart.fog, fillOpacity: chart.fogOpacity }} />
       </ShapeSource>
       <Images images={MARKER_IMAGES} />
       <ShapeSource
@@ -138,16 +149,29 @@ function MapboxPlaceMap({
         <SymbolLayer
           id="places-pins"
           style={{
-            iconImage: [
-              'concat',
-              'marker-',
-              ['get', 'category'],
-              ['case', ['get', 'unlocked'], '', '-locked'],
-            ],
-            iconSize: compact ? 0.45 : 1,
+            // Expression arrays don't fit the style prop's types, hence the casts.
+            iconImage: PIN_IMAGE as unknown as string,
+            iconAnchor: 'bottom',
+            iconSize: compact ? 0.5 : 1,
             iconAllowOverlap: true,
             iconIgnorePlacement: true,
-            symbolSortKey: ['case', ['get', 'unlocked'], 1, 0],
+            symbolSortKey: PIN_SORT as unknown as number,
+          }}
+        />
+        {/* Names under the pins, like a tourist map; overlapping ones are left out. */}
+        <SymbolLayer
+          id="places-labels"
+          minZoomLevel={compact ? 24 : 12.5}
+          style={{
+            textField: ['get', 'name'],
+            textSize: 12,
+            textColor: '#1A2238',
+            textHaloColor: '#FFFFFF',
+            textHaloWidth: 2,
+            textAnchor: 'top',
+            textOffset: [0, 0.3],
+            textMaxWidth: 10,
+            symbolSortKey: PIN_SORT as unknown as number,
           }}
         />
       </ShapeSource>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { landmarkOf } from './markers';
 import { circleRing, FOG_CLEAR_RADIUS_M, fogPolygon, type Place } from '@wandro/shared';
 import { useSession } from '@/state/session';
 
@@ -54,7 +55,13 @@ export function placesGeoJson(places: Place[], unlockedIds: Set<string>) {
     features: places.map((p) => ({
       type: 'Feature' as const,
       id: p.id,
-      properties: { id: p.id, name: p.name, category: p.category, unlocked: unlockedIds.has(p.id) },
+      properties: {
+        id: p.id,
+        name: p.name,
+        category: p.category,
+        unlocked: unlockedIds.has(p.id),
+        landmark: landmarkOf(p),
+      },
       geometry: { type: 'Point' as const, coordinates: [p.lng, p.lat] },
     })),
   };

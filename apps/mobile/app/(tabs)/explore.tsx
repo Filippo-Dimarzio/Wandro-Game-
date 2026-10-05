@@ -37,6 +37,7 @@ import { t } from '@/i18n';
 import { isDemo } from '@/lib/env';
 import { useLocation } from '@/lib/useLocation';
 import { useWalkControls } from '@/lib/walk';
+import { MapKey } from '@/components/MapKey';
 import { MapAmbience } from '@/map/MapAmbience';
 import { PlaceMap } from '@/map/PlaceMap';
 import { useSession } from '@/state/session';
@@ -229,18 +230,10 @@ export default function Explore() {
         <SafeAreaView edges={['top']} style={styles.top} pointerEvents="box-none">
           <CategoryChips value={category} onChange={setCategory} />
           <View style={styles.topRow} pointerEvents="box-none">
-            <View style={[styles.legend, shadow, { backgroundColor: c.card }]}>
-              <View style={[styles.dot, { backgroundColor: c.locked }]} />
-              <Text style={{ color: c.text }}>{t('explore.locked')}</Text>
-              <View
-                style={[
-                  styles.dot,
-                  { backgroundColor: category ? c.category[category] : c.accent },
-                ]}
-              />
-              <Text style={{ color: c.text }}>{t('explore.unlocked')}</Text>
-              <Text style={{ color: c.textMuted }}>· {visible.length}</Text>
-            </View>
+            <MapKey
+              toExplore={visible.filter((p) => !ids.has(p.id)).length}
+              discovered={visible.filter((p) => ids.has(p.id)).length}
+            />
             {isDemo && (
               <Pressable
                 onPress={() => {

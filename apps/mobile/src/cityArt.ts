@@ -2,9 +2,8 @@ import type { ImageSource } from 'expo-image';
 
 /* eslint-disable @typescript-eslint/no-require-imports -- static asset requires for Metro */
 /**
- * Each city's landmark, in colour once you've unlocked the city and greyed out before.
- * Drawn in assets/cities/src (drop a photo there to replace a drawing) and rendered by
- * scripts/render-cities.mjs.
+ * Each city's landmark as a terracotta ink sketch, greyed out until you've unlocked the city.
+ * Traced from the stamp engravings (assets/stamps/src) by scripts/render-cities.mjs.
  */
 export const CITY_ART: Record<string, { found: ImageSource; locked: ImageSource }> = {
   sintra: {
