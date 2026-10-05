@@ -15,6 +15,8 @@ octopus. Hidden gems are worth the most.
 - **Status:** v2.0 — the full game loop (Phases 0–8). See the [roadmap](#roadmap).
 - **Play in your browser:** <https://filippo-dimarzio.github.io/Wandro-Game-/> (demo mode — click
   **Install app** to put it on your desktop)
+- **See a pull request before it ships:** every PR runs the **PR preview** workflow, which
+  screenshots each main screen (download **app-screenshots** from the run)
 - **Download for desktop:** Windows, macOS and Linux installers on the
   [latest release](https://github.com/Filippo-Dimarzio/Wandro-Game-/releases/latest)
 

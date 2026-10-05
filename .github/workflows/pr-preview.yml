@@ -1,0 +1,60 @@
+name: PR preview
+
+# Builds the web app (demo mode) for every pull request, walks through it like a new player and
+# attaches a screenshot of each main screen to the run, so you can see how a change looks
+# before it goes live. Download them from the run's "Artifacts" section.
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_NO_TELEMETRY: 1
+      ELECTRON_SKIP_BINARY_DOWNLOAD: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter mobile build:web
+      - name: Install Playwright and Chromium
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw"
+          npm install --prefix "$RUNNER_TEMP/pw" --no-save playwright@1.56.1
+          "$RUNNER_TEMP/pw/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Take screenshots
+        run: |
+          python3 -m http.server 8082 --directory apps/mobile/dist &
+          sleep 2
+          # Run from the Playwright install so `import 'playwright'` resolves.
+          cp apps/mobile/scripts/screenshots.mjs "$RUNNER_TEMP/pw/"
+          node "$RUNNER_TEMP/pw/screenshots.mjs" http://localhost:8082/ "$GITHUB_WORKSPACE/screenshots" | tee tour.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-screenshots
+          path: screenshots
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## App preview"
+            echo "Screenshots of every main screen are attached to this run as **app-screenshots**."
+            echo
+            ls screenshots 2>/dev/null | sed 's/^/- /'
+            echo
+            echo '```'
+            cat tour.log 2>/dev/null
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
