@@ -2,15 +2,16 @@
 // demo plays exactly like the real game; with a backend none of this runs.
 import {
   BEACON_BONUS,
+  CHALLENGE_XP,
   DAILY_CHALLENGE_BONUS,
   DEMO_PLACES,
   FIRST_DISCOVERER_BONUS,
+  ledgerXp,
   levelFromXp,
   newlyEarnedBadges,
   regionFor,
   nextStreak,
   pointsForVisit,
-  streakXp,
   TIME_QUEST_BONUS,
   timeQuestFor,
   timeQuestOpen,
@@ -99,7 +100,8 @@ export function lisbonDate(d: Date): string {
 export function walletOf(p: DemoProgress) {
   const coins = p.ledger.reduce((s, e) => s + e.coins, 0);
   const coinsEarned = p.ledger.reduce((s, e) => s + Math.max(0, e.coins), 0);
-  const xp = p.ledger.reduce((s, e) => s + e.xp, 0);
+  // XP follows the same rule as the server (ledger_xp): 50 per completed challenge, nothing else.
+  const xp = p.ledger.reduce((s, e) => s + ledgerXp(e.kind), 0);
   return {
     coins,
     coinsEarned,
@@ -135,7 +137,7 @@ function applyBadgesAndCollections(p: DemoProgress, places: Place[], now: Date) 
     if (c.placeIds.every((id) => p.unlocked[id])) {
       collectionsClaimed[c.id] = at;
       collectionsCompleted.push(c.id);
-      ledger.push({ kind: 'collection', coins: c.bonus, xp: c.bonus, at, ref: c.id });
+      ledger.push({ kind: 'collection', coins: c.bonus, xp: 0, at, ref: c.id });
     }
   }
 
@@ -160,7 +162,7 @@ function applyBadgesAndCollections(p: DemoProgress, places: Place[], now: Date) 
   const badges = { ...p.badges };
   for (const b of earned) {
     badges[b.code] = at;
-    ledger.push({ kind: 'badge', coins: 0, xp: b.xp, at, ref: b.code });
+    ledger.push({ kind: 'badge', coins: 0, xp: 0, at, ref: b.code });
   }
   return {
     progress: { ...p, ledger, badges, collectionsClaimed },
@@ -183,13 +185,13 @@ export function applyVisit(
   const visitCoins = pts.total - pts.firstDiscovererBonus;
   const ledger: LedgerEntry[] = [
     ...p.ledger,
-    { kind: 'visit', coins: visitCoins, xp: visitCoins, at, ref: place.id },
+    { kind: 'visit', coins: visitCoins, xp: CHALLENGE_XP, at, ref: place.id },
   ];
   if (pts.firstDiscovererBonus) {
     ledger.push({
       kind: 'first_discoverer',
       coins: FIRST_DISCOVERER_BONUS,
-      xp: FIRST_DISCOVERER_BONUS,
+      xp: 0,
       at,
       ref: place.id,
     });
@@ -201,18 +203,17 @@ export function applyVisit(
     ledger.push({
       kind: 'time_quest',
       coins: timeQuestBonus,
-      xp: timeQuestBonus,
+      xp: 0,
       at,
       ref: place.id,
     });
   const beacons = boosts.beacons ?? [];
   for (const id of beacons)
-    ledger.push({ kind: 'friend_beacon', coins: BEACON_BONUS, xp: BEACON_BONUS, at, ref: id });
+    ledger.push({ kind: 'friend_beacon', coins: BEACON_BONUS, xp: 0, at, ref: id });
   const beaconBonus = beacons.length * BEACON_BONUS;
   const today = lisbonDate(now);
   const streak = nextStreak(p.lastActiveDate, today, p.streak);
-  if (p.lastActiveDate !== today)
-    ledger.push({ kind: 'streak', coins: 0, xp: streakXp(streak), at });
+  if (p.lastActiveDate !== today) ledger.push({ kind: 'streak', coins: 0, xp: 0, at });
 
   const afterVisit: DemoProgress = {
     ...p,
@@ -230,7 +231,7 @@ export function applyVisit(
     afterVisit.ledger.push({
       kind: 'collection',
       coins: c.stepBonus,
-      xp: c.stepBonus,
+      xp: 0,
       at,
       ref: c.id,
     });
@@ -282,7 +283,7 @@ export function applyDailyChallenge(
     challengesCompleted: p.challengesCompleted + 1,
     ledger: [
       ...p.ledger,
-      { kind: 'daily_challenge', coins: bonus, xp: bonus, at, ref: challengeId },
+      { kind: 'daily_challenge', coins: bonus, xp: CHALLENGE_XP, at, ref: challengeId },
     ],
   };
   const { progress, newBadges } = applyBadgesAndCollections(next, places, now);

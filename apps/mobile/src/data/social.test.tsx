@@ -25,18 +25,11 @@ describe('social (demo mode)', () => {
   describe('after sharing a moment', () => {
     beforeEach(() => post());
 
-    it('shows the last 24 h from people you follow or are friends with, newest first', async () => {
+    it('shows your moment and no made-up posts from other players', async () => {
       const { result } = await renderHook(() => useFeed(), { wrapper });
       expect(result.current.status.unlocked).toBe(true);
-      const others = result.current.items.filter((i) => !i.isMine);
-      expect([...new Set(others.map((i) => i.userId))].sort()).toEqual([
-        'demo-user-ines',
-        'demo-user-tomas',
-      ]);
-      // Ines's 30-hour-old post and Mia's 2-day-old one have disappeared.
-      expect(others.map((i) => i.id).sort()).toEqual(['demo-post-1', 'demo-post-2']);
-      const times = result.current.items.map((i) => i.createdAt);
-      expect([...times].sort().reverse()).toEqual(times);
+      expect(result.current.items.length).toBeGreaterThan(0);
+      expect(result.current.items.every((i) => i.isMine)).toBe(true);
     });
 
     it('likes and unlikes a post', async () => {
@@ -51,20 +44,9 @@ describe('social (demo mode)', () => {
       });
     });
 
-    it('blocking hides that explorer and unfollows them', async () => {
-      const { result } = await renderHook(() => useFeed(), { wrapper });
+    it('blocking someone unfollows them', async () => {
       await act(async () => useSession.getState().block('demo-user-ines'));
-      expect(result.current.items.some((i) => i.userId === 'demo-user-ines')).toBe(false);
       expect(useSession.getState().following).not.toContain('demo-user-ines');
-    });
-
-    it('reported posts disappear from your feed', async () => {
-      const { result } = await renderHook(() => useFeed(), { wrapper });
-      const target = result.current.items.find((i) => !i.isMine)!.id;
-      await act(async () =>
-        useSession.getState().report({ targetType: 'post', targetId: target, reason: 'spam' }),
-      );
-      expect(result.current.items.some((i) => i.id === target)).toBe(false);
     });
   });
 

@@ -1,4 +1,4 @@
-import { BASE_POINTS, FIRST_DISCOVERER_BONUS } from './constants';
+import { BASE_POINTS, CHALLENGE_XP, FIRST_DISCOVERER_BONUS, LEVEL_UP_XP } from './constants';
 import type { Category } from './types';
 
 /**
@@ -28,15 +28,25 @@ export function pointsForVisit(
   return { base: basePoints, multiplier, firstDiscovererBonus, total };
 }
 
-/** level = floor(sqrt(xp / 100)) + 1 */
-export function levelFromXp(xp: number): number {
-  return Math.floor(Math.sqrt(Math.max(0, xp) / 100)) + 1;
-}
-
-/** Minimum XP needed to reach a level. */
+/**
+ * Total XP needed to reach a level: each level-up costs twice the one before
+ * (250, then 500, 1000, ...), so level 2 = 250, level 3 = 750, level 4 = 1750.
+ * Mirrored by level_for_xp() in the database.
+ */
 export function xpForLevel(level: number): number {
   const l = Math.max(1, Math.floor(level));
-  return (l - 1) * (l - 1) * 100;
+  return LEVEL_UP_XP * (2 ** (l - 1) - 1);
+}
+
+export function levelFromXp(xp: number): number {
+  let level = 1;
+  while (level < 41 && Math.max(0, xp) >= xpForLevel(level + 1)) level += 1;
+  return level;
+}
+
+/** XP a reward of this kind gives: only completed challenges earn XP. Mirrors ledger_xp(). */
+export function ledgerXp(kind: string): number {
+  return kind === 'visit' || kind === 'daily_challenge' ? CHALLENGE_XP : 0;
 }
 
 export interface LevelProgress {

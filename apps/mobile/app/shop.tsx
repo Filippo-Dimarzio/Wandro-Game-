@@ -1,12 +1,18 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { DEFAULT_SKIN_COLOR, SHOP_ITEMS, type ShopItem, type ShopItemKind } from '@wandro/shared';
+import {
+  DEFAULT_SKIN_COLOR,
+  SHOP_ITEMS,
+  unlockProgress,
+  type ShopItem,
+  type ShopItemKind,
+} from '@wandro/shared';
 import { CoinCounter } from '@/components/CoinCounter';
 import { OctopusAvatar } from '@/components/OctopusAvatar';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useLoadout } from '@/data/loadout';
-import { useBuyItem, useEquipItem } from '@/data/shop';
+import { useBuyItem, useEquipItem, useUnlockStats } from '@/data/shop';
 import { useWallet } from '@/data/wallet';
 import { CoinIcon } from '@/components/CoinIcon';
 import { t, type TranslationKey } from '@/i18n';
@@ -24,6 +30,7 @@ export default function Shop() {
   const loadout = useLoadout();
   const buy = useBuyItem();
   const equip = useEquipItem();
+  const stats = useUnlockStats();
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
   const minutesLeft = Math.max(0, Math.ceil((loadout.trailEndsAt - Date.now()) / 60_000));
 
@@ -35,7 +42,9 @@ export default function Shop() {
       },
       onError: (e) => {
         const code =
-          ['insufficient_coins', 'already_owned'].find((k) => e.message.includes(k)) ?? 'unknown';
+          ['insufficient_coins', 'already_owned', 'challenge_not_done'].find((k) =>
+            e.message.includes(k),
+          ) ?? 'unknown';
         setMessage({ text: t(`shop.error.${code}` as TranslationKey), ok: false });
       },
     });
@@ -101,7 +110,8 @@ export default function Shop() {
               const equipped =
                 (item.kind === 'skin' && loadout.skin === item.code) ||
                 (item.kind === 'hat' && loadout.hat === item.code);
-              const affordable = wallet.coins >= item.price;
+              const progress = owned ? null : unlockProgress(item, stats);
+              const affordable = wallet.coins >= item.price && (progress?.met ?? true);
               let action: React.ReactNode;
               const running = item.durationMinutes
                 ? item.code.startsWith('incense')
@@ -161,6 +171,10 @@ export default function Shop() {
                   swatch={item.color}
                   name={item.name}
                   description={item.description}
+                  challenge={
+                    progress && item.challenge ? { text: item.challenge, ...progress } : undefined
+                  }
+                  testID={`item-${item.code}`}
                   badge={
                     equipped
                       ? t('shop.equipped')
@@ -195,18 +209,23 @@ function ItemRow({
   name,
   description,
   badge,
+  challenge,
   action,
+  testID,
 }: {
   emoji: string;
   swatch?: string;
   name: string;
   description: string;
   badge?: string;
+  /** Earn it first: the challenge and how far along you are. */
+  challenge?: { text: string; done: number; total: number; met: boolean };
   action: React.ReactNode;
+  testID?: string;
 }) {
   const c = useColors();
   return (
-    <View style={[styles.item, { backgroundColor: c.card, borderColor: c.border }]}>
+    <View style={[styles.item, { backgroundColor: c.card, borderColor: c.border }]} testID={testID}>
       <View style={[styles.icon, { backgroundColor: swatch ?? c.surface }]}>
         <Text style={{ fontSize: 26 }}>{emoji}</Text>
       </View>
@@ -216,6 +235,35 @@ function ItemRow({
           {badge ? <Text style={{ color: c.accent, fontWeight: '700' }}> · {badge}</Text> : null}
         </Text>
         {!!description && <Text style={{ color: c.textMuted, fontSize: 13 }}>{description}</Text>}
+        {challenge && (
+          <View
+            style={[
+              styles.challenge,
+              { backgroundColor: challenge.met ? c.accentSoft : c.goldSoft },
+            ]}
+            testID={`${testID}-challenge`}
+          >
+            <Text style={{ color: c.text, fontWeight: '700', fontSize: 13 }}>
+              {challenge.met ? '✅' : '🔒'} {t('shop.challenge')}: {challenge.text}
+            </Text>
+            <View style={styles.challengeRow}>
+              <View style={[styles.track, { backgroundColor: c.border }]}>
+                <View
+                  style={[
+                    styles.fill,
+                    {
+                      backgroundColor: challenge.met ? c.accent : c.gold,
+                      width: `${(challenge.done / challenge.total) * 100}%`,
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={{ color: c.textMuted, fontWeight: '800', fontSize: 12 }}>
+                {challenge.done}/{challenge.total}
+              </Text>
+            </View>
+          </View>
+        )}
         <View style={{ marginTop: 6, alignSelf: 'flex-start' }}>{action}</View>
       </View>
     </View>
@@ -293,6 +341,10 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     padding: space.md,
   },
+  challenge: { borderRadius: radius.sm, padding: space.sm, gap: 6, marginTop: 4 },
+  challengeRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  track: { flex: 1, height: 6, borderRadius: 3, overflow: 'hidden' },
+  fill: { height: 6, borderRadius: 3 },
   icon: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center' },
   action: {
     borderRadius: radius.pill,

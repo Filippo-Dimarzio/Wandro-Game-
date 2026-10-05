@@ -48,4 +48,22 @@ describe('Store (demo mode)', () => {
     expect(useSession.getState().inventory.equipped.hat).toBe('hat_flower');
     expect(screen.queryByTestId('buy-hat_flower')).toBeNull();
   });
+
+  it('a skin is earned with its challenge before it can be bought', async () => {
+    const coast = DEMO_PLACES.filter((p) => p.category === 'coast' && !p.hidden).slice(0, 3);
+    useSession.getState().recordVisit(coast[0]!, DEMO_PLACES);
+    await render(<Shop />, { wrapper });
+    expect(screen.getByTestId('item-skin_ocean-challenge')).toHaveTextContent(
+      /Discover 3 beaches & coast spots.*1\/3/,
+    );
+    expect(screen.getByTestId('buy-skin_ocean')).toBeDisabled();
+  });
+
+  it('once the challenge is done, the skin can be bought', async () => {
+    for (const p of DEMO_PLACES.filter((x) => x.category === 'coast' && !x.hidden).slice(0, 3))
+      useSession.getState().recordVisit(p, DEMO_PLACES);
+    await render(<Shop />, { wrapper });
+    expect(screen.getByTestId('item-skin_ocean-challenge')).toHaveTextContent(/3\/3/);
+    expect(screen.getByTestId('buy-skin_ocean')).not.toBeDisabled();
+  });
 });

@@ -1,5 +1,11 @@
+import type { Category } from './types';
+
 /** Store catalogue. Coins are only ever earned by playing; nothing here affects points or rank. */
 export type ShopItemKind = 'boost' | 'skin' | 'hat';
+
+/** A challenge to complete before an item can be bought. Checked by buy_item() on the server. */
+export type ShopUnlock =
+  { kind: 'category'; category: Category; count: number } | { kind: 'stamps'; count: number };
 
 export interface ShopItem {
   code: string;
@@ -13,6 +19,10 @@ export interface ShopItem {
   consumable?: boolean;
   /** Skin colour for the octopus. */
   color?: string;
+  /** Complete this first; then the item can be bought. */
+  unlock?: ShopUnlock;
+  /** The unlock challenge in words, shown in the store. */
+  challenge?: string;
   emoji: string;
 }
 
@@ -42,7 +52,9 @@ export const SHOP_ITEMS: ShopItem[] = [
   {
     code: 'skin_ocean',
     name: 'Ocean octopus',
-    description: 'Deep Atlantic blue.',
+    description: 'Deep Atlantic blue, with sea-foam suckers.',
+    unlock: { kind: 'category', category: 'coast', count: 3 },
+    challenge: 'Discover 3 beaches & coast spots.',
     kind: 'skin',
     price: 300,
     color: '#2B6CB0',
@@ -51,7 +63,9 @@ export const SHOP_ITEMS: ShopItem[] = [
   {
     code: 'skin_coral',
     name: 'Coral octopus',
-    description: 'Warm coral, like Pena Palace at sunset.',
+    description: 'Warm coral, the colour of Pena Palace’s walls.',
+    unlock: { kind: 'category', category: 'heritage', count: 5 },
+    challenge: 'Discover 5 heritage sites.',
     kind: 'skin',
     price: 450,
     color: '#C05621',
@@ -60,7 +74,9 @@ export const SHOP_ITEMS: ShopItem[] = [
   {
     code: 'skin_midnight',
     name: 'Midnight octopus',
-    description: 'For night walks and fado.',
+    description: 'Ink-dark night blue that glows under the stars.',
+    unlock: { kind: 'category', category: 'music_events', count: 2 },
+    challenge: 'Discover 2 music & events spots.',
     kind: 'skin',
     price: 600,
     color: '#2D3748',
@@ -69,7 +85,9 @@ export const SHOP_ITEMS: ShopItem[] = [
   {
     code: 'skin_gold',
     name: 'Golden octopus',
-    description: 'Shiny. Very shiny.',
+    description: 'Polished gold from tentacle to tip.',
+    unlock: { kind: 'stamps', count: 3 },
+    challenge: 'Collect 3 city stamps.',
     kind: 'skin',
     price: 1200,
     color: '#B7791F',
@@ -165,4 +183,21 @@ export function isTrailActive(activeUntil: Record<string, string>, now = Date.no
 
 export function trailEndsAt(activeUntil: Record<string, string>): number {
   return Math.max(0, ...TRAIL_ITEM_CODES.map((c) => Date.parse(activeUntil[c] ?? '') || 0));
+}
+
+/** What a player has done, for checking store unlocks (demo mode; the server counts the same). */
+export interface UnlockStats {
+  categoryCounts: Partial<Record<Category, number>>;
+  cityStamps: number;
+}
+
+/** Progress towards an item's unlock challenge, or null if it has none. */
+export function unlockProgress(
+  item: ShopItem,
+  stats: UnlockStats,
+): { done: number; total: number; met: boolean } | null {
+  const u = item.unlock;
+  if (!u) return null;
+  const done = u.kind === 'stamps' ? stats.cityStamps : (stats.categoryCounts[u.category] ?? 0);
+  return { done: Math.min(done, u.count), total: u.count, met: done >= u.count };
 }

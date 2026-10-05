@@ -12,15 +12,6 @@ export interface DemoUser {
   discoveries: number;
 }
 
-export interface DemoFeedPost {
-  id: string;
-  userId: string;
-  placeId: string;
-  caption: string;
-  hoursAgo: number;
-  likes: number;
-}
-
 export const DEMO_USERS: DemoUser[] = [
   {
     id: 'demo-user-ines',
@@ -71,49 +62,6 @@ export const DEMO_USERS: DemoUser[] = [
     coins: 2600,
     weeklyCoins: 120,
     discoveries: 11,
-  },
-];
-
-export const DEMO_FEED: DemoFeedPost[] = [
-  {
-    id: 'demo-post-1',
-    userId: 'demo-user-ines',
-    placeId: 'demo-capuchos',
-    caption: 'Cork walls and total silence. Felt like time stopped.',
-    hoursAgo: 2,
-    likes: 24,
-  },
-  {
-    id: 'demo-post-2',
-    userId: 'demo-user-tomas',
-    placeId: 'demo-cruz-alta',
-    caption: 'Highest point of the hills — the fog lifted just for us 🌫️',
-    hoursAgo: 5,
-    likes: 41,
-  },
-  {
-    id: 'demo-post-3',
-    userId: 'demo-user-sofia',
-    placeId: 'demo-adraga',
-    caption: 'Low tide = secret arches. Go before sunset.',
-    hoursAgo: 20,
-    likes: 87,
-  },
-  {
-    id: 'demo-post-4',
-    userId: 'demo-user-ines',
-    placeId: 'demo-brinquedo',
-    caption: 'Did not expect a toy museum to be this charming.',
-    hoursAgo: 30,
-    likes: 12,
-  },
-  {
-    id: 'demo-post-5',
-    userId: 'demo-user-mia',
-    placeId: 'demo-monserrate',
-    caption: 'The gardens are a whole world of their own.',
-    hoursAgo: 48,
-    likes: 33,
   },
 ];
 

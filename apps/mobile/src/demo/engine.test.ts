@@ -22,7 +22,8 @@ describe('demo engine', () => {
     expect(r.result.newBadges).toEqual(['first_step', 'hidden_gem', 'first_discoverer']);
     const w = walletOf(r.progress);
     expect(w.coins).toBe(570);
-    expect(w.xp).toBe(570 + 10 + 3 * 50);
+    // XP is separate from coins: one discovery = one challenge = 50 XP.
+    expect(w.xp).toBe(50);
     expect(w.streak).toBe(1);
   });
 

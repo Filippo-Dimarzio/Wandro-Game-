@@ -16,18 +16,17 @@ import { LogOutButton } from '@/components/LogOutButton';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useDeleteAccount, useExportData, useUpdatePrivacy } from '@/data/account';
 import { t } from '@/i18n';
-import { isDemo } from '@/lib/env';
 import { setDailyReminder } from '@/lib/notifications';
 import { useSession } from '@/state/session';
-import { column, radius, space, useColors } from '@/theme';
+import { column, radius, space, useColors, useIsDark } from '@/theme';
 
 export default function Settings() {
   const c = useColors();
   const profile = useSession((s) => s.profile);
   const prefs = useSession((s) => s.prefs);
   const setPref = useSession((s) => s.setPref);
-  const demoModerator = useSession((s) => s.demoModerator);
-  const setDemoModerator = useSession((s) => s.setDemoModerator);
+  const setTheme = useSession((s) => s.setTheme);
+  const dark = useIsDark();
   const privacy = useUpdatePrivacy();
   const exportData = useExportData();
   const deleteAccount = useDeleteAccount();
@@ -50,6 +49,17 @@ export default function Settings() {
               onValueChange={(v) => privacy.mutate(v)}
               accessibilityLabel={t('settings.private')}
               testID="private-switch"
+            />
+          </Row>
+        </Section>
+
+        <Section title={t('settings.appearance')}>
+          <Row label={t('theme.dark')}>
+            <Switch
+              value={dark}
+              onValueChange={(on) => setTheme(on ? 'dark' : 'light')}
+              accessibilityLabel={t('theme.dark')}
+              testID="dark-switch"
             />
           </Row>
         </Section>
@@ -107,18 +117,6 @@ export default function Settings() {
           </Pressable>
           {deleteAccount.isError && <Text style={{ color: c.danger }}>{t('common.error')}</Text>}
         </Section>
-
-        {isDemo && (
-          <Section title={t('settings.demo')}>
-            <Row label={t('settings.demoModerator')}>
-              <Switch
-                value={demoModerator}
-                onValueChange={setDemoModerator}
-                accessibilityLabel={t('settings.demoModerator')}
-              />
-            </Row>
-          </Section>
-        )}
 
         <Section title={t('settings.about')}>
           <Pressable

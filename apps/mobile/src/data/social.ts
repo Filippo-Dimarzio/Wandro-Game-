@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DEMO_PLACES, MOMENT_VISIBLE_HOURS, type Category } from '@wandro/shared';
-import { DEMO_FEED, DEMO_USERS, demoUser } from '@/demo/social';
+import { DEMO_USERS, demoUser } from '@/demo/social';
 import { walletOf } from '@/demo/engine';
 import { isDemo } from '@/lib/env';
 import { keepPhoto } from '@/lib/photo';
@@ -129,28 +129,8 @@ export function useFeed() {
     likedByMe: !!s.liked[p.id],
     isMine: true,
   }));
-  const others: FeedItem[] = !status.unlocked
-    ? []
-    : DEMO_FEED.filter(
-        (p) =>
-          p.hoursAgo < MOMENT_VISIBLE_HOURS &&
-          (s.following.includes(p.userId) || s.friends[p.userId] === 'friends') &&
-          !s.blocked.includes(p.userId),
-      )
-        .filter((p) => !s.reports.some((r) => r.targetType === 'post' && r.targetId === p.id))
-        .map((p) => ({
-          id: p.id,
-          userId: p.userId,
-          username: demoUser(p.userId)?.username ?? '',
-          placeId: p.placeId,
-          placeName: placeById(p.placeId)?.name ?? '',
-          category: placeById(p.placeId)?.category ?? 'other',
-          caption: p.caption,
-          createdAt: new Date(now - p.hoursAgo * 3_600_000).toISOString(),
-          likeCount: p.likes + (s.liked[p.id] ? 1 : 0),
-          likedByMe: !!s.liked[p.id],
-          isMine: false,
-        }));
+  // The demo has no real other players, so it shows no one else's photos (no made-up posts).
+  const others: FeedItem[] = [];
   const items = [...mine, ...others].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   return { items, status, isLoading: false, error: null, refetch: async () => undefined };
 }
@@ -427,7 +407,20 @@ export interface LeaderboardRow {
   username: string;
   level: number;
   coins: number;
+  /** Challenges completed (places discovered; in that city on a city board). */
+  challenges: number;
   isMe: boolean;
+}
+
+/** A demo explorer's challenges in a city: most in their home city. Fictional, but stable. */
+function demoCityChallenges(u: (typeof DEMO_USERS)[number], region: string): number {
+  const home = u.homeCity
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+  if (home.includes(region)) return Math.max(1, Math.round(u.discoveries * 0.6));
+  const salt = [...`${u.id}${region}`].reduce((a, ch) => a + ch.charCodeAt(0), 0);
+  return salt % 5;
 }
 
 export function useLeaderboard(scope: LeaderboardScope, region = 'sintra') {
@@ -448,6 +441,7 @@ export function useLeaderboard(scope: LeaderboardScope, region = 'sintra') {
           username: string;
           level: number;
           coins: number;
+          challenges: number;
           is_me: boolean;
         }[]
       ).map((r) => ({
@@ -456,6 +450,7 @@ export function useLeaderboard(scope: LeaderboardScope, region = 'sintra') {
         username: r.username,
         level: r.level,
         coins: Number(r.coins),
+        challenges: Number(r.challenges ?? 0),
         isMe: r.is_me,
       }));
     },
@@ -467,11 +462,18 @@ export function useLeaderboard(scope: LeaderboardScope, region = 'sintra') {
   const myWeekly = s.ledger
     .filter((e) => e.coins > 0 && Date.parse(e.at) > weekAgo)
     .reduce((a, e) => a + e.coins, 0);
+  const myChallenges =
+    scope === 'region'
+      ? Object.keys(s.unlocked).filter(
+          (id) => DEMO_PLACES.find((p) => p.id === id)?.region === region,
+        ).length
+      : w.discoveries + s.challengesCompleted;
   const me = {
     userId: ME,
     username: s.profile?.username ?? 'you',
     level: w.level,
     coins: scope === 'weekly' ? myWeekly : w.coinsEarned,
+    challenges: myChallenges,
     isMe: true,
   };
   const others = DEMO_USERS.filter((u) => !s.blocked.includes(u.id))
@@ -481,10 +483,15 @@ export function useLeaderboard(scope: LeaderboardScope, region = 'sintra') {
       username: u.username,
       level: u.level,
       coins: scope === 'weekly' ? u.weeklyCoins : u.coins,
+      challenges: scope === 'region' ? demoCityChallenges(u, region) : u.discoveries,
       isMe: false,
-    }));
+    }))
+    .filter((r) => scope !== 'region' || r.challenges > 0);
+  // City boards rank by challenges completed there; the others by coins earned.
+  const key = (r: { coins: number; challenges: number }) =>
+    scope === 'region' ? r.challenges : r.coins;
   const rows = [...others, me]
-    .sort((a, b) => b.coins - a.coins)
+    .sort((a, b) => key(b) - key(a) || b.coins - a.coins)
     .map((r, i) => ({ ...r, rank: i + 1 }));
   return { rows, isLoading: false };
 }

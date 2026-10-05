@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { levelProgress, octopusStage } from '@wandro/shared';
+import { CHALLENGE_XP, levelProgress, octopusStage } from '@wandro/shared';
 import type { Wallet } from '@/data/wallet';
 import { CoinAmount } from '@/components/CoinIcon';
 import { t } from '@/i18n';
@@ -38,6 +38,9 @@ export function ProgressStrip({ wallet }: { wallet: Wallet }) {
           count: wallet.discoveries,
         })}
         {wallet.streak > 0 ? ` · 🔥 ${t('home.streak', { days: wallet.streak })}` : ''}
+      </Text>
+      <Text style={{ color: c.textMuted, fontSize: 12 }} testID="xp-explainer">
+        {t('home.xpExplainer', { xp: CHALLENGE_XP })}
       </Text>
     </Pressable>
   );

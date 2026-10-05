@@ -19,6 +19,7 @@ import { COLLECTION_COMPLETION_BONUS, COLLECTION_STEP_BONUS, regionFor } from '@
 import { CITY_ART } from '@/cityArt';
 import { AnimatedCard } from '@/components/AnimatedCard';
 import { CoinIcon } from '@/components/CoinIcon';
+import { PhotoLibrary } from '@/components/PhotoLibrary';
 import { PostageStamp } from '@/components/PostageStamp';
 import { useCities, type City } from '@/data/cities';
 import type { CollectionProgress } from '@/data/collections';
@@ -70,6 +71,7 @@ export default function Collections() {
             />
           ))}
         </View>
+        <PhotoLibrary />
       </ScrollView>
       <CitySheet city={open} onClose={() => setOpen(null)} />
     </SafeAreaView>

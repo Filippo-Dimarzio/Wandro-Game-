@@ -1,5 +1,5 @@
 import { evaluateCheckin, type Ping } from './checkin';
-import { BADGES, newlyEarnedBadges, nextStreak, streakXp } from './progression';
+import { BADGES, newlyEarnedBadges, nextStreak } from './progression';
 
 const place = { lat: 38.8236, lng: -9.4731, radiusM: 75, dwellSeconds: 120 };
 const t0 = 1_700_000_000_000;
@@ -55,10 +55,6 @@ describe('progression', () => {
     expect(nextStreak('2026-10-03', '2026-10-04', 3)).toBe(4);
     expect(nextStreak('2026-10-04', '2026-10-04', 4)).toBe(4);
     expect(nextStreak('2026-10-01', '2026-10-04', 4)).toBe(1);
-  });
-  it('caps streak XP at 7 days', () => {
-    expect(streakXp(1)).toBe(10);
-    expect(streakXp(30)).toBe(70);
   });
   it('awards badges once', () => {
     const stats = {

@@ -41,6 +41,23 @@ describe('catalogues match the database seeds', () => {
     expect(db).toEqual(ts);
   });
 
+  it('shop unlock challenges: same items, kinds, categories and counts', () => {
+    const block = sql.slice(sql.indexOf('update public.shop_items s\nset unlock_kind'));
+    const values = block.slice(0, block.indexOf(') as v(code, kind, category, count'));
+    const db = [
+      ...values.matchAll(/\('([a-z_]+)', '(category|stamps)', (?:'([a-z_]+)'|null), (\d+),/g),
+    ].map(([, code, kind, category, count]) => ({
+      code,
+      unlock:
+        kind === 'stamps'
+          ? { kind, count: Number(count) }
+          : { kind, category, count: Number(count) },
+    }));
+    const ts = SHOP_ITEMS.filter((i) => i.unlock).map((i) => ({ code: i.code, unlock: i.unlock }));
+    expect(db).toEqual(ts);
+    expect(ts.length).toBe(4);
+  });
+
   it('badges: same codes', () => {
     const block = sql.slice(
       sql.indexOf('insert into public.badges'),

@@ -34,9 +34,13 @@ export const COLLECTION_STEP_BONUS = 20;
 
 /** Daily challenge pays the qualifying discovery's coins again (double coins). */
 export const DAILY_CHALLENGE_MULTIPLIER = 2;
-export const STREAK_XP_PER_DAY = 10;
-export const STREAK_XP_CAP_DAYS = 7;
-export const BADGE_XP = 50;
+/**
+ * XP is separate from coins: every completed challenge (a discovered place or a daily challenge)
+ * gives the same XP, however rare or valuable it was. 5 challenges = 250 XP = level 2.
+ */
+export const CHALLENGE_XP = 50;
+/** XP from level 1 to level 2; each next level needs twice as much as the one before. */
+export const LEVEL_UP_XP = 250;
 /** How often the app sends a location ping during a check-in. */
 export const PING_INTERVAL_SECONDS = 5;
 /** Accuracy slack added to the geofence radius, capped so bad GPS can't stretch it far. */

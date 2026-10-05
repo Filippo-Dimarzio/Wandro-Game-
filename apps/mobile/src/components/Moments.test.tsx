@@ -41,9 +41,9 @@ describe('Moments', () => {
     });
     await render(<Moments />, { wrapper });
     const tiles = screen.getAllByTestId('moment-tile');
-    expect(tiles).toHaveLength(3); // yours + Ines + Tomas from the last 24 h
+    expect(tiles).toHaveLength(1); // yours: the demo shows no made-up posts from others
     expect(screen.getByText('24 h left')).toBeOnTheScreen();
-    fireEvent.press(tiles[1]);
+    fireEvent.press(tiles[0]);
     expect(await screen.findByTestId('feed-card')).toBeOnTheScreen();
   });
 });

@@ -24,6 +24,7 @@ import {
   PIN_SORT,
 } from './markers';
 import type { PlaceMapProps } from './types';
+import { nearestOnLines, setStreetSnapper } from './streets';
 import { accuracyGeoJson, guidanceGeoJson, placesGeoJson, useFog } from './useFog';
 
 export type { PlaceMapProps } from './types';
@@ -62,6 +63,40 @@ const FALLBACK_STYLE: maplibregl.StyleSpecification = {
     },
   ],
 };
+
+const STREET_LAYERS = ['sb-street', 'sb-avenue'];
+
+/** Snaps a point to the nearest street drawn on the map (demo walking keeps to the roads). */
+function streetSnapper(m: MLMap) {
+  return (p: { lat: number; lng: number }, maxM: number) => {
+    const layers = STREET_LAYERS.filter((l) => m.getLayer(l));
+    if (!layers.length) return undefined;
+    const metresPerPx = (156543.03392 * Math.cos((p.lat * Math.PI) / 180)) / 2 ** m.getZoom();
+    const r = Math.max(4, maxM / metresPerPx);
+    const at = m.project([p.lng, p.lat]);
+    const features = m.queryRenderedFeatures(
+      [
+        [at.x - r, at.y - r],
+        [at.x + r, at.y + r],
+      ],
+      { layers },
+    );
+    const lines = features.flatMap((f) => {
+      const g = f.geometry;
+      const parts =
+        g.type === 'LineString'
+          ? [g.coordinates]
+          : g.type === 'MultiLineString'
+            ? g.coordinates
+            : [];
+      return parts.map((line) => line.map(([lng, lat]) => m.project([lng!, lat!])));
+    });
+    const best = nearestOnLines(at, lines);
+    if (!best || best.dist > r) return null;
+    const ll = m.unproject([best.point.x, best.point.y]);
+    return { lat: ll.lat, lng: ll.lng };
+  };
+}
 
 /** If the vector tiles can't load, fall back to plain OpenStreetMap raster tiles under the game layers. */
 function addRasterFallback(m: MLMap) {
@@ -107,11 +142,15 @@ const MARKER_CSS = `
 .wandro-me { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
 .wandro-me .pulse { position: absolute; width: 44px; height: 44px; border-radius: 50%; background: rgba(43,108,176,.35); animation: wandro-pulse 2s ease-out infinite; }
 .wandro-me .glow { position: absolute; width: 96px; height: 96px; border-radius: 50%; background: radial-gradient(circle, rgba(246,173,85,.75), rgba(246,173,85,0) 70%); animation: wandro-glow 1.8s ease-in-out infinite; }
-.wandro-me .body { position: relative; width: 36px; height: 36px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1; }
-.wandro-me .hat { position: absolute; top: -14px; font-size: 18px; line-height: 1; }
+.wandro-me .body { position: relative; width: 36px; height: 36px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.35); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 22px; line-height: 1; }
+.wandro-me .body.hatted { font-size: 18px; padding-top: 6px; box-sizing: border-box; }
+.wandro-me .hat { font-size: 13px; line-height: 1; margin-bottom: -6px; position: relative; z-index: 1; }
+/* A little bounce while the octopus walks. */
+.wandro-me.walking .body { animation: wandro-walk .28s ease-in-out infinite alternate; }
+@keyframes wandro-walk { from { transform: translateY(0) rotate(-6deg) } to { transform: translateY(-4px) rotate(6deg) } }
 @keyframes wandro-pulse { 0% { transform: scale(.6); opacity: .9 } 100% { transform: scale(2.2); opacity: 0 } }
 @keyframes wandro-glow { 0%,100% { transform: scale(.85); opacity: .7 } 50% { transform: scale(1.1); opacity: 1 } }
-@media (prefers-reduced-motion: reduce) { .wandro-me .pulse, .wandro-me .glow { animation: none } }
+@media (prefers-reduced-motion: reduce) { .wandro-me .pulse, .wandro-me .glow, .wandro-me.walking .body { animation: none } }
 `;
 
 function ensureMarkerCss() {
@@ -124,7 +163,9 @@ function ensureMarkerCss() {
 
 function markerHtml(skin: string | undefined, hat: string | undefined, glow: boolean): string {
   const hatEmoji = shopItem(hat)?.emoji;
-  return `${glow ? '<div class="glow"></div>' : ''}<div class="pulse"></div><div class="body" style="background:${skinColor(skin)}">🐙</div>${hatEmoji ? `<div class="hat">${hatEmoji}</div>` : ''}`;
+  // The hat sits on the octopus's head, inside its circle.
+  const hatHtml = hatEmoji ? `<div class="hat">${hatEmoji}</div>` : '';
+  return `${glow ? '<div class="glow"></div>' : ''}<div class="pulse"></div><div class="body${hatEmoji ? ' hatted' : ''}" style="background:${skinColor(skin)}">${hatHtml}<div>🐙</div></div>`;
 }
 
 function setSourceData(m: MLMap | null, ready: boolean, id: string, data: GeoJSON.GeoJSON) {
@@ -272,6 +313,7 @@ export function PlaceMap({
       m.on('mouseenter', 'places', () => (m.getCanvas().style.cursor = 'pointer'));
       m.on('mouseleave', 'places', () => (m.getCanvas().style.cursor = ''));
       ready.current = true;
+      setStreetSnapper(streetSnapper(m));
     });
 
     // Marching-ants animation on the incense trail.
@@ -294,6 +336,7 @@ export function PlaceMap({
     if (!reduceMotion) frame = requestAnimationFrame(animate);
 
     return () => {
+      setStreetSnapper(null);
       clearTimeout(slow);
       cancelAnimationFrame(frame);
       ready.current = false;
@@ -312,7 +355,15 @@ export function PlaceMap({
     setSourceData(map.current, ready.current, 'trail', guidance.line);
   }, [guidance]);
 
+  // Bounce while moving: the class stays on for a moment after each step.
+  const stepTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
+    const el = marker.current?.getElement();
+    if (el && follow) {
+      el.classList.add('walking');
+      if (stepTimer.current) clearTimeout(stepTimer.current);
+      stepTimer.current = setTimeout(() => el.classList.remove('walking'), 250);
+    }
     marker.current?.setLngLat([userPosition.lng, userPosition.lat]);
     if (follow)
       map.current?.easeTo({ center: [userPosition.lng, userPosition.lat], duration: 250 });

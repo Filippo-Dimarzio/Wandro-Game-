@@ -1,7 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 import { moveBy, type LatLng } from '@wandro/shared';
+import { snapToStreet } from '@/map/streets';
 import { useSession } from '@/state/session';
+
+/** How far off a street a step may land before it's pulled back onto the road. */
+export const STREET_SNAP_M = 15;
 
 /** Game-speed walking (m/s) so places a few km apart are reachable; Shift walks slowly. */
 export const WALK_SPEED_MPS = 20;
@@ -40,6 +44,19 @@ export function stepPosition(from: LatLng, held: Set<Direction>, metres: number)
 }
 
 /**
+ * One step that keeps to the streets: the octopus is pulled onto the nearest road, and doesn't
+ * move if there's none close by (no walking through buildings). Free movement if the map has
+ * no street data.
+ */
+export function walkStep(from: LatLng, held: Set<Direction>, metres: number): LatLng {
+  const next = stepPosition(from, held, metres);
+  if (next === from) return from;
+  const snapped = snapToStreet(next, STREET_SNAP_M);
+  if (snapped === undefined) return next;
+  return snapped ?? from;
+}
+
+/**
  * Walk the octopus in demo mode: WASD / arrow keys on web and desktop, or the on-screen pad.
  * Moves the demo position, which the map, check-ins and proximity all read.
  */
@@ -57,7 +74,7 @@ export function useWalkControls(enabled: boolean, start: LatLng) {
       if (!keys.size) return;
       const from = useSession.getState().teleport ?? startRef.current;
       const metres = ((slow.current ? SLOW_WALK_SPEED_MPS : WALK_SPEED_MPS) * TICK_MS) / 1000;
-      setTeleport(stepPosition(from, keys, metres));
+      setTeleport(walkStep(from, keys, metres));
     }, TICK_MS);
 
     if (Platform.OS !== 'web') return () => clearInterval(timer);

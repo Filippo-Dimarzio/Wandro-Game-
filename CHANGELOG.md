@@ -6,6 +6,16 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- XP and levels: every completed challenge (discovery or daily challenge) gives 50 XP; level 2
+  needs 250 XP and each next level doubles the XP needed. Coins stay separate (spent in the store).
+  The Home header explains the difference.
+- Octopus skins have their own challenge (e.g. discover 3 coast spots) that must be completed
+  before they can be bought; the server enforces it (`challenge_not_done`).
+- Cities leaderboard: one board per city, ranked by challenges completed there.
+- Dark mode button in the Home header and a Dark mode switch in Settings (no floating widget).
+- "Your photo library" in Collections keeps every photo you posted; Moments still show a post for 24 h.
+- Streets have an outline so they read at every zoom, and the walking character follows streets on
+  the web map instead of crossing buildings.
 - PR preview workflow: every pull request builds the web app and attaches screenshots of each
   main screen (`apps/mobile/scripts/screenshots.mjs`).
 - Storybook map: the map now looks like a hand-painted city map, with peach ground, mint parks
@@ -114,6 +124,8 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Changed
 
+- Hats now sit on the octopus's head.
+- Removed the made-up demo posts from Moments and the "Act as a moderator" demo tool (teleport stays).
 - Wandro is Portugal-only for now (Phase 10): Sintra, Lisbon, Porto, Évora and Aveiro. The other
   18 cities are switched off in the database (regions inactive, places closed, sets closed) and
   removed from the app's code, demo, dev seed and importer; the European content is kept on the

@@ -58,11 +58,19 @@ export function OctopusAvatar({ size = 64, skin, hat, glow, accessibilityLabel }
           { width: size, height: size, borderRadius: size / 2, backgroundColor: skinColor(skin) },
         ]}
       >
-        <Text style={{ fontSize: size * 0.58 }}>🐙</Text>
+        {/* The hat sits on the octopus's head: stacked on top of it, overlapping its crown. */}
+        <View style={{ alignItems: 'center', marginTop: hatEmoji ? size * 0.1 : 0 }}>
+          {hatEmoji && (
+            <Text
+              style={[styles.hat, { fontSize: size * 0.3, marginBottom: -size * 0.2 }]}
+              testID="avatar-hat"
+            >
+              {hatEmoji}
+            </Text>
+          )}
+          <Text style={{ fontSize: size * (hatEmoji ? 0.5 : 0.58) }}>🐙</Text>
+        </View>
       </View>
-      {hatEmoji && (
-        <Text style={[styles.hat, { fontSize: size * 0.42, top: -size * 0.28 }]}>{hatEmoji}</Text>
-      )}
     </View>
   );
 }
@@ -70,5 +78,5 @@ export function OctopusAvatar({ size = 64, skin, hat, glow, accessibilityLabel }
 const styles = StyleSheet.create({
   glow: { position: 'absolute', backgroundColor: '#F6AD55' },
   body: { alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#fff' },
-  hat: { position: 'absolute' },
+  hat: { zIndex: 1 },
 });

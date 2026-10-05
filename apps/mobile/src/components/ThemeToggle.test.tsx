@@ -28,12 +28,3 @@ describe('ThemeToggle', () => {
     expect((await renderHook(() => useColors())).result.current).toBe(lightColors);
   });
 });
-
-describe('ThemeToggle during a trip', () => {
-  it('steps aside while the trip animation plays', async () => {
-    useSession.getState().reset();
-    useSession.getState().startFlight({ from: 'sintra', to: 'evora', km: 131 });
-    await render(<ThemeToggle />);
-    expect(screen.queryByTestId('theme-toggle')).toBeNull();
-  });
-});

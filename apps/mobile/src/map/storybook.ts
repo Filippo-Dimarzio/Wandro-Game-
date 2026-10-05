@@ -14,6 +14,8 @@ export interface StorybookPalette {
   water: string;
   shore: string;
   rail: string;
+  /** Outline under every street, so streets stay visible on the ground and under the mist. */
+  casing: string;
   label: string;
   halo: string;
 }
@@ -29,6 +31,7 @@ export const STORYBOOK: Record<'light' | 'dark', StorybookPalette> = {
     water: '#8FABEB',
     shore: '#E8806A',
     rail: '#E2B797',
+    casing: '#D29E7B',
     label: '#2F3E7A',
     halo: '#FBF1E4',
   },
@@ -42,6 +45,7 @@ export const STORYBOOK: Record<'light' | 'dark', StorybookPalette> = {
     water: '#2C3F7A',
     shore: '#B8655A',
     rail: '#5E4C55',
+    casing: '#17121F',
     label: '#F3E6D6',
     halo: '#2A2236',
   },
@@ -71,6 +75,8 @@ export function storybookPaint(p: StorybookPalette): [string, string, string][] 
     ['sb-water', 'fill-color', p.water],
     ['sb-river', 'line-color', p.water],
     ['sb-rail', 'line-color', p.rail],
+    ['sb-street-case', 'line-color', p.casing],
+    ['sb-avenue-case', 'line-color', p.casing],
     ['sb-street', 'line-color', p.street],
     ['sb-avenue', 'line-color', p.avenue],
     ['sb-street-name', 'text-color', p.label],
@@ -171,7 +177,40 @@ export function storybookStyle(p: StorybookPalette): Record<string, Json> {
       filter: ['in', ['get', 'class'], ['literal', ['rail', 'transit']]],
       paint: { 'line-width': 1.5, 'line-dasharray': [3, 2] },
     },
-    // Streets: soft cream ribbons with round ends, no outlines (like painted roads).
+    // Streets: cream ribbons with round ends on a darker outline, so they read at every zoom.
+    {
+      id: 'sb-street-case',
+      type: 'line',
+      source: BASE_SOURCE,
+      'source-layer': 'transportation',
+      minzoom: 12,
+      filter: ['in', ['get', 'class'], ['literal', MINOR]],
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: {
+        'line-width': width([
+          [12, 2],
+          [14, 4.5],
+          [16, 9],
+          [18, 18],
+        ]),
+      },
+    },
+    {
+      id: 'sb-avenue-case',
+      type: 'line',
+      source: BASE_SOURCE,
+      'source-layer': 'transportation',
+      filter: ['in', ['get', 'class'], ['literal', MAJOR]],
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: {
+        'line-width': width([
+          [8, 2],
+          [13, 5.5],
+          [16, 12],
+          [18, 25],
+        ]),
+      },
+    },
     {
       id: 'sb-street',
       type: 'line',

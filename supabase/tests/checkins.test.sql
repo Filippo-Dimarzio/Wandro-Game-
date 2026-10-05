@@ -7,7 +7,11 @@ insert into auth.users (id, raw_user_meta_data) values
 update profiles set is_moderator = true where id = '00000000-0000-0000-0000-0000000000e3';
 
 select pg_temp.check(rarity_multiplier(0) = 5 and rarity_multiplier(10) = 3, 'rarity multiplier matches the shared formula');
-select pg_temp.check(level_for_xp(0) = 1 and level_for_xp(100) = 2 and level_for_xp(400) = 3, 'levels match the shared formula');
+select pg_temp.check(level_for_xp(0) = 1 and level_for_xp(249) = 1 and level_for_xp(250) = 2
+  and level_for_xp(749) = 2 and level_for_xp(750) = 3 and level_for_xp(1750) = 4, 'levels match the shared formula (each level-up doubles)');
+select pg_temp.check(ledger_xp('visit') = 50 and ledger_xp('daily_challenge') = 50
+  and ledger_xp('first_discoverer') = 0 and ledger_xp('collection') = 0 and ledger_xp('badge') = 0,
+  'only completed challenges earn XP');
 
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1');
 

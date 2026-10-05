@@ -39,7 +39,7 @@ Wandro is a photo-first, community-driven exploration game. Players uncover real
 | 5   | Branching        | One branch per phase (`phase-N-...`). I open a PR only when you ask.                                                                                                                                                        |
 | 6   | Moderation tool  | Supabase Studio plus SQL views for the MVP. A small in-app admin screen only if Studio proves too clumsy.                                                                                                                   |
 | 7   | Location privacy | Raw location pings are kept only until a visit is verified (or 24 h at most), then deleted. Only the verified summary is kept.                                                                                              |
-| 8   | Rarity / streaks | Rarity by all-time unique visitors (formula in section 6). Streak is daily and gives XP only, never points.                                                                                                                 |
+| 8   | Rarity / streaks | Rarity by all-time unique visitors (formula in section 6). Streak is daily and gives no points; XP comes only from challenges.                                                                                              |
 | 9   | Minimum age      | 16+ (conservative GDPR choice; confirm before launch).                                                                                                                                                                      |
 | 10  | Languages        | English first; every string goes through i18n from day one so PT/ES/IT/FR can be added without refactoring.                                                                                                                 |
 
@@ -128,7 +128,7 @@ Honest limits: GPS can always be spoofed by a determined user, especially on roo
 - Points are frozen at award time in the ledger (a later change in rarity never alters earlier awards).
 - First discoverer: a flat bonus plus a "First discoverer" mark on the place.
 - Collection completion: bonus points, awarded once.
-- XP levels: `level = floor(sqrt(xp / 100)) + 1`. Streaks (daily) add XP only.
+- XP: 50 per completed challenge (a discovery or the daily challenge); nothing else gives XP. Level 2 needs 250 XP (5 challenges) and each further level needs twice the XP of the previous step (250, 500, 1000, …): `xp_for_level(n) = 250 × (2^(n−1) − 1)`. Coins are separate: they vary with rarity and bonuses and are what you spend in the store.
 - Concurrency: `place_stats` is updated under a row lock inside the check-in transaction, so two simultaneous check-ins cannot both be "first".
 - All constants live in `packages/shared` and a config table, with unit tests.
 

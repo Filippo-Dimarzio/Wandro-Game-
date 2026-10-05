@@ -1,12 +1,14 @@
 import {
   pointsForVisit,
   rarityMultiplier,
+  ledgerXp,
   levelFromXp,
   levelProgress,
   xpForLevel,
   octopusStage,
 } from './scoring';
 import { haversineMeters, isWithinGeofence, formatDistance } from './geo';
+import { CHALLENGE_XP } from './constants';
 
 describe('rarityMultiplier', () => {
   it('is 5x for undiscovered and falls with visitors', () => {
@@ -47,19 +49,31 @@ describe('pointsForVisit', () => {
 });
 
 describe('levels', () => {
-  it('maps xp to levels', () => {
+  it('5 challenges (250 XP) reach level 2, and each level-up then costs twice as much', () => {
     expect(levelFromXp(0)).toBe(1);
-    expect(levelFromXp(99)).toBe(1);
-    expect(levelFromXp(100)).toBe(2);
-    expect(levelFromXp(400)).toBe(3);
+    expect(levelFromXp(5 * CHALLENGE_XP)).toBe(2);
+    expect(levelFromXp(249)).toBe(1);
+    expect(levelFromXp(749)).toBe(2);
+    expect(levelFromXp(750)).toBe(3);
+    expect(levelFromXp(1750)).toBe(4);
+    expect([2, 3, 4, 5].map((l) => xpForLevel(l + 1) - xpForLevel(l))).toEqual([
+      500, 1000, 2000, 4000,
+    ]);
+  });
+  it('only completed challenges earn XP', () => {
+    expect(ledgerXp('visit')).toBe(CHALLENGE_XP);
+    expect(ledgerXp('daily_challenge')).toBe(CHALLENGE_XP);
+    for (const k of ['first_discoverer', 'collection', 'badge', 'streak', 'purchase', 'time_quest'])
+      expect(ledgerXp(k)).toBe(0);
   });
   it('xpForLevel inverts levelFromXp', () => {
     for (const l of [1, 2, 5, 10]) expect(levelFromXp(xpForLevel(l))).toBe(l);
   });
   it('reports progress inside a level', () => {
-    const p = levelProgress(250);
+    const p = levelProgress(500);
     expect(p.level).toBe(2);
-    expect(p.xpIntoLevel).toBe(150);
+    expect(p.xpIntoLevel).toBe(250);
+    expect(p.xpForNext).toBe(500);
     expect(p.fraction).toBeCloseTo(0.5);
   });
   it('maps level to octopus stage', () => {

@@ -1,4 +1,3 @@
-import { BADGE_XP, STREAK_XP_CAP_DAYS, STREAK_XP_PER_DAY } from './constants';
 import type { Category } from './types';
 
 /** Next streak value given the last active day and today (YYYY-MM-DD, Lisbon calendar on the server). */
@@ -6,10 +5,6 @@ export function nextStreak(lastActive: string | null, today: string, current: nu
   if (lastActive === today) return Math.max(current, 1);
   if (lastActive && daysBetween(lastActive, today) === 1) return current + 1;
   return 1;
-}
-
-export function streakXp(streak: number): number {
-  return STREAK_XP_PER_DAY * Math.min(streak, STREAK_XP_CAP_DAYS);
 }
 
 function daysBetween(a: string, b: string): number {
@@ -31,7 +26,6 @@ export interface BadgeDef {
   description: string;
   emoji: string;
   criteria: BadgeCriteria;
-  xp: number;
 }
 
 /** Mirrors the `badges` seed in supabase/migrations (same codes). */
@@ -42,7 +36,6 @@ export const BADGES: BadgeDef[] = [
     description: 'Discover your first place.',
     emoji: '👣',
     criteria: { type: 'total_visits', count: 1 },
-    xp: BADGE_XP,
   },
   {
     code: 'explorer_10',
@@ -50,7 +43,6 @@ export const BADGES: BadgeDef[] = [
     description: 'Discover 10 places.',
     emoji: '🧭',
     criteria: { type: 'total_visits', count: 10 },
-    xp: BADGE_XP,
   },
   {
     code: 'heritage_3',
@@ -58,7 +50,6 @@ export const BADGES: BadgeDef[] = [
     description: 'Discover 3 heritage sites.',
     emoji: '🏰',
     criteria: { type: 'category_count', category: 'heritage', count: 3 },
-    xp: BADGE_XP,
   },
   {
     code: 'castle_keeper',
@@ -66,7 +57,6 @@ export const BADGES: BadgeDef[] = [
     description: 'Discover 5 heritage sites.',
     emoji: '👑',
     criteria: { type: 'category_count', category: 'heritage', count: 5 },
-    xp: BADGE_XP,
   },
   {
     code: 'nature_5',
@@ -74,7 +64,6 @@ export const BADGES: BadgeDef[] = [
     description: 'Discover 5 nature spots.',
     emoji: '🌿',
     criteria: { type: 'category_count', category: 'nature', count: 5 },
-    xp: BADGE_XP,
   },
   {
     code: 'culture_5',
@@ -82,7 +71,6 @@ export const BADGES: BadgeDef[] = [
     description: 'Discover 5 museums or cultural places.',
     emoji: '🎨',
     criteria: { type: 'category_count', category: 'culture', count: 5 },
-    xp: BADGE_XP,
   },
   {
     code: 'hidden_gem',
@@ -90,7 +78,6 @@ export const BADGES: BadgeDef[] = [
     description: 'Discover a place fewer than 10 explorers have found.',
     emoji: '💎',
     criteria: { type: 'rare_visit', maxVisitors: 10 },
-    xp: BADGE_XP,
   },
   {
     code: 'first_discoverer',
@@ -98,7 +85,6 @@ export const BADGES: BadgeDef[] = [
     description: 'Be the very first to discover a place.',
     emoji: '🚩',
     criteria: { type: 'first_discoverer', count: 1 },
-    xp: BADGE_XP,
   },
   {
     code: 'sintra_complete',
@@ -106,7 +92,6 @@ export const BADGES: BadgeDef[] = [
     description: 'Discover every place in Sintra.',
     emoji: '🐙',
     criteria: { type: 'region_complete', region: 'sintra' },
-    xp: BADGE_XP,
   },
   {
     code: 'streak_7',
@@ -114,7 +99,6 @@ export const BADGES: BadgeDef[] = [
     description: 'Explore 7 days in a row.',
     emoji: '🔥',
     criteria: { type: 'streak', days: 7 },
-    xp: BADGE_XP,
   },
   {
     code: 'challenger',
@@ -122,7 +106,6 @@ export const BADGES: BadgeDef[] = [
     description: 'Complete a daily challenge.',
     emoji: '⚡',
     criteria: { type: 'daily_challenges', count: 1 },
-    xp: BADGE_XP,
   },
   {
     code: 'challenger_7',
@@ -130,7 +113,6 @@ export const BADGES: BadgeDef[] = [
     description: 'Complete 7 daily challenges.',
     emoji: '🌟',
     criteria: { type: 'daily_challenges', count: 7 },
-    xp: BADGE_XP,
   },
 ];
 

@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { router } from 'expo-router';
 import {
   ActivityIndicator,
@@ -78,6 +79,7 @@ export default function Home() {
             >
               <CoinCounter coins={wallet.coins} />
             </Pressable>
+            <ThemeToggle />
             <Pressable
               onPress={() => router.push('/friends')}
               accessibilityRole="button"
