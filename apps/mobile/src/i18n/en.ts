@@ -92,6 +92,7 @@ export const en = {
   'style.castles': 'Castles & palaces',
   'style.nature': 'Nature & viewpoints',
   'style.museums': 'Museums & art',
+  'style.culture': 'Food, festivals & neighbourhoods',
   'style.music': 'Music & nightlife',
   'style.beaches': 'Beaches & coast',
   'style.hidden': 'Hidden gems',

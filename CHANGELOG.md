@@ -6,6 +6,10 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Category circles are filled edge to edge: each card is zoomed inside its ring so its painted
+  frame no longer shows. On sign-up, "Museums & art" now shows the Art & museums card, and a new
+  "Food, festivals & neighbourhoods" style maps to Culture.
+
 - The app now speaks in Wandro's voice: warm, short and specific, with a little Portuguese
   ("Bora?", "Olha!", "Obrigado") at onboarding, discoveries, challenges, empty screens, hidden
   gems, errors and notifications. Buttons, settings and privacy text stay plain.

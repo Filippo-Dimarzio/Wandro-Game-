@@ -28,7 +28,8 @@ const STYLES: { id: string; category: Category }[] = [
   { id: 'beaches', category: 'coast' },
   { id: 'nature', category: 'nature' },
   { id: 'castles', category: 'heritage' },
-  { id: 'museums', category: 'culture' },
+  { id: 'museums', category: 'art' },
+  { id: 'culture', category: 'culture' },
   { id: 'music', category: 'music_events' },
   { id: 'hidden', category: 'other' },
 ];
