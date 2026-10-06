@@ -161,7 +161,7 @@ export const PORTUGAL_QUESTS = [
     [
       'piriquita',
       'Piriquita Bakery',
-      'other',
+      'culture',
       38.7978,
       -9.3925,
       1500,
@@ -170,7 +170,7 @@ export const PORTUGAL_QUESTS = [
     [
       'sao-pedro-fair',
       'São Pedro Fair',
-      'other',
+      'culture',
       38.788,
       -9.377,
       300,
@@ -416,7 +416,7 @@ export const PORTUGAL_QUESTS = [
     [
       'pasteis-belem',
       'Pastéis de Belém',
-      'other',
+      'culture',
       38.6975,
       -9.2032,
       4000,
@@ -425,7 +425,7 @@ export const PORTUGAL_QUESTS = [
     [
       'feira-ladra',
       'Feira da Ladra',
-      'other',
+      'culture',
       38.715,
       -9.127,
       800,
@@ -443,7 +443,7 @@ export const PORTUGAL_QUESTS = [
     [
       'ginjinha',
       'A Ginjinha',
-      'other',
+      'culture',
       38.714,
       -9.138,
       1200,
@@ -452,7 +452,7 @@ export const PORTUGAL_QUESTS = [
     [
       'pink-street',
       'Pink Street',
-      'other',
+      'culture',
       38.7068,
       -9.144,
       900,
@@ -654,7 +654,7 @@ export const PORTUGAL_QUESTS = [
     [
       'majestic',
       'Majestic Café',
-      'other',
+      'culture',
       41.1468,
       -8.6065,
       2000,
@@ -663,7 +663,7 @@ export const PORTUGAL_QUESTS = [
     [
       'santiago',
       'Café Santiago',
-      'other',
+      'culture',
       41.148,
       -8.603,
       800,
@@ -672,7 +672,7 @@ export const PORTUGAL_QUESTS = [
     [
       'grahams',
       'Graham’s Port Lodge',
-      'other',
+      'culture',
       41.1365,
       -8.624,
       400,
@@ -690,7 +690,7 @@ export const PORTUGAL_QUESTS = [
     [
       'galerias-paris',
       'Rua Galeria de Paris',
-      'other',
+      'culture',
       41.1468,
       -8.6135,
       400,
@@ -991,7 +991,7 @@ export const PORTUGAL_QUESTS = [
     [
       'mercado',
       'Évora Market',
-      'other',
+      'culture',
       38.5665,
       -7.9035,
       300,
@@ -1009,7 +1009,7 @@ export const PORTUGAL_QUESTS = [
     [
       'pao-de-rala',
       'Pão de Rala',
-      'other',
+      'culture',
       38.5705,
       -7.9035,
       200,
@@ -1037,7 +1037,7 @@ export const PORTUGAL_QUESTS = [
     [
       'cinco-quinas',
       'Torre das Cinco Quinas',
-      'heritage',
+      'other',
       38.5745,
       -7.902,
       5,
@@ -1131,11 +1131,11 @@ export const PORTUGAL_QUESTS = [
     [
       'canal-piramides',
       'Canal das Pirâmides',
-      'nature',
+      'other',
       40.642,
       -8.66,
       200,
-      'The canal where the lagoon meets the city. Quest: find the pyramids.',
+      'The canal where the lagoon meets the city, its mouth marked by two stone pyramids. Quest: find the pyramids.',
     ],
     [
       'se',
@@ -1320,7 +1320,7 @@ export const PORTUGAL_QUESTS = [
     [
       'ovos-moles',
       'Ovos Moles',
-      'other',
+      'culture',
       40.6415,
       -8.6505,
       800,
@@ -1329,7 +1329,7 @@ export const PORTUGAL_QUESTS = [
     [
       'mercado-peixe',
       'Mercado do Peixe',
-      'other',
+      'culture',
       40.6445,
       -8.6575,
       300,
