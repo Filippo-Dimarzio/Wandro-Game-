@@ -15,6 +15,14 @@ import { useWallet } from '@/data/wallet';
 import { InstallBanner } from '@/components/InstallBanner';
 import { LogOutButton } from '@/components/LogOutButton';
 import { ProgressStrip } from '@/components/ProgressStrip';
+import {
+  CityProgress,
+  classTitle,
+  Records,
+  StyleBars,
+  TrophyShelf,
+} from '@/components/ProfileSections';
+import { useExplorerStats } from '@/data/explorerStats';
 import { isDemo } from '@/lib/env';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
@@ -29,6 +37,7 @@ export default function Profile() {
   const { ids } = useUnlockedIds();
   const wallet = useWallet();
   const allBadges = useBadges();
+  const stats = useExplorerStats();
   const isModerator = useIsModerator();
   const loadout = useLoadout();
   const profile = useSession((s) => s.profile);
@@ -36,7 +45,6 @@ export default function Profile() {
   const explorer = useMyExplorer();
   const setExplorer = useSetExplorer();
   const [picking, setPicking] = useState(false);
-  const discovered = places.filter((p) => ids.has(p.id));
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
@@ -64,7 +72,10 @@ export default function Profile() {
             {profile?.homeCity ? (
               <Text style={{ color: c.textMuted }}>{profile.homeCity}</Text>
             ) : null}
-            <Text style={{ color: c.accent, fontWeight: '700' }}>
+            <Text style={{ color: c.accent, fontWeight: '800' }} testID="explorer-class">
+              {t('profile.classLine', { class: classTitle(stats), level })}
+            </Text>
+            <Text style={{ color: c.textMuted, fontWeight: '600' }}>
               {t('profile.stage', { stage: explorerStage(level) })}
             </Text>
             <Pressable
@@ -92,6 +103,15 @@ export default function Profile() {
 
         <Text style={[styles.section, { color: c.text }]}>{t('profile.progress')}</Text>
         <ProgressStrip wallet={wallet} />
+
+        <Text style={[styles.section, { color: c.text }]}>{t('profile.records')}</Text>
+        <Records stats={stats} streak={wallet.streak} />
+
+        <Text style={[styles.section, { color: c.text }]}>{t('profile.style')}</Text>
+        <StyleBars stats={stats} />
+
+        <Text style={[styles.section, { color: c.text }]}>{t('profile.cities')}</Text>
+        <CityProgress stats={stats} />
 
         <View style={styles.links}>
           <LinkButton
@@ -145,40 +165,8 @@ export default function Profile() {
           <PlaceMap places={places} unlockedIds={ids} userPosition={loc.position} compact />
         </View>
 
-        <View style={styles.stats}>
-          {[
-            [t('profile.discoveries'), discovered.length],
-            [t('profile.points'), wallet.coins],
-            [t('profile.level'), level],
-          ].map(([label, value]) => (
-            <View
-              key={String(label)}
-              style={[styles.stat, { backgroundColor: c.surface }]}
-              accessible
-              accessibilityLabel={`${label}: ${value}`}
-            >
-              <Text style={{ color: c.text, fontSize: 22, fontWeight: '900' }}>{value}</Text>
-              <Text style={{ color: c.textMuted }}>{label}</Text>
-            </View>
-          ))}
-        </View>
-
-        <Text style={[styles.section, { color: c.text }]}>{t('profile.badges')}</Text>
-        <View style={styles.badges}>
-          {allBadges.map((b) => (
-            <View
-              key={b.code}
-              style={[styles.badge, { backgroundColor: c.surface, opacity: b.awardedAt ? 1 : 0.4 }]}
-              accessible
-              accessibilityLabel={`${b.name}: ${b.description}${b.awardedAt ? '' : ', locked'}`}
-            >
-              <Text style={{ fontSize: 26 }}>{b.emoji}</Text>
-              <Text style={{ color: c.text, fontWeight: '600', textAlign: 'center', fontSize: 12 }}>
-                {b.name}
-              </Text>
-            </View>
-          ))}
-        </View>
+        <Text style={[styles.section, { color: c.text }]}>{t('profile.trophies')}</Text>
+        <TrophyShelf badges={allBadges} />
 
         <InstallBanner always />
         <LogOutButton />
@@ -207,17 +195,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     overflow: 'hidden',
     borderWidth: StyleSheet.hairlineWidth,
-  },
-  stats: { flexDirection: 'row', gap: space.sm },
-  stat: { flex: 1, borderRadius: radius.md, padding: space.md, alignItems: 'center' },
-  badges: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
-  badge: {
-    width: '23%',
-    minWidth: 76,
-    borderRadius: radius.md,
-    padding: space.sm,
-    alignItems: 'center',
-    gap: 4,
   },
   button: {
     borderWidth: 1,

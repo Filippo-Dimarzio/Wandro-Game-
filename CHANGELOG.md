@@ -6,6 +6,12 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- A more game-like Profile: an explorer class from the category you discover most ("Palace
+  Hunter · Level 3"), Records (discoveries, first finds, day streak, rarest find), your exploring
+  style as one bar per category, progress in each city, and a Trophy shelf with bronze, silver and
+  gold badges and the goal of each locked one. Numbers come from `my_explorer_stats()` (server)
+  or `explorerStats()` (demo).
+
 - Quinta do Relógio and Quinta da Penha Verde are private estates: they are marked private and
   closed (never an active challenge), and the Sintra National Palace moves to Heritage.
 
