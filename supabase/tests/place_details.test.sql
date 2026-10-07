@@ -13,7 +13,7 @@ select pg_temp.check(
    join places x on x.id = n.id where x.source_id = 'pena') = 3,
   'nearby_places() returns the facts');
 select pg_temp.check(
-  (select count(*) from places where details = '{}'::jsonb and source = 'seed' and source_id = 'lisbon-belem-tower') = 1,
+  (select count(*) from places where details = '{}'::jsonb and source = 'seed' and source_id = 'porto-ribeira') = 1,
   'places without details default to an empty object');
 
 -- Checked facts keep their source next to them; local-source facts are flagged for review.
@@ -28,6 +28,19 @@ select pg_temp.check(
    from places x, jsonb_array_elements(x.details -> 'facts') f
    where x.source = 'seed' and x.source_id = 'sintra-almocageme'),
   'Almoçageme facts from local sources are flagged for curator review');
+select pg_temp.check(
+  (select count(*) from places x
+   where x.source = 'seed' and x.source_id like 'lisbon-%' and x.status = 'active'
+     and jsonb_array_length(coalesce(x.details -> 'facts', '[]'::jsonb)) = 0) = 0,
+  'every active Lisbon place has facts');
+select pg_temp.check(
+  (select bool_and(f ->> 'source' like 'https://%' and (f ->> 'needsReview')::boolean)
+   from places x, jsonb_array_elements(x.details -> 'facts') f
+   where x.source = 'seed' and x.source_id like 'lisbon-%'),
+  'every Lisbon fact carries its https source and waits for curator review');
+select pg_temp.check(
+  (select description from places where source = 'seed' and source_id = 'lisbon-gloria') not ilike '%ride%',
+  'the Glória quest does not ask players to ride the funicular');
 
 -- The Toy Museum closed in 2014; the NewsMuseum waits as a draft for a curator.
 select pg_temp.check(

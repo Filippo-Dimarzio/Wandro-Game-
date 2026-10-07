@@ -10,6 +10,10 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
   fact count on Learn ("Learn · 3"). One tap opens the card on that tab; no need to find the
   handle first.
 - Every fact on Learn is readable before you visit; nothing is blurred until discovery.
+- Lisbon Learn facts: all 54 Lisbon places get a teaser and 1–3 facts (137 in all), each stored
+  with the page it was checked against and flagged for curator review. Corrected three
+  descriptions: the São Cristóvão “Fado Vadio” mural is gone, São Carlos took six months to build,
+  and the Glória quest no longer asks you to ride the funicular after the 2025 derailment.
 - Day streak, Duolingo style: a 🔥 counter on Home that lights up once you complete a challenge
   today, a week view (Monday to Sunday) with a flame on each day played, an "at risk" nudge when
   you haven't played yet today, and a streak celebration on the reward card for the first

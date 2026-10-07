@@ -58,6 +58,19 @@ describe('place details', () => {
     expect(facts).not.toMatch(/natural lake|reservoir|man-made/i);
   });
 
+  it('every Lisbon place has facts, each with its source and flagged for review', () => {
+    const lisbon = DEMO_PLACES.filter((p) => p.region === 'lisbon');
+    expect(lisbon.filter((p) => !p.details).map((p) => p.id)).toEqual([]);
+    for (const p of lisbon)
+      for (const f of p.details!.facts)
+        expect([p.id, !!f.source, f.needsReview]).toEqual([p.id, true, true]);
+  });
+
+  it('never asks players to ride the Glória funicular after the 2025 crash', () => {
+    const gloria = DEMO_PLACES.find((p) => p.id === 'demo-lisbon-gloria')!;
+    expect(gloria.description).not.toMatch(/ride/i);
+  });
+
   it('the closed Toy Museum is not a place to visit', () => {
     expect(DEMO_PLACES.find((p) => p.id === 'demo-brinquedo')).toBeUndefined();
     expect(PLACE_DETAILS['demo-brinquedo']).toBeUndefined();

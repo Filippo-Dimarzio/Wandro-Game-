@@ -357,7 +357,7 @@ export const PORTUGAL_QUESTS = [
       38.7095,
       -9.1418,
       200,
-      'An opera house of 1793 built by merchants in three months. Quest: find the square where Pessoa was born.',
+      'An opera house of 1793, built in just six months. Quest: find the square where Pessoa was born.',
     ],
     [
       'casa-independente',
@@ -384,7 +384,7 @@ export const PORTUGAL_QUESTS = [
       38.7155,
       -9.144,
       900,
-      'The funicular from Restauradores to the São Pedro de Alcântara viewpoint. Quest: ride it up, walk down.',
+      'The steep street from Restauradores up to Bairro Alto, along the Glória funicular line. Quest: walk up the hill.',
     ],
     [
       'pilar-7',

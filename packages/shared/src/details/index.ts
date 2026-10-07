@@ -1,8 +1,9 @@
 import type { PlaceDetails } from '../types';
+import { LISBON_DETAILS } from './lisbon';
 import { SINTRA_DETAILS } from './sintra';
 
-/** Learn and Plan content by place id. Sintra is the pilot; other cities follow after review. */
-export const PLACE_DETAILS: Record<string, PlaceDetails> = { ...SINTRA_DETAILS };
+/** Learn and Plan content by place id: Sintra (the pilot) and Lisbon. */
+export const PLACE_DETAILS: Record<string, PlaceDetails> = { ...SINTRA_DETAILS, ...LISBON_DETAILS };
 
 // The seed's source_id for a demo place id (the Sintra music corner predates the naming rule).
 const SOURCE_ID_OVERRIDES: Record<string, string> = { 'demo-music': 'music-corner' };

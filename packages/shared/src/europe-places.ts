@@ -195,7 +195,7 @@ const LAUNCH_PLACES: Place[] = [
     38.7128,
     -9.1351,
     6,
-    'Stairway painted with a mural of the fado singers who lived here.',
+    'Mouraria stairway where the “Fado Vadio” mural once honoured the neighbourhood’s fado singers.',
     { hidden: true },
   ),
   placeIn(
