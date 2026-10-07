@@ -173,6 +173,7 @@ export const en = {
   'place.tabPlan': 'Plan',
   'place.factLocked': 'Discover this place to reveal this fact',
   'place.lookFor': 'Look for',
+  'place.sources': 'Sources',
   'place.noFacts': 'Fun facts for this place are on their way.',
   'place.noPlan': 'Planning notes for this place are on their way.',
   'place.bestTime': 'Best time',

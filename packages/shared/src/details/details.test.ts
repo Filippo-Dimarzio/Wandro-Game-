@@ -26,6 +26,8 @@ describe('place details', () => {
       expect([id, d.facts.length >= 1 && d.facts.length <= 3]).toEqual([id, true]);
       for (const f of d.facts) expect([id, f.length <= 140]).toEqual([id, true]);
       if (d.durationMin !== undefined) expect(d.durationMin).toBeGreaterThan(0);
+      for (const s of d.sources ?? [])
+        expect([id, s]).toEqual([id, expect.stringMatching(/^https:\/\//)]);
     }
   });
 

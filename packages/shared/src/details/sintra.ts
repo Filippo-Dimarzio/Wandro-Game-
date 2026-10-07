@@ -261,11 +261,20 @@ export const SINTRA_DETAILS: Record<string, PlaceDetails> = {
   },
   'demo-sintra-lagoa-azul': {
     teaser: 'A quiet blue lake in the pine forest on the road to the coast.',
-    facts: ['It lies inside the Sintra-Cascais Natural Park.'],
+    facts: [
+      'It’s a natural lake: fine clay from Sintra’s weathered granite seals the bed, so the water can’t drain away.',
+      'Carp, perch, terrapins and freshwater mussels live in it.',
+      'Invasive mosquitofish and American turtles are pushing out the native wildlife.',
+    ],
     bestTime: 'Weekday mornings.',
     durationMin: 45,
     cost: 'free',
     access: 'trail',
+    tip: 'Swimming isn’t advised.',
+    sources: [
+      'https://www.vortexmag.net/lagoa-azul-de-sintra-um-pequeno-paraiso-perto-de-lisboa-2/',
+      'https://lisboasecreta.co/lagoa-azul-em-sintra/',
+    ],
   },
   'demo-sintra-pedra-amarela': {
     teaser: 'A granite outcrop with a sweeping view over the hills to the sea.',
@@ -292,12 +301,16 @@ export const SINTRA_DETAILS: Record<string, PlaceDetails> = {
   'demo-sintra-tram': {
     teaser: 'A vintage tram that rattles from the hills down to the beach.',
     facts: [
-      'The Sintra tram line opened in 1904.',
-      'It mostly runs in the warmer months, on restored old cars.',
+      'The line opened in 1904 and runs 13 km through Colares to Praia das Maçãs.',
+      'The ride takes about 40 minutes.',
+      'Its red tram cars, still in use today, date from the 1930s.',
     ],
     bestTime: 'Summer weekends: check the timetable first.',
     durationMin: 45,
     cost: 'paid',
+    sources: [
+      'https://www.sintraportugaltourism.com/transportation/sintra-tram-to-praia-das-macas.html',
+    ],
   },
   'demo-sintra-praia-macas': {
     teaser: 'A family beach where the old tram line meets the sea.',
@@ -376,11 +389,19 @@ export const SINTRA_DETAILS: Record<string, PlaceDetails> = {
     access: 'some_steps',
   },
   'demo-sintra-natural-history': {
-    teaser: 'Fossils and minerals in a 19th-century house on the old square.',
-    facts: ['Some of its fossils are tens of millions of years old.'],
-    lookFor: 'The dinosaur egg.',
+    teaser: 'Fossils, minerals and dinosaur eggs in an 1893 house in the old centre.',
+    facts: [
+      'It opened on 1 August 2009, in a building from 1893 in the historic centre.',
+      'Miguel and Fernanda Barbosa gathered most of its 10,000+ pieces, 9,416 of them fossils, over 50 years.',
+      'It shows dinosaur nests with eggs from the Gobi Desert and pieces of China’s Nantan meteorite.',
+    ],
+    lookFor: 'The dinosaur eggs from the Gobi Desert.',
     durationMin: 45,
     cost: 'ticket',
+    sources: [
+      'https://en.wikipedia.org/wiki/Sintra_Natural_History_Museum',
+      'https://www.visitportugal.com/en/NR/exeres/9F4F3D3A-7ABF-4628-AA9E-EA3EEEDBD457',
+    ],
   },
   'demo-sintra-fonte-pipa': {
     teaser: 'A tiled fountain where villagers once filled their jugs.',
@@ -409,11 +430,17 @@ export const SINTRA_DETAILS: Record<string, PlaceDetails> = {
     access: 'step_free',
   },
   'demo-sintra-casa-teatro': {
-    teaser: 'A small theatre company’s home in the Estefânia quarter.',
-    facts: ['Small venues like this stage local productions and readings through the year.'],
+    teaser: 'A 50-seat theatre inside a 1928 cinema, in the town that grew around the railway.',
+    facts: [
+      'It opened as the Tivoli cinema on Carnival Saturday, 18 February 1928.',
+      'After the cinema closed it spent years as a warehouse and carpentry workshop.',
+      'Today the nonprofit Chão de Oliva runs it, with seats that fold away to reshape the room.',
+    ],
+    lookFor: 'The old cinema name on the front.',
     bestTime: 'An evening performance.',
     durationMin: 90,
     cost: 'ticket',
+    sources: ['https://chaodeoliva.com/casa-de-teatro-de-sintra/'],
   },
   'demo-sintra-feira-merces': {
     teaser: 'Sintra’s old country fair, around a hilltop chapel.',
@@ -454,11 +481,18 @@ export const SINTRA_DETAILS: Record<string, PlaceDetails> = {
   },
   'demo-sintra-portela-station': {
     teaser: 'The station of Sintra’s newer quarter, one stop before the end of the line.',
-    facts: ['Trains from Lisbon stop here just before the Sintra terminus.'],
+    facts: [
+      'It opened on 2 April 1887, the day the railway from Lisbon’s Alcântara-Terra to Sintra began.',
+      'Sintra’s old tram stops a 7-minute walk away, near the MU.SA museum.',
+    ],
     lookFor: 'The tile panel in the hall.',
     durationMin: 10,
     cost: 'free',
     access: 'step_free',
+    sources: [
+      'https://pt.wikipedia.org/wiki/Esta%C3%A7%C3%A3o_Ferrovi%C3%A1ria_da_Portela_de_Sintra',
+      'https://www.sintraportugaltourism.com/transportation/sintra-tram-to-praia-das-macas.html',
+    ],
   },
   'demo-sintra-piriquita': {
     teaser: 'Sintra’s famous bakery, warm travesseiros since 1862.',
@@ -539,11 +573,20 @@ export const SINTRA_DETAILS: Record<string, PlaceDetails> = {
   },
   'demo-sintra-almocageme': {
     teaser: 'A village square where locals meet for coffee before the beach.',
-    facts: ['It is the village above Adraga beach, in the Colares wine area.'],
+    facts: [
+      'Its name comes from the Arabic al-munsagem, “running water”, for the streams off the Sintra hills.',
+      'Its festival for Nossa Senhora da Graça began in 1758, in thanks that the 1755 earthquake killed no one here.',
+      'It is the village above Adraga beach, in the Colares wine area.',
+    ],
     lookFor: 'The old fountain on the square.',
+    bestTime: 'October, during the village festival.',
     durationMin: 20,
     cost: 'free',
     access: 'step_free',
+    sources: [
+      'https://bvalmocageme.pt/index.php/almocageme-dois-mil-anos-de-historia',
+      'https://www.aldeiasdeportugal.pt/aldeia/almocageme/',
+    ],
   },
   'demo-sintra-vila-sassetti': {
     teaser: 'A secret garden path from a hidden villa up to the Moorish castle.',

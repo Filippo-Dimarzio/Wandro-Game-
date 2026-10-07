@@ -63,6 +63,8 @@ export interface PlaceDetails {
   access?: PlaceAccess;
   /** Practical or safety note, e.g. "Private estate: view it from the road". */
   tip?: string;
+  /** Pages the facts were checked against (https), shown as links under the facts. */
+  sources?: string[];
 }
 
 export interface VisitSummary {

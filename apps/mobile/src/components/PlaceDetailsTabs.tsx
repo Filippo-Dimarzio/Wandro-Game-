@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 import { FREE_FACTS, formatDistance, haversineMeters, type Place } from '@wandro/shared';
 import { t } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
@@ -72,8 +72,31 @@ export function PlaceLearn({ place, unlocked }: { place: Place; unlocked: boolea
           </Text>
         </View>
       )}
+      {d.sources && d.sources.length > 0 && (
+        <View style={styles.sources} testID="place-sources">
+          <Text style={{ color: c.textMuted, fontSize: 12, fontWeight: '700' }}>
+            {t('place.sources')}:
+          </Text>
+          {d.sources.map((url) => (
+            <Text
+              key={url}
+              onPress={() => Linking.openURL(url).catch(() => undefined)}
+              accessibilityRole="link"
+              style={{ color, fontSize: 12, textDecorationLine: 'underline' }}
+            >
+              {hostOf(url)}
+            </Text>
+          ))}
+        </View>
+      )}
     </View>
   );
+}
+
+/** "en.wikipedia.org" from a source URL, for a short link label. */
+export function hostOf(url: string): string {
+  const m = /^https?:\/\/(?:www\.)?([^/]+)/.exec(url);
+  return m ? m[1]! : url;
 }
 
 /** Plan tab: best time, time needed, cost, access, a practical tip and a place to pair it with. */
@@ -153,4 +176,5 @@ const styles = StyleSheet.create({
     padding: space.md,
   },
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: space.sm },
+  sources: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, alignItems: 'center' },
 });

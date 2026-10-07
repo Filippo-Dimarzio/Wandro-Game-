@@ -89,6 +89,17 @@ describe('PlaceSheet', () => {
     expect(screen.getByText(/^Castle of the Moors · /)).toBeOnTheScreen();
   });
 
+  it('Learn links the sources the facts were checked against', async () => {
+    const museum = DEMO_PLACES.find((p) => p.id === 'demo-sintra-natural-history')!;
+    await render(<PlaceSheet place={museum} userPosition={museum} unlocked onClose={() => {}} />, {
+      wrapper,
+    });
+    await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
+    await fireEvent.press(screen.getByTestId('tab-learn'));
+    expect(screen.getByRole('link', { name: 'en.wikipedia.org' })).toBeOnTheScreen();
+    expect(screen.getByText(/Nantan meteorite/)).toBeOnTheScreen();
+  });
+
   it('Plan shows safety and access tips', async () => {
     const cabo = DEMO_PLACES.find((p) => p.id === 'demo-cabo')!;
     await render(

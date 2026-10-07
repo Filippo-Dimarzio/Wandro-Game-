@@ -6,6 +6,9 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Checked facts with sources for six Sintra places (Lagoa Azul, the tram, the Natural History
+  Museum, Casa de Teatro, Portela station, Almoçageme); the Learn tab links each source.
+
 - Place sheets have About, Learn and Plan tabs. Learn: a one-line teaser, up to three fun facts
   (the first is free; the rest unlock when you discover the place) and something to look for on
   site. Plan: best time, time needed, cost, how easy it is to reach, safety or access tips and a
