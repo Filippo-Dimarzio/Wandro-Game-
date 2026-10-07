@@ -59,6 +59,24 @@ describe('PlaceSheet', () => {
     expect(screen.getByText(/Triton arch/)).toBeOnTheScreen();
   });
 
+  it('shows the teaser and a Learn tab with a fact count without expanding', async () => {
+    await render(
+      <PlaceSheet place={pena} userPosition={pena} unlocked={false} onClose={() => {}} />,
+      { wrapper },
+    );
+    expect(screen.getByTestId('peek-teaser')).toHaveTextContent(pena.details!.teaser);
+    expect(
+      screen.getByRole('tab', {
+        name: `Learn: ${pena.details!.facts.length} facts about this place`,
+      }),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText(fact1!)).toBeNull();
+
+    await fireEvent.press(screen.getByTestId('tab-learn'));
+    expect(screen.getByText(fact1!)).toBeOnTheScreen();
+    expect(screen.queryByTestId('peek-teaser')).toBeNull();
+  });
+
   it('Learn reveals every fact once discovered', async () => {
     await render(<PlaceSheet place={pena} userPosition={pena} unlocked onClose={() => {}} />, {
       wrapper,

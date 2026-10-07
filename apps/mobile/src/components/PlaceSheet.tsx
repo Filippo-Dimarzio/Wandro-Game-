@@ -38,6 +38,11 @@ const TAB_LABEL = {
   learn: 'place.tabLearn',
   plan: 'place.tabPlan',
 } as const;
+const TAB_ICON = {
+  about: 'information-circle',
+  learn: 'bulb',
+  plan: 'map',
+} as const;
 
 interface Props {
   place: Place;
@@ -69,6 +74,7 @@ export function PlaceSheet({
   const distance = haversineMeters(userPosition, place);
   const catColor = c.category[place.category];
   const schedule = scheduleLines(place.hours);
+  const factCount = place.details?.facts.length ?? 0;
 
   const openDirections = () => {
     Linking.openURL(directionsUrl(place, distance)).catch(() => undefined);
@@ -157,27 +163,50 @@ export function PlaceSheet({
       </View>
       {!unlocked && <TimeQuestBadge place={place} />}
 
-      {expanded && (
-        <View style={[styles.tabs, { backgroundColor: c.surface }]} accessibilityRole="tablist">
-          {TABS.map((k) => {
-            const on = tab === k;
-            return (
-              <Pressable
-                key={k}
-                onPress={() => setTab(k)}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: on }}
-                style={[styles.tab, on && { backgroundColor: catColor }]}
-                testID={`tab-${k}`}
-              >
-                <Text style={{ color: on ? c.onCategory : c.text, fontWeight: '800' }}>
-                  {t(TAB_LABEL[k])}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+      {!expanded && place.details?.teaser && (
+        <Text style={{ color: c.text, fontWeight: '700' }} numberOfLines={2} testID="peek-teaser">
+          {place.details.teaser}
+        </Text>
       )}
+
+      {/* Always visible so the Learn and Plan content is one obvious tap away. */}
+      <View style={[styles.tabs, { backgroundColor: c.surface }]} accessibilityRole="tablist">
+        {TABS.map((k) => {
+          const on = expanded && tab === k;
+          const label =
+            k === 'learn' && factCount > 0
+              ? t('place.tabLearnCount', { count: factCount })
+              : t(TAB_LABEL[k]);
+          return (
+            <Pressable
+              key={k}
+              onPress={() => {
+                if (on) setExpanded(false);
+                else {
+                  setTab(k);
+                  setExpanded(true);
+                }
+              }}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: on }}
+              accessibilityLabel={
+                k === 'learn' && factCount > 0
+                  ? t('place.tabLearnA11y', { count: factCount })
+                  : undefined
+              }
+              style={[
+                styles.tab,
+                on && { backgroundColor: catColor },
+                !expanded && k === 'learn' && { borderWidth: 2, borderColor: catColor },
+              ]}
+              testID={`tab-${k}`}
+            >
+              <Ionicons name={TAB_ICON[k]} size={16} color={on ? c.onCategory : catColor} />
+              <Text style={{ color: on ? c.onCategory : c.text, fontWeight: '800' }}>{label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
 
       {expanded && tab !== 'about' && (
         <ScrollView style={{ maxHeight: height * 0.4 }} contentContainerStyle={{ gap: space.md }}>
@@ -321,6 +350,8 @@ const styles = StyleSheet.create({
   tabs: { flexDirection: 'row', borderRadius: radius.pill, padding: 4, gap: 4 },
   tab: {
     flex: 1,
+    flexDirection: 'row',
+    gap: 4,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 40,
