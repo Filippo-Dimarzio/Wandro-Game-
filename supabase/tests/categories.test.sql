@@ -16,4 +16,9 @@ select pg_temp.check(
   and (select count(*) from places where source = 'seed' and category = 'culture'
        and source_id in ('aveiro-moliceiro-ride', 'aveiro-sao-jacinto-ferry')) = 2,
   'the aqueduct is Heritage; the boat ride and ferry are Culture');
+select pg_temp.check(
+  (select category from places where source = 'seed' and source_id = 'capuchos') = 'other'
+  and not exists (select 1 from places where source = 'seed' and source_id = 'sintra-capuchos'
+                  and status = 'active'),
+  'the Convent of the Capuchos is one Curiosity, not two places');
 rollback;

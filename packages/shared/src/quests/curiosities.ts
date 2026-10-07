@@ -2,19 +2,11 @@ import { quests } from '../place-in';
 
 // Genuine oddities, so every city keeps five or more Curiosities now that its bakeries, bars,
 // cafés and markets count as Culture (food, markets and cafés). Aveiro's Canal das Pirâmides
-// became a curiosity too, so a park keeps its Nature at five.
+// became a curiosity too, so a park keeps its Nature at five. In Sintra the cork-lined Convent of
+// the Capuchos (demo-capuchos) is the curiosity.
 
 export const CURIOSITY_QUESTS = [
   ...quests('sintra', [
-    [
-      'capuchos',
-      'Convent of the Capuchos',
-      'other',
-      38.784,
-      -9.4365,
-      40,
-      'Friars lived here in tiny cells lined with cork, with doors so low you have to bow. Quest: find a cork-lined door.',
-    ],
     [
       'vila-sassetti',
       'Vila Sassetti Path',

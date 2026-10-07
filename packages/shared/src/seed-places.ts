@@ -72,11 +72,11 @@ const SINTRA_PLACES: Place[] = [
   p(
     'demo-capuchos',
     'Convent of the Capuchos',
-    'heritage',
+    'other',
     38.7777,
     -9.4469,
     120,
-    'Tiny cork-lined convent hidden in the forest.',
+    'Tiny cork-lined convent hidden in the forest. Quest: find a cork-lined door, so low you have to bow.',
   ),
   p(
     'demo-seteais',
