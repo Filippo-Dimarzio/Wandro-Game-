@@ -24,11 +24,43 @@ describe('place details', () => {
     for (const [id, d] of Object.entries(PLACE_DETAILS)) {
       expect([id, d.teaser.length <= 120]).toEqual([id, true]);
       expect([id, d.facts.length >= 1 && d.facts.length <= 3]).toEqual([id, true]);
-      for (const f of d.facts) expect([id, f.length <= 140]).toEqual([id, true]);
+      for (const f of d.facts) expect([id, f.text.length <= 200]).toEqual([id, true]);
       if (d.durationMin !== undefined) expect(d.durationMin).toBeGreaterThan(0);
-      for (const s of d.sources ?? [])
-        expect([id, s]).toEqual([id, expect.stringMatching(/^https:\/\//)]);
     }
+  });
+
+  it('stores each checked fact with an https source next to it', () => {
+    for (const [id, d] of Object.entries(PLACE_DETAILS))
+      for (const f of d.facts)
+        if (f.source !== undefined)
+          expect([id, f.source]).toEqual([id, expect.stringMatching(/^https:\/\//)]);
+    const sourced = (id: string) => PLACE_DETAILS[id]!.facts.every((f) => f.source);
+    for (const id of [
+      'demo-sintra-lagoa-azul',
+      'demo-sintra-chalet-biester',
+      'demo-sintra-portela-station',
+      'demo-sintra-casa-teatro',
+      'demo-sintra-almocageme',
+      'demo-sintra-natural-history',
+      'demo-sintra-tram-banzao',
+      'demo-sintra-tram-galamares',
+    ])
+      expect([id, sourced(id)]).toEqual([id, true]);
+  });
+
+  it('flags facts from local sources for curator review (Almoçageme)', () => {
+    expect(PLACE_DETAILS['demo-sintra-almocageme']!.facts.every((f) => f.needsReview)).toBe(true);
+  });
+
+  it('keeps Lagoa Azul to its two checked facts, with no natural-lake or reservoir claim', () => {
+    const facts = PLACE_DETAILS['demo-sintra-lagoa-azul']!.facts.map((f) => f.text).join(' ');
+    expect(PLACE_DETAILS['demo-sintra-lagoa-azul']!.facts).toHaveLength(2);
+    expect(facts).not.toMatch(/natural lake|reservoir|man-made/i);
+  });
+
+  it('the closed Toy Museum is not a place to visit', () => {
+    expect(DEMO_PLACES.find((p) => p.id === 'demo-brinquedo')).toBeUndefined();
+    expect(PLACE_DETAILS['demo-brinquedo']).toBeUndefined();
   });
 
   it('the database gets the same details (migration)', () => {

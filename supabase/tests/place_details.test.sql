@@ -16,6 +16,29 @@ select pg_temp.check(
   (select count(*) from places where details = '{}'::jsonb and source = 'seed' and source_id = 'lisbon-belem-tower') = 1,
   'places without details default to an empty object');
 
+-- Checked facts keep their source next to them; local-source facts are flagged for review.
+select pg_temp.check(
+  (select bool_and(f ? 'source' and f ->> 'source' like 'https://%')
+   from places x, jsonb_array_elements(x.details -> 'facts') f
+   where x.source = 'seed' and x.source_id in ('sintra-lagoa-azul', 'sintra-chalet-biester',
+     'sintra-tram-banzao', 'sintra-tram-galamares', 'sintra-natural-history')),
+  'each checked fact carries its https source');
+select pg_temp.check(
+  (select bool_and((f ->> 'needsReview')::boolean)
+   from places x, jsonb_array_elements(x.details -> 'facts') f
+   where x.source = 'seed' and x.source_id = 'sintra-almocageme'),
+  'Almoçageme facts from local sources are flagged for curator review');
+
+-- The Toy Museum closed in 2014; the NewsMuseum waits as a draft for a curator.
+select pg_temp.check(
+  not exists (select 1 from places where source = 'seed' and source_id = 'brinquedo' and status = 'active'),
+  'the closed Toy Museum is never an active place');
+select pg_temp.check(
+  (select status from places where source = 'seed' and source_id = 'sintra-newsmuseum') = 'draft'
+  and not exists (select 1 from places_public p join places x on x.id = p.id
+                  where x.source_id = 'sintra-newsmuseum'),
+  'the NewsMuseum is a draft, hidden from players until a curator approves it');
+
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000f1');
 do $$ begin
   update places set details = '{"teaser":"hacked"}' where source_id = 'pena';

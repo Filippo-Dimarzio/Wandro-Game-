@@ -16,15 +16,18 @@ const row = {
 
 describe('rowToPlace', () => {
   it('maps the details column into place.details', () => {
-    const p = rowToPlace({
-      ...row,
-      details: { teaser: 'A palace', facts: ['One'], cost: 'ticket' },
-    });
-    expect(p.details).toEqual({ teaser: 'A palace', facts: ['One'], cost: 'ticket' });
+    const facts = [{ text: 'One', source: 'https://example.org' }];
+    const p = rowToPlace({ ...row, details: { teaser: 'A palace', facts, cost: 'ticket' } });
+    expect(p.details).toEqual({ teaser: 'A palace', facts, cost: 'ticket' });
   });
 
   it('leaves details out when the place has none yet (empty object)', () => {
     expect(rowToPlace({ ...row, details: {} }).details).toBeUndefined();
     expect(rowToPlace(row).details).toBeUndefined();
+  });
+
+  it('reads older plain-text facts as unsourced facts', () => {
+    const details = { teaser: 'A palace', facts: ['Old style'] } as never;
+    expect(rowToPlace({ ...row, details }).details?.facts).toEqual([{ text: 'Old style' }]);
   });
 });

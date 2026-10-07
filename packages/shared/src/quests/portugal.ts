@@ -57,7 +57,7 @@ export const PORTUGAL_QUESTS = [
       38.795,
       -9.3978,
       25,
-      'A Gothic-Revival chalet of the 1880s, painted inside by Luigi Manini. Quest: frame its slate turrets through the trees.',
+      'Designed in 1880 and finished in 1907; Polanski filmed The Ninth Gate here. Quest: frame your own film still of it.',
     ],
     [
       'santa-maria',
@@ -75,7 +75,7 @@ export const PORTUGAL_QUESTS = [
       38.7995,
       -9.388,
       80,
-      'Fossils and minerals in a 19th-century house on the old square. Quest: find the dinosaur egg.',
+      'More than 10,000 pieces in an 1893 building, gathered by Miguel and Fernanda Barbosa. Quest: find the dinosaur eggs.',
     ],
     [
       'fonte-pipa',
@@ -111,7 +111,7 @@ export const PORTUGAL_QUESTS = [
       38.7976,
       -9.383,
       80,
-      'A small theatre company’s home in Estefânia. Quest: find out what’s on tonight.',
+      'The old Tivoli cinema of 1928, now a 50-seat theatre run by Chão de Oliva. Quest: find out what’s on tonight.',
     ],
     [
       'feira-merces',
@@ -138,7 +138,7 @@ export const PORTUGAL_QUESTS = [
       38.8128,
       -9.4505,
       70,
-      'The 1904 tram still rattles through the vineyards here. Quest: wait for the bell and photograph the car.',
+      'The tram’s main freight stop, where the line restarted in 1980. Quest: wait for the bell and photograph the car.',
     ],
     [
       'tram-galamares',
@@ -147,7 +147,7 @@ export const PORTUGAL_QUESTS = [
       38.8003,
       -9.4155,
       40,
-      'A halt on the old line from the hills to the sea. Quest: ride one stop towards the coast.',
+      'A halt on the 1904 tram line, which runs in summer. Quest: ride one stop towards the coast.',
     ],
     [
       'portela-station',
@@ -156,7 +156,7 @@ export const PORTUGAL_QUESTS = [
       38.802,
       -9.3667,
       200,
-      'Where the Lisbon line meets the town’s new quarter. Quest: find the tile panel in the hall.',
+      'Opened on 2 April 1887, when the railway from Alcântara-Terra (Lisbon) to Sintra began. Quest: walk 7 minutes to the tram stop.',
     ],
     [
       'piriquita',

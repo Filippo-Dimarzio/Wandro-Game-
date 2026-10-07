@@ -43,7 +43,7 @@ describe('PlaceSheet', () => {
   });
 
   const pena = DEMO_PLACES.find((p) => p.id === 'demo-pena')!;
-  const [fact1, fact2] = pena.details!.facts;
+  const [fact1, fact2] = pena.details!.facts.map((f) => f.text);
 
   it('Learn shows one fact before discovery and blurs the rest', async () => {
     await render(
@@ -89,14 +89,14 @@ describe('PlaceSheet', () => {
     expect(screen.getByText(/^Castle of the Moors · /)).toBeOnTheScreen();
   });
 
-  it('Learn links the sources the facts were checked against', async () => {
+  it('Learn links each fact to the source it was checked against', async () => {
     const museum = DEMO_PLACES.find((p) => p.id === 'demo-sintra-natural-history')!;
     await render(<PlaceSheet place={museum} userPosition={museum} unlocked onClose={() => {}} />, {
       wrapper,
     });
     await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
     await fireEvent.press(screen.getByTestId('tab-learn'));
-    expect(screen.getByRole('link', { name: 'en.wikipedia.org' })).toBeOnTheScreen();
+    expect(screen.getAllByTestId('fact-source')[0]).toHaveTextContent('Source: en.wikipedia.org');
     expect(screen.getByText(/Nantan meteorite/)).toBeOnTheScreen();
   });
 

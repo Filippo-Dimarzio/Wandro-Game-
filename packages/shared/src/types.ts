@@ -49,11 +49,20 @@ export type PlaceCost = 'free' | 'ticket' | 'paid';
  * Optional story and practical notes shown on the place sheet: the Learn tab (teaser, facts, a
  * detail to look for) and the Plan tab. Facts after the first stay blurred until discovery.
  */
+/** One fact on the Learn tab, with the page it was checked against. */
+export interface PlaceFact {
+  text: string;
+  /** https page the fact was checked against; absent means not yet sourced. */
+  source?: string;
+  /** From a local or unofficial source: a curator should confirm it. Not shown to players. */
+  needsReview?: boolean;
+}
+
 export interface PlaceDetails {
   /** One line on why it's worth going. */
   teaser: string;
-  /** One to three short, checkable facts. */
-  facts: string[];
+  /** One to three short facts, each with its source when checked. */
+  facts: PlaceFact[];
   /** Something to spot once you're there. */
   lookFor?: string;
   bestTime?: string;
@@ -63,8 +72,6 @@ export interface PlaceDetails {
   access?: PlaceAccess;
   /** Practical or safety note, e.g. "Private estate: view it from the road". */
   tip?: string;
-  /** Pages the facts were checked against (https), shown as links under the facts. */
-  sources?: string[];
 }
 
 export interface VisitSummary {

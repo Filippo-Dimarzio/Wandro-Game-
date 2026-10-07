@@ -10,6 +10,7 @@ import {
   visiblePlaces,
   type Place,
   type PlaceDetails,
+  type PlaceFact,
 } from '@wandro/shared';
 import { isDemo } from '@/lib/env';
 import { supabase } from '@/lib/supabase';
@@ -51,7 +52,15 @@ export function rowToPlace(r: PlaceRow): Place {
     photoSource: r.photo_source ?? undefined,
     region: regionFor(r)?.slug,
     ...(r.is_hidden && { hidden: true }),
-    ...(r.details?.teaser && { details: { facts: [], ...r.details } as PlaceDetails }),
+    ...(r.details?.teaser && {
+      details: {
+        ...r.details,
+        // Older rows stored facts as plain strings; read them as unsourced facts.
+        facts: (r.details.facts ?? []).map((f: PlaceFact | string) =>
+          typeof f === 'string' ? { text: f } : f,
+        ),
+      } as PlaceDetails,
+    }),
   };
 }
 

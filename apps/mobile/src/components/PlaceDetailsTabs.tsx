@@ -39,7 +39,20 @@ export function PlaceLearn({ place, unlocked }: { place: Place; unlocked: boolea
             <View style={[styles.num, { backgroundColor: color }]}>
               <Text style={{ color: c.onCategory, fontWeight: '900', fontSize: 12 }}>{i + 1}</Text>
             </View>
-            <Text style={{ color: c.text, flex: 1, lineHeight: 21 }}>{fact}</Text>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={{ color: c.text, lineHeight: 21 }}>{fact.text}</Text>
+              {fact.source && (
+                <Text
+                  onPress={() => Linking.openURL(fact.source!).catch(() => undefined)}
+                  accessibilityRole="link"
+                  accessibilityLabel={t('place.sourceA11y', { site: hostOf(fact.source) })}
+                  style={{ color, fontSize: 12, textDecorationLine: 'underline' }}
+                  testID="fact-source"
+                >
+                  {t('place.source', { site: hostOf(fact.source) })}
+                </Text>
+              )}
+            </View>
           </View>
         ) : (
           <View
@@ -70,23 +83,6 @@ export function PlaceLearn({ place, unlocked }: { place: Place; unlocked: boolea
             <Text style={{ fontWeight: '800', color }}>{t('place.lookFor')}: </Text>
             {d.lookFor}
           </Text>
-        </View>
-      )}
-      {d.sources && d.sources.length > 0 && (
-        <View style={styles.sources} testID="place-sources">
-          <Text style={{ color: c.textMuted, fontSize: 12, fontWeight: '700' }}>
-            {t('place.sources')}:
-          </Text>
-          {d.sources.map((url) => (
-            <Text
-              key={url}
-              onPress={() => Linking.openURL(url).catch(() => undefined)}
-              accessibilityRole="link"
-              style={{ color, fontSize: 12, textDecorationLine: 'underline' }}
-            >
-              {hostOf(url)}
-            </Text>
-          ))}
         </View>
       )}
     </View>
@@ -176,5 +172,4 @@ const styles = StyleSheet.create({
     padding: space.md,
   },
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: space.sm },
-  sources: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, alignItems: 'center' },
 });

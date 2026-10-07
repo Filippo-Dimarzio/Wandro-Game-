@@ -6,6 +6,12 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Sintra facts checked against sources: every fact now stores its source URL next to it (shown
+  as "Source: …" under the fact), and facts from local sources are flagged for curator review.
+  Lagoa Azul, Chalet Biester, Portela station, Casa de Teatro, Almoçageme, the Natural History
+  Museum and the Banzão and Galamares tram stops use only checked facts. The Toy Museum (closed
+  31 Aug 2014) is removed; the NewsMuseum in the same building waits as a draft for review.
+
 - Checked facts with sources for six Sintra places (Lagoa Azul, the tram, the Natural History
   Museum, Casa de Teatro, Portela station, Almoçageme); the Learn tab links each source.
 

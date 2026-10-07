@@ -50,7 +50,7 @@ export const DEMO_COLLECTIONS: CollectionDef[] = [
     description: 'Places fewer than 20 explorers have found.',
     theme: 'other',
     region: 'sintra',
-    placeIds: ['demo-condessa', 'demo-cruz-alta', 'demo-brinquedo', 'demo-music'],
+    placeIds: ['demo-condessa', 'demo-cruz-alta', 'demo-sintra-almocageme', 'demo-music'],
   }),
   ...CITY_SETS.map((s) =>
     set({

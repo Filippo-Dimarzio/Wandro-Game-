@@ -125,15 +125,6 @@ const SINTRA_PLACES: Place[] = [
     'The highest point of the Sintra hills.',
   ),
   p(
-    'demo-brinquedo',
-    'Toy Museum',
-    'culture',
-    38.8,
-    -9.3867,
-    3,
-    'Quirky museum of toys from across the centuries.',
-  ),
-  p(
     'demo-music',
     'Sintra Live Music Corner',
     'music_events',

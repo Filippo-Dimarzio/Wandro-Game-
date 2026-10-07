@@ -30,7 +30,7 @@ export const CULTURE_THEME_QUESTS = [
       38.796,
       -9.473,
       15,
-      'A village of whitewashed houses where Colares locals meet over coffee before the beach. Quest: find the old fountain.',
+      'A village named after its running water, with a festival every October since 1758. Quest: find a stream coming down from the hills.',
     ],
   ]),
   ...quests('lisbon', [
