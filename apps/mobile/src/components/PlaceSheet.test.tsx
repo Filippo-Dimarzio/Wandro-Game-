@@ -43,9 +43,9 @@ describe('PlaceSheet', () => {
   });
 
   const pena = DEMO_PLACES.find((p) => p.id === 'demo-pena')!;
-  const [fact1, fact2] = pena.details!.facts.map((f) => f.text);
+  const [fact1, fact2, fact3] = pena.details!.facts.map((f) => f.text);
 
-  it('Learn shows one fact before discovery and blurs the rest', async () => {
+  it('Learn shows every fact before discovery', async () => {
     await render(
       <PlaceSheet place={pena} userPosition={pena} unlocked={false} onClose={() => {}} />,
       { wrapper },
@@ -54,8 +54,8 @@ describe('PlaceSheet', () => {
     await fireEvent.press(screen.getByTestId('tab-learn'));
     expect(screen.getByText(pena.details!.teaser)).toBeOnTheScreen();
     expect(screen.getByText(fact1!)).toBeOnTheScreen();
-    expect(screen.queryByText(fact2!)).toBeNull();
-    expect(screen.getAllByTestId('fact-locked')).toHaveLength(2);
+    expect(screen.getByText(fact2!)).toBeOnTheScreen();
+    expect(screen.getByText(fact3!)).toBeOnTheScreen();
     expect(screen.getByText(/Triton arch/)).toBeOnTheScreen();
   });
 

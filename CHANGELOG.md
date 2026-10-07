@@ -9,6 +9,7 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - The place card shows About · Learn · Plan straight away, with the place's teaser and a
   fact count on Learn ("Learn · 3"). One tap opens the card on that tab; no need to find the
   handle first.
+- Every fact on Learn is readable before you visit; nothing is blurred until discovery.
 - Day streak, Duolingo style: a 🔥 counter on Home that lights up once you complete a challenge
   today, a week view (Monday to Sunday) with a flame on each day played, an "at risk" nudge when
   you haven't played yet today, and a streak celebration on the reward card for the first

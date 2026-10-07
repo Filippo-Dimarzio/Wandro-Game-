@@ -173,7 +173,6 @@ export const en = {
   'place.tabPlan': 'Plan',
   'place.tabLearnCount': 'Learn · {count}',
   'place.tabLearnA11y': 'Learn: {count} facts about this place',
-  'place.factLocked': 'Discover this place to reveal this fact',
   'place.lookFor': 'Look for',
   'place.source': 'Source: {site}',
   'place.sourceA11y': 'Source for this fact: {site}',

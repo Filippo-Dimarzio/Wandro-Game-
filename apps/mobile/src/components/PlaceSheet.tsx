@@ -211,7 +211,7 @@ export function PlaceSheet({
       {expanded && tab !== 'about' && (
         <ScrollView style={{ maxHeight: height * 0.4 }} contentContainerStyle={{ gap: space.md }}>
           {tab === 'learn' ? (
-            <PlaceLearn place={place} unlocked={unlocked} />
+            <PlaceLearn place={place} />
           ) : (
             <PlacePlan place={place} others={others} />
           )}

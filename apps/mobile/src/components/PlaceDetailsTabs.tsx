@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Linking, StyleSheet, Text, View } from 'react-native';
-import { FREE_FACTS, formatDistance, haversineMeters, type Place } from '@wandro/shared';
+import { formatDistance, haversineMeters, type Place } from '@wandro/shared';
 import { t } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
 
@@ -24,8 +24,8 @@ export function durationLabel(min: number): string {
     : t('place.durationHours', { hours: Math.round((min / 60) * 2) / 2 });
 }
 
-/** Learn tab: teaser, facts (blurred after the first until discovery) and something to look for. */
-export function PlaceLearn({ place, unlocked }: { place: Place; unlocked: boolean }) {
+/** Learn tab: teaser, every fact (readable before you go) and something to look for. */
+export function PlaceLearn({ place }: { place: Place }) {
   const c = useColors();
   const d = place.details;
   const color = c.category[place.category];
@@ -33,49 +33,27 @@ export function PlaceLearn({ place, unlocked }: { place: Place; unlocked: boolea
   return (
     <View style={styles.panel} testID="place-learn">
       <Text style={[styles.teaser, { color: c.text }]}>{d.teaser}</Text>
-      {d.facts.map((fact, i) =>
-        unlocked || i < FREE_FACTS ? (
-          <View key={i} style={styles.fact}>
-            <View style={[styles.num, { backgroundColor: color }]}>
-              <Text style={{ color: c.onCategory, fontWeight: '900', fontSize: 12 }}>{i + 1}</Text>
-            </View>
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={{ color: c.text, lineHeight: 21 }}>{fact.text}</Text>
-              {fact.source && (
-                <Text
-                  onPress={() => Linking.openURL(fact.source!).catch(() => undefined)}
-                  accessibilityRole="link"
-                  accessibilityLabel={t('place.sourceA11y', { site: hostOf(fact.source) })}
-                  style={{ color, fontSize: 12, textDecorationLine: 'underline' }}
-                  testID="fact-source"
-                >
-                  {t('place.source', { site: hostOf(fact.source) })}
-                </Text>
-              )}
-            </View>
+      {d.facts.map((fact, i) => (
+        <View key={i} style={styles.fact}>
+          <View style={[styles.num, { backgroundColor: color }]}>
+            <Text style={{ color: c.onCategory, fontWeight: '900', fontSize: 12 }}>{i + 1}</Text>
           </View>
-        ) : (
-          <View
-            key={i}
-            style={styles.fact}
-            accessible
-            accessibilityLabel={t('place.factLocked')}
-            testID="fact-locked"
-          >
-            <View style={[styles.num, { backgroundColor: c.border }]}>
-              <Ionicons name="lock-closed" size={12} color={c.textMuted} />
-            </View>
-            {/* Redacted bars instead of the text, so nothing leaks before discovery. */}
-            <View style={{ flex: 1, gap: 6 }}>
-              <View style={[styles.bar, { backgroundColor: c.border, width: '92%' }]} />
-              <View style={[styles.bar, { backgroundColor: c.border, width: '64%' }]} />
-            </View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={{ color: c.text, lineHeight: 21 }}>{fact.text}</Text>
+            {fact.source && (
+              <Text
+                onPress={() => Linking.openURL(fact.source!).catch(() => undefined)}
+                accessibilityRole="link"
+                accessibilityLabel={t('place.sourceA11y', { site: hostOf(fact.source) })}
+                style={{ color, fontSize: 12, textDecorationLine: 'underline' }}
+                testID="fact-source"
+              >
+                {t('place.source', { site: hostOf(fact.source) })}
+              </Text>
+            )}
           </View>
-        ),
-      )}
-      {d.facts.length > FREE_FACTS && !unlocked && (
-        <Text style={{ color: c.textMuted, fontSize: 13 }}>{t('place.factLocked')}</Text>
-      )}
+        </View>
+      ))}
       {d.lookFor && (
         <View style={[styles.lookFor, { backgroundColor: c.categoryTint[place.category] }]}>
           <Ionicons name="eye-outline" size={18} color={color} />
@@ -163,7 +141,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 1,
   },
-  bar: { height: 10, borderRadius: 5 },
   lookFor: {
     flexDirection: 'row',
     alignItems: 'flex-start',

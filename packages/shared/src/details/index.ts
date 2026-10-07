@@ -4,9 +4,6 @@ import { SINTRA_DETAILS } from './sintra';
 /** Learn and Plan content by place id. Sintra is the pilot; other cities follow after review. */
 export const PLACE_DETAILS: Record<string, PlaceDetails> = { ...SINTRA_DETAILS };
 
-/** Facts shown before discovery; the rest stay blurred until the place is found. */
-export const FREE_FACTS = 1;
-
 // The seed's source_id for a demo place id (the Sintra music corner predates the naming rule).
 const SOURCE_ID_OVERRIDES: Record<string, string> = { 'demo-music': 'music-corner' };
 export const seedSourceId = (id: string) => SOURCE_ID_OVERRIDES[id] ?? id.replace(/^demo-/, '');
