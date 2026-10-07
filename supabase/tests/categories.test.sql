@@ -11,4 +11,9 @@ select pg_temp.check(
 select pg_temp.check(
   (select base_points from places where source = 'seed' and source_id = 'lisbon-pasteis-belem') = 100,
   'moved places earn their new category''s base points');
+select pg_temp.check(
+  (select category from places where source = 'seed' and source_id = 'lisbon-aqueduct') = 'heritage'
+  and (select count(*) from places where source = 'seed' and category = 'culture'
+       and source_id in ('aveiro-moliceiro-ride', 'aveiro-sao-jacinto-ferry')) = 2,
+  'the aqueduct is Heritage; the boat ride and ferry are Culture');
 rollback;

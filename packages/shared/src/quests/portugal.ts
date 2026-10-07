@@ -434,7 +434,7 @@ export const PORTUGAL_QUESTS = [
     [
       'aqueduct',
       'Águas Livres Aqueduct',
-      'other',
+      'heritage',
       38.73,
       -9.168,
       300,
@@ -1347,7 +1347,7 @@ export const PORTUGAL_QUESTS = [
     [
       'moliceiro-ride',
       'Moliceiro Boat Ride',
-      'other',
+      'culture',
       40.6415,
       -8.6558,
       1000,
@@ -1356,7 +1356,7 @@ export const PORTUGAL_QUESTS = [
     [
       'sao-jacinto-ferry',
       'São Jacinto Ferry',
-      'other',
+      'culture',
       40.665,
       -8.739,
       100,

@@ -10,7 +10,9 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
   Pastéis de Belém, A Ginjinha, Feira da Ladra, Majestic Café and others) move to Culture. New
   curiosities keep five per city: Capuchos cork convent, Vila Sassetti path, Casa dos Bicos,
   Prazeres Cemetery, Cais das Colunas, São Roque, Agramonte Cemetery, Cedofeita, Senhor da Pedra,
-  Arrábida Bridge, Arch of Dona Isabel, Graça giants and the Santo André museum ship.
+  Arrábida Bridge, Arch of Dona Isabel, Graça giants and the Santo André museum ship. The Águas
+  Livres Aqueduct moves to Heritage and the moliceiro boat ride and São Jacinto ferry to Culture;
+  São Domingos Church, Senhor das Barrocas Chapel and Cais do Bico join Curiosities.
 
 - Category circles are filled edge to edge: each card is zoomed inside its ring so its painted
   frame no longer shows. On sign-up, "Museums & art" now shows the Art & museums card, and a new

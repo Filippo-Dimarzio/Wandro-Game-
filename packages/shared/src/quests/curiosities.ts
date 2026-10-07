@@ -62,6 +62,15 @@ export const CURIOSITY_QUESTS = [
       55,
       'A plain church hiding a chapel built in Rome from lapis lazuli and gold, blessed by the Pope and shipped to Lisbon in 1747. Quest: find the mosaic that looks like a painting.',
     ],
+    [
+      'sao-domingos',
+      'São Domingos Church',
+      'other',
+      38.7148,
+      -9.1374,
+      70,
+      'Gutted by fire in 1959 and reopened with its scorched columns and blackened walls left as they were. Quest: find a cracked column.',
+    ],
   ]),
   ...quests('porto', [
     [
@@ -139,6 +148,24 @@ export const CURIOSITY_QUESTS = [
       -8.6468,
       40,
       'A green valley of lawns, ponds and old trees running below the city centre. Quest: find a bench by the water.',
+    ],
+    [
+      'senhor-das-barrocas',
+      'Senhor das Barrocas Chapel',
+      'other',
+      40.6397,
+      -8.6423,
+      15,
+      'A small Baroque chapel built on an eight-sided plan, rare in Portugal. Quest: count its sides from outside.',
+    ],
+    [
+      'cais-do-bico',
+      'Cais do Bico, Murtosa',
+      'other',
+      40.733,
+      -8.654,
+      20,
+      'A quiet lagoon quay where painted moliceiro boats are still built and moored. Quest: find a prow with a cheeky painted joke.',
     ],
   ]),
 ];

@@ -131,7 +131,7 @@ from (values
   ('lisbon', 'lisbon-pilar-7', 'Pillar 7 Bridge Experience', 'Inside a pillar of the 25 de Abril bridge. Quest: stand on the glass deck as the trains pass.', 'culture', 100, 38.6945, -9.1755, false, null),
   ('lisbon', 'lisbon-pasteis-belem', 'Pastéis de Belém', 'The custard tarts of the Jerónimos monks, made to a secret recipe since 1837. Quest: eat one with cinnamon.', 'culture', 100, 38.6975, -9.2032, false, null),
   ('lisbon', 'lisbon-feira-ladra', 'Feira da Ladra', 'The Thieves’ Market, held since the 13th century. Quest: find an old azulejo tile.', 'culture', 100, 38.715, -9.127, false, null),
-  ('lisbon', 'lisbon-aqueduct', 'Águas Livres Aqueduct', 'Its arches survived the 1755 earthquake that flattened the city. Quest: walk along the top.', 'other', 60, 38.73, -9.168, false, null),
+  ('lisbon', 'lisbon-aqueduct', 'Águas Livres Aqueduct', 'Its arches survived the 1755 earthquake that flattened the city. Quest: walk along the top.', 'heritage', 120, 38.73, -9.168, false, null),
   ('lisbon', 'lisbon-ginjinha', 'A Ginjinha', 'A doorway bar pouring cherry liqueur since 1840. Quest: ask for it “com elas”, with the cherries.', 'culture', 100, 38.714, -9.138, false, null),
   ('lisbon', 'lisbon-pink-street', 'Pink Street', 'Once the sailors’ red-light street, now painted pink. Quest: find a bar named after an old brothel.', 'culture', 100, 38.7068, -9.144, false, null),
   ('lisbon', 'lisbon-recolhimento', 'Miradouro do Recolhimento', 'A walled garden viewpoint below the castle that few people find. Quest: find the gate.', 'other', 60, 38.7118, -9.133, true, null),
@@ -231,8 +231,8 @@ from (values
   ('aveiro', 'aveiro-ovos-moles', 'Ovos Moles', 'Egg sweets in wafer shells shaped like shells and fish. Quest: try one.', 'culture', 100, 40.6415, -8.6505, false, null),
   ('aveiro', 'aveiro-mercado-peixe', 'Mercado do Peixe', 'The fish market by the canal. Quest: find the grilled sardines.', 'culture', 100, 40.6445, -8.6575, false, null),
   ('aveiro', 'aveiro-lacos', 'Bridge of Friendship Ribbons', 'Ribbons tied by friends and lovers. Quest: tie one.', 'other', 60, 40.643, -8.653, false, null),
-  ('aveiro', 'aveiro-moliceiro-ride', 'Moliceiro Boat Ride', 'The boats that once gathered seaweed. Quest: take a ride.', 'other', 60, 40.6415, -8.6558, false, null),
-  ('aveiro', 'aveiro-sao-jacinto-ferry', 'São Jacinto Ferry', 'A ferry across the lagoon mouth. Quest: cross.', 'other', 60, 40.665, -8.739, false, null),
+  ('aveiro', 'aveiro-moliceiro-ride', 'Moliceiro Boat Ride', 'The boats that once gathered seaweed. Quest: take a ride.', 'culture', 100, 40.6415, -8.6558, false, null),
+  ('aveiro', 'aveiro-sao-jacinto-ferry', 'São Jacinto Ferry', 'A ferry across the lagoon mouth. Quest: cross.', 'culture', 100, 40.665, -8.739, false, null),
   ('aveiro', 'aveiro-misericordia', 'Misericórdia Church', 'A tiled church with a lions’ portal. Quest: find the lions.', 'heritage', 120, 40.6413, -8.652, true, null),
   ('aveiro', 'aveiro-botiroes', 'Cais dos Botirões', 'Tiles of old fishermen on the quay. Quest: find the tile.', 'other', 60, 40.6455, -8.651, true, null),
   ('sintra', 'sintra-cafe-saudade', 'Café Saudade', 'Once the Mathilde bakery, where Sintra’s queijadas were made for the day-trippers off the train. Quest: order one with a galão.', 'culture', 100, 38.7998, -9.3818, false, null),
@@ -256,6 +256,7 @@ from (values
   ('lisbon', 'lisbon-prazeres', 'Prazeres Cemetery', 'A city of the dead: streets of family mausoleums, some with windows you can peer into. Quest: find a mausoleum with an angel on the roof.', 'other', 60, 38.7135, -9.17, false, null),
   ('lisbon', 'lisbon-cais-das-colunas', 'Cais das Colunas', 'Two marble columns and a stair into the Tagus, where kings and ambassadors once stepped ashore. Quest: photograph the columns with the river behind.', 'other', 60, 38.7067, -9.1363, false, null),
   ('lisbon', 'lisbon-sao-roque', 'São Roque Church', 'A plain church hiding a chapel built in Rome from lapis lazuli and gold, blessed by the Pope and shipped to Lisbon in 1747. Quest: find the mosaic that looks like a painting.', 'other', 60, 38.7133, -9.1434, false, null),
+  ('lisbon', 'lisbon-sao-domingos', 'São Domingos Church', 'Gutted by fire in 1959 and reopened with its scorched columns and blackened walls left as they were. Quest: find a cracked column.', 'other', 60, 38.7148, -9.1374, false, null),
   ('porto', 'porto-agramonte', 'Agramonte Cemetery', 'Art Nouveau tombs, mourning statues and family chapels, built after a cholera outbreak in 1855. Quest: find a weeping statue.', 'other', 60, 41.1561, -8.6305, false, null),
   ('porto', 'porto-cedofeita', 'Old Church of Cedofeita', 'A tiny Romanesque church that may be the oldest in Porto, hidden behind its big modern namesake. Quest: find the carved animals on the doorway.', 'other', 60, 41.1546, -8.6189, false, null),
   ('porto', 'porto-senhor-da-pedra', 'Senhor da Pedra Chapel', 'A white hexagonal chapel standing on a rock in the surf at Miramar beach. Quest: photograph it with the waves behind.', 'other', 60, 41.0723, -8.6631, false, null),
@@ -263,7 +264,9 @@ from (values
   ('evora', 'evora-arco-isabel', 'Arch of Dona Isabel', 'A Roman gateway still standing in the old city wall, with houses built around it. Quest: walk through it.', 'other', 60, 38.5737, -7.9113, false, null),
   ('evora', 'evora-graca', 'Graça Church Giants', 'A church front guarded by four stone giants that locals call the Meninos da Graça, the Graça boys. Quest: count the giants.', 'other', 60, 38.5687, -7.9068, false, null),
   ('aveiro', 'aveiro-santo-andre', 'Santo André Museum Ship', 'A real cod-fishing trawler from 1948, now a museum ship you can walk through. Quest: find the cod hold.', 'other', 60, 40.634, -8.7135, false, null),
-  ('aveiro', 'aveiro-baixa-santo-antonio', 'Baixa de Santo António Park', 'A green valley of lawns, ponds and old trees running below the city centre. Quest: find a bench by the water.', 'nature', 80, 40.6377, -8.6468, false, null)
+  ('aveiro', 'aveiro-baixa-santo-antonio', 'Baixa de Santo António Park', 'A green valley of lawns, ponds and old trees running below the city centre. Quest: find a bench by the water.', 'nature', 80, 40.6377, -8.6468, false, null),
+  ('aveiro', 'aveiro-senhor-das-barrocas', 'Senhor das Barrocas Chapel', 'A small Baroque chapel built on an eight-sided plan, rare in Portugal. Quest: count its sides from outside.', 'other', 60, 40.6397, -8.6423, false, null),
+  ('aveiro', 'aveiro-cais-do-bico', 'Cais do Bico, Murtosa', 'A quiet lagoon quay where painted moliceiro boats are still built and moored. Quest: find a prow with a cheeky painted joke.', 'other', 60, 40.733, -8.654, false, null)
 ) as v(region, source_id, name, description, category, base_points, lat, lng, hidden, hours)
 join public.regions r on r.slug = v.region
 on conflict (source, source_id) do nothing;
