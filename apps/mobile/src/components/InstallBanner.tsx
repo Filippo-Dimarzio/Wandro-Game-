@@ -14,14 +14,14 @@ import { useSession } from '@/state/session';
 import { radius, space, useColors } from '@/theme';
 
 /** "Get Wandro on your desktop": install the web app, or download the desktop installer. */
-export function InstallBanner() {
+export function InstallBanner({ always = false }: { always?: boolean }) {
   const c = useColors();
   const dismissed = useSession((s) => s.installPromptDismissed);
   const dismiss = useSession((s) => s.dismissInstallPrompt);
   const [canInstall, setCanInstall] = useState(canPromptInstall());
   useEffect(() => onInstallAvailabilityChange(() => setCanInstall(canPromptInstall())), []);
 
-  if (!isWeb || isInstalled || dismissed) return null;
+  if (!isWeb || isInstalled || (dismissed && !always)) return null;
 
   return (
     <View
@@ -34,14 +34,16 @@ export function InstallBanner() {
           <Text style={{ color: c.text, fontWeight: '800' }}>{t('install.title')}</Text>
           <Text style={{ color: c.textMuted, fontSize: 13 }}>{t('install.body')}</Text>
         </View>
-        <Pressable
-          onPress={dismiss}
-          accessibilityRole="button"
-          accessibilityLabel={t('install.dismiss')}
-          hitSlop={10}
-        >
-          <Ionicons name="close" size={20} color={c.textMuted} />
-        </Pressable>
+        {!always && (
+          <Pressable
+            onPress={dismiss}
+            accessibilityRole="button"
+            accessibilityLabel={t('install.dismiss')}
+            hitSlop={10}
+          >
+            <Ionicons name="close" size={20} color={c.textMuted} />
+          </Pressable>
+        )}
       </View>
       <View style={styles.row}>
         {canInstall && (

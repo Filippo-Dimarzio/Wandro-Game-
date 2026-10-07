@@ -11,6 +11,13 @@ const wrapper = queryWrapper();
 describe('DailyChallengeCard (demo mode)', () => {
   beforeEach(() => useSession.getState().reset());
 
+  it('keeps the description behind Details so the card stays short', async () => {
+    await render(<DailyChallengeCard places={DEMO_PLACES} />, { wrapper });
+    expect(screen.queryByText(/discover/i)).toBeNull();
+    await fireEvent.press(screen.getByTestId('challenge-details'));
+    expect(screen.getByText(/discover/i)).toBeOnTheScreen();
+  });
+
   it('stays locked until a matching place is discovered, then a hold claims double coins once', async () => {
     jest.useFakeTimers();
     await render(<DailyChallengeCard places={DEMO_PLACES} />, { wrapper });

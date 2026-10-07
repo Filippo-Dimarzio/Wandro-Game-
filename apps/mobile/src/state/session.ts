@@ -120,6 +120,8 @@ interface SessionState extends DemoProgress {
   /** Demo-only switch so the moderation screens can be tried. */
   demoModerator: boolean;
   installPromptDismissed: boolean;
+  /** Home tips the player closed (e.g. 'howto', 'join'); they stay reachable from Profile. */
+  dismissedTips: string[];
   prefs: { dailyReminder: boolean; theme?: ThemePref };
 
   completeOnboarding: (profile: LocalProfile) => void;
@@ -153,6 +155,7 @@ interface SessionState extends DemoProgress {
   lightBeacon: (id: string) => 'no_beacon' | 'challenge_not_found' | null;
   setDemoModerator: (on: boolean) => void;
   dismissInstallPrompt: () => void;
+  dismissTip: (id: string) => void;
   setPref: (key: 'dailyReminder', value: boolean) => void;
   setTheme: (theme: ThemePref) => void;
   reset: () => void;
@@ -183,6 +186,7 @@ const initial = {
   landedAt: 0,
   demoModerator: false,
   installPromptDismissed: false,
+  dismissedTips: [],
   prefs: { dailyReminder: true },
 };
 
@@ -437,6 +441,10 @@ export const useSession = create<SessionState>()(
         })),
       setDemoModerator: (demoModerator) => set({ demoModerator }),
       dismissInstallPrompt: () => set({ installPromptDismissed: true }),
+      dismissTip: (id) =>
+        set((s) => ({
+          dismissedTips: s.dismissedTips.includes(id) ? s.dismissedTips : [...s.dismissedTips, id],
+        })),
       setPref: (key, value) => set((s) => ({ prefs: { ...s.prefs, [key]: value } })),
       setTheme: (theme) => set((s) => ({ prefs: { ...s.prefs, theme } })),
       reset: () => set({ ...initial, friendChallenges: initialFriendChallenges() }),

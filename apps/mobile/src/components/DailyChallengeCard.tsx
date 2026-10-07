@@ -47,6 +47,7 @@ export function DailyChallengeCard({
   const c = useColors();
   const { challenge, confirm } = useDailyChallenge(places);
   const [now, setNow] = useState(Date.now());
+  const [details, setDetails] = useState(false);
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 30_000);
     return () => clearInterval(id);
@@ -108,13 +109,25 @@ export function DailyChallengeCard({
         <Text style={[styles.title, { color: c.text }]} accessibilityRole="header">
           {challenge.title}
         </Text>
-        <Text style={{ color: c.textMuted }}>{challenge.description}</Text>
         {!challenge.completedAt && !expired && (
           <Text style={[styles.timer, { color: c.textMuted }]}>
             {t('challenge.endsIn', { time: formatRemaining(remaining) })}
           </Text>
         )}
-        {cat && !challenge.completedAt && !expired && (
+        <Pressable
+          onPress={() => setDetails((d) => !d)}
+          accessibilityRole="button"
+          accessibilityState={{ expanded: details }}
+          style={styles.link}
+          testID="challenge-details"
+        >
+          <Text style={{ color: c.textMuted, fontWeight: '700' }}>
+            {details ? t('challenge.hideDetails') : t('challenge.details')}
+          </Text>
+          <Ionicons name={details ? 'chevron-up' : 'chevron-down'} size={16} color={c.textMuted} />
+        </Pressable>
+        {details && <Text style={{ color: c.textMuted }}>{challenge.description}</Text>}
+        {details && cat && !challenge.completedAt && !expired && (
           <Pressable
             onPress={() =>
               router.push({ pathname: '/discover/[category]', params: { category: cat } })
@@ -173,7 +186,7 @@ const styles = StyleSheet.create({
   picturedText: { color: '#fff', fontWeight: '700', fontSize: 12 },
   card: { borderRadius: radius.lg, overflow: 'hidden' },
   cover: {
-    height: 150,
+    height: 120,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',

@@ -12,7 +12,10 @@ import { useLoadout } from '@/data/loadout';
 import { useIsModerator } from '@/data/moderation';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { useWallet } from '@/data/wallet';
+import { InstallBanner } from '@/components/InstallBanner';
 import { LogOutButton } from '@/components/LogOutButton';
+import { ProgressStrip } from '@/components/ProgressStrip';
+import { isDemo } from '@/lib/env';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { PlaceMap } from '@/map/PlaceMap';
@@ -87,6 +90,9 @@ export default function Profile() {
           </View>
         )}
 
+        <Text style={[styles.section, { color: c.text }]}>{t('profile.progress')}</Text>
+        <ProgressStrip wallet={wallet} />
+
         <View style={styles.links}>
           <LinkButton
             icon="search"
@@ -113,6 +119,18 @@ export default function Profile() {
             label={t('profile.settings')}
             onPress={() => router.push('/settings')}
           />
+          <LinkButton
+            icon="help-circle"
+            label={t('howto.title')}
+            onPress={() => router.push('/howto')}
+          />
+          {isDemo && (
+            <LinkButton
+              icon="rocket"
+              label={t('joinCard.cta')}
+              onPress={() => router.push('/join?src=profile')}
+            />
+          )}
           {isModerator && (
             <LinkButton
               icon="shield-checkmark"
@@ -162,6 +180,7 @@ export default function Profile() {
           ))}
         </View>
 
+        <InstallBanner always />
         <LogOutButton />
       </ScrollView>
     </SafeAreaView>

@@ -8,6 +8,7 @@ export const en = {
   'joinCard.body':
     'This is the demo. The real game opens in Lisbon and Sintra in December. Save your spot and I’ll let you know. Bora?',
   'joinCard.cta': 'Join the beta',
+  'joinCard.dismiss': 'Hide this card',
   'portal.start': 'Bora? Start exploring',
 
   'register.title': 'Create your explorer',
@@ -108,6 +109,9 @@ export const en = {
   'home.notifications': 'Notifications',
   'home.interests': 'Discover by interest',
   'home.seeAll': 'See all',
+  'home.seeAllNearby': 'See all nearby',
+  'home.levelChip': 'Lv {level}',
+  'home.progressA11y': 'Level {level}, {streak}-day streak. Opens your progress',
   'home.discoveredBy': '{name} discovered {place}',
   'home.level': 'Level {level}',
   'home.xpExplainer':
@@ -455,6 +459,10 @@ export const en = {
     'When you arrive, hold “Start discovery” and stay a moment. The fog lifts and the coins are yours.',
   'howto.step4': 'Complete today’s challenge for double coins.',
   'howto.dismiss': 'Got it',
+  'nearby.empty': 'You have discovered everything near you. Pick another city on the map!',
+  'challenge.details': 'Details',
+  'challenge.hideDetails': 'Hide details',
+  'profile.progress': 'Your progress',
   'profile.settings': 'Settings',
   'install.title': 'Get Wandro on your desktop',
   'install.body': 'Install the app, or download it for Windows, macOS or Linux.',

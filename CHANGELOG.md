@@ -6,6 +6,13 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- A calmer Home: a slim header (explorer, greeting, a Lv · streak chip, coins, friends, search),
+  one tip at a time (how to play, then the beta invite, then install; each can be closed), a
+  shorter daily challenge with its details behind a tap, the 3 nearest places with "See all
+  nearby", and the interests row. Progress, leaderboard, how to play, the beta invite and the
+  desktop install now live on Profile; the theme switch is in Settings; a new Nearby page lists
+  every place still to discover.
+
 - Directions open the right place from anywhere: walking routes within 3 km, the maps app's own
   choice of car or transit across town, and the place itself (not a failed route from wherever
   the phone is) when the player is over 50 km away. One shared, tested helper for every

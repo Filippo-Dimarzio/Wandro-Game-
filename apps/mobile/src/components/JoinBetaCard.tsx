@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { t } from '@/i18n';
@@ -9,7 +10,7 @@ const BRAND = '#0E7C66';
 const CREAM = '#FBF1E4';
 
 /** On the demo site only: invites people who like the demo to join the beta waitlist. */
-export function JoinBetaCard() {
+export function JoinBetaCard({ onDismiss }: { onDismiss?: () => void }) {
   if (!isDemo) return null;
   return (
     <View style={styles.card} testID="join-beta-card">
@@ -18,6 +19,17 @@ export function JoinBetaCard() {
         <Text style={styles.title} accessibilityRole="header">
           {t('joinCard.title')}
         </Text>
+        {onDismiss && (
+          <Pressable
+            onPress={onDismiss}
+            accessibilityRole="button"
+            accessibilityLabel={t('joinCard.dismiss')}
+            hitSlop={10}
+            testID="join-beta-dismiss"
+          >
+            <Ionicons name="close" size={20} color={CREAM} />
+          </Pressable>
+        )}
       </View>
       <Text style={styles.body}>{t('joinCard.body')}</Text>
       <Pressable

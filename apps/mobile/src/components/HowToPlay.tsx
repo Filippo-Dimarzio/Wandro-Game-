@@ -1,15 +1,12 @@
-import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { t, type TranslationKey } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
 
 const STEPS: TranslationKey[] = ['howto.step1', 'howto.step2', 'howto.step3', 'howto.step4'];
 
-/** First-run guide, shown until the first discovery (or until dismissed). */
-export function HowToPlay() {
+/** The first-run guide: a Home tip until dismissed, and always on the How to play page. */
+export function HowToPlay({ onDismiss }: { onDismiss?: () => void }) {
   const c = useColors();
-  const [hidden, setHidden] = useState(false);
-  if (hidden) return null;
   return (
     <View
       style={[styles.card, { backgroundColor: c.surface, borderColor: c.accent }]}
@@ -26,13 +23,16 @@ export function HowToPlay() {
           <Text style={{ color: c.text, flex: 1 }}>{t(k)}</Text>
         </View>
       ))}
-      <Pressable
-        onPress={() => setHidden(true)}
-        accessibilityRole="button"
-        style={{ alignSelf: 'flex-end' }}
-      >
-        <Text style={{ color: c.accent, fontWeight: '800' }}>{t('howto.dismiss')}</Text>
-      </Pressable>
+      {onDismiss && (
+        <Pressable
+          onPress={onDismiss}
+          accessibilityRole="button"
+          style={{ alignSelf: 'flex-end', minHeight: 44, justifyContent: 'center' }}
+          testID="how-to-play-dismiss"
+        >
+          <Text style={{ color: c.accent, fontWeight: '800' }}>{t('howto.dismiss')}</Text>
+        </Pressable>
+      )}
     </View>
   );
 }
