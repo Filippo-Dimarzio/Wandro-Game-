@@ -6,6 +6,9 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Quinta do Relógio and Quinta da Penha Verde are private estates: they are marked private and
+  closed (never an active challenge), and the Sintra National Palace moves to Heritage.
+
 - Sintra facts checked against sources: every fact now stores its source URL next to it (shown
   as "Source: …" under the fact), and facts from local sources are flagged for curator review.
   Lagoa Azul, Chalet Biester, Portela station, Casa de Teatro, Almoçageme, the Natural History

@@ -388,27 +388,6 @@ export const SINTRA_DETAILS: Record<string, PlaceDetails> = {
     cost: 'ticket',
     access: 'trail',
   },
-  'demo-sintra-quinta-relogio': {
-    teaser: 'A neo-Moorish house where a king spent his honeymoon.',
-    facts: [
-      { text: 'It was built around 1860 in a Moorish Revival style.' },
-      { text: 'King Carlos and Queen Amélia spent their honeymoon here in 1886.' },
-    ],
-    lookFor: 'The horseshoe arches, seen from the road.',
-    durationMin: 10,
-    cost: 'free',
-    access: 'step_free',
-    tip: 'Private property: enjoy it from the road.',
-  },
-  'demo-sintra-penha-verde': {
-    teaser: 'The wooded estate of a 16th-century viceroy of India.',
-    facts: [
-      { text: 'João de Castro, viceroy of Portuguese India, made this estate his retreat.' },
-      { text: 'Legend says he planted trees here that he brought back from Asia.' },
-    ],
-    durationMin: 15,
-    tip: 'Private estate: view it from the road unless it is open for an event.',
-  },
   'demo-sintra-chalet-biester': {
     teaser: 'The chalet where Hollywood came to film The Ninth Gate.',
     facts: [

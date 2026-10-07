@@ -60,7 +60,7 @@ const LAUNCH_PLACES: Place[] = [
     'sintra',
     'sintra-national-palace',
     'Sintra National Palace',
-    'culture',
+    'heritage',
     38.7976,
     -9.3906,
     3800,
