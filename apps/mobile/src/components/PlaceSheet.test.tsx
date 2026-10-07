@@ -41,4 +41,62 @@ describe('PlaceSheet', () => {
       params: { category: 'coast' },
     });
   });
+
+  const pena = DEMO_PLACES.find((p) => p.id === 'demo-pena')!;
+  const [fact1, fact2] = pena.details!.facts;
+
+  it('Learn shows one fact before discovery and blurs the rest', async () => {
+    await render(
+      <PlaceSheet place={pena} userPosition={pena} unlocked={false} onClose={() => {}} />,
+      { wrapper },
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
+    await fireEvent.press(screen.getByTestId('tab-learn'));
+    expect(screen.getByText(pena.details!.teaser)).toBeOnTheScreen();
+    expect(screen.getByText(fact1!)).toBeOnTheScreen();
+    expect(screen.queryByText(fact2!)).toBeNull();
+    expect(screen.getAllByTestId('fact-locked')).toHaveLength(2);
+    expect(screen.getByText(/Triton arch/)).toBeOnTheScreen();
+  });
+
+  it('Learn reveals every fact once discovered', async () => {
+    await render(<PlaceSheet place={pena} userPosition={pena} unlocked onClose={() => {}} />, {
+      wrapper,
+    });
+    await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
+    await fireEvent.press(screen.getByTestId('tab-learn'));
+    expect(screen.getByText(fact2!)).toBeOnTheScreen();
+    expect(screen.queryByTestId('fact-locked')).toBeNull();
+  });
+
+  it('Plan shows time, cost, access and a nearby place to pair it with', async () => {
+    const mouros = DEMO_PLACES.find((p) => p.id === 'demo-mouros')!;
+    await render(
+      <PlaceSheet
+        place={pena}
+        others={[pena, mouros, adraga]}
+        userPosition={pena}
+        unlocked={false}
+        onClose={() => {}}
+      />,
+      { wrapper },
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
+    await fireEvent.press(screen.getByTestId('tab-plan'));
+    expect(screen.getByText('About 2 h')).toBeOnTheScreen();
+    expect(screen.getByText('Ticket needed')).toBeOnTheScreen();
+    expect(screen.getByText('Steep climb')).toBeOnTheScreen();
+    expect(screen.getByText(/^Castle of the Moors · /)).toBeOnTheScreen();
+  });
+
+  it('Plan shows safety and access tips', async () => {
+    const cabo = DEMO_PLACES.find((p) => p.id === 'demo-cabo')!;
+    await render(
+      <PlaceSheet place={cabo} userPosition={cabo} unlocked={false} onClose={() => {}} />,
+      { wrapper },
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
+    await fireEvent.press(screen.getByTestId('tab-plan'));
+    expect(screen.getByTestId('place-tip')).toHaveTextContent(/fences/);
+  });
 });

@@ -354,6 +354,7 @@ export default function Explore() {
         {selected && (
           <PlaceSheet
             place={selected}
+            others={all}
             userPosition={loc.position}
             unlocked={ids.has(selected.id)}
             onClose={() => setSelected(null)}

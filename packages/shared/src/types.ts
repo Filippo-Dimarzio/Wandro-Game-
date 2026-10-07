@@ -35,6 +35,34 @@ export interface Place {
   region?: string;
   /** Hidden gem: kept off the map until the player comes within HIDDEN_REVEAL_RADIUS_M. */
   hidden?: boolean;
+  /** Learn and Plan content for the place sheet (see details/). */
+  details?: PlaceDetails;
+}
+
+/** How hard a place is to reach on foot, from easiest. */
+export type PlaceAccess = 'step_free' | 'some_steps' | 'steep' | 'trail';
+
+/** What a visit costs: free, a ticket, or money to spend inside (a café, a bar, a tasting). */
+export type PlaceCost = 'free' | 'ticket' | 'paid';
+
+/**
+ * Optional story and practical notes shown on the place sheet: the Learn tab (teaser, facts, a
+ * detail to look for) and the Plan tab. Facts after the first stay blurred until discovery.
+ */
+export interface PlaceDetails {
+  /** One line on why it's worth going. */
+  teaser: string;
+  /** One to three short, checkable facts. */
+  facts: string[];
+  /** Something to spot once you're there. */
+  lookFor?: string;
+  bestTime?: string;
+  /** Typical visit length in minutes. */
+  durationMin?: number;
+  cost?: PlaceCost;
+  access?: PlaceAccess;
+  /** Practical or safety note, e.g. "Private estate: view it from the road". */
+  tip?: string;
 }
 
 export interface VisitSummary {

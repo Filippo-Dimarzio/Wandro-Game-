@@ -1,3 +1,4 @@
+import { detailsSql } from './details';
 import { EUROPE_PLACES } from './europe-places';
 import { CITY_SETS } from './sets';
 
@@ -52,6 +53,9 @@ ${setPlaces.join(',\n')}
 join public.collections c on c.slug = v.slug
 join public.places p on p.source = 'seed' and p.source_id = v.source_id
 on conflict do nothing;
+
+-- Learn and Plan content for the place sheet (PLACE_DETAILS).
+${detailsSql()}
 ${SEED_END}`;
 }
 

@@ -1,0 +1,24 @@
+import type { PlaceDetails } from '../types';
+import { SINTRA_DETAILS } from './sintra';
+
+/** Learn and Plan content by place id. Sintra is the pilot; other cities follow after review. */
+export const PLACE_DETAILS: Record<string, PlaceDetails> = { ...SINTRA_DETAILS };
+
+/** Facts shown before discovery; the rest stay blurred until the place is found. */
+export const FREE_FACTS = 1;
+
+// The seed's source_id for a demo place id (the Sintra music corner predates the naming rule).
+const SOURCE_ID_OVERRIDES: Record<string, string> = { 'demo-music': 'music-corner' };
+export const seedSourceId = (id: string) => SOURCE_ID_OVERRIDES[id] ?? id.replace(/^demo-/, '');
+
+const q = (s: string) => `'${s.replace(/'/g, "''")}'`;
+
+/** One UPDATE per place, so the database carries the same details as demo mode. */
+export function detailsSql(details: Record<string, PlaceDetails> = PLACE_DETAILS): string {
+  return Object.entries(details)
+    .map(
+      ([id, d]) =>
+        `update public.places set details = ${q(JSON.stringify(d))}::jsonb where source = 'seed' and source_id = ${q(seedSourceId(id))};`,
+    )
+    .join('\n');
+}

@@ -2,7 +2,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { directionsUrl } from '@/lib/directions';
 import {
   formatDistance,
@@ -17,12 +25,23 @@ import { isDemo } from '@/lib/env';
 import { scheduleLines } from '@/lib/hours';
 import { radius, space, useColors } from '@/theme';
 import { CategoryPill, HoursChip } from './PlaceBits';
+import { PlaceLearn, PlacePlan } from './PlaceDetailsTabs';
 import { TimeQuestBadge } from './TimeQuestBadge';
 
 export { categoryIcon } from '@/categories';
 
+type Tab = 'about' | 'learn' | 'plan';
+const TABS: Tab[] = ['about', 'learn', 'plan'];
+const TAB_LABEL = {
+  about: 'place.tabAbout',
+  learn: 'place.tabLearn',
+  plan: 'place.tabPlan',
+} as const;
+
 interface Props {
   place: Place;
+  /** Other places on the map, to suggest one to pair with on the Plan tab. */
+  others?: Place[];
   userPosition: LatLng;
   unlocked: boolean;
   onClose: () => void;
@@ -32,9 +51,19 @@ interface Props {
 }
 
 /** Google Maps-style sheet: a peek card that expands to full details, coloured by category. */
-export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport, onGuide }: Props) {
+export function PlaceSheet({
+  place,
+  others = [],
+  userPosition,
+  unlocked,
+  onClose,
+  onTeleport,
+  onGuide,
+}: Props) {
   const c = useColors();
+  const { height } = useWindowDimensions();
   const [expanded, setExpanded] = useState(false);
+  const [tab, setTab] = useState<Tab>('about');
   const pts = pointsForVisit(place.category, place.uniqueVisitors, place.basePoints);
   const distance = haversineMeters(userPosition, place);
   const catColor = c.category[place.category];
@@ -58,7 +87,8 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
         <View style={[styles.handle, { backgroundColor: c.border }]} />
       </Pressable>
 
-      {expanded && (
+      {/* The photo sits on About only, so Learn and Plan fit on small screens. */}
+      {expanded && tab === 'about' && (
         <View style={styles.photo}>
           <Image
             source={placeImage(place)}
@@ -127,7 +157,44 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
       {!unlocked && <TimeQuestBadge place={place} />}
 
       {expanded && (
-        <>
+        <View style={[styles.tabs, { backgroundColor: c.surface }]} accessibilityRole="tablist">
+          {TABS.map((k) => {
+            const on = tab === k;
+            return (
+              <Pressable
+                key={k}
+                onPress={() => setTab(k)}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: on }}
+                style={[styles.tab, on && { backgroundColor: catColor }]}
+                testID={`tab-${k}`}
+              >
+                <Text style={{ color: on ? c.onCategory : c.text, fontWeight: '800' }}>
+                  {t(TAB_LABEL[k])}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      )}
+
+      {expanded && tab !== 'about' && (
+        <ScrollView style={{ maxHeight: height * 0.4 }} contentContainerStyle={{ gap: space.md }}>
+          {tab === 'learn' ? (
+            <PlaceLearn place={place} unlocked={unlocked} />
+          ) : (
+            <PlacePlan place={place} others={others} />
+          )}
+        </ScrollView>
+      )}
+
+      {expanded && tab === 'about' && (
+        <ScrollView style={{ maxHeight: height * 0.4 }} contentContainerStyle={{ gap: space.md }}>
+          {place.details?.teaser && (
+            <Text style={{ color: c.text, fontWeight: '800', fontSize: 16 }}>
+              {place.details.teaser}
+            </Text>
+          )}
           <Text style={{ color: c.text, lineHeight: 21 }}>{place.description}</Text>
           {schedule.map((line) => (
             <View key={line} style={styles.scheduleRow}>
@@ -168,7 +235,7 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
             </Text>
             <Ionicons name="arrow-forward" size={16} color={catColor} />
           </Pressable>
-        </>
+        </ScrollView>
       )}
 
       <View style={styles.actions}>
@@ -249,6 +316,14 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   scheduleRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  tabs: { flexDirection: 'row', borderRadius: radius.pill, padding: 4, gap: 4 },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 40,
+    borderRadius: radius.pill,
+  },
   learn: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44 },
   actions: { flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' },
   action: {

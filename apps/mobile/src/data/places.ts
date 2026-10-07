@@ -9,6 +9,7 @@ import {
   regionFor,
   visiblePlaces,
   type Place,
+  type PlaceDetails,
 } from '@wandro/shared';
 import { isDemo } from '@/lib/env';
 import { supabase } from '@/lib/supabase';
@@ -29,6 +30,8 @@ interface PlaceRow {
   photo_license?: string | null;
   photo_source?: string | null;
   is_hidden?: boolean;
+  /** Learn and Plan content; an empty object when the place has none yet. */
+  details?: Partial<PlaceDetails> | null;
 }
 
 export function rowToPlace(r: PlaceRow): Place {
@@ -48,6 +51,7 @@ export function rowToPlace(r: PlaceRow): Place {
     photoSource: r.photo_source ?? undefined,
     region: regionFor(r)?.slug,
     ...(r.is_hidden && { hidden: true }),
+    ...(r.details?.teaser && { details: { facts: [], ...r.details } as PlaceDetails }),
   };
 }
 

@@ -19,3 +19,4 @@ export * from './boosts';
 export * from './challenges';
 export * from './explorers';
 export * from './waitlist';
+export * from './details';

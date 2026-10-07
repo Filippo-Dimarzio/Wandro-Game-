@@ -6,6 +6,11 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Place sheets have About, Learn and Plan tabs. Learn: a one-line teaser, up to three fun facts
+  (the first is free; the rest unlock when you discover the place) and something to look for on
+  site. Plan: best time, time needed, cost, how easy it is to reach, safety or access tips and a
+  nearby place to pair it with. Written for all 52 Sintra places first (the pilot city).
+
 - A calmer Home: a slim header (explorer, greeting, a Lv · streak chip, coins, friends, search),
   one tip at a time (how to play, then the beta invite, then install; each can be closed), a
   shorter daily challenge with its details behind a tap, the 3 nearest places with "See all
