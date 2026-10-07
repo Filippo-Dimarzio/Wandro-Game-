@@ -18,6 +18,10 @@ jest.mock('@/lib/photo', () => ({
 const pena = DEMO_PLACES.find((p) => p.id === 'demo-pena')!;
 const adraga = DEMO_PLACES.find((p) => p.id === 'demo-adraga')!;
 
+// The first render compiles the sheet's whole module graph (about 3 s on a cold cache), which
+// can pass Jest's 5 s default on a busy CI runner.
+jest.setTimeout(20_000);
+
 describe('PhotoButton and PhotoSheet', () => {
   beforeEach(() => {
     useSession.getState().reset();
