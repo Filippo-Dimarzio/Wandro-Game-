@@ -13,17 +13,21 @@ import {
   StyleSheet,
   Text,
   View,
+  type StyleProp,
+  type ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLLECTION_COMPLETION_BONUS, COLLECTION_STEP_BONUS, regionFor } from '@wandro/shared';
-import { CITY_ART } from '@/cityArt';
+import { STAMP_ART } from '@/cityArt';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { AnimatedCard } from '@/components/AnimatedCard';
 import { CoinIcon } from '@/components/CoinIcon';
 import { PhotoLibrary } from '@/components/PhotoLibrary';
-import { PostageStamp } from '@/components/PostageStamp';
+import { perforations, PostageStamp } from '@/components/PostageStamp';
 import { useCities, type City } from '@/data/cities';
 import type { CollectionProgress } from '@/data/collections';
 import { t, type TranslationKey } from '@/i18n';
+import { stampBlur } from '@/lib/stampBlur';
 import { useLocation } from '@/lib/useLocation';
 import { column, radius, shadow, space, useColors } from '@/theme';
 
@@ -40,20 +44,11 @@ export default function Collections() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
+      <GameBackdrop />
       <ScrollView contentContainerStyle={[styles.container, column]}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: c.text }]} accessibilityRole="header">
-            {t('collections.title')}
-          </Text>
-          <Pressable
-            onPress={() => router.push('/leaderboard')}
-            accessibilityRole="button"
-            accessibilityLabel={t('home.leaderboard')}
-            hitSlop={8}
-          >
-            <Ionicons name="trophy-outline" size={24} color={c.text} />
-          </Pressable>
-        </View>
+        <Text style={[styles.title, { color: c.text }]} accessibilityRole="header">
+          {t('collections.title')}
+        </Text>
         <Text style={{ color: c.textMuted }}>
           {t('collections.subtitle', {
             step: COLLECTION_STEP_BONUS,
@@ -90,34 +85,23 @@ function CityBox({
   onPress: () => void;
 }) {
   const c = useColors();
-  const art = CITY_ART[city.region.slug];
+  const [size, setSize] = useState({ width: 0, height: 0 });
   const fraction = city.total ? city.done / city.total : 0;
   return (
     <AnimatedCard
       index={index}
       onPress={onPress}
+      onLayout={(e) => setSize(e.nativeEvent.layout)}
       accessibilityRole="button"
       accessibilityLabel={`${city.region.name}, ${t('collections.places', { done: city.done, total: city.total })}${
         city.unlocked ? '' : `, ${t('explore.locked')}`
       }`}
-      style={[styles.box, shadow, { backgroundColor: c.card }]}
+      style={[styles.box, shadow, { backgroundColor: PAPER }]}
       contentStyle={styles.boxContent}
       testID={`city-card-${city.region.slug}`}
     >
-      {art && (
-        <Image
-          source={city.unlocked ? art.found : art.locked}
-          style={StyleSheet.absoluteFill}
-          contentFit="cover"
-          transition={400}
-          accessibilityLabel={t(`landmark.${city.region.slug}` as TranslationKey)}
-        />
-      )}
-      <LinearGradient
-        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)']}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
+      <StampFace city={city} style={styles.boxFace} />
+      <Perforations width={size.width} height={size.height} color={c.bg} />
       <View style={styles.boxTop}>
         {isHere ? (
           <View style={[styles.badge, { backgroundColor: c.accent }]}>
@@ -128,13 +112,7 @@ function CityBox({
           <View />
         )}
         {city.unlocked ? (
-          <PostageStamp
-            region={city.region}
-            width={44}
-            tilt={6}
-            gold={city.gold}
-            testID={`city-stamp-${city.region.slug}`}
-          />
+          <Cancellation gold={city.gold} testID={`city-stamp-${city.region.slug}`} />
         ) : (
           <View style={styles.lock} testID={`city-locked-${city.region.slug}`}>
             <Ionicons name="lock-closed" size={14} color="#fff" />
@@ -156,7 +134,70 @@ function CityBox({
   );
 }
 
+/**
+ * The city's vintage stamp, blurred until you play there: each completed challenge sharpens it
+ * and finishing the city shows it in full (see stampBlur).
+ */
+function StampFace({ city, style }: { city: City; style: StyleProp<ViewStyle> }) {
+  const blur = stampBlur(city.done, city.total);
+  return (
+    <View style={style} pointerEvents="none">
+      <Image
+        source={STAMP_ART[city.region.slug]}
+        style={StyleSheet.absoluteFill}
+        contentFit="cover"
+        blurRadius={blur}
+        transition={400}
+        accessibilityLabel={t(`landmark.${city.region.slug}` as TranslationKey)}
+        testID={`city-art-${city.region.slug}`}
+      />
+      <LinearGradient
+        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.72)']}
+        locations={[0.45, 1]}
+        style={StyleSheet.absoluteFill}
+      />
+    </View>
+  );
+}
+
+/** Perforation holes along a stamp's edges, punched in the page colour. */
+function Perforations({ width, height, color }: { width: number; height: number; color: string }) {
+  if (!width || !height) return null;
+  const r = 5;
+  const dot = { width: r * 2, height: r * 2, borderRadius: r, backgroundColor: color };
+  const holes = [
+    ...perforations(width, r).flatMap((x) => [
+      { key: `t${x}`, left: x - r, top: -r },
+      { key: `b${x}`, left: x - r, top: height - r },
+    ]),
+    ...perforations(height, r).flatMap((y) => [
+      { key: `l${y}`, left: -r, top: y - r },
+      { key: `r${y}`, left: width - r, top: y - r },
+    ]),
+  ];
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      {holes.map(({ key, ...at }) => (
+        <View key={key} style={[styles.hole, dot, at]} />
+      ))}
+    </View>
+  );
+}
+
+/** The round "collected" postmark inked over a city you've unlocked. */
+function Cancellation({ gold, testID }: { gold: boolean; testID: string }) {
+  const ink = gold ? '#FFD34D' : '#FFFFFF';
+  return (
+    <View style={[styles.cancel, { borderColor: ink }]} testID={testID}>
+      <Text style={[styles.cancelText, { color: ink }]}>{gold ? '★ WANDRO ★' : 'WANDRO'}</Text>
+      <Ionicons name="checkmark" size={14} color={ink} />
+    </View>
+  );
+}
+
 const native = Platform.OS !== 'web';
+/** Stamp paper. */
+const PAPER = '#FFFFFF';
 
 /** The city opened up: its landmark, hidden-gem progress and sets, zooming in from the grid. */
 function CitySheet({ city, onClose }: { city: City | null; onClose: () => void }) {
@@ -184,7 +225,6 @@ function CitySheet({ city, onClose }: { city: City | null; onClose: () => void }
     });
 
   if (!shown) return null;
-  const art = CITY_ART[shown.region.slug];
   return (
     <Modal visible transparent animationType="none" onRequestClose={close}>
       <Animated.View style={[styles.scrim, { opacity: anim }]}>
@@ -209,14 +249,13 @@ function CitySheet({ city, onClose }: { city: City | null; onClose: () => void }
         >
           <ScrollView contentContainerStyle={{ paddingBottom: space.xl }}>
             <View style={styles.hero}>
-              {art && (
-                <Image
-                  source={shown.unlocked ? art.found : art.locked}
-                  style={StyleSheet.absoluteFill}
-                  contentFit="cover"
-                  accessibilityLabel={t(`landmark.${shown.region.slug}` as TranslationKey)}
-                />
-              )}
+              <Image
+                source={STAMP_ART[shown.region.slug]}
+                style={StyleSheet.absoluteFill}
+                contentFit="cover"
+                blurRadius={stampBlur(shown.done, shown.total)}
+                accessibilityLabel={t(`landmark.${shown.region.slug}` as TranslationKey)}
+              />
               <LinearGradient
                 colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']}
                 style={StyleSheet.absoluteFill}
@@ -367,7 +406,6 @@ const styles = StyleSheet.create({
   },
   stampNote: { flex: 1, fontSize: 18, fontWeight: '900' },
   container: { padding: space.lg, gap: space.md, paddingBottom: space.xxl },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   title: { fontSize: 28, fontWeight: '900' },
   grid: {
     flexDirection: 'row',
@@ -375,8 +413,28 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     rowGap: space.md,
   },
-  box: { width: '48%', aspectRatio: 0.82, borderRadius: radius.lg },
-  boxContent: { justifyContent: 'space-between', padding: space.md },
+  box: { width: '48%', aspectRatio: 0.82, borderRadius: 4 },
+  boxContent: { justifyContent: 'space-between', padding: space.md + 6 },
+  boxFace: {
+    position: 'absolute',
+    top: 9,
+    left: 9,
+    right: 9,
+    bottom: 9,
+    overflow: 'hidden',
+    borderRadius: 2,
+  },
+  hole: { position: 'absolute' },
+  cancel: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [{ rotate: '-14deg' }],
+  },
+  cancelText: { fontSize: 7, fontWeight: '900', letterSpacing: 0.6 },
   boxTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   badge: {
     flexDirection: 'row',

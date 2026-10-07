@@ -40,12 +40,12 @@ export const lightColors = {
   gold: '#93600E',
   goldSoft: '#FFF4DE',
   danger: '#C53030',
-  bg: '#F4F9FE', // airy blue-white
-  surface: '#E9F3FB',
+  bg: '#FAF3E6', // warm map parchment (with the treasure-map backdrop on top, see GameBackdrop)
+  surface: '#F5EDE0',
   card: '#FFFFFF',
   text: '#0E1A24',
   textMuted: '#4A5A68',
-  border: '#D5E4F0',
+  border: '#E6D7BF',
   locked: '#8A938F', // grey pins for undiscovered places
   me: '#2B6CB0',
   fog: 'rgba(227, 238, 247, 0.82)',
@@ -63,12 +63,12 @@ export const darkColors: typeof lightColors = {
   gold: '#E8B04A',
   goldSoft: '#2E2410',
   danger: '#FC8181',
-  bg: '#0E151C',
-  surface: '#17212B',
-  card: '#1B2631',
+  bg: '#14121F', // night-time map
+  surface: '#1F1B2E',
+  card: '#231F35',
   text: '#EEF4F9',
   textMuted: '#A7B6C3',
-  border: '#2A3946',
+  border: '#352F4A',
   locked: '#6F7975',
   me: '#63A4E8',
   fog: 'rgba(16, 24, 32, 0.78)',

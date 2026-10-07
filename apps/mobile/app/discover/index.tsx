@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CATEGORIES } from '@wandro/shared';
 import { CATEGORY_META } from '@/categories';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { AnimatedCard } from '@/components/AnimatedCard';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t } from '@/i18n';
@@ -20,6 +21,7 @@ export default function DiscoverHub() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
+      <GameBackdrop />
       <ScrollView contentContainerStyle={[styles.container, column]}>
         <Pressable
           onPress={() => router.back()}

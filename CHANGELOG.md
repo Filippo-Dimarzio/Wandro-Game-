@@ -6,6 +6,26 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Day streak, Duolingo style: a 🔥 counter on Home that lights up once you complete a challenge
+  today, a week view (Monday to Sunday) with a flame on each day played, an "at risk" nudge when
+  you haven't played yet today, and a streak celebration on the reward card for the first
+  challenge of the day. A missed day resets it to 0 (`my_wallet()` now reports the live streak).
+- Interests as Instagram-style stories at the top of Home; tapping one opens the map showing only
+  that interest's challenges (bright ring = still something to discover there).
+- A small 📷 on every challenge (place cards, today's challenge, the map's place sheet and the Check
+  in card) opens a compact photo box: camera, live photo, camera roll or files. Places you've
+  discovered post straight to today's moments; for others the photo rides along with your check-in
+  and posts when it succeeds.
+- Live photos, BeReal style: a photo of the place plus a selfie, shown inset in moments, the feed
+  and your photo library. The selfie follows the photo's rules (EXIF stripped, blank-checked by
+  `check-photo` before others see it, 24 h for others, forever for you, exported and deleted with
+  your account). Today's moments show a LIVE tag and refresh every 30 s so friends' posts pop in.
+- Game look: a treasure-map backdrop (trails, compass, mountains, X marks) tiled behind every
+  screen in a warm parchment / night-map palette, so wide screens are never half white; the bottom
+  bar is icons only in game tiles, with your explorer's face for Profile.
+- Collections: each city card is its vintage postage stamp with a perforated edge, blurred at first
+  and sharper with every challenge completed there, fully clear once the city is complete.
+
 - A more game-like Profile: an explorer class from the category you discover most ("Palace
   Hunter · Level 3"), Records (discoveries, first finds, day streak, rarest find), your exploring
   style as one bar per category, progress in each city, and a Trophy shelf with bronze, silver and
@@ -190,6 +210,13 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - Animated cards: they slide in and press down softly; Reduce Motion turns this off.
 
 ### Changed
+
+- Check-ins are instant: no more waiting at a place. The server verifies your current location
+  straight away (mock locations, teleport jumps and impossible travel are still held for review).
+- The leaderboard is one Portugal board ranked by XP (plus per-city and friends views); the global
+  and weekly boards are gone.
+- The full-page "share your discovery" screen is replaced by the small photo box. The Collections
+  trophy button is gone (the leaderboard is on Profile).
 
 - Hats now sit on the octopus's head.
 - Removed the made-up demo posts from Moments and the "Act as a moderator" demo tool (teleport stays).

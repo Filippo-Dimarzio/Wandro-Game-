@@ -16,6 +16,7 @@ import {
   type WaitlistField,
   type WaitlistSignup,
 } from '@wandro/shared';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { Check } from '@/components/Check';
 import { explorerImage } from '@/components/ExplorerAvatar';
 import { WandroLogo } from '@/components/WandroLogo';
@@ -65,6 +66,7 @@ export default function Join() {
   if (join.isSuccess) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+        <GameBackdrop />
         <View style={[styles.done, column]} testID="join-done">
           <WandroLogo size={72} />
           <Text style={[styles.doneTitle, { color: c.text }]} accessibilityRole="header">
@@ -83,6 +85,7 @@ export default function Join() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['bottom']}>
+      <GameBackdrop />
       <ScrollView contentContainerStyle={{ paddingBottom: space.xxl }}>
         <View style={styles.hero}>
           <SafeAreaView edges={['top']} style={[styles.heroInner, column]}>

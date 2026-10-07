@@ -7,6 +7,7 @@ import { haversineMeters, type LatLng, type Place } from '@wandro/shared';
 import { placeImage } from '@/categories';
 import { useDailyChallenge } from '@/data/challenge';
 import { AnimatedCard } from '@/components/AnimatedCard';
+import { PhotoButton } from '@/components/PhotoSheet';
 import { CoinIcon } from '@/components/CoinIcon';
 import { t } from '@/i18n';
 import { radius, shadow, space, useColors } from '@/theme';
@@ -83,6 +84,11 @@ export function DailyChallengeCard({
           />
         ) : (
           <View style={[StyleSheet.absoluteFill, { backgroundColor: accent }]} />
+        )}
+        {pictured && (
+          <View style={styles.photo}>
+            <PhotoButton place={pictured} />
+          </View>
         )}
         {pictured && (
           <View style={styles.pictured}>
@@ -177,13 +183,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: space.md,
     bottom: space.sm,
-    maxWidth: '85%',
+    maxWidth: '72%',
     backgroundColor: 'rgba(14,26,36,0.72)',
     borderRadius: radius.pill,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   picturedText: { color: '#fff', fontWeight: '700', fontSize: 12 },
+  photo: { position: 'absolute', right: space.md, bottom: space.sm },
   card: { borderRadius: radius.lg, overflow: 'hidden' },
   cover: {
     height: 120,

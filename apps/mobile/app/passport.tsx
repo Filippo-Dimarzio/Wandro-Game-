@@ -5,6 +5,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { regionBySlug } from '@wandro/shared';
 import { CATEGORY_META } from '@/categories';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { PostageStamp, StampSlot } from '@/components/PostageStamp';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useCities } from '@/data/cities';
@@ -37,6 +38,7 @@ export default function Passport() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={t('passport.title')} />
       <ScrollView contentContainerStyle={[styles.container, column]}>
         <View

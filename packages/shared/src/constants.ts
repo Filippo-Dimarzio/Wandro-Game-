@@ -1,7 +1,6 @@
 import type { Category } from './types';
 
 export const DEFAULT_GEOFENCE_RADIUS_M = 75;
-export const DEFAULT_DWELL_SECONDS = 120;
 export const MAX_ACCURACY_M = 50;
 
 export const CATEGORIES: readonly Category[] = [

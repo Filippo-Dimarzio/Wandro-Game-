@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { LogOutButton } from '@/components/LogOutButton';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useDeleteAccount, useExportData, useUpdatePrivacy } from '@/data/account';
@@ -40,6 +41,7 @@ export default function Settings() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={t('settings.title')} />
       <ScrollView contentContainerStyle={[styles.container, column]}>
         <Section title={t('settings.privacy')}>

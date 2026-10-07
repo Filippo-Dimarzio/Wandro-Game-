@@ -1,5 +1,6 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { t, type TranslationKey } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
@@ -17,6 +18,7 @@ export default function Privacy() {
   const c = useColors();
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={t('privacy.title')} />
       <ScrollView contentContainerStyle={styles.container}>
         <View style={[styles.card, { backgroundColor: c.surface }]}>

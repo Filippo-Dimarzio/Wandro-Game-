@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DEFAULT_EXPLORER, type Category, type ExplorerId } from '@wandro/shared';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { CategoryMark } from '@/components/CategoryMark';
 import { Check } from '@/components/Check';
 import { ExplorerPicker } from '@/components/ExplorerPicker';
@@ -89,6 +90,7 @@ export default function Register() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}

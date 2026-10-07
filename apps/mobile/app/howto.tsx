@@ -1,5 +1,6 @@
 import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { HowToPlay } from '@/components/HowToPlay';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { t } from '@/i18n';
@@ -10,6 +11,7 @@ export default function HowTo() {
   const c = useColors();
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={t('howto.title')} />
       <ScrollView contentContainerStyle={[styles.container, column]}>
         <HowToPlay />

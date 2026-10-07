@@ -62,15 +62,15 @@ describe('social (demo mode)', () => {
     ]);
   });
 
-  it('friends leaderboard ranks you among followed explorers by coins', async () => {
+  it('friends leaderboard ranks you among followed explorers by XP', async () => {
     const { result } = await renderHook(() => useLeaderboard('friends'), { wrapper });
     const names = result.current.rows.map((r) => r.username);
     expect(names).toEqual(['ines.wanders', 'tomas_trails', 'you']);
     expect(result.current.rows.map((r) => r.rank)).toEqual([1, 2, 3]);
   });
 
-  it('global leaderboard leaves private explorers out', async () => {
-    const { result } = await renderHook(() => useLeaderboard('global'), { wrapper });
+  it('the Portugal leaderboard leaves private explorers out', async () => {
+    const { result } = await renderHook(() => useLeaderboard('country'), { wrapper });
     expect(result.current.rows.some((r) => r.username === 'joao_on_foot')).toBe(false);
   });
 });

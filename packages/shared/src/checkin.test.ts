@@ -1,7 +1,7 @@
 import { evaluateCheckin, type Ping } from './checkin';
 import { BADGES, newlyEarnedBadges, nextStreak } from './progression';
 
-const place = { lat: 38.8236, lng: -9.4731, radiusM: 75, dwellSeconds: 120 };
+const place = { lat: 38.8236, lng: -9.4731, radiusM: 75 };
 const t0 = 1_700_000_000_000;
 const ping = (sec: number, eastM = 5, extra: Partial<Ping> = {}): Ping => ({
   lat: place.lat,
@@ -15,37 +15,33 @@ const track = (secs: number, eastM = 5) =>
   Array.from({ length: secs / 20 + 1 }, (_, i) => ping(i * 20, eastM));
 
 describe('evaluateCheckin (mirrors complete_checkin)', () => {
-  it('is pending before the dwell time', () => {
-    expect(evaluateCheckin(track(60), place, t0, t0 + 60_000)).toEqual({
-      status: 'pending',
-      secondsLeft: 60,
-    });
+  it('verifies straight away when you are there: no waiting', () => {
+    expect(evaluateCheckin([ping(0)], place)).toEqual({ status: 'verified' });
   });
-  it('verifies a steady 2-minute visit', () => {
-    expect(evaluateCheckin(track(130), place, t0, t0 + 130_000)).toEqual({ status: 'verified' });
+  it('rejects a check-in from outside the geofence', () => {
+    expect(evaluateCheckin([ping(0, 400)], place)).toMatchObject({ reason: 'left_geofence' });
   });
-  it('rejects walking away', () => {
-    expect(evaluateCheckin(track(130, 400), place, t0, t0 + 130_000)).toMatchObject({
+  it('rejects walking away before checking in', () => {
+    expect(evaluateCheckin([ping(0), ping(20, 400)], place)).toMatchObject({
       reason: 'left_geofence',
     });
   });
-  it('rejects too few pings', () => {
-    expect(evaluateCheckin([ping(0), ping(125)], place, t0, t0 + 130_000).status).toBe('rejected');
+  it('rejects a poor GPS fix', () => {
+    expect(evaluateCheckin([ping(0, 5, { accuracyM: 200 })], place).status).toBe('rejected');
+  });
+  it('rejects having no location at all', () => {
+    expect(evaluateCheckin([], place).status).toBe('rejected');
   });
   it('flags mock locations', () => {
-    const p = track(130).map((x) => ({ ...x, isMocked: true }));
-    expect(evaluateCheckin(p, place, t0, t0 + 130_000)).toMatchObject({
+    expect(evaluateCheckin([ping(0, 5, { isMocked: true })], place)).toMatchObject({
       status: 'flagged',
       reason: 'mock_location',
     });
   });
   it('flags teleport jumps', () => {
-    const p = track(130);
-    p[2] = { ...p[2], lat: p[2].lat + 0.02 };
-    p.push(ping(135), ping(140), ping(145), ping(150), ping(155));
-    expect(evaluateCheckin(p, place, t0, t0 + 160_000)).toMatchObject({
-      reason: 'impossible_speed',
-    });
+    const p = track(40);
+    p[1] = { ...p[1]!, lat: p[1]!.lat + 0.02 };
+    expect(evaluateCheckin(p, place)).toMatchObject({ reason: 'impossible_speed' });
   });
 });
 

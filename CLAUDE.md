@@ -80,6 +80,6 @@ Before reporting a phase done, run `pnpm lint && pnpm typecheck && pnpm test && 
 ## Testing expectations
 
 - Scoring: unit tests for the rarity formula, bonuses, streaks and levels.
-- Check-in: integration tests for too-far, too-short, low accuracy, mock flag, impossible speed, replay and concurrent first-discoverer.
+- Check-in (instant, no dwell): integration tests for too-far, walked-away, low accuracy, mock flag, impossible speed, replay and concurrent first-discoverer.
 - RLS: tests that a user cannot read private profiles' data, write another user's rows, or write server-only tables.
 - UI: component tests for map-sheet, feed and forms using React Native Testing Library.

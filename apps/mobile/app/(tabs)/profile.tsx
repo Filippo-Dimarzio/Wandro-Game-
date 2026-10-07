@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { explorerStage } from '@wandro/shared';
 import { Ionicons } from '@expo/vector-icons';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { ExplorerAvatar } from '@/components/ExplorerAvatar';
 import { ExplorerPicker } from '@/components/ExplorerPicker';
 import { useMyExplorer, useSetExplorer } from '@/data/explorer';
@@ -48,6 +49,7 @@ export default function Profile() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
+      <GameBackdrop />
       <ScrollView contentContainerStyle={[styles.container, column]}>
         <View style={styles.header}>
           <Pressable

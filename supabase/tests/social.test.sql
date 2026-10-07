@@ -84,10 +84,10 @@ select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1');
 select pg_temp.check((select count(*) from feed() where not username = 'alice') = 2, 'accepted followers see private posts');
 
 -- Leaderboards: private Clara is hidden globally but visible to Alice among friends.
-select pg_temp.check(not exists (select 1 from leaderboard('global') where username = 'clara'), 'private profiles stay off the global leaderboard');
+select pg_temp.check(not exists (select 1 from leaderboard('country') where username = 'clara'), 'private profiles stay off the Portugal leaderboard');
 select pg_temp.check(exists (select 1 from leaderboard('friends') where username = 'clara'), 'friends leaderboard includes accepted private friends');
-select pg_temp.check((select username from leaderboard('global') order by rank limit 1) = 'bruno', 'leaderboard ranks by coins earned');
-select pg_temp.check(exists (select 1 from leaderboard('weekly')) and exists (select 1 from leaderboard('region', 'sintra')), 'weekly and region boards work');
+select pg_temp.check((select username from leaderboard('country') order by rank limit 1) = 'bruno', 'leaderboard ranks by XP');
+select pg_temp.check(exists (select 1 from leaderboard('region', 'sintra')), 'city boards work');
 
 -- Reports
 insert into reports (reporter_id, target_type, target_id, reason)

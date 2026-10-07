@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useSearchProfiles } from '@/data/social';
 import { t } from '@/i18n';
@@ -13,6 +14,7 @@ export default function Search() {
   const results = useSearchProfiles(q);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={t('search.title')} />
       <View style={{ paddingHorizontal: space.lg }}>
         <TextInput

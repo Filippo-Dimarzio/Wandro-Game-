@@ -9,6 +9,7 @@ import {
   type ShopItem,
   type ShopItemKind,
 } from '@wandro/shared';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { CoinCounter } from '@/components/CoinCounter';
 import { ExplorerAvatar, explorerImage } from '@/components/ExplorerAvatar';
 import { useMyExplorer } from '@/data/explorer';
@@ -54,6 +55,7 @@ export default function Shop() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={t('shop.title')} />
       <ScrollView contentContainerStyle={[styles.container, column]}>
         <View style={[styles.hero, { backgroundColor: c.surface }]}>

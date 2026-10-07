@@ -10,13 +10,15 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CATEGORIES, haversineMeters } from '@wandro/shared';
-import { CategoryMark } from '@/components/CategoryMark';
+import { haversineMeters } from '@wandro/shared';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { CoinCounter } from '@/components/CoinCounter';
 import { DailyChallengeCard } from '@/components/DailyChallengeCard';
 import { ExplorerAvatar } from '@/components/ExplorerAvatar';
 import { HomeTip } from '@/components/HomeTip';
+import { InterestStories } from '@/components/InterestStories';
 import { PlaceCard } from '@/components/PlaceBits';
+import { StreakFlame } from '@/components/Streak';
 import { useMyExplorer } from '@/data/explorer';
 import { useFriendChallenges, useFriends } from '@/data/friends';
 import { useLoadout } from '@/data/loadout';
@@ -59,6 +61,7 @@ export default function Home() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
+      <GameBackdrop />
       <ScrollView
         contentContainerStyle={[styles.container, column]}
         refreshControl={
@@ -90,11 +93,11 @@ export default function Home() {
             >
               <Text style={{ color: c.accent, fontWeight: '800', fontSize: 12 }}>
                 {t('home.levelChip', { level: wallet.level })}
-                {wallet.streak > 0 ? ` · 🔥 ${wallet.streak}` : ''}
               </Text>
             </Pressable>
           </View>
           <View style={styles.headerIcons}>
+            <StreakFlame />
             <Pressable
               onPress={() => router.push('/shop')}
               accessibilityRole="button"
@@ -132,6 +135,8 @@ export default function Home() {
             </Pressable>
           </View>
         </View>
+
+        <InterestStories places={list} unlocked={ids} />
 
         <HomeTip discoveries={wallet.discoveries} />
 
@@ -175,38 +180,6 @@ export default function Home() {
             />
           ))}
         </ScrollView>
-
-        <View style={styles.sectionRow}>
-          <Text style={[styles.section, { color: c.text }]} accessibilityRole="header">
-            {t('home.interests')}
-          </Text>
-          <Pressable onPress={() => router.push('/discover')} accessibilityRole="link" hitSlop={8}>
-            <Text style={{ color: c.accent, fontWeight: '800' }}>{t('home.seeAll')}</Text>
-          </Pressable>
-        </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.interests}
-        >
-          {CATEGORIES.map((cat) => (
-            <Pressable
-              key={cat}
-              onPress={() =>
-                router.push({ pathname: '/discover/[category]', params: { category: cat } })
-              }
-              accessibilityRole="button"
-              accessibilityLabel={t(`category.${cat}`)}
-              style={styles.interest}
-              testID={`interest-${cat}`}
-            >
-              <CategoryMark category={cat} size={56} />
-              <Text style={[styles.interestLabel, { color: c.text }]} numberOfLines={2}>
-                {t(`category.${cat}`)}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
       </ScrollView>
     </SafeAreaView>
   );
@@ -243,8 +216,5 @@ const styles = StyleSheet.create({
     marginTop: space.xs,
   },
   section: { fontSize: 20, fontWeight: '800' },
-  interests: { gap: space.md, paddingRight: space.lg },
-  interest: { width: 72, alignItems: 'center', gap: 6 },
-  interestLabel: { fontSize: 12, fontWeight: '700', textAlign: 'center' },
   rail: { gap: space.md, paddingBottom: space.sm, paddingRight: space.lg },
 });

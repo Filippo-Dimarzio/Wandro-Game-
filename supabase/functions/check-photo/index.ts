@@ -1,6 +1,6 @@
 // check-photo: decides on the server whether an uploaded post photo is blank (a black frame,
 // a flat colour). Passed photos are shown to others; blank ones are deleted from storage and
-// removed from the post.
+// removed from the post. A live photo's selfie is checked too: if either is blank, both go.
 //
 //   POST { post_id }      as the post's author, right after posting (the app does this)
 //   POST { sweep: true }  as a moderator: check every photo not yet checked (up to 200)
@@ -16,29 +16,32 @@ const admin = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
-async function check(post: { id: string; photo_path: string | null }) {
-  let ok = true;
-  if (post.photo_path) {
-    const { data, error } = await admin.storage.from('post-photos').download(post.photo_path);
-    if (error || !data) ok = false;
-    else {
-      try {
-        const img = jpeg.decode(new Uint8Array(await data.arrayBuffer()), {
-          useTArray: true,
-          maxMemoryUsageInMB: 256,
-        });
-        ok = !photoLooksBlank(img.data);
-      } catch {
-        ok = false; // Not a readable JPEG: the app always uploads one, so treat it as bad.
-      }
-    }
+async function looksOk(path: string): Promise<boolean> {
+  const { data, error } = await admin.storage.from('post-photos').download(path);
+  if (error || !data) return false;
+  try {
+    const img = jpeg.decode(new Uint8Array(await data.arrayBuffer()), {
+      useTArray: true,
+      maxMemoryUsageInMB: 256,
+    });
+    return !photoLooksBlank(img.data);
+  } catch {
+    return false; // Not a readable JPEG: the app always uploads one, so treat it as bad.
   }
-  const { data: path, error } = await admin.rpc('record_photo_check', {
+}
+
+async function check(post: { id: string; photo_path: string | null; selfie_path?: string | null }) {
+  let ok = true;
+  for (const path of [post.photo_path, post.selfie_path]) {
+    if (ok && path) ok = await looksOk(path);
+  }
+  const { data: paths, error } = await admin.rpc('record_photo_check', {
     p_post: post.id,
     p_ok: ok,
   });
   if (error) throw error;
-  if (!ok && path) await admin.storage.from('post-photos').remove([path as string]);
+  const remove = (paths as string[] | null) ?? [];
+  if (!ok && remove.length) await admin.storage.from('post-photos').remove(remove);
   return { post_id: post.id, ok };
 }
 
@@ -61,7 +64,7 @@ Deno.serve(async (req) => {
     if (!moderator) return json({ error: 'forbidden' }, 403);
     const { data: posts, error } = await admin
       .from('posts')
-      .select('id, photo_path')
+      .select('id, photo_path, selfie_path')
       .is('photo_checked_at', null)
       .not('photo_path', 'is', null)
       .limit(200);
@@ -74,7 +77,7 @@ Deno.serve(async (req) => {
   if (!body.post_id) return json({ error: 'post_id_required' }, 400);
   const { data: post } = await admin
     .from('posts')
-    .select('id, user_id, photo_path')
+    .select('id, user_id, photo_path, selfie_path')
     .eq('id', body.post_id)
     .single();
   if (!post) return json({ error: 'post_not_found' }, 404);

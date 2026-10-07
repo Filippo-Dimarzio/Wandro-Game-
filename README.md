@@ -64,9 +64,10 @@ key moments; the player is always the hero.
    **Directions in Google Maps**. When a hidden gem is within 150 m, the app nudges you.
 3. **Go there.** On a phone you walk there for real. In the browser or the desktop app (demo
    mode) you can walk your explorer with **WASD / arrow keys** (Shift = slow) or the on-screen pad.
-4. **Stay a moment.** Hold **Start discovery** and stay inside the place's geofence (75 m) while
-   the ring fills (2 minutes; 8 seconds in demo). The server checks location, accuracy, timing,
-   mock locations and impossible speed — it never trusts the phone for coins.
+4. **Check in.** Inside the place's geofence (75 m), hold **Hold to check in**: no waiting. The
+   server checks location, accuracy, mock locations and impossible speed — it never trusts the
+   phone for coins. Add a photo first (camera, camera roll, files or a live photo) and it posts
+   itself to today's moments.
 5. **Unlock it.** The fog clears in a circle, coins land in your explorer's pouch, you may earn
    badges, and you can share a photo (its location data is stripped first).
 6. **Daily challenge — double coins.** Each day brings a new challenge (e.g. _"Step into history:
@@ -107,16 +108,16 @@ key moments; the player is always the hero.
 
 ## Screens
 
-| Screen           | What it does                                                                                                                                                  |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Entry portal** | Full-screen view under fog; hold to clear it and reveal Wandro.                                                                                               |
-| **Registration** | Sign-up (email, Google, Apple), username, home city, then **pick your explorer style** (castles, nature, museums, music, beaches, hidden gems).               |
-| **Home**         | A slim progress strip (level, explorer rank, coins), interests, today's challenge, places near you.                                                           |
-| **Explore**      | Map with locked/discovered places, category chips, legend, recenter button, and a bottom sheet with photo, category, distance, points, rarity and directions. |
-| **Check in (+)** | Nearest place, hold to start discovery, dwell ring, reward card; below it today's moments (small boxes, unlocked by sharing your own, gone after 24 h).       |
-| **Collections**  | One card per city that opens with an animation to show its sets of 5 places and your progress.                                                                |
-| **Passport**     | Every moment you've shared, stamped by city. Only you see it.                                                                                                 |
-| **Profile**      | "Map of you" (your cleared fog), discoveries, points, level, explorer rank and badges.                                                                        |
+| Screen           | What it does                                                                                                                                                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Entry portal** | Full-screen view under fog; hold to clear it and reveal Wandro.                                                                                                     |
+| **Registration** | Sign-up (email, Google, Apple), username, home city, then **pick your explorer style** (castles, nature, museums, music, beaches, hidden gems).                     |
+| **Home**         | A slim progress strip (level, explorer rank, coins), interests, today's challenge, places near you.                                                                 |
+| **Explore**      | Map with locked/discovered places, category chips, legend, recenter button, and a bottom sheet with photo, category, distance, points, rarity and directions.       |
+| **Check in (+)** | Nearest place, instant hold-to-check-in with an optional photo, reward card; below it today's moments (small boxes, unlocked by sharing your own, gone after 24 h). |
+| **Collections**  | One card per city that opens with an animation to show its sets of 5 places and your progress.                                                                      |
+| **Passport**     | Every moment you've shared, stamped by city. Only you see it.                                                                                                       |
+| **Profile**      | "Map of you" (your cleared fog), discoveries, points, level, explorer rank and badges.                                                                              |
 
 Navigation is a bottom tab bar like Instagram: Home · Explore · Check in · Collections · Profile.
 
@@ -129,13 +130,13 @@ Navigation is a bottom tab bar like Instagram: Home · Explore · Check in · Co
 | First discoverer  | +50 coins                                                                                                     |
 | Daily challenge   | Double coins: the qualifying discovery pays again (at least 75), once a day                                   |
 | Sets              | +20 coins per place from a set, +50 for finishing the set                                                     |
-| Levels            | `level = floor(sqrt(xp / 100)) + 1`; streaks give XP only                                                     |
+| Levels            | 50 XP per completed challenge; level 2 at 250 XP, then each level needs double the last step                  |
 | Badges            | Category ("3 heritage sites"), region ("Sintra complete"), rarity ("Hidden gem hunter"), streak and community |
 
 Coins and XP are written to an append-only ledger, so later changes in rarity never change past
-rewards. Each player can complete each place **once**. XP comes with every coin earned (plus
-streaks and badges) and never goes down; leaderboards rank by coins **earned**, so shopping
-doesn't cost you rank.
+rewards. Each player can complete each place **once**. XP (50 per challenge) never goes down;
+the leaderboard (Portugal, per city or friends) ranks by XP, so shopping never costs you rank.
+Complete a challenge every day to keep your 🔥 day streak, Duolingo style.
 
 ## The Store
 
@@ -248,7 +249,6 @@ explorers; real players appear once a Supabase project is connected.
 
 - **Teleport here (demo)** in a place's sheet moves you there, so you can try a discovery from
   anywhere.
-- Dwell time is shortened to 8 seconds (the real rule is 2 minutes, enforced by the server).
 - **Explore → Adventures → city** moves your explorer to another city (a flight between Lisbon and Porto).
 - Demo friends (ines.wanders, mia.maps…) answer requests straight away and have sent you challenges.
 - **Profile → Log out** returns to the portal and, as there's no account in the demo, starts over.

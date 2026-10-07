@@ -46,7 +46,7 @@ import { radius, shadow, space, useColors } from '@/theme';
 
 export default function Explore() {
   const c = useColors();
-  const params = useLocalSearchParams<{ place?: string; category?: string }>();
+  const params = useLocalSearchParams<{ place?: string; category?: string; at?: string }>();
   const loc = useLocation();
   const { width } = useWindowDimensions();
   // Tablets and desktop keep the adventures panel open beside the map; phones slide it out.
@@ -105,10 +105,11 @@ export default function Explore() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target?.id]);
 
+  // From an interest story on Home: show only that interest's challenges.
   useEffect(() => {
     if (params.category && CATEGORIES.includes(params.category as Category))
       setCategory(params.category as Category);
-  }, [params.category]);
+  }, [params.category, params.at]);
 
   useEffect(() => {
     if (params.place) setSelected(all.find((p) => p.id === params.place) ?? null);

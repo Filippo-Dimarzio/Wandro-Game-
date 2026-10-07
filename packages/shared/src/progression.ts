@@ -1,3 +1,4 @@
+import { daysBetween } from './streak';
 import type { Category } from './types';
 
 /** Next streak value given the last active day and today (YYYY-MM-DD, Lisbon calendar on the server). */
@@ -5,10 +6,6 @@ export function nextStreak(lastActive: string | null, today: string, current: nu
   if (lastActive === today) return Math.max(current, 1);
   if (lastActive && daysBetween(lastActive, today) === 1) return current + 1;
   return 1;
-}
-
-function daysBetween(a: string, b: string): number {
-  return Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86_400_000);
 }
 
 export type BadgeCriteria =

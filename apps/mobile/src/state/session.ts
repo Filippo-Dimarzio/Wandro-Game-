@@ -57,6 +57,8 @@ export interface DemoPost {
   placeId: string;
   caption: string;
   photoUri?: string;
+  /** Live photo: the front-camera selfie taken with it, shown inset (BeReal style). */
+  selfieUri?: string;
   at: string;
 }
 
@@ -122,7 +124,12 @@ interface SessionState extends DemoProgress {
   installPromptDismissed: boolean;
   /** Home tips the player closed (e.g. 'howto', 'join'); they stay reachable from Profile. */
   dismissedTips: string[];
-  prefs: { dailyReminder: boolean; theme?: ThemePref };
+  prefs: {
+    dailyReminder: boolean;
+    theme?: ThemePref;
+    /** Last day (Lisbon) the streak celebration was shown, so it plays once a day. */
+    streakCelebrated?: string;
+  };
 
   completeOnboarding: (profile: LocalProfile) => void;
   updateProfile: (patch: Partial<LocalProfile>) => void;
@@ -158,6 +165,7 @@ interface SessionState extends DemoProgress {
   dismissTip: (id: string) => void;
   setPref: (key: 'dailyReminder', value: boolean) => void;
   setTheme: (theme: ThemePref) => void;
+  markStreakCelebrated: (day: string) => void;
   reset: () => void;
 }
 
@@ -215,7 +223,9 @@ export function keepRecentPhotos(posts: DemoPost[], now = Date.now()): DemoPost[
     if (!p.photoUri) return p;
     kept += 1;
     const fresh = now - Date.parse(p.at) < 24 * 3_600_000;
-    return fresh || kept <= MAX_KEPT_PHOTOS ? p : { ...p, photoUri: undefined };
+    return fresh || kept <= MAX_KEPT_PHOTOS
+      ? p
+      : { ...p, photoUri: undefined, selfieUri: undefined };
   });
 }
 
@@ -447,6 +457,7 @@ export const useSession = create<SessionState>()(
         })),
       setPref: (key, value) => set((s) => ({ prefs: { ...s.prefs, [key]: value } })),
       setTheme: (theme) => set((s) => ({ prefs: { ...s.prefs, theme } })),
+      markStreakCelebrated: (day) => set((s) => ({ prefs: { ...s.prefs, streakCelebrated: day } })),
       reset: () => set({ ...initial, friendChallenges: initialFriendChallenges() }),
     }),
     {

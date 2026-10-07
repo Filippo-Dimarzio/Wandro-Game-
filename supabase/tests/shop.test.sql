@@ -19,12 +19,12 @@ end $$;
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b9');
 create temp table before on commit drop as
   select (my_wallet() ->> 'coins')::int as coins, (my_wallet() ->> 'xp')::int as xp,
-         (select coins from leaderboard('global') where is_me) as rank_coins;
+         (select xp from leaderboard('country') where is_me) as rank_xp;
 grant select on before to authenticated;
 
 select pg_temp.check((buy_item('incense_30') ->> 'coins')::int = (select coins from before) - 150, 'buying the incense trail spends 150 coins');
 select pg_temp.check((my_wallet() ->> 'xp')::int = (select xp from before), 'spending coins never lowers XP');
-select pg_temp.check((select coins from leaderboard('global') where is_me) = (select rank_coins from before), 'spending coins never lowers leaderboard rank');
+select pg_temp.check((select xp from leaderboard('country') where is_me) = (select rank_xp from before), 'spending coins never lowers leaderboard rank');
 select pg_temp.check((select expires_at from user_inventory where item_code = 'incense_30') between now() + interval '29 minutes' and now() + interval '31 minutes', 'incense trail runs for 30 minutes');
 do $$ begin perform buy_item('incense_30'); end $$;
 select pg_temp.check((select expires_at from user_inventory where item_code = 'incense_30') between now() + interval '59 minutes' and now() + interval '61 minutes', 'buying again extends the trail');

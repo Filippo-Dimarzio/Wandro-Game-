@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { DEMO_PLACES, MOMENT_VISIBLE_HOURS, type Category } from '@wandro/shared';
+import { CHALLENGE_XP, DEMO_PLACES, MOMENT_VISIBLE_HOURS, type Category } from '@wandro/shared';
 import { DEMO_USERS, demoUser } from '@/demo/social';
 import { walletOf } from '@/demo/engine';
 import { isDemo } from '@/lib/env';
@@ -16,6 +16,8 @@ export interface FeedItem {
   category: Category;
   caption: string;
   photoUrl?: string;
+  /** Live photo: the selfie taken with the photo, shown inset. */
+  selfieUrl?: string;
   createdAt: string;
   likeCount: number;
   likedByMe: boolean;
@@ -55,6 +57,8 @@ export function useFeed() {
   const server = useQuery({
     queryKey: ['feed'],
     enabled: !isDemo,
+    // Friends' moments pop in while you look, without pulling to refresh.
+    refetchInterval: 30_000,
     queryFn: async (): Promise<{ items: FeedItem[]; status: MomentStatus }> => {
       const db = supabase!;
       const me = (await db.auth.getUser()).data.user?.id;
@@ -73,12 +77,15 @@ export function useFeed() {
         category: Category;
         caption: string | null;
         photo_path: string | null;
+        selfie_path: string | null;
         created_at: string;
         like_count: number;
         liked_by_me: boolean;
       }[];
       const st = status.data as { unlocked: boolean; expires_at: string | null };
-      const urls = await signedUrls(rows.flatMap((r) => (r.photo_path ? [r.photo_path] : [])));
+      const urls = await signedUrls(
+        rows.flatMap((r) => [r.photo_path, r.selfie_path].filter((x): x is string => !!x)),
+      );
       return {
         status: { unlocked: st.unlocked, expiresAt: st.expires_at },
         items: rows.map((r) => ({
@@ -90,6 +97,7 @@ export function useFeed() {
           category: r.category,
           caption: r.caption ?? '',
           photoUrl: r.photo_path ? urls[r.photo_path] : undefined,
+          selfieUrl: r.selfie_path ? urls[r.selfie_path] : undefined,
           createdAt: r.created_at,
           likeCount: Number(r.like_count),
           likedByMe: r.liked_by_me,
@@ -124,6 +132,7 @@ export function useFeed() {
     category: placeById(p.placeId)?.category ?? 'other',
     caption: p.caption,
     photoUrl: p.photoUri,
+    selfieUrl: p.selfieUri,
     createdAt: p.at,
     likeCount: s.liked[p.id] ? 1 : 0,
     likedByMe: !!s.liked[p.id],
@@ -144,6 +153,7 @@ export interface PassportStamp {
   region: string | null;
   caption: string;
   photoUrl?: string;
+  selfieUrl?: string;
   createdAt: string;
 }
 
@@ -164,9 +174,12 @@ export function usePassport() {
         region_slug: string | null;
         caption: string | null;
         photo_path: string | null;
+        selfie_path: string | null;
         created_at: string;
       }[];
-      const urls = await signedUrls(rows.flatMap((r) => (r.photo_path ? [r.photo_path] : [])));
+      const urls = await signedUrls(
+        rows.flatMap((r) => [r.photo_path, r.selfie_path].filter((x): x is string => !!x)),
+      );
       return rows.map((r) => ({
         id: r.post_id,
         placeId: r.place_id,
@@ -175,6 +188,7 @@ export function usePassport() {
         region: r.region_slug,
         caption: r.caption ?? '',
         photoUrl: r.photo_path ? urls[r.photo_path] : undefined,
+        selfieUrl: r.selfie_path ? urls[r.selfie_path] : undefined,
         createdAt: r.created_at,
       }));
     },
@@ -191,6 +205,7 @@ export function usePassport() {
         region: place?.region ?? null,
         caption: p.caption,
         photoUrl: p.photoUri,
+        selfieUrl: p.selfieUri,
         createdAt: p.at,
       };
     })
@@ -400,14 +415,16 @@ export function useSearchProfiles(q: string) {
   }));
 }
 
-export type LeaderboardScope = 'friends' | 'region' | 'global' | 'weekly';
+/** Portugal (everyone), one city, or your friends. Every board ranks by XP. */
+export type LeaderboardScope = 'country' | 'region' | 'friends';
 export interface LeaderboardRow {
   rank: number;
   userId: string;
   username: string;
   level: number;
-  coins: number;
-  /** Challenges completed (places discovered; in that city on a city board). */
+  /** XP: 50 per completed challenge (on a city board, the XP earned in that city). */
+  xp: number;
+  /** Challenges completed (in that city on a city board). */
   challenges: number;
   isMe: boolean;
 }
@@ -440,7 +457,7 @@ export function useLeaderboard(scope: LeaderboardScope, region = 'sintra') {
           user_id: string;
           username: string;
           level: number;
-          coins: number;
+          xp: number;
           challenges: number;
           is_me: boolean;
         }[]
@@ -449,7 +466,7 @@ export function useLeaderboard(scope: LeaderboardScope, region = 'sintra') {
         userId: r.user_id,
         username: r.username,
         level: r.level,
-        coins: Number(r.coins),
+        xp: Number(r.xp),
         challenges: Number(r.challenges ?? 0),
         isMe: r.is_me,
       }));
@@ -458,10 +475,6 @@ export function useLeaderboard(scope: LeaderboardScope, region = 'sintra') {
   if (!isDemo) return { rows: server.data ?? [], isLoading: server.isLoading };
 
   const w = walletOf({ ...s });
-  const weekAgo = Date.now() - 7 * 86_400_000;
-  const myWeekly = s.ledger
-    .filter((e) => e.coins > 0 && Date.parse(e.at) > weekAgo)
-    .reduce((a, e) => a + e.coins, 0);
   const myChallenges =
     scope === 'region'
       ? Object.keys(s.unlocked).filter(
@@ -472,26 +485,26 @@ export function useLeaderboard(scope: LeaderboardScope, region = 'sintra') {
     userId: ME,
     username: s.profile?.username ?? 'you',
     level: w.level,
-    coins: scope === 'weekly' ? myWeekly : w.coinsEarned,
+    xp: scope === 'region' ? myChallenges * CHALLENGE_XP : w.xp,
     challenges: myChallenges,
     isMe: true,
   };
   const others = DEMO_USERS.filter((u) => !s.blocked.includes(u.id))
     .filter((u) => (scope === 'friends' ? s.following.includes(u.id) : !u.isPrivate))
-    .map((u) => ({
-      userId: u.id,
-      username: u.username,
-      level: u.level,
-      coins: scope === 'weekly' ? u.weeklyCoins : u.coins,
-      challenges: scope === 'region' ? demoCityChallenges(u, region) : u.discoveries,
-      isMe: false,
-    }))
-    .filter((r) => scope !== 'region' || r.challenges > 0);
-  // City boards rank by challenges completed there; the others by coins earned.
-  const key = (r: { coins: number; challenges: number }) =>
-    scope === 'region' ? r.challenges : r.coins;
+    .map((u) => {
+      const challenges = scope === 'region' ? demoCityChallenges(u, region) : u.discoveries;
+      return {
+        userId: u.id,
+        username: u.username,
+        level: u.level,
+        xp: challenges * CHALLENGE_XP,
+        challenges,
+        isMe: false,
+      };
+    });
   const rows = [...others, me]
-    .sort((a, b) => key(b) - key(a) || b.coins - a.coins)
+    .filter((r) => r.xp > 0 || r.isMe)
+    .sort((a, b) => b.xp - a.xp || b.challenges - a.challenges)
     .map((r, i) => ({ ...r, rank: i + 1 }));
   return { rows, isLoading: false };
 }
@@ -504,10 +517,13 @@ export function useCreatePost() {
       placeId,
       caption,
       photoUri,
+      selfieUri,
     }: {
       placeId: string;
       caption: string;
       photoUri?: string;
+      /** Live photo: the front-camera selfie taken with the photo. */
+      selfieUri?: string;
     }) => {
       if (isDemo) {
         addPost({
@@ -515,6 +531,7 @@ export function useCreatePost() {
           placeId,
           caption,
           photoUri: photoUri ? await keepPhoto(photoUri) : undefined,
+          selfieUri: photoUri && selfieUri ? await keepPhoto(selfieUri) : undefined,
           at: new Date().toISOString(),
         });
         return;
@@ -528,15 +545,17 @@ export function useCreatePost() {
         .eq('place_id', placeId)
         .single();
       if (visit.error) throw visit.error;
-      let photoPath: string | null = null;
-      if (photoUri) {
-        const blob = await (await fetch(photoUri)).arrayBuffer();
-        photoPath = `${me}/${visit.data.id}.jpg`;
+      const upload = async (uri: string, path: string) => {
+        const blob = await (await fetch(uri)).arrayBuffer();
         const up = await db.storage
           .from('post-photos')
-          .upload(photoPath, blob, { contentType: 'image/jpeg', upsert: true });
+          .upload(path, blob, { contentType: 'image/jpeg', upsert: true });
         if (up.error) throw up.error;
-      }
+        return path;
+      };
+      const photoPath = photoUri ? await upload(photoUri, `${me}/${visit.data.id}.jpg`) : null;
+      const selfiePath =
+        photoUri && selfieUri ? await upload(selfieUri, `${me}/${visit.data.id}-selfie.jpg`) : null;
       const { data: post, error } = await db
         .from('posts')
         .insert({
@@ -545,6 +564,7 @@ export function useCreatePost() {
           place_id: placeId,
           caption: caption || null,
           photo_path: photoPath,
+          selfie_path: selfiePath,
         })
         .select('id')
         .single();

@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { DEMO_PLACES } from '@wandro/shared';
 import Collections from '../../app/(tabs)/collections';
+import { STAMP_MAX_BLUR } from '@/lib/stampBlur';
 import { useSession } from '@/state/session';
 import { queryWrapper } from '@/test/queryWrapper';
 
@@ -25,6 +26,22 @@ describe('Collections', () => {
     expect(screen.getByTestId('city-stamp-evora')).toBeOnTheScreen();
     expect(screen.queryByTestId('city-stamp-aveiro')).toBeNull();
     expect(screen.getByTestId('city-locked-aveiro')).toBeOnTheScreen();
+  });
+
+  it('shows each city as its vintage stamp, blurred until you complete challenges there', async () => {
+    await render(<Collections />, { wrapper });
+    const blurOf = () => screen.getByTestId('city-art-evora').props.blurRadius as number;
+    const before = blurOf();
+    expect(before).toBe(STAMP_MAX_BLUR);
+    const temple = DEMO_PLACES.find((p) => p.id === 'demo-evora-roman-temple')!;
+    await act(async () => void useSession.getState().recordVisit(temple, DEMO_PLACES));
+    expect(blurOf()).toBeLessThan(before);
+    expect(blurOf()).toBeGreaterThan(0);
+  });
+
+  it('has no trophy button: the leaderboard lives on Profile', async () => {
+    await render(<Collections />, { wrapper });
+    expect(screen.queryByLabelText('Leaderboard')).toBeNull();
   });
 
   it('opens a city with its sets and how far you are from its hidden gems', async () => {

@@ -9,7 +9,6 @@ export interface Ping extends LatLng {
 }
 
 export type CheckinVerdict =
-  | { status: 'pending'; secondsLeft: number }
   | { status: 'verified' }
   | { status: 'rejected'; reason: 'left_geofence' }
   | { status: 'flagged'; reason: 'mock_location' | 'impossible_speed' };
@@ -22,28 +21,17 @@ export function isInsideGeofence(p: Ping, place: LatLng, radiusM: number): boole
 }
 
 /**
- * Same rules as supabase complete_checkin(): enough time, at least 3 pings with 80% inside the
- * geofence, still there near the end, no mock locations, no teleport jumps.
+ * Same rules as supabase complete_checkin(): no waiting, you only need to be there now (your
+ * latest location fix inside the geofence with good accuracy). Mock locations and teleport
+ * jumps between fixes are held for review.
  */
 export function evaluateCheckin(
   pings: Ping[],
-  place: LatLng & { radiusM: number; dwellSeconds: number },
-  startedAt: number,
-  now: number,
+  place: LatLng & { radiusM: number },
 ): CheckinVerdict {
-  const elapsed = Math.floor((now - startedAt) / 1000);
-  if (elapsed < place.dwellSeconds)
-    return { status: 'pending', secondsLeft: place.dwellSeconds - elapsed };
-
   const sorted = [...pings].sort((a, b) => a.at - b.at);
-  const inside = sorted.filter((p) => isInsideGeofence(p, place, place.radiusM));
-  const lastInside = inside.length ? inside[inside.length - 1].at : 0;
-  if (
-    sorted.length < 3 ||
-    inside.length < 3 ||
-    inside.length / sorted.length < 0.8 ||
-    lastInside < startedAt + place.dwellSeconds * 800
-  ) {
+  const last = sorted[sorted.length - 1];
+  if (!last || !isInsideGeofence(last, place, place.radiusM)) {
     return { status: 'rejected', reason: 'left_geofence' };
   }
   if (sorted.some((p) => p.isMocked)) return { status: 'flagged', reason: 'mock_location' };

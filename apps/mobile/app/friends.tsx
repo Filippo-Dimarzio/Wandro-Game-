@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { FriendButton } from '@/components/FriendButton';
 import { PlayerAvatar } from '@/components/PlayerAvatar';
 import { FriendChallengeCard } from '@/components/FriendChallengeCard';
@@ -43,6 +44,7 @@ export default function Friends() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={t('friends.title')} />
       <ScrollView
         contentContainerStyle={[styles.container, column]}

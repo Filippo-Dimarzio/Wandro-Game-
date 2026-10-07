@@ -9,6 +9,7 @@ import { isDemo } from '@/lib/env';
 import { timeAgo } from '@/lib/time';
 import { radius, space, useColors } from '@/theme';
 import { CATEGORY_META } from '@/categories';
+import { LiveInset } from '@/components/LiveInset';
 
 export function FeedCard({ item }: { item: FeedItem }) {
   const c = useColors();
@@ -106,12 +107,15 @@ export function FeedCard({ item }: { item: FeedItem }) {
         accessibilityLabel={item.placeName}
       >
         {item.photoUrl ? (
-          <Image
-            source={{ uri: item.photoUrl }}
-            style={styles.photo}
-            contentFit="cover"
-            accessibilityLabel={item.caption || item.placeName}
-          />
+          <View>
+            <Image
+              source={{ uri: item.photoUrl }}
+              style={styles.photo}
+              contentFit="cover"
+              accessibilityLabel={item.caption || item.placeName}
+            />
+            {item.selfieUrl && <LiveInset uri={item.selfieUrl} size={96} />}
+          </View>
         ) : (
           <View style={styles.photo}>
             <Image

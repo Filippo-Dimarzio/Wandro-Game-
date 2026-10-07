@@ -7,6 +7,10 @@ import { CoinIcon } from '@/components/CoinIcon';
 import { ExplorerAvatar } from '@/components/ExplorerAvatar';
 import { useMyExplorer } from '@/data/explorer';
 import { useLoadout } from '@/data/loadout';
+import { useStreak } from '@/data/wallet';
+import { StreakHero } from '@/components/Streak';
+import { lisbonDate } from '@/demo/engine';
+import { useSession } from '@/state/session';
 import { t, type TranslationKey } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
 
@@ -40,6 +44,17 @@ export function RewardCard({ placeName, outcome, onDone, onShare }: Props) {
   const loadout = useLoadout();
   const coins = useCountUp(outcome.coins ?? 0);
   const pop = useRef(new Animated.Value(0.8)).current;
+  // First challenge of the day: the streak flame lights up, Duolingo style (once a day).
+  const streak = useStreak();
+  const celebrated = useSession((s) => s.prefs.streakCelebrated);
+  const markCelebrated = useSession((s) => s.markStreakCelebrated);
+  const [showStreak, setShowStreak] = useState(false);
+  useEffect(() => {
+    const today = lisbonDate(new Date());
+    if (outcome.status !== 'verified' || !streak.doneToday || celebrated === today) return;
+    setShowStreak(true);
+    markCelebrated(today);
+  }, [outcome.status, streak.doneToday, celebrated, markCelebrated]);
   useEffect(() => {
     Animated.spring(pop, { toValue: 1, useNativeDriver: true, friction: 5 }).start();
     if (outcome.status === 'verified') {
@@ -91,6 +106,11 @@ export function RewardCard({ placeName, outcome, onDone, onShare }: Props) {
       <Text style={[styles.title, { color: c.accentOn }]} accessibilityRole="header">
         {t('reward.title')}
       </Text>
+      {showStreak && (
+        <View style={[styles.streak, { backgroundColor: c.card }]} testID="reward-streak">
+          <StreakHero streak={streak} celebrate />
+        </View>
+      )}
       <Text style={{ color: c.accentOn, fontSize: 16 }}>{placeName}</Text>
       <View style={styles.coinRow}>
         <CoinIcon size={40} />
@@ -108,7 +128,7 @@ export function RewardCard({ placeName, outcome, onDone, onShare }: Props) {
       )}
       <View style={styles.row}>
         {outcome.level !== undefined && <Chip text={t('reward.level', { level: outcome.level })} />}
-        {outcome.streak !== undefined && (
+        {outcome.streak !== undefined && !showStreak && (
           <Chip text={`🔥 ${t('reward.streak', { days: outcome.streak })}`} />
         )}
       </View>
@@ -181,6 +201,7 @@ function Chip({ text }: { text: string }) {
 const styles = StyleSheet.create({
   card: { borderRadius: radius.lg, padding: space.xl, gap: space.sm, alignItems: 'center' },
   title: { fontSize: 26, fontWeight: '900' },
+  streak: { alignSelf: 'stretch', borderRadius: radius.lg, padding: space.md },
   coins: { fontSize: 40, fontWeight: '900' },
   coinRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   row: { flexDirection: 'row', gap: space.sm, flexWrap: 'wrap', justifyContent: 'center' },

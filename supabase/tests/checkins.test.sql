@@ -41,14 +41,9 @@ grant select on ch to authenticated;
 create temp table s1 on commit drop as
   select (start_checkin(pg_temp.place_id('adraga'), 38.8236, -9.4731, 8) ->> 'session_id')::uuid as id;
 grant select on s1 to authenticated;
-select pg_temp.check((complete_checkin((select id from s1)) ->> 'status') = 'pending', 'completing before the dwell time is pending');
-
-reset role;
-select pg_temp.simulate_session((select id from s1), 130);
-select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1');
 create temp table r1 on commit drop as select complete_checkin((select id from s1)) as r;
 grant select on r1 to authenticated;
-select pg_temp.check((select r ->> 'status' from r1) = 'verified', 'a 2-minute visit inside the geofence is verified');
+select pg_temp.check((select r ->> 'status' from r1) = 'verified', 'checking in inside the geofence verifies straight away: no waiting');
 select pg_temp.check((select (r ->> 'coins')::int from r1) = 80 * 5 + 50 + 20, 'first discovery pays base x 5 rarity + 50 pioneer bonus + 20 for a place from a set');
 select pg_temp.check((select r -> 'new_badges' from r1) ?& array['first_step', 'first_discoverer', 'hidden_gem'], 'first badges are awarded');
 select pg_temp.check((select (r ->> 'streak')::int from r1) = 1, 'streak starts at 1');
@@ -106,7 +101,7 @@ grant select on s3 to authenticated;
 reset role;
 select pg_temp.simulate_session((select id from s3), 130, 400);
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000e2');
-select pg_temp.check((complete_checkin((select id from s3)) ->> 'reason') = 'left_geofence', 'walking away during the dwell is rejected');
+select pg_temp.check((complete_checkin((select id from s3)) ->> 'reason') = 'left_geofence', 'checking in after walking away is rejected');
 
 -- Mock location is held for review, then approved by a moderator.
 create temp table s4 on commit drop as

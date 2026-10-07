@@ -7,6 +7,7 @@ export * from './fog';
 export * from './hours';
 export * from './checkin';
 export * from './progression';
+export * from './streak';
 export * from './walk';
 export * from './shop';
 export * from './regions';

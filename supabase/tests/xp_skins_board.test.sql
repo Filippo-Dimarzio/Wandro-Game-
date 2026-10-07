@@ -48,6 +48,15 @@ select pg_temp.check((select username from leaderboard('region', 'sintra') order
   'the city leaderboard ranks by challenges completed there');
 select pg_temp.check((select challenges from leaderboard('region', 'sintra') where username = 'walker') = 4,
   'and shows how many');
-select pg_temp.check((select username from leaderboard('global') order by rank limit 1) = 'richie',
-  'the global board still ranks by coins earned');
+select pg_temp.check((select username from leaderboard('country') order by rank limit 1) = 'walker',
+  'the Portugal board ranks by XP, not coins: richie''s 10,000 coins do not put him first');
+select pg_temp.check((select xp from leaderboard('country') where username = 'walker') = 200,
+  'and shows each player''s XP');
+do $$ begin
+  perform leaderboard('global');
+  raise exception 'the global board should be gone';
+exception when others then
+  if sqlerrm <> 'invalid_scope' then raise; end if;
+  raise notice 'ok - the global and weekly boards are gone';
+end $$;
 rollback;

@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { FlatList, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { haversineMeters } from '@wandro/shared';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { PlaceCard } from '@/components/PlaceBits';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { usePlaces, useUnlockedIds } from '@/data/places';
@@ -22,6 +23,7 @@ export default function Nearby() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={t('home.nearYou')} />
       <FlatList
         data={rows}

@@ -1,5 +1,6 @@
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import {
   useBlankPhotoSweep,
@@ -20,6 +21,7 @@ export default function Moderation() {
   if (!isMod) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+        <GameBackdrop />
         <ScreenHeader title={t('mod.title')} />
         <Text style={{ color: c.textMuted, padding: space.lg }}>{t('mod.forbidden')}</Text>
       </SafeAreaView>
@@ -30,6 +32,7 @@ export default function Moderation() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={t('mod.title')} />
       <ScrollView contentContainerStyle={styles.container}>
         {queue.isLoading && <ActivityIndicator />}

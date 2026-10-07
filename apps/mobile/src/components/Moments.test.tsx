@@ -25,11 +25,10 @@ describe('Moments', () => {
 
     await act(async () => void useSession.getState().recordVisit(pena, DEMO_PLACES));
     await render(<Moments />, { wrapper });
-    fireEvent.press(screen.getByTestId('share-moment'));
-    expect(mockPush).toHaveBeenCalledWith({
-      pathname: '/post/new',
-      params: { place: 'demo-pena' },
-    });
+    await fireEvent.press(screen.getByTestId('share-moment'));
+    // A small photo box, not a full page.
+    expect(screen.getByTestId('photo-sheet')).toBeOnTheScreen();
+    expect(screen.getByText('📸 Pena Palace')).toBeOnTheScreen();
   });
 
   it('shows small boxes once you have shared, and opens one', async () => {

@@ -40,9 +40,9 @@ describe('Category page', () => {
     expect(screen.getByText(/Salt air, the sound of the waves/)).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Places' }));
-    expect(screen.getByRole('button', { name: /Adraga Beach/ })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: /Cabo da Roca/ })).toBeOnTheScreen();
-    expect(screen.queryByRole('button', { name: /Pena Palace/ })).toBeNull();
+    expect(screen.getByRole('button', { name: /^Adraga Beach/ })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /^Cabo da Roca/ })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /^Pena Palace/ })).toBeNull();
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Learn' }));
     expect(screen.getByText(/explore rock pools/)).toBeOnTheScreen();

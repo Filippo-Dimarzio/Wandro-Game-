@@ -2,15 +2,28 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CATEGORY_META } from '@/categories';
 import { AnimatedCard } from '@/components/AnimatedCard';
 import { FeedCard } from '@/components/FeedCard';
+import { LiveInset } from '@/components/LiveInset';
+import { PhotoSheet } from '@/components/PhotoSheet';
+import { usePlaces } from '@/data/places';
 import { momentExpiry, useFeed, useShareable, type FeedItem } from '@/data/social';
 import { t } from '@/i18n';
 import { timeAgo } from '@/lib/time';
+import { useLocation } from '@/lib/useLocation';
 import { radius, shadow, space, useColors } from '@/theme';
 
 /**
@@ -23,6 +36,9 @@ export function Moments() {
   const feed = useFeed();
   const shareable = useShareable();
   const [open, setOpen] = useState<FeedItem | null>(null);
+  const [sharing, setSharing] = useState(false);
+  const places = usePlaces(useLocation().position).data ?? [];
+  const shareablePlace = places.find((p) => p.id === shareable) ?? null;
   const others = feed.items.filter((i) => !i.isMine);
   const mine = feed.items.filter((i) => i.isMine);
   // Keep the open card in sync with likes.
@@ -31,9 +47,12 @@ export function Moments() {
   return (
     <View style={{ gap: space.sm }} testID="moments">
       <View style={styles.header}>
-        <Text style={[styles.title, { color: c.text }]} accessibilityRole="header">
-          {t('moments.title')}
-        </Text>
+        <View style={styles.titleRow}>
+          <Text style={[styles.title, { color: c.text }]} accessibilityRole="header">
+            {t('moments.title')}
+          </Text>
+          <LiveDot />
+        </View>
         <Pressable
           onPress={() => router.push('/passport')}
           accessibilityRole="button"
@@ -72,7 +91,7 @@ export function Moments() {
           </Text>
           {shareable && (
             <Pressable
-              onPress={() => router.push({ pathname: '/post/new', params: { place: shareable } })}
+              onPress={() => setSharing(true)}
               accessibilityRole="button"
               style={[styles.cta, { backgroundColor: c.accent }]}
               testID="share-moment"
@@ -101,6 +120,8 @@ export function Moments() {
         </>
       )}
 
+      {sharing && <PhotoSheet place={shareablePlace} onClose={() => setSharing(false)} />}
+
       <Modal
         visible={!!current}
         animationType="fade"
@@ -126,6 +147,29 @@ export function Moments() {
   );
 }
 
+/** A pulsing red dot: moments pop in live as your friends complete challenges. */
+function LiveDot() {
+  const pulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 0.3, duration: 700, useNativeDriver: native }),
+        Animated.timing(pulse, { toValue: 1, duration: 700, useNativeDriver: native }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [pulse]);
+  return (
+    <View style={styles.live} accessible accessibilityLabel={t('moments.live')}>
+      <Animated.View style={[styles.liveDot, { opacity: pulse }]} />
+      <Text style={styles.liveText}>{t('photo.liveTag')}</Text>
+    </View>
+  );
+}
+
+const native = Platform.OS !== 'web';
+
 function Tile({ item, index, onPress }: { item: FeedItem; index: number; onPress: () => void }) {
   const c = useColors();
   const hoursLeft = Math.max(1, Math.ceil((momentExpiry(item.createdAt) - Date.now()) / 3_600_000));
@@ -145,6 +189,7 @@ function Tile({ item, index, onPress }: { item: FeedItem; index: number; onPress
         contentFit="cover"
         accessible={false}
       />
+      {item.selfieUrl && <LiveInset uri={item.selfieUrl} size={28} />}
       <LinearGradient
         colors={['transparent', 'rgba(0,0,0,0.7)']}
         style={styles.caption}
@@ -164,6 +209,18 @@ function Tile({ item, index, onPress }: { item: FeedItem; index: number; onPress
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title: { fontSize: 20, fontWeight: '800' },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  live: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#E53E3E',
+    borderRadius: radius.pill,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#fff' },
+  liveText: { color: '#fff', fontSize: 11, fontWeight: '900', letterSpacing: 0.6 },
   passport: {
     flexDirection: 'row',
     alignItems: 'center',

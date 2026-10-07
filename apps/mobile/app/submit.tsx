@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CATEGORIES, type Category } from '@wandro/shared';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { Check } from '@/components/Check';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { WandroLogo } from '@/components/WandroLogo';
@@ -30,6 +31,7 @@ export default function Submit() {
   if (submit.isSuccess) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+        <GameBackdrop />
         <ScreenHeader title={t('submit.title')} />
         <View style={styles.container}>
           <View style={{ alignItems: 'center' }}>
@@ -55,6 +57,7 @@ export default function Submit() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={t('submit.title')} />
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <Text style={{ color: c.textMuted }}>{t('submit.intro')}</Text>

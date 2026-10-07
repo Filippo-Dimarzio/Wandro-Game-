@@ -20,6 +20,7 @@ import {
   type Place,
 } from '@wandro/shared';
 import { placeImage } from '@/categories';
+import { PhotoButton } from '@/components/PhotoSheet';
 import { t } from '@/i18n';
 import { isDemo } from '@/lib/env';
 import { scheduleLines } from '@/lib/hours';
@@ -258,6 +259,7 @@ export function PlaceSheet({
             <Text style={{ color: c.gold, fontWeight: '800' }}>{t('hud.guide')}</Text>
           </Pressable>
         )}
+        <PhotoButton place={place} size={40} />
         {isDemo && onTeleport && (
           <Pressable
             onPress={onTeleport}

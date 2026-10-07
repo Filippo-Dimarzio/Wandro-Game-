@@ -6,9 +6,9 @@ export interface DemoUser {
   username: string;
   homeCity: string;
   isPrivate: boolean;
+  /** Matches their XP: 50 per discovery (see levelFromXp). */
   level: number;
   coins: number;
-  weeklyCoins: number;
   discoveries: number;
 }
 
@@ -18,19 +18,17 @@ export const DEMO_USERS: DemoUser[] = [
     username: 'ines.wanders',
     homeCity: 'Lisbon',
     isPrivate: false,
-    level: 6,
+    level: 3,
     coins: 3120,
-    weeklyCoins: 640,
-    discoveries: 14,
+    discoveries: 18,
   },
   {
     id: 'demo-user-tomas',
     username: 'tomas_trails',
     homeCity: 'Sintra',
     isPrivate: false,
-    level: 4,
+    level: 2,
     coins: 1980,
-    weeklyCoins: 910,
     discoveries: 9,
   },
   {
@@ -38,19 +36,17 @@ export const DEMO_USERS: DemoUser[] = [
     username: 'sofia.sees',
     homeCity: 'Cascais',
     isPrivate: false,
-    level: 8,
+    level: 4,
     coins: 5400,
-    weeklyCoins: 300,
-    discoveries: 22,
+    discoveries: 38,
   },
   {
     id: 'demo-user-joao',
     username: 'joao_on_foot',
     homeCity: 'Porto',
     isPrivate: true,
-    level: 3,
+    level: 2,
     coins: 1150,
-    weeklyCoins: 450,
     discoveries: 6,
   },
   {
@@ -58,10 +54,9 @@ export const DEMO_USERS: DemoUser[] = [
     username: 'mia.maps',
     homeCity: 'Porto',
     isPrivate: false,
-    level: 5,
+    level: 3,
     coins: 2600,
-    weeklyCoins: 120,
-    discoveries: 11,
+    discoveries: 16,
   },
 ];
 

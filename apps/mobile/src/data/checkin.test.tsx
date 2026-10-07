@@ -17,19 +17,13 @@ const at = (lat: number, lng: number): UserLocation => ({
 const wrapper = queryWrapper();
 
 describe('useCheckin (demo mode)', () => {
-  beforeEach(() => {
-    useSession.getState().reset();
-    jest.useFakeTimers();
-  });
-  afterEach(() => jest.useRealTimers());
+  beforeEach(() => useSession.getState().reset());
 
-  it('verifies after the dwell time and awards coins', async () => {
+  it('verifies straight away, with no waiting, and awards coins', async () => {
     const { result } = await renderHook(() => useCheckin(at(adraga.lat, adraga.lng), DEMO_PLACES), {
       wrapper,
     });
     await act(async () => result.current.start(adraga));
-    expect(result.current.phase.kind).toBe('dwelling');
-    await act(async () => void jest.advanceTimersByTime(9000));
     expect(result.current.phase).toMatchObject({
       kind: 'done',
       // Adraga is in "The wild coast" set: +20 on top.
@@ -42,14 +36,12 @@ describe('useCheckin (demo mode)', () => {
     expect(useSession.getState().unlocked[adraga.id]).toBeDefined();
   });
 
-  it('rejects when the explorer walks away during the dwell', async () => {
-    let loc = at(adraga.lat, adraga.lng);
-    const { result, rerender } = await renderHook(() => useCheckin(loc, DEMO_PLACES), { wrapper });
+  it('rejects a check-in from outside the place', async () => {
+    const { result } = await renderHook(
+      () => useCheckin(at(adraga.lat + 0.01, adraga.lng), DEMO_PLACES),
+      { wrapper },
+    );
     await act(async () => result.current.start(adraga));
-    await act(async () => void jest.advanceTimersByTime(2000));
-    loc = at(adraga.lat + 0.01, adraga.lng);
-    await rerender({});
-    await act(async () => void jest.advanceTimersByTime(8000));
     expect(result.current.phase).toMatchObject({
       kind: 'done',
       outcome: { status: 'rejected', reason: 'left_geofence' },

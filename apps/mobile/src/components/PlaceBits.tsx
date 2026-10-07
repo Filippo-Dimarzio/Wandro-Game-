@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { formatDistance, pointsForVisit, type Category, type Place } from '@wandro/shared';
 import { categoryIcon, placeImage } from '@/categories';
 import { AnimatedCard } from '@/components/AnimatedCard';
+import { PhotoButton } from '@/components/PhotoSheet';
 import { t } from '@/i18n';
 import { hoursStatus } from '@/lib/hours';
 import { radius, shadow, space, useColors } from '@/theme';
@@ -78,6 +79,9 @@ export function PlaceCard({ place, distanceM, unlocked, onPress, width, index }:
             <Ionicons name={unlocked ? 'checkmark' : 'lock-closed'} size={12} color="#fff" />
           </View>
         </View>
+        <View style={styles.photo}>
+          <PhotoButton place={place} />
+        </View>
       </View>
       <View style={styles.body}>
         <Text style={[styles.name, { color: c.text }]} numberOfLines={2}>
@@ -114,6 +118,7 @@ const styles = StyleSheet.create({
     padding: space.sm,
   },
   lock: { borderRadius: 12, padding: 5 },
+  photo: { position: 'absolute', right: space.sm, bottom: space.sm },
   body: { padding: space.md, gap: 4 },
   name: { fontWeight: '800', fontSize: 15 },
 });

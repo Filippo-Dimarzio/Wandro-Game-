@@ -11,6 +11,7 @@ import {
   type LatLng,
 } from '@wandro/shared';
 import { placeImage } from '@/categories';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { CategoryPill } from '@/components/PlaceBits';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { FRIEND_CHALLENGE_ERRORS, useChallengeFriend, useFriends } from '@/data/friends';
@@ -64,6 +65,7 @@ export default function ChallengeFriend() {
   if (!friend) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+        <GameBackdrop />
         <ScreenHeader title={t('friends.challenge')} />
         <Text style={{ color: c.textMuted, padding: space.lg }}>{t('friends.notFriends')}</Text>
       </SafeAreaView>
@@ -72,6 +74,7 @@ export default function ChallengeFriend() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={t('friends.challengeTitle', { name: friend.username })} />
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <Text style={{ color: c.textMuted }}>{t('friends.challengeIntro')}</Text>

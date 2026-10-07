@@ -30,18 +30,18 @@ Wandro is a photo-first, community-driven exploration game. Players uncover real
 
 ## 2. Decisions and assumptions (see also section 14 for UX decisions) (change any of these)
 
-| #   | Topic            | Default I will build to                                                                                                                                                                                                     |
-| --- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Photos in MVP    | **Yes.** Feed and photo posts are MVP (Phase 4a). Proof photo is optional and never required for points.                                                                                                                    |
-| 2   | Place photos     | Wikimedia Commons (licence + author + source URL stored for attribution), plus moderated user uploads.                                                                                                                      |
-| 3   | Accounts         | Assumed none exist yet. Dev runs locally (Supabase CLI + Docker). One hosted prod project; staging added only if needed. Mapbox, Apple Developer and Google Play accounts are needed by Phase 2 / Phase 5 — see section 11. |
-| 4   | Repo             | pnpm monorepo (see section 3).                                                                                                                                                                                              |
-| 5   | Branching        | One branch per phase (`phase-N-...`). I open a PR only when you ask.                                                                                                                                                        |
-| 6   | Moderation tool  | Supabase Studio plus SQL views for the MVP. A small in-app admin screen only if Studio proves too clumsy.                                                                                                                   |
-| 7   | Location privacy | Raw location pings are kept only until a visit is verified (or 24 h at most), then deleted. Only the verified summary is kept.                                                                                              |
-| 8   | Rarity / streaks | Rarity by all-time unique visitors (formula in section 6). Streak is daily and gives no points; XP comes only from challenges.                                                                                              |
-| 9   | Minimum age      | 16+ (conservative GDPR choice; confirm before launch).                                                                                                                                                                      |
-| 10  | Languages        | English first; every string goes through i18n from day one so PT/ES/IT/FR can be added without refactoring.                                                                                                                 |
+| #   | Topic            | Default I will build to                                                                                                                                                                                                             |
+| --- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Photos in MVP    | **Yes.** Feed and photo posts are MVP (Phase 4a). Proof photo is optional and never required for points.                                                                                                                            |
+| 2   | Place photos     | Wikimedia Commons (licence + author + source URL stored for attribution), plus moderated user uploads.                                                                                                                              |
+| 3   | Accounts         | Assumed none exist yet. Dev runs locally (Supabase CLI + Docker). One hosted prod project; staging added only if needed. Mapbox, Apple Developer and Google Play accounts are needed by Phase 2 / Phase 5 — see section 11.         |
+| 4   | Repo             | pnpm monorepo (see section 3).                                                                                                                                                                                                      |
+| 5   | Branching        | One branch per phase (`phase-N-...`). I open a PR only when you ask.                                                                                                                                                                |
+| 6   | Moderation tool  | Supabase Studio plus SQL views for the MVP. A small in-app admin screen only if Studio proves too clumsy.                                                                                                                           |
+| 7   | Location privacy | Raw location pings are kept only until a visit is verified (or 24 h at most), then deleted. Only the verified summary is kept.                                                                                                      |
+| 8   | Rarity / streaks | Rarity by all-time unique visitors (formula in section 6). Duolingo-style daily streak: complete a challenge each day (Lisbon calendar) to keep it; a missed day resets it to 0. It gives no points; XP comes only from challenges. |
+| 9   | Minimum age      | 16+ (conservative GDPR choice; confirm before launch).                                                                                                                                                                              |
+| 10  | Languages        | English first; every string goes through i18n from day one so PT/ES/IT/FR can be added without refactoring.                                                                                                                         |
 
 ## 3. Architecture
 
@@ -103,21 +103,21 @@ All tables have `id uuid pk`, `created_at`, and RLS enabled. Key columns only:
 
 **Later (design hooks, not built):** `comments`, `daily_challenges`, `events`, `teams`, `venue_partners`, `place_translations`.
 
-**Leaderboards:** SQL views / materialized views, refreshed on a schedule. Scopes: friends, region, global, weekly. Private profiles are excluded from public boards.
+**Leaderboards:** one server function, `leaderboard(scope, region)`, ranked by **XP** (50 per completed challenge). Scopes: `country` (Portugal, every public player), `region` (XP earned in one city) and `friends`. The global and weekly boards were retired. Private profiles are excluded from public boards.
 
 ## 5. Check-in validation (server-side)
 
-1. **Start:** the app calls `start_checkin(place_id)`. The server creates a session with its own start timestamp. The client must be within the geofence (plus accuracy tolerance) to start.
-2. **During dwell:** the app sends batched location pings (foreground only) while the user is at the place.
-3. **Complete:** the app calls `complete_checkin(session_id)`. The server checks:
-   - Elapsed server time since start ≥ place dwell time (default 120 s). Client clocks are ignored.
-   - Enough pings within the geofence across the dwell window; reported accuracy ≤ 50 m (configurable).
+Check-ins are **instant** (no waiting at the place, since `20261026090200_instant_checkin`): being there now is enough.
+
+1. **Start:** the app calls `start_checkin(place_id)` with one location fix. The server creates a session with its own start timestamp. The client must be within the geofence (plus accuracy tolerance) with accuracy ≤ 50 m to start.
+2. **Complete:** the app calls `complete_checkin(session_id)` straight away. The server checks:
+   - The latest fix is still inside the geofence with accuracy ≤ 50 m (`places.dwell_seconds` is no longer used).
    - Plausibility: no impossible jumps, speed within limits, no travel faster than a sensible maximum between the user's last two visits.
    - Mock flag: Android `mocked` and iOS software-simulated source info (where the OS exposes it). If flagged, the visit is held for review and gives no points. No automatic ban.
    - Rate limits: at most N check-ins per hour and per day per user.
    - Place is `active`, and the user has no existing visit there (also enforced by the unique constraint).
-4. **On success** (one DB transaction): insert the visit, update `place_stats`, write ledger rows, update XP, level, streak and badges, delete the raw pings, return the result to the app.
-5. **Idempotent:** retrying a completed session returns the same result and never double-awards.
+3. **On success** (one DB transaction): insert the visit, update `place_stats`, write ledger rows, update XP, level, streak and badges, delete the raw pings, return the result to the app.
+4. **Idempotent:** retrying a completed session returns the same result and never double-awards.
 
 Honest limits: GPS can always be spoofed by a determined user, especially on rooted or jailbroken devices. The goal is to make cheating inconvenient and detectable, and to keep cheaters off public leaderboards (flagged accounts are reviewable).
 
@@ -171,7 +171,7 @@ Each phase ends with: tests + lint green, a summary of changes, a manual test li
 
 **Phase 2 — Map:** Mapbox map with fog styling, user location (foreground), nearby places, locked/unlocked styling, category filters, place sheet. _Manual check:_ map performance, contrast, small-screen layout, screen-reader labels.
 
-**Phase 3 — Check-in & scoring:** server functions (`start_checkin`, `add_checkin_ping`, `complete_checkin`), scoring, levels, streaks, badges, integration tests for scoring/validation/RLS. _Manual check:_ real-world walk to a Sintra place; negative tests (too far, too short, mock location).
+**Phase 3 — Check-in & scoring:** server functions (`start_checkin`, `add_checkin_ping`, `complete_checkin`), scoring, levels, streaks, badges, integration tests for scoring/validation/RLS. _Manual check:_ real-world walk to a Sintra place; negative tests (too far, poor accuracy, mock location).
 
 **Phase 4a — Photos, feed & safety:** posts with optional proof photo, follow/unfollow (with private-profile requests), home feed, likes, report/block, guidelines. _Manual check:_ two test accounts following each other; report and block flows.
 
@@ -253,7 +253,7 @@ Comments, food challenges (venue QR codes for proof), Instagram sharing via the 
 - Home: photo feed first, with a slim progress strip (level, streak, points) above it.
 - Explore: tapping a place opens a Google Maps-style bottom sheet (peek, then drag to expand).
 - Unlock moment: the fog clears in an animated circle around the place. Celebration is otherwise kept restrained.
-- Capture (+): auto-detect and confirm. When the user is near a place, a banner offers "You're at X — start discovery", a progress ring fills during the dwell time, then the user can add a photo.
+- Capture (+): auto-detect and confirm. When the user is near a place, hold to check in (instant, no waiting). A photo can be attached first (camera, camera roll, files or a BeReal-style live photo) and posts itself to today's moments when the check-in succeeds.
 - Nearby suggestions appear as in-app banners only (foreground location only; no background alerts).
 
 **Profile & progression**

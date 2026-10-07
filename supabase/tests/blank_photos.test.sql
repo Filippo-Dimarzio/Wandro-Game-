@@ -30,7 +30,7 @@ select pg_temp.check((select photo_path from feed() where username = 'snapper') 
 
 reset role;
 set local role service_role;
-select pg_temp.check(record_photo_check((select id from snap), true) is null, 'a good photo passes');
+select pg_temp.check(cardinality(record_photo_check((select id from snap), true)) = 0, 'a good photo passes');
 reset role;
 select pg_temp.as_user('00000000-0000-0000-0000-00000000cc02');
 select pg_temp.check((select photo_path from feed() where username = 'snapper') is not null,
@@ -38,7 +38,7 @@ select pg_temp.check((select photo_path from feed() where username = 'snapper') 
 
 reset role;
 set local role service_role;
-select pg_temp.check(record_photo_check((select id from snap), false) like '%.jpg',
+select pg_temp.check((record_photo_check((select id from snap), false))[1] like '%.jpg',
   'a blank photo hands back its file to delete');
 reset role;
 select pg_temp.check((select photo_path is null and photo_checked_at is not null from posts where id = (select id from snap)),

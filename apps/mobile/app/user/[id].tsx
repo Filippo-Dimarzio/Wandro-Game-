@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { explorerStage } from '@wandro/shared';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { FriendButton } from '@/components/FriendButton';
 import { PlayerAvatar } from '@/components/PlayerAvatar';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -25,6 +26,7 @@ export default function UserProfile() {
   if (!card) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+        <GameBackdrop />
         <ScreenHeader title="" />
         <Text style={{ color: c.textMuted, padding: space.lg }}>{t('user.notFound')}</Text>
       </SafeAreaView>
@@ -41,6 +43,7 @@ export default function UserProfile() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={card.username} />
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>

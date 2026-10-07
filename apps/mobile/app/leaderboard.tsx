@@ -3,27 +3,31 @@ import { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DEFAULT_REGION, REGIONS, regionFor } from '@wandro/shared';
+import { GameBackdrop } from '@/components/GameBackdrop';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { ME, useLeaderboard, type LeaderboardScope } from '@/data/social';
-import { CoinAmount } from '@/components/CoinIcon';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { column, radius, space, useColors } from '@/theme';
 
-const SCOPES: LeaderboardScope[] = ['friends', 'region', 'global', 'weekly'];
+const SCOPES: LeaderboardScope[] = ['country', 'region', 'friends'];
 const MEDALS = ['🥇', '🥈', '🥉'];
+
+const challengesLabel = (count: number) =>
+  t(count === 1 ? 'leaderboard.challengeOne' : 'leaderboard.challenges', { count });
 
 export default function Leaderboard() {
   const c = useColors();
-  const [scope, setScope] = useState<LeaderboardScope>('friends');
+  const [scope, setScope] = useState<LeaderboardScope>('country');
   const loc = useLocation();
   const here = regionFor(loc.position) ?? DEFAULT_REGION;
   const [city, setCity] = useState<string | null>(null);
   const region = REGIONS.find((r) => r.slug === city) ?? here;
   const { rows } = useLeaderboard(scope, region.slug);
-  const byChallenges = scope === 'region';
+  const byCity = scope === 'region';
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <GameBackdrop />
       <ScreenHeader title={t('leaderboard.title')} />
       <View style={styles.tabs} accessibilityRole="tablist">
         {SCOPES.map((s) => (
@@ -35,12 +39,12 @@ export default function Leaderboard() {
             style={[styles.tab, { backgroundColor: scope === s ? c.accent : c.surface }]}
           >
             <Text style={{ color: scope === s ? c.accentOn : c.text, fontWeight: '700' }}>
-              {s === 'region' ? `🏙️ ${t('leaderboard.cities')}` : t(`leaderboard.${s}`)}
+              {t(`leaderboard.${s}`)}
             </Text>
           </Pressable>
         ))}
       </View>
-      {byChallenges && (
+      {byCity && (
         <View style={styles.tabs} testID="city-picker">
           {REGIONS.map((r) => (
             <Pressable
@@ -62,7 +66,7 @@ export default function Leaderboard() {
         </View>
       )}
       <Text style={{ color: c.textMuted, paddingHorizontal: space.lg, fontSize: 12 }}>
-        {byChallenges ? t('leaderboard.cityNote', { city: region.name }) : t('leaderboard.note')}
+        {byCity ? t('leaderboard.cityNote', { city: region.name }) : t('leaderboard.note')}
       </Text>
       <FlatList
         data={rows}
@@ -74,11 +78,7 @@ export default function Leaderboard() {
             disabled={item.isMe || item.userId === ME}
             onPress={() => router.push({ pathname: '/user/[id]', params: { id: item.userId } })}
             style={[styles.row, { backgroundColor: item.isMe ? c.accent : c.surface }]}
-            accessibilityLabel={
-              byChallenges
-                ? `${item.rank}. ${item.username}, ${t(item.challenges === 1 ? 'leaderboard.challengeOne' : 'leaderboard.challenges', { count: item.challenges })}`
-                : `${item.rank}. ${item.username}, ${item.coins} coins`
-            }
+            accessibilityLabel={`${item.rank}. ${item.username}, ${t('leaderboard.xp', { xp: item.xp })}, ${challengesLabel(item.challenges)}`}
           >
             <Text style={[styles.rank, { color: item.isMe ? c.accentOn : c.text }]}>
               {MEDALS[item.rank - 1] ?? item.rank}
@@ -87,19 +87,20 @@ export default function Leaderboard() {
               {item.username}
               {item.isMe ? ` (${t('leaderboard.you')})` : ''}
             </Text>
-            {byChallenges ? (
+            <View style={{ alignItems: 'flex-end' }}>
               <Text
                 style={{ color: item.isMe ? c.accentOn : c.text, fontWeight: '900' }}
+                testID="row-xp"
+              >
+                ⭐ {t('leaderboard.xp', { xp: item.xp })}
+              </Text>
+              <Text
+                style={{ color: item.isMe ? c.accentOn : c.textMuted, fontSize: 12 }}
                 testID="row-challenges"
               >
-                🎯{' '}
-                {t(item.challenges === 1 ? 'leaderboard.challengeOne' : 'leaderboard.challenges', {
-                  count: item.challenges,
-                })}
+                🎯 {challengesLabel(item.challenges)}
               </Text>
-            ) : (
-              <CoinAmount amount={item.coins} color={item.isMe ? c.accentOn : c.gold} />
-            )}
+            </View>
           </Pressable>
         )}
       />
