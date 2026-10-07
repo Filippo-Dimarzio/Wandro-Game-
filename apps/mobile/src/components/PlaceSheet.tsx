@@ -2,7 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { directionsUrl } from '@/lib/directions';
 import {
   formatDistance,
   haversineMeters,
@@ -40,12 +41,7 @@ export function PlaceSheet({ place, userPosition, unlocked, onClose, onTeleport,
   const schedule = scheduleLines(place.hours);
 
   const openDirections = () => {
-    const q = `${place.lat},${place.lng}`;
-    const url = Platform.select({
-      ios: `http://maps.apple.com/?daddr=${q}&dirflg=w`,
-      default: `https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=walking`,
-    });
-    Linking.openURL(url).catch(() => undefined);
+    Linking.openURL(directionsUrl(place, distance)).catch(() => undefined);
   };
 
   return (

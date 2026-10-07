@@ -6,6 +6,11 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Directions open the right place from anywhere: walking routes within 3 km, the maps app's own
+  choice of car or transit across town, and the place itself (not a failed route from wherever
+  the phone is) when the player is over 50 km away. One shared, tested helper for every
+  Directions button.
+
 - Curiosities are oddities again: bakeries, bars, cafés, port lodges and markets (Piriquita,
   Pastéis de Belém, A Ginjinha, Feira da Ladra, Majestic Café and others) move to Culture. New
   curiosities keep five per city: Capuchos cork convent, Vila Sassetti path, Casa dos Bicos,

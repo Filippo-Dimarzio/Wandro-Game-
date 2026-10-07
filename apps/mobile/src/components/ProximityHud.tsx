@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { directionsUrl } from '@/lib/directions';
 import {
   approachProgress,
   formatDistance,
@@ -17,14 +18,6 @@ interface Props {
   trailActive: boolean;
   onDiscover: () => void;
   onStop: () => void;
-}
-
-export function directionsUrl(target: { lat: number; lng: number }): string {
-  const q = `${target.lat},${target.lng}`;
-  return Platform.select({
-    ios: `http://maps.apple.com/?daddr=${q}&dirflg=w`,
-    default: `https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=walking`,
-  });
 }
 
 /** Find-My-style guidance card: how close you are to your next adventure. */
@@ -108,7 +101,7 @@ export function ProximityHud({
           </Pressable>
         ) : (
           <Pressable
-            onPress={() => Linking.openURL(directionsUrl(target)).catch(() => undefined)}
+            onPress={() => Linking.openURL(directionsUrl(target, distanceM)).catch(() => undefined)}
             accessibilityRole="link"
             style={[styles.button, { backgroundColor: c.accent, flex: 1 }]}
           >
