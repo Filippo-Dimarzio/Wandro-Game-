@@ -41,12 +41,19 @@ import { useWalkControls } from '@/lib/walk';
 import { MapKey } from '@/components/MapKey';
 import { MapAmbience } from '@/map/MapAmbience';
 import { PlaceMap } from '@/map/PlaceMap';
+import { useChallengeIntro } from '@/state/challengeIntro';
 import { useSession } from '@/state/session';
 import { radius, shadow, space, useColors } from '@/theme';
 
 export default function Explore() {
   const c = useColors();
-  const params = useLocalSearchParams<{ place?: string; category?: string; at?: string }>();
+  const params = useLocalSearchParams<{
+    place?: string;
+    category?: string;
+    at?: string;
+    guide?: string;
+    open?: string;
+  }>();
   const loc = useLocation();
   const { width } = useWindowDimensions();
   // Tablets and desktop keep the adventures panel open beside the map; phones slide it out.
@@ -76,6 +83,7 @@ export default function Explore() {
     }).start();
   }, [sidebarOpen, slide]);
   const { ids } = useUnlockedIds();
+  const showIntro = useChallengeIntro((s) => s.show);
   const loadout = useLoadout();
   const explorer = useMyExplorer();
   const setTeleport = useSession((s) => s.setTeleport);
@@ -111,9 +119,28 @@ export default function Explore() {
       setCategory(params.category as Category);
   }, [params.category, params.at]);
 
+  // A place opened from elsewhere, once per tap, as soon as it has loaded. From its challenge
+  // card, "Let's go!" sends `guide` (guide the player there) and "Read more" sends `open=sheet`;
+  // any other link to a challenge you haven't done opens its card first.
+  const opened = useRef<string | null>(null);
   useEffect(() => {
-    if (params.place) setSelected(all.find((p) => p.id === params.place) ?? null);
-  }, [params.place, all]);
+    if (!params.place) return;
+    const key = `${params.place}:${params.at ?? ''}:${params.guide ?? ''}:${params.open ?? ''}`;
+    if (opened.current === key) return;
+    const p = all.find((x) => x.id === params.place);
+    if (!p) return;
+    opened.current = key;
+    if (params.guide === '1' && !ids.has(p.id)) {
+      setFocus({ lat: p.lat, lng: p.lng });
+      startGuide(p);
+    } else if (params.open === 'sheet' || ids.has(p.id)) selectPlace(p);
+    else {
+      setFocus({ lat: p.lat, lng: p.lng });
+      showIntro(p);
+    }
+    // startGuide/selectPlace only read state; re-running on their identity would re-open the place.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.place, params.at, params.guide, params.open, all]);
 
   // A place picked from another city opens once that city's places have loaded.
   useEffect(() => {
@@ -163,6 +190,13 @@ export default function Explore() {
     setRecenter((n) => n + 1);
   };
 
+  /** Tapping a challenge you haven't done opens its card first; found places open their sheet. */
+  const tapPlace = (p: Place) => {
+    if (ids.has(p.id)) return selectPlace(p);
+    if (!docked) setSidebarOpen(false);
+    showIntro(p);
+  };
+
   const selectPlace = (p: Place) => {
     setSelected(p);
     setFocus({ lat: p.lat, lng: p.lng });
@@ -197,7 +231,7 @@ export default function Explore() {
       position={loc.position}
       region={region}
       hidden={hidden}
-      onSelect={selectPlace}
+      onSelect={tapPlace}
       onShowChallenge={showChallenge}
       onPickCity={() => setPickerOpen(true)}
       onClose={onClose}
@@ -221,7 +255,7 @@ export default function Explore() {
           trail={loadout.trailActive && !!target}
           avatar={{ explorer, skin: loadout.skin, hat: loadout.hat }}
           follow={walking}
-          onSelect={setSelected}
+          onSelect={tapPlace}
           recenterSignal={recenter}
           focus={focus}
           onLongPress={(p) =>

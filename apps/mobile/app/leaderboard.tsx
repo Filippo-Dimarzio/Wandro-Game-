@@ -1,73 +1,31 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { DEFAULT_REGION, REGIONS, regionFor } from '@wandro/shared';
 import { GameBackdrop } from '@/components/GameBackdrop';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { ME, useLeaderboard, type LeaderboardScope } from '@/data/social';
+import { ME, useLeaderboard } from '@/data/social';
 import { t } from '@/i18n';
-import { useLocation } from '@/lib/useLocation';
 import { column, radius, space, useColors } from '@/theme';
 
-const SCOPES: LeaderboardScope[] = ['country', 'region', 'friends'];
 const MEDALS = ['🥇', '🥈', '🥉'];
 
 const challengesLabel = (count: number) =>
   t(count === 1 ? 'leaderboard.challengeOne' : 'leaderboard.challenges', { count });
 
+/** One board for all of Portugal, ranked by XP (50 per completed challenge). */
 export default function Leaderboard() {
   const c = useColors();
-  const [scope, setScope] = useState<LeaderboardScope>('country');
-  const loc = useLocation();
-  const here = regionFor(loc.position) ?? DEFAULT_REGION;
-  const [city, setCity] = useState<string | null>(null);
-  const region = REGIONS.find((r) => r.slug === city) ?? here;
-  const { rows } = useLeaderboard(scope, region.slug);
-  const byCity = scope === 'region';
+  const { rows } = useLeaderboard('country');
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
       <GameBackdrop />
       <ScreenHeader title={t('leaderboard.title')} />
-      <View style={styles.tabs} accessibilityRole="tablist">
-        {SCOPES.map((s) => (
-          <Pressable
-            key={s}
-            onPress={() => setScope(s)}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: scope === s }}
-            style={[styles.tab, { backgroundColor: scope === s ? c.accent : c.surface }]}
-          >
-            <Text style={{ color: scope === s ? c.accentOn : c.text, fontWeight: '700' }}>
-              {t(`leaderboard.${s}`)}
-            </Text>
-          </Pressable>
-        ))}
+      <View style={styles.board}>
+        <Text style={[styles.boardName, { color: c.text }]} accessibilityRole="header">
+          {t('leaderboard.country')}
+        </Text>
+        <Text style={{ color: c.textMuted, fontSize: 12 }}>{t('leaderboard.note')}</Text>
       </View>
-      {byCity && (
-        <View style={styles.tabs} testID="city-picker">
-          {REGIONS.map((r) => (
-            <Pressable
-              key={r.slug}
-              onPress={() => setCity(r.slug)}
-              accessibilityRole="button"
-              accessibilityState={{ selected: r.slug === region.slug }}
-              style={[
-                styles.city,
-                { backgroundColor: r.slug === region.slug ? c.text : c.surface },
-              ]}
-              testID={`board-city-${r.slug}`}
-            >
-              <Text style={{ color: r.slug === region.slug ? c.bg : c.text, fontWeight: '700' }}>
-                {r.name}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
-      <Text style={{ color: c.textMuted, paddingHorizontal: space.lg, fontSize: 12 }}>
-        {byCity ? t('leaderboard.cityNote', { city: region.name }) : t('leaderboard.note')}
-      </Text>
       <FlatList
         data={rows}
         keyExtractor={(r) => r.userId}
@@ -109,31 +67,14 @@ export default function Leaderboard() {
 }
 
 const styles = StyleSheet.create({
-  tabs: {
-    flexDirection: 'row',
-    gap: space.sm,
-    paddingHorizontal: space.lg,
-    paddingBottom: space.sm,
-    flexWrap: 'wrap',
-  },
-  tab: {
-    borderRadius: radius.pill,
-    paddingHorizontal: 14,
-    minHeight: 40,
-    justifyContent: 'center',
-  },
+  board: { paddingHorizontal: space.lg, gap: 2 },
+  boardName: { fontSize: 20, fontWeight: '900' },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.md,
     padding: space.md,
     borderRadius: radius.md,
-  },
-  city: {
-    borderRadius: radius.pill,
-    paddingHorizontal: 12,
-    minHeight: 34,
-    justifyContent: 'center',
   },
   rank: { width: 32, fontSize: 18, fontWeight: '900', textAlign: 'center' },
 });

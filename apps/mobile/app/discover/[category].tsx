@@ -13,6 +13,7 @@ import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t, type TranslationKey } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { radius, shadow, space, useColors } from '@/theme';
+import { useChallengeIntro } from '@/state/challengeIntro';
 
 type Tab = 'overview' | 'places' | 'learn';
 const TABS: { id: Tab; label: TranslationKey }[] = [
@@ -46,6 +47,7 @@ function CategoryContent({ cat }: { cat: Category }) {
   const found = places.filter(({ p }) => ids.has(p.id)).length;
   const nearest = places.find(({ p }) => !ids.has(p.id)) ?? places[0];
 
+  const showIntro = useChallengeIntro((st) => st.show);
   const openOnMap = (placeId?: string) =>
     router.push({
       pathname: '/(tabs)/explore',
@@ -163,7 +165,7 @@ function CategoryContent({ cat }: { cat: Category }) {
                   place={nearest.p}
                   distanceM={nearest.d}
                   unlocked={ids.has(nearest.p.id)}
-                  onPress={() => openOnMap(nearest.p.id)}
+                  onPress={() => showIntro(nearest.p)}
                 />
               )}
             </View>
@@ -181,7 +183,7 @@ function CategoryContent({ cat }: { cat: Category }) {
                   place={p}
                   distanceM={d}
                   unlocked={ids.has(p.id)}
-                  onPress={() => openOnMap(p.id)}
+                  onPress={() => showIntro(p)}
                 />
               ))}
             </View>

@@ -103,7 +103,7 @@ All tables have `id uuid pk`, `created_at`, and RLS enabled. Key columns only:
 
 **Later (design hooks, not built):** `comments`, `daily_challenges`, `events`, `teams`, `venue_partners`, `place_translations`.
 
-**Leaderboards:** one server function, `leaderboard(scope, region)`, ranked by **XP** (50 per completed challenge). Scopes: `country` (Portugal, every public player), `region` (XP earned in one city) and `friends`. The global and weekly boards were retired. Private profiles are excluded from public boards.
+**Leaderboards:** one server function, `leaderboard(scope, region)`, ranked by **XP** (50 per completed challenge). Scopes: `country` (Portugal, every public player), `region` (XP earned in one city) and `friends`; the app shows the single Portugal board. The global and weekly boards were retired. Private profiles are excluded from public boards.
 
 ## 5. Check-in validation (server-side)
 

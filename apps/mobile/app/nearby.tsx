@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { FlatList, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { haversineMeters } from '@wandro/shared';
@@ -9,11 +8,13 @@ import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { column, space, useColors } from '@/theme';
+import { useChallengeIntro } from '@/state/challengeIntro';
 
 /** Every place still to discover near you, closest first (Home shows the first few). */
 export default function Nearby() {
   const c = useColors();
   const loc = useLocation();
+  const showIntro = useChallengeIntro((st) => st.show);
   const places = usePlaces(loc.position).data ?? [];
   const { ids } = useUnlockedIds();
   const rows = places
@@ -35,7 +36,7 @@ export default function Nearby() {
             place={p}
             distanceM={d}
             unlocked={false}
-            onPress={() => router.push({ pathname: '/(tabs)/explore', params: { place: p.id } })}
+            onPress={() => showIntro(p)}
           />
         )}
         ListEmptyComponent={

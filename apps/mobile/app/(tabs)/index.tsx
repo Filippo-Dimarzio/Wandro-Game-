@@ -28,6 +28,7 @@ import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { useSession } from '@/state/session';
 import { column, radius, space, useColors } from '@/theme';
+import { useChallengeIntro } from '@/state/challengeIntro';
 
 /** How many nearby places Home shows; the rest are one tap away on the Nearby page. */
 const HOME_NEARBY = 3;
@@ -41,6 +42,7 @@ export default function Home() {
   const c = useColors();
   const profile = useSession((s) => s.profile);
   const loc = useLocation();
+  const showIntro = useChallengeIntro((st) => st.show);
   const places = usePlaces(loc.position);
   const { ids } = useUnlockedIds();
   const wallet = useWallet();
@@ -176,7 +178,7 @@ export default function Home() {
               distanceM={d}
               unlocked={false}
               width={200}
-              onPress={() => router.push({ pathname: '/(tabs)/explore', params: { place: p.id } })}
+              onPress={() => showIntro(p)}
             />
           ))}
         </ScrollView>

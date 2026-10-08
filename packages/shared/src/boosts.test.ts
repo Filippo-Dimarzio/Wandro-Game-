@@ -13,6 +13,10 @@ import { SHOP_ITEMS, TRAIL_ITEM_CODES } from './shop';
 
 const root = join(__dirname, '..', '..', '..', 'supabase');
 const migration = readFileSync(join(root, 'migrations', '20261013090000_boosts.sql'), 'utf8');
+const moreQuests = readFileSync(
+  join(root, 'migrations', '20261028090000_more_time_quests.sql'),
+  'utf8',
+);
 const seed = readFileSync(join(root, 'seed', 'seed.sql'), 'utf8');
 
 /** Lisbon is UTC+1 in summer and UTC+0 in winter. */
@@ -61,7 +65,7 @@ describe('time-of-day quests', () => {
         [...values.matchAll(/\('([a-z0-9-]+)', '(golden|night)'\)/g)].map((m) => [m[1], m[2]]),
       );
     };
-    expect(pairs(migration)).toEqual(TIME_QUESTS);
+    expect({ ...pairs(migration), ...pairs(moreQuests) }).toEqual(TIME_QUESTS);
     expect(pairs(seed)).toEqual(TIME_QUESTS);
   });
 

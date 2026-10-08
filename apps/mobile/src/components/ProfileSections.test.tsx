@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react-native';
 import { BADGES, DEMO_PLACES, explorerStats, REGIONS } from '@wandro/shared';
-import { classTitle, CityProgress, Records, StyleBars, TrophyShelf } from './ProfileSections';
+import { classTitle, Records, StyleBars, TrophyShelf } from './ProfileSections';
 
 const byId = (id: string) => DEMO_PLACES.find((p) => p.id === id)!;
 const slugs = REGIONS.map((r) => r.slug);
@@ -29,12 +29,6 @@ describe('profile sections', () => {
     expect(
       screen.getByLabelText('Rarest find: Cruz Alta Viewpoint, 8 explorers'),
     ).toBeOnTheScreen();
-  });
-
-  it('shows found and total places per city', async () => {
-    await render(<CityProgress stats={stats} />);
-    const total = DEMO_PLACES.filter((p) => p.region === 'sintra').length;
-    expect(screen.getByLabelText(`Sintra: 3 of ${total} places found`)).toBeOnTheScreen();
   });
 
   it('rings earned trophies by tier and shows the goal of locked ones', async () => {

@@ -11,9 +11,12 @@ select pg_temp.check(not time_quest_open('golden', '2026-07-15T18:59:00Z'), 'gol
 select pg_temp.check(time_quest_open('golden', '2026-12-10T16:30:00Z'), 'golden hour follows the earlier winter sunset');
 select pg_temp.check(time_quest_open('night', '2026-07-16T03:30:00Z'), 'night quests are open before dawn');
 select pg_temp.check(not time_quest_open('night', '2026-07-15T12:00:00Z'), 'night quests are closed at midday');
+select pg_temp.check((select time_quest from places where source_id = 'lisbon-belem-tower') = 'golden'
+  and (select time_quest from places where source_id = 'evora-giraldo-fountain') = 'night',
+  'the five later quests are set (e.g. Belém at golden hour, Giraldo Square at night)');
 
 select pg_temp.as_anon();
-select pg_temp.check((select count(*) from time_quests()) = 11, 'anyone can see which places have time quests');
+select pg_temp.check((select count(*) from time_quests()) = 16, 'anyone can see which places have time quests');
 reset role;
 
 -- Coins to spend: Pena (also collects the Sintra stamp, in plain ink).
@@ -60,7 +63,7 @@ select pg_temp.check((select (v -> 'breakdown' ->> 'time_quest')::int from (
     select award_visit('00000000-0000-0000-0000-0000000000c3', pg_temp.place_id('evora-roman-temple'), 38.57, -7.91, 8, 130) as v) x) = 0,
   'without the key a time quest pays nothing extra');
 select pg_temp.check((select (v -> 'breakdown' ->> 'time_quest')::int from (
-    select award_visit('00000000-0000-0000-0000-0000000000c1', pg_temp.place_id('lisbon-belem-tower'), 38.69, -9.21, 8, 130) as v) x) = 0,
+    select award_visit('00000000-0000-0000-0000-0000000000c1', pg_temp.place_id('lisbon-jeronimos'), 38.69, -9.21, 8, 130) as v) x) = 0,
   'places without a time quest pay nothing extra');
 select pg_temp.check(not (select gold from city_stamps where user_id = '00000000-0000-0000-0000-0000000000c1' and region_slug = 'lisbon'),
   'without ink the next stamp is plain');

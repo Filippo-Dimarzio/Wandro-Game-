@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
+import { Image, type ImageSource } from 'expo-image';
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native';
 import type { Region } from '@wandro/shared';
@@ -55,10 +55,19 @@ export function PostageStamp({
   tilt = 0,
   animate = false,
   gold = false,
+  art: artOverride,
+  postmark = true,
+  label,
   testID,
 }: {
   region: Region;
   value?: number;
+  /** A place's own picture instead of the city's engraving (a challenge's stamp). */
+  art?: ImageSource;
+  /** Cancelled with the Wandro postmark: collected. An uncollected stamp is clean. */
+  postmark?: boolean;
+  /** Screen-reader label; defaults to the city's stamp. */
+  label?: string;
   /** Collected with gold stamp ink. */
   gold?: boolean;
   width?: number;
@@ -70,7 +79,7 @@ export function PostageStamp({
   const height = Math.round(width * RATIO);
   const r = Math.max(2.5, width * 0.04);
   const pad = r * 2;
-  const art = STAMP_ART[region.slug] ?? CITY_ART[region.slug]?.found;
+  const art = artOverride ?? STAMP_ART[region.slug] ?? CITY_ART[region.slug]?.found;
   const land = useRef(new Animated.Value(animate ? 0 : 1)).current;
 
   useEffect(() => {
@@ -89,7 +98,9 @@ export function PostageStamp({
     <Animated.View
       accessible
       accessibilityRole="image"
-      accessibilityLabel={t(gold ? 'stamp.goldLabel' : 'stamp.label', { city: region.name })}
+      accessibilityLabel={
+        label ?? t(gold ? 'stamp.goldLabel' : 'stamp.label', { city: region.name })
+      }
       testID={testID}
       style={[
         styles.shadow,
@@ -136,7 +147,14 @@ export function PostageStamp({
           </View>
         )}
       </View>
-      <Postmark size={width * 0.52} name={region.name} small={small} ink={gold ? GOLD_INK : INK} />
+      {postmark && (
+        <Postmark
+          size={width * 0.52}
+          name={region.name}
+          small={small}
+          ink={gold ? GOLD_INK : INK}
+        />
+      )}
     </Animated.View>
   );
 }

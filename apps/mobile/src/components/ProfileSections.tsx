@@ -3,7 +3,6 @@ import {
   BADGE_TIER,
   CATEGORIES,
   explorerClass,
-  REGIONS,
   type BadgeTier,
   type ExplorerStats,
 } from '@wandro/shared';
@@ -95,38 +94,6 @@ export function Records({ stats, streak }: { stats: ExplorerStats; streak: numbe
   );
 }
 
-export function CityProgress({ stats }: { stats: ExplorerStats }) {
-  const c = useColors();
-  return (
-    <View style={{ gap: space.sm }} testID="city-progress">
-      {stats.cities.map((city) => {
-        const name = REGIONS.find((r) => r.slug === city.region)?.name ?? city.region;
-        const pct = city.total ? Math.round((city.found / city.total) * 100) : 0;
-        return (
-          <View
-            key={city.region}
-            style={styles.barRow}
-            accessible
-            accessibilityLabel={t('profile.cityA11y', {
-              city: name,
-              found: city.found,
-              total: city.total,
-            })}
-          >
-            <Text style={[styles.cityName, { color: c.text }]}>{name}</Text>
-            <View style={[styles.track, { backgroundColor: c.border }]}>
-              <View style={[styles.fill, { width: `${pct}%`, backgroundColor: c.accent }]} />
-            </View>
-            <Text style={[styles.cityCount, { color: c.textMuted }]}>
-              {t('profile.cityCount', { found: city.found, total: city.total })}
-            </Text>
-          </View>
-        );
-      })}
-    </View>
-  );
-}
-
 /** Badges by tier: earned ones ringed in bronze, silver or gold; locked ones show their goal. */
 export function TrophyShelf({ badges }: { badges: EarnedBadge[] }) {
   const c = useColors();
@@ -182,8 +149,6 @@ const styles = StyleSheet.create({
   track: { flex: 1, height: 10, borderRadius: 5, overflow: 'hidden' },
   fill: { height: 10, borderRadius: 5 },
   barCount: { width: 24, textAlign: 'right', fontWeight: '800' },
-  cityName: { width: 72, fontWeight: '700' },
-  cityCount: { width: 56, textAlign: 'right', fontSize: 12, fontWeight: '700' },
   records: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   record: { flexBasis: '47%', flexGrow: 1, borderRadius: radius.md, padding: space.md, gap: 2 },
   shelf: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },

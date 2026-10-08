@@ -481,6 +481,9 @@ from (values
   ('lisbon-senhora-do-monte', 'golden'), ('lisbon-fado-alfama', 'night'),
   ('porto-serra-pilar', 'golden'), ('porto-dom-luis', 'night'),
   ('evora-alto-sao-bento', 'golden'), ('evora-roman-temple', 'night'),
-  ('aveiro-costa-nova', 'golden'), ('aveiro-canal-piramides', 'night')
+  ('aveiro-costa-nova', 'golden'), ('aveiro-canal-piramides', 'night'),
+  ('lisbon-belem-tower', 'golden'), ('lisbon-santa-justa', 'night'),
+  ('porto-foz', 'golden'), ('porto-ribeira', 'night'),
+  ('evora-giraldo-fountain', 'night')
 ) as v(source_id, kind)
 where p.source = 'seed' and p.source_id = v.source_id;

@@ -6,6 +6,13 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Challenge cards: tapping a challenge you haven't done (on Home, Nearby, an interest page, the map's
+  list or a map pin) first opens a card with the place as a postage stamp (clean until you collect
+  it, postmarked after), what it pays, a short teaser and something to look for. "Let's go!" starts
+  guiding you there on the map; "Read more first" opens its About · Learn · Plan sheet.
+- Five more time-of-day quests: Belém Tower and Foz do Douro at golden hour; Santa Justa Lift,
+  Ribeira and Giraldo Square at night (16 in all).
+
 - The place card shows About · Learn · Plan straight away, with the place's teaser and a
   fact count on Learn ("Learn · 3"). One tap opens the card on that tab; no need to find the
   handle first.
@@ -221,8 +228,9 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 - Check-ins are instant: no more waiting at a place. The server verifies your current location
   straight away (mock locations, teleport jumps and impossible travel are still held for review).
-- The leaderboard is one Portugal board ranked by XP (plus per-city and friends views); the global
-  and weekly boards are gone.
+- The leaderboard is one Portugal board ranked by XP; the global, weekly, city and friends boards
+  are gone from the app.
+- Profile no longer shows the City progress bars (each city's progress is on its Collections stamp).
 - The full-page "share your discovery" screen is replaced by the small photo box. The Collections
   trophy button is gone (the leaderboard is on Profile).
 

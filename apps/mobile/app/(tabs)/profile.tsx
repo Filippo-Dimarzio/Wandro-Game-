@@ -16,13 +16,7 @@ import { useWallet } from '@/data/wallet';
 import { InstallBanner } from '@/components/InstallBanner';
 import { LogOutButton } from '@/components/LogOutButton';
 import { ProgressStrip } from '@/components/ProgressStrip';
-import {
-  CityProgress,
-  classTitle,
-  Records,
-  StyleBars,
-  TrophyShelf,
-} from '@/components/ProfileSections';
+import { classTitle, Records, StyleBars, TrophyShelf } from '@/components/ProfileSections';
 import { useExplorerStats } from '@/data/explorerStats';
 import { isDemo } from '@/lib/env';
 import { t } from '@/i18n';
@@ -111,9 +105,6 @@ export default function Profile() {
 
         <Text style={[styles.section, { color: c.text }]}>{t('profile.style')}</Text>
         <StyleBars stats={stats} />
-
-        <Text style={[styles.section, { color: c.text }]}>{t('profile.cities')}</Text>
-        <CityProgress stats={stats} />
 
         <View style={styles.links}>
           <LinkButton

@@ -135,7 +135,7 @@ Navigation is a bottom tab bar like Instagram: Home · Explore · Check in · Co
 
 Coins and XP are written to an append-only ledger, so later changes in rarity never change past
 rewards. Each player can complete each place **once**. XP (50 per challenge) never goes down;
-the leaderboard (Portugal, per city or friends) ranks by XP, so shopping never costs you rank.
+the leaderboard (one board for Portugal) ranks by XP, so shopping never costs you rank.
 Complete a challenge every day to keep your 🔥 day streak, Duolingo style.
 
 ## The Store

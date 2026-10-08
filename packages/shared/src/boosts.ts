@@ -17,7 +17,7 @@ export const FRIEND_BEACON_CODE = 'friend_beacon';
 /**
  * Places with a golden-hour or night quest, by seed source id (the demo id without `demo-`).
  * Only open, public, lit spots for night: no closed sites or dark trails.
- * The migration sets places.time_quest from the same list (a test compares them).
+ * The migrations set places.time_quest from the same list (a test compares them).
  */
 export const TIME_QUESTS: Record<string, TimeQuest> = {
   adraga: 'golden',
@@ -31,6 +31,12 @@ export const TIME_QUESTS: Record<string, TimeQuest> = {
   'evora-roman-temple': 'night',
   'aveiro-costa-nova': 'golden',
   'aveiro-canal-piramides': 'night',
+  // Added in 20261028090000_more_time_quests.
+  'lisbon-belem-tower': 'golden',
+  'lisbon-santa-justa': 'night',
+  'porto-foz': 'golden',
+  'porto-ribeira': 'night',
+  'evora-giraldo-fountain': 'night',
 };
 
 export function timeQuestFor(placeId: string): TimeQuest | undefined {
