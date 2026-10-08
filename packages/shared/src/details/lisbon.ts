@@ -1,4 +1,5 @@
 import type { PlaceDetails } from '../types';
+import { flagForReview } from './review';
 
 const WIKI = 'https://en.wikipedia.org/wiki/';
 
@@ -6,7 +7,7 @@ const WIKI = 'https://en.wikipedia.org/wiki/';
  * Learn content for Lisbon, keyed by place id. Every fact carries the page it was checked
  * against; all are flagged for a curator to re-read before the city leaves review.
  */
-const LISBON: Record<string, PlaceDetails> = {
+export const LISBON_DETAILS: Record<string, PlaceDetails> = flagForReview({
   'demo-lisbon-belem-tower': {
     teaser: 'A stone fortress standing in the Tagus, all ropes, crosses and lookout turrets.',
     facts: [
@@ -830,12 +831,4 @@ const LISBON: Record<string, PlaceDetails> = {
       },
     ],
   },
-};
-
-// Researched from the linked pages, not supplied by a curator: flag every fact for review.
-export const LISBON_DETAILS: Record<string, PlaceDetails> = Object.fromEntries(
-  Object.entries(LISBON).map(([id, d]) => [
-    id,
-    { ...d, facts: d.facts.map((f) => ({ ...f, needsReview: true })) },
-  ]),
-);
+});

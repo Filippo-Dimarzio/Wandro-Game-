@@ -58,13 +58,17 @@ describe('place details', () => {
     expect(facts).not.toMatch(/natural lake|reservoir|man-made/i);
   });
 
-  it('every Lisbon place has facts, each with its source and flagged for review', () => {
-    const lisbon = DEMO_PLACES.filter((p) => p.region === 'lisbon');
-    expect(lisbon.filter((p) => !p.details).map((p) => p.id)).toEqual([]);
-    for (const p of lisbon)
-      for (const f of p.details!.facts)
-        expect([p.id, !!f.source, f.needsReview]).toEqual([p.id, true, true]);
-  });
+  it.each(['lisbon', 'porto', 'evora'])(
+    'every %s place has facts, each with its source and flagged for review',
+    (region) => {
+      const places = DEMO_PLACES.filter((p) => p.region === region);
+      expect(places.length).toBeGreaterThan(0);
+      expect(places.filter((p) => !p.details).map((p) => p.id)).toEqual([]);
+      for (const p of places)
+        for (const f of p.details!.facts)
+          expect([p.id, !!f.source, f.needsReview]).toEqual([p.id, true, true]);
+    },
+  );
 
   it('never asks players to ride the Glória funicular after the 2025 crash', () => {
     const gloria = DEMO_PLACES.find((p) => p.id === 'demo-lisbon-gloria')!;

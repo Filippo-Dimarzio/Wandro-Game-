@@ -595,7 +595,7 @@ export const PORTUGAL_QUESTS = [
       41.149,
       -8.611,
       300,
-      'An art deco theatre of 1932 on the Praça D. João I. Quest: find its deco lettering.',
+      'Porto’s Art Deco municipal theatre on the Praça D. João I. Quest: find its deco lettering.',
     ],
     [
       'casa-guitarra',
@@ -941,7 +941,7 @@ export const PORTUGAL_QUESTS = [
       38.5655,
       -7.905,
       200,
-      'A bullring of 1890 that also hosts concerts and fairs. Quest: find the poster.',
+      'A bullring of 1889 that also hosts concerts and fairs. Quest: find the poster.',
     ],
     [
       'harmonia',

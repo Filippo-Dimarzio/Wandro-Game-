@@ -70,7 +70,7 @@ export const CULTURE_THEME_QUESTS = [
       41.1488,
       -8.6075,
       120,
-      'Porto’s market of 1914, reopened with its stallholders back in place. Quest: find a stall selling bread from Avintes.',
+      'Porto’s grand old market, reopened in 2022 with its stallholders back in place. Quest: find a stall selling bread from Avintes.',
     ],
     [
       'fontainhas',

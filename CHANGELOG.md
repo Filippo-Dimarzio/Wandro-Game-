@@ -6,6 +6,10 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Porto and Évora Learn facts: all 50 Porto and 42 Évora places get a teaser and facts, each
+  stored with the page it was checked against and flagged for curator review. Corrected three
+  dates in descriptions: Bolhão market (origins 1838), the Rivoli (remade 1923) and Évora's
+  bullring (opened 1889).
 - Opening any place with facts lands straight on its Learn tab, facts first. Source links are
   no longer shown on the card (each fact still keeps its source in the data for curators).
 - Challenge cards: tapping a challenge you haven't done (on Home, Nearby, an interest page, the map's
