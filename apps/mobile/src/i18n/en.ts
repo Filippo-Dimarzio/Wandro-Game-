@@ -174,8 +174,6 @@ export const en = {
   'place.tabLearnCount': 'Learn · {count}',
   'place.tabLearnA11y': 'Learn: {count} facts about this place',
   'place.lookFor': 'Look for',
-  'place.source': 'Source: {site}',
-  'place.sourceA11y': 'Source for this fact: {site}',
   'place.noFacts': 'Fun facts for this place are on their way.',
   'place.noPlan': 'Planning notes for this place are on their way.',
   'place.bestTime': 'Best time',

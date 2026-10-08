@@ -388,6 +388,7 @@ export default function Explore() {
 
         {selected && (
           <PlaceSheet
+            key={selected.id}
             place={selected}
             others={all}
             userPosition={loc.position}

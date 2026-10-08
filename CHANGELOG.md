@@ -6,6 +6,8 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Opening any place with facts lands straight on its Learn tab, facts first. Source links are
+  no longer shown on the card (each fact still keeps its source in the data for curators).
 - Challenge cards: tapping a challenge you haven't done (on Home, Nearby, an interest page, the map's
   list or a map pin) first opens a card with the place as a postage stamp (clean until you collect
   it, postmarked after), what it pays, a short teaser and something to look for. "Let's go!" starts

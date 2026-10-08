@@ -21,7 +21,7 @@ describe('PlaceSheet', () => {
     expect(screen.getByTestId('hours-chip')).toBeOnTheScreen();
     expect(screen.queryByTestId('time-quest')).toBeNull();
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
+    await fireEvent.press(screen.getByTestId('tab-about'));
     expect(screen.getByText('Thu–Sat · 21:30–00:30')).toBeOnTheScreen();
   });
 
@@ -34,7 +34,7 @@ describe('PlaceSheet', () => {
     expect(screen.getByText('Beaches & coast')).toBeOnTheScreen();
     expect(screen.getByTestId('time-quest')).toHaveTextContent(/Golden-hour quest/);
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
+    await fireEvent.press(screen.getByTestId('tab-about'));
     await fireEvent.press(screen.getByRole('link', { name: /More about Beaches & coast/ }));
     expect(mockPush).toHaveBeenCalledWith({
       pathname: '/discover/[category]',
@@ -50,8 +50,6 @@ describe('PlaceSheet', () => {
       <PlaceSheet place={pena} userPosition={pena} unlocked={false} onClose={() => {}} />,
       { wrapper },
     );
-    await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
-    await fireEvent.press(screen.getByTestId('tab-learn'));
     expect(screen.getByText(pena.details!.teaser)).toBeOnTheScreen();
     expect(screen.getByText(fact1!)).toBeOnTheScreen();
     expect(screen.getByText(fact2!)).toBeOnTheScreen();
@@ -59,30 +57,38 @@ describe('PlaceSheet', () => {
     expect(screen.getByText(/Triton arch/)).toBeOnTheScreen();
   });
 
-  it('shows the teaser and a Learn tab with a fact count without expanding', async () => {
+  it('opens straight onto Learn, with the fact count on the tab', async () => {
     await render(
       <PlaceSheet place={pena} userPosition={pena} unlocked={false} onClose={() => {}} />,
       { wrapper },
     );
-    expect(screen.getByTestId('peek-teaser')).toHaveTextContent(pena.details!.teaser);
-    expect(
-      screen.getByRole('tab', {
-        name: `Learn: ${pena.details!.facts.length} facts about this place`,
-      }),
-    ).toBeOnTheScreen();
-    expect(screen.queryByText(fact1!)).toBeNull();
-
-    await fireEvent.press(screen.getByTestId('tab-learn'));
+    const learn = screen.getByRole('tab', {
+      name: `Learn: ${pena.details!.facts.length} facts about this place`,
+    });
+    expect(learn).toBeSelected();
+    expect(screen.getByTestId('place-learn')).toBeOnTheScreen();
     expect(screen.getByText(fact1!)).toBeOnTheScreen();
-    expect(screen.queryByTestId('peek-teaser')).toBeNull();
+
+    // Tapping the open tab folds the card down to its peek, teaser still showing.
+    await fireEvent.press(learn);
+    expect(screen.queryByText(fact1!)).toBeNull();
+    expect(screen.getByTestId('peek-teaser')).toHaveTextContent(pena.details!.teaser);
+  });
+
+  it('places without facts open on the short card', async () => {
+    const bare = { ...pena, id: 'demo-bare', details: undefined };
+    await render(
+      <PlaceSheet place={bare} userPosition={bare} unlocked={false} onClose={() => {}} />,
+      { wrapper },
+    );
+    expect(screen.queryByTestId('place-learn')).toBeNull();
+    expect(screen.getByTestId('tab-learn')).not.toBeSelected();
   });
 
   it('Learn reveals every fact once discovered', async () => {
     await render(<PlaceSheet place={pena} userPosition={pena} unlocked onClose={() => {}} />, {
       wrapper,
     });
-    await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
-    await fireEvent.press(screen.getByTestId('tab-learn'));
     expect(screen.getByText(fact2!)).toBeOnTheScreen();
     expect(screen.queryByTestId('fact-locked')).toBeNull();
   });
@@ -99,7 +105,6 @@ describe('PlaceSheet', () => {
       />,
       { wrapper },
     );
-    await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
     await fireEvent.press(screen.getByTestId('tab-plan'));
     expect(screen.getByText('About 2 h')).toBeOnTheScreen();
     expect(screen.getByText('Ticket needed')).toBeOnTheScreen();
@@ -107,14 +112,12 @@ describe('PlaceSheet', () => {
     expect(screen.getByText(/^Castle of the Moors · /)).toBeOnTheScreen();
   });
 
-  it('Learn links each fact to the source it was checked against', async () => {
+  it('Learn shows the facts without source links', async () => {
     const museum = DEMO_PLACES.find((p) => p.id === 'demo-sintra-natural-history')!;
     await render(<PlaceSheet place={museum} userPosition={museum} unlocked onClose={() => {}} />, {
       wrapper,
     });
-    await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
-    await fireEvent.press(screen.getByTestId('tab-learn'));
-    expect(screen.getAllByTestId('fact-source')[0]).toHaveTextContent('Source: en.wikipedia.org');
+    expect(screen.queryByTestId('fact-source')).toBeNull();
     expect(screen.getByText(/Nantan meteorite/)).toBeOnTheScreen();
   });
 
@@ -124,7 +127,6 @@ describe('PlaceSheet', () => {
       <PlaceSheet place={cabo} userPosition={cabo} unlocked={false} onClose={() => {}} />,
       { wrapper },
     );
-    await fireEvent.press(screen.getByRole('button', { name: 'Show details' }));
     await fireEvent.press(screen.getByTestId('tab-plan'));
     expect(screen.getByTestId('place-tip')).toHaveTextContent(/fences/);
   });

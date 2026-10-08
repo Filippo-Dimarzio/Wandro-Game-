@@ -68,13 +68,14 @@ export function PlaceSheet({
 }: Props) {
   const c = useColors();
   const { height } = useWindowDimensions();
-  const [expanded, setExpanded] = useState(false);
-  const [tab, setTab] = useState<Tab>('about');
+  const factCount = place.details?.facts.length ?? 0;
+  // Places with facts open straight onto Learn, so the facts are the first thing you see.
+  const [expanded, setExpanded] = useState(factCount > 0);
+  const [tab, setTab] = useState<Tab>(factCount > 0 ? 'learn' : 'about');
   const pts = pointsForVisit(place.category, place.uniqueVisitors, place.basePoints);
   const distance = haversineMeters(userPosition, place);
   const catColor = c.category[place.category];
   const schedule = scheduleLines(place.hours);
-  const factCount = place.details?.facts.length ?? 0;
 
   const openDirections = () => {
     Linking.openURL(directionsUrl(place, distance)).catch(() => undefined);

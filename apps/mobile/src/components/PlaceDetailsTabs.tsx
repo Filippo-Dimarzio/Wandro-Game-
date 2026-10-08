@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { formatDistance, haversineMeters, type Place } from '@wandro/shared';
 import { t } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
@@ -38,20 +38,7 @@ export function PlaceLearn({ place }: { place: Place }) {
           <View style={[styles.num, { backgroundColor: color }]}>
             <Text style={{ color: c.onCategory, fontWeight: '900', fontSize: 12 }}>{i + 1}</Text>
           </View>
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text style={{ color: c.text, lineHeight: 21 }}>{fact.text}</Text>
-            {fact.source && (
-              <Text
-                onPress={() => Linking.openURL(fact.source!).catch(() => undefined)}
-                accessibilityRole="link"
-                accessibilityLabel={t('place.sourceA11y', { site: hostOf(fact.source) })}
-                style={{ color, fontSize: 12, textDecorationLine: 'underline' }}
-                testID="fact-source"
-              >
-                {t('place.source', { site: hostOf(fact.source) })}
-              </Text>
-            )}
-          </View>
+          <Text style={{ color: c.text, lineHeight: 21, flex: 1 }}>{fact.text}</Text>
         </View>
       ))}
       {d.lookFor && (
@@ -65,12 +52,6 @@ export function PlaceLearn({ place }: { place: Place }) {
       )}
     </View>
   );
-}
-
-/** "en.wikipedia.org" from a source URL, for a short link label. */
-export function hostOf(url: string): string {
-  const m = /^https?:\/\/(?:www\.)?([^/]+)/.exec(url);
-  return m ? m[1]! : url;
 }
 
 /** Plan tab: best time, time needed, cost, access, a practical tip and a place to pair it with. */
