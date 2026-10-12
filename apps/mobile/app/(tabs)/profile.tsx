@@ -1,13 +1,11 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { explorerStage } from '@wandro/shared';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackdrop } from '@/components/GameBackdrop';
 import { ExplorerAvatar } from '@/components/ExplorerAvatar';
-import { ExplorerPicker } from '@/components/ExplorerPicker';
-import { useMyExplorer, useSetExplorer } from '@/data/explorer';
+import { useMyExplorer } from '@/data/explorer';
 import { useBadges } from '@/data/badges';
 import { useLoadout } from '@/data/loadout';
 import { useIsModerator } from '@/data/moderation';
@@ -19,6 +17,7 @@ import { ProgressStrip } from '@/components/ProgressStrip';
 import { classTitle, Records, StyleBars, TrophyShelf } from '@/components/ProfileSections';
 import { useExplorerStats } from '@/data/explorerStats';
 import { isDemo } from '@/lib/env';
+import { homeCityLabel } from '@/lib/homeCity';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { PlaceMap } from '@/map/PlaceMap';
@@ -38,8 +37,7 @@ export default function Profile() {
   const profile = useSession((s) => s.profile);
   const level = wallet.level;
   const explorer = useMyExplorer();
-  const setExplorer = useSetExplorer();
-  const [picking, setPicking] = useState(false);
+  const city = homeCityLabel(profile?.homeCity);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
@@ -47,9 +45,9 @@ export default function Profile() {
       <ScrollView contentContainerStyle={[styles.container, column]}>
         <View style={styles.header}>
           <Pressable
-            onPress={() => router.push('/shop')}
+            onPress={() => router.push('/customise')}
             accessibilityRole="button"
-            accessibilityLabel={t('profile.store')}
+            accessibilityLabel={t('customise.title')}
           >
             <ExplorerAvatar
               explorer={explorer}
@@ -60,42 +58,33 @@ export default function Profile() {
               glow={loadout.trailActive}
               accessibilityLabel={t('profile.stage', { stage: explorerStage(level) })}
             />
+            <View style={[styles.edit, { backgroundColor: c.accent, borderColor: c.bg }]}>
+              <Ionicons name="color-palette" size={14} color={c.accentOn} />
+            </View>
           </Pressable>
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, gap: 2 }}>
             <Text style={[styles.name, { color: c.text }]} accessibilityRole="header">
               {profile?.username}
             </Text>
-            {profile?.homeCity ? (
-              <Text style={{ color: c.textMuted }}>{profile.homeCity}</Text>
-            ) : null}
             <Text style={{ color: c.accent, fontWeight: '800' }} testID="explorer-class">
               {t('profile.classLine', { class: classTitle(stats), level })}
             </Text>
-            <Text style={{ color: c.textMuted, fontWeight: '600' }}>
-              {t('profile.stage', { stage: explorerStage(level) })}
-            </Text>
-            <Pressable
-              onPress={() => setPicking((v) => !v)}
-              accessibilityRole="button"
-              accessibilityState={{ expanded: picking }}
-              testID="change-explorer"
-            >
-              <Text style={{ color: c.textMuted, fontWeight: '700', marginTop: 4 }}>
-                {t('profile.changeExplorer')}
-              </Text>
-            </Pressable>
+            <View style={styles.chips}>
+              {city && (
+                <View style={[styles.link, { backgroundColor: c.surface }]} testID="home-city">
+                  <Text style={{ fontSize: 16 }}>{city.flag}</Text>
+                  <Text style={{ color: c.text, fontWeight: '700' }}>{city.name}</Text>
+                </View>
+              )}
+              <LinkButton
+                icon="color-palette"
+                label={t('profile.customise')}
+                onPress={() => router.push('/customise')}
+                testID="customise-button"
+              />
+            </View>
           </View>
         </View>
-
-        {picking && (
-          <View style={[styles.picker, { backgroundColor: c.surface }]}>
-            <ExplorerPicker
-              value={explorer}
-              skin={loadout.skin}
-              onChange={(id) => setExplorer.mutate(id, { onSuccess: () => setPicking(false) })}
-            />
-          </View>
-        )}
 
         <Text style={[styles.section, { color: c.text }]}>{t('profile.progress')}</Text>
         <ProgressStrip wallet={wallet} />
@@ -108,19 +97,9 @@ export default function Profile() {
 
         <View style={styles.links}>
           <LinkButton
-            icon="search"
-            label={t('search.title')}
-            onPress={() => router.push('/search')}
-          />
-          <LinkButton
             icon="book"
             label={t('passport.title')}
             onPress={() => router.push('/passport')}
-          />
-          <LinkButton
-            icon="trophy"
-            label={t('leaderboard.title')}
-            onPress={() => router.push('/leaderboard')}
           />
           <LinkButton
             icon="storefront"
@@ -131,11 +110,6 @@ export default function Profile() {
             icon="settings"
             label={t('profile.settings')}
             onPress={() => router.push('/settings')}
-          />
-          <LinkButton
-            icon="help-circle"
-            label={t('howto.title')}
-            onPress={() => router.push('/howto')}
           />
           {isDemo && (
             <LinkButton
@@ -170,7 +144,18 @@ export default function Profile() {
 
 const styles = StyleSheet.create({
   links: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
-  picker: { borderRadius: radius.lg, padding: space.md },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginTop: space.xs },
+  edit: {
+    position: 'absolute',
+    right: -2,
+    bottom: -2,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   link: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -203,10 +188,12 @@ function LinkButton({
   icon,
   label,
   onPress,
+  testID,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
   onPress: () => void;
+  testID?: string;
 }) {
   const c = useColors();
   return (
@@ -214,6 +201,7 @@ function LinkButton({
       onPress={onPress}
       accessibilityRole="button"
       style={[styles.link, { backgroundColor: c.surface }]}
+      testID={testID}
     >
       <Ionicons name={icon} size={18} color={c.accent} />
       <Text style={{ color: c.text, fontWeight: '700' }}>{label}</Text>

@@ -6,6 +6,10 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Customise your explorer: a Customise button on Profile (and a palette badge on your avatar) opens
+  your explorer on a little stage with Explorer, Outfit and Hat tabs. Tap to swap explorer or wear
+  anything you own; things you don't own yet show a lock and take you to the Store.
+
 - Porto and Évora Learn facts: all 50 Porto and 42 Évora places get a teaser and facts, each
   stored with the page it was checked against and flagged for curator review. Corrected three
   dates in descriptions: Bolhão market (origins 1838), the Rivoli (remade 1923) and Évora's
@@ -231,6 +235,11 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - Animated cards: they slide in and press down softly; Reduce Motion turns this off.
 
 ### Changed
+
+- Profile is simpler: the progress card shows only your level, its rank and your XP, with a thicker
+  bar that fills as you earn XP; your home city is a chip with its flag (🇵🇹 Lisbon); the Find
+  explorers, Leaderboard and How to play buttons are gone (search is on Home, and tapping your
+  progress card opens the leaderboard).
 
 - Check-ins are instant: no more waiting at a place. The server verifies your current location
   straight away (mock locations, teleport jumps and impossible travel are still held for review).

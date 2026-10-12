@@ -1,46 +1,59 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { CHALLENGE_XP, explorerStage, levelProgress } from '@wandro/shared';
+import { useEffect, useRef } from 'react';
+import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
+import { explorerStage, levelProgress } from '@wandro/shared';
 import type { Wallet } from '@/data/wallet';
-import { CoinAmount } from '@/components/CoinIcon';
 import { t } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
 
+/**
+ * Your level at a glance: level, rank and XP, with a bar that fills as you earn XP (and starts
+ * again from empty on each new level). Tapping it opens the leaderboard.
+ */
 export function ProgressStrip({ wallet }: { wallet: Wallet }) {
   const c = useColors();
   const lp = levelProgress(wallet.xp);
+  const fill = useRef(new Animated.Value(lp.fraction)).current;
+  useEffect(() => {
+    Animated.timing(fill, {
+      toValue: lp.fraction,
+      duration: 700,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [fill, lp.fraction]);
+  const label = `${t('home.level', { level: lp.level })} · ${explorerStage(lp.level)}`;
   return (
     <Pressable
       onPress={() => router.push('/leaderboard')}
       style={[styles.strip, { backgroundColor: c.surface }]}
       accessibilityRole="button"
-      accessibilityLabel={`${t('home.level', { level: lp.level })}, ${explorerStage(lp.level)}, ${t('coins.a11y', { coins: wallet.coins })}, ${t('home.streak', { days: wallet.streak })}`}
+      accessibilityLabel={`${label}, ${t('profile.xp', { xp: lp.xpIntoLevel, next: lp.xpForNext })}`}
+      accessibilityHint={t('profile.progressHint')}
       testID="progress-strip"
     >
       <View style={styles.row}>
-        <Text style={[styles.level, { color: c.text }]}>
-          {t('home.level', { level: lp.level })} · {explorerStage(lp.level)}
+        <Text style={[styles.level, { color: c.text }]}>{label}</Text>
+        <Text style={[styles.xp, { color: c.accent }]} testID="xp-count">
+          {t('profile.xp', { xp: lp.xpIntoLevel, next: lp.xpForNext })}
         </Text>
-        <CoinAmount amount={wallet.coins} color={c.gold} size={18} />
       </View>
-      <View style={[styles.track, { backgroundColor: c.border }]}>
-        <View
+      <View
+        style={[styles.track, { backgroundColor: c.border }]}
+        accessibilityRole="progressbar"
+        accessibilityValue={{ min: 0, max: lp.xpForNext, now: lp.xpIntoLevel }}
+        testID="xp-bar"
+      >
+        <Animated.View
           style={[
             styles.bar,
-            { width: `${Math.round(lp.fraction * 100)}%`, backgroundColor: c.accent },
+            {
+              backgroundColor: c.accent,
+              width: fill.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
+            },
           ]}
         />
       </View>
-      <Text style={{ color: c.textMuted, fontSize: 12 }}>
-        {lp.xpIntoLevel}/{lp.xpForNext} XP ·{' '}
-        {t(wallet.discoveries === 1 ? 'home.discoveryOne' : 'home.discoveryMany', {
-          count: wallet.discoveries,
-        })}
-        {wallet.streak > 0 ? ` · 🔥 ${t('home.streak', { days: wallet.streak })}` : ''}
-      </Text>
-      <Text style={{ color: c.textMuted, fontSize: 12 }} testID="xp-explainer">
-        {t('home.xpExplainer', { xp: CHALLENGE_XP })}
-      </Text>
     </Pressable>
   );
 }
@@ -48,8 +61,8 @@ export function ProgressStrip({ wallet }: { wallet: Wallet }) {
 const styles = StyleSheet.create({
   strip: { borderRadius: radius.md, padding: space.md, gap: space.sm },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  level: { fontWeight: '700', fontSize: 15 },
-  points: { fontWeight: '900', fontSize: 16 },
-  track: { height: 6, borderRadius: 3, overflow: 'hidden' },
-  bar: { height: 6, borderRadius: 3 },
+  level: { fontWeight: '800', fontSize: 15 },
+  xp: { fontWeight: '900', fontSize: 14 },
+  track: { height: 12, borderRadius: 6, overflow: 'hidden' },
+  bar: { height: 12, borderRadius: 6 },
 });
