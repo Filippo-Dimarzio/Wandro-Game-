@@ -78,7 +78,7 @@ describe('Challenge a friend', () => {
     mockParams = { id: 'demo-user-ines' };
     await render(<ChallengeFriend />, { wrapper });
     expect(screen.getByTestId('send-challenge')).toBeDisabled();
-    await fireEvent.press(screen.getByTestId('pick-demo-pena'));
+    await fireEvent.press(await screen.findByTestId('pick-demo-pena'));
     await fireEvent.changeText(screen.getByTestId('challenge-note'), 'Sunrise from the terrace!');
     await fireEvent.press(screen.getByTestId('send-challenge'));
 

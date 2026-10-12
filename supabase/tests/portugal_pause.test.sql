@@ -6,8 +6,8 @@ insert into auth.users (id, raw_user_meta_data) values
   ('00000000-0000-0000-0000-00000000ef02', '{"username":"friend"}');
 
 select pg_temp.check((select count(*) from regions where airport is null) = 0, 'every region has an airport code');
-select pg_temp.check((select array_agg(distinct airport order by airport) from regions where is_active) = array['LIS', 'OPO'],
-  'live cities use Lisbon and Porto airports');
+select pg_temp.check((select array_agg(distinct airport order by airport) from regions where is_active) = array['FAO', 'LIS', 'OPO'],
+  'live cities use Faro, Lisbon and Porto airports');
 
 update regions set is_active = true where slug = 'paris';
 insert into places (name, description, location, category, base_points, source, source_id, status, region_id)

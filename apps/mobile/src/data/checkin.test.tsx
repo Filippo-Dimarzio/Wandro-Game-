@@ -12,7 +12,7 @@ const at = (lat: number, lng: number): UserLocation => ({
   isReal: false,
   isMocked: false,
   permission: 'granted',
-  request: async () => undefined,
+  request: async () => 'granted' as const,
 });
 const wrapper = queryWrapper();
 

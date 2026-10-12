@@ -48,6 +48,7 @@ export default function Profile() {
             onPress={() => router.push('/customise')}
             accessibilityRole="button"
             accessibilityLabel={t('customise.title')}
+            testID="customise-avatar"
           >
             <ExplorerAvatar
               explorer={explorer}
@@ -76,12 +77,6 @@ export default function Profile() {
                   <Text style={{ color: c.text, fontWeight: '700' }}>{city.name}</Text>
                 </View>
               )}
-              <LinkButton
-                icon="color-palette"
-                label={t('profile.customise')}
-                onPress={() => router.push('/customise')}
-                testID="customise-button"
-              />
             </View>
           </View>
         </View>

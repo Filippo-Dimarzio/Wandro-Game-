@@ -28,15 +28,15 @@ describe('Passport city stamps', () => {
 
   it('shows an empty slot per city until you collect its stamp', async () => {
     await render(<Passport />, { wrapper: queryWrapper() });
-    for (const slug of ['sintra', 'lisbon', 'porto', 'evora', 'aveiro'])
+    for (const slug of ['sintra', 'lisbon', 'porto', 'evora', 'aveiro', 'algarve'])
       expect(screen.getByTestId(`passport-slot-${slug}`)).toBeOnTheScreen();
-    expect(screen.getByText('0 of 5 cities collected')).toBeOnTheScreen();
+    expect(screen.getByText('0 of 6 cities collected')).toBeOnTheScreen();
 
     const temple = DEMO_PLACES.find((p) => p.id === 'demo-evora-roman-temple')!;
     await act(async () => void useSession.getState().recordVisit(temple, DEMO_PLACES));
     expect(screen.getByTestId('passport-city-evora')).toBeOnTheScreen();
     expect(screen.getByLabelText('Évora stamp')).toBeOnTheScreen();
     expect(screen.queryByTestId('passport-slot-evora')).toBeNull();
-    expect(screen.getByText('1 of 5 cities collected')).toBeOnTheScreen();
+    expect(screen.getByText('1 of 6 cities collected')).toBeOnTheScreen();
   });
 });

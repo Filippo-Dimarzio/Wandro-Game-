@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" width="500" height="560">
+  <!-- The Algarve: golden sea-arch cliffs (Ponta da Piedade, Benagil), Cape St Vincent's lighthouse,
+       a surfer and a kayak. Vintage engraved stamp style. Ink: deep ochre. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6C99A"/>
+      <stop offset="0.55" stop-color="#FBE3C2"/>
+      <stop offset="1" stop-color="#F6E9CF"/>
+    </linearGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3FA7B5"/>
+      <stop offset="1" stop-color="#1F6F86"/>
+    </linearGradient>
+    <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#7A3B12" stroke-width="1.1" opacity="0.45"/>
+    </pattern>
+  </defs>
+  <rect width="500" height="560" fill="url(#sky)"/>
+  <!-- sun and rays -->
+  <g transform="translate(330 190)" fill="#EE9A4A" opacity="0.25">
+    <path d="M0 0L-24 -300L24 -300Z"/><path d="M0 0L-24 -300L24 -300Z" transform="rotate(22)"/>
+    <path d="M0 0L-24 -300L24 -300Z" transform="rotate(44)"/><path d="M0 0L-24 -300L24 -300Z" transform="rotate(-22)"/>
+    <path d="M0 0L-24 -300L24 -300Z" transform="rotate(-44)"/><path d="M0 0L-24 -300L24 -300Z" transform="rotate(-66)"/>
+  </g>
+  <circle cx="330" cy="190" r="46" fill="#F6B25C" stroke="#7A3B12" stroke-width="2"/>
+  <!-- gulls -->
+  <g fill="none" stroke="#7A3B12" stroke-width="2" stroke-linecap="round">
+    <path d="M90 120q10-10 20 0q10-10 20 0"/><path d="M150 92q8-8 16 0q8-8 16 0"/><path d="M400 110q7-7 14 0q7-7 14 0"/>
+  </g>
+  <!-- headland with the lighthouse (Cape St Vincent) -->
+  <path d="M0 210C40 200 90 205 130 220L160 300L150 400H0Z" fill="#E2A54E"/>
+  <path d="M0 210C40 200 90 205 130 220L160 300L150 400H0Z" fill="url(#hatch)"/>
+  <g stroke="#7A3B12" stroke-width="2" stroke-linejoin="round">
+    <path d="M62 206h22l-3-74h-16z" fill="#F7F1E1"/>
+    <path d="M60 132h26v-10H60z" fill="#C8432F"/>
+    <path d="M64 122h18v-16H64z" fill="#F9E39A"/>
+    <path d="M62 106l11-12l11 12z" fill="#C8432F"/>
+    <path d="M65 160h16M64 184h18" />
+    <path d="M86 206h34v-18H86z" fill="#F7F1E1"/>
+    <path d="M86 188l17-12l17 12z" fill="#C8432F"/>
+  </g>
+  <!-- the great golden cliff with its sea arch -->
+  <path d="M500 230C460 222 410 228 370 246C340 260 320 290 316 330L312 420H500Z" fill="#E7A94F"/>
+  <path d="M500 230C460 222 410 228 370 246C340 260 320 290 316 330L312 420H500Z" fill="url(#hatch)"/>
+  <path d="M352 420C352 370 372 334 404 334C436 334 452 372 452 420Z" fill="#2C8796" stroke="#7A3B12" stroke-width="2.4"/>
+  <g fill="none" stroke="#7A3B12" stroke-width="2" stroke-linecap="round">
+    <path d="M336 300c20-6 40-4 56 6M330 350c14-4 22-2 28 4M462 300c14-4 26-2 36 4M470 360c10-2 20 0 28 4"/>
+    <path d="M380 262c18-8 46-10 70-4"/>
+  </g>
+  <!-- a sea stack -->
+  <path d="M220 420C218 380 226 340 242 330C258 340 266 380 264 420Z" fill="#E7A94F" stroke="#7A3B12" stroke-width="2.2"/>
+  <path d="M220 420C218 380 226 340 242 330C258 340 266 380 264 420Z" fill="url(#hatch)"/>
+  <!-- sea with a breaking wave -->
+  <rect x="0" y="400" width="500" height="160" fill="url(#sea)"/>
+  <path d="M0 430C60 380 140 370 190 400C150 395 120 410 112 440Z" fill="#7FCBD3" stroke="#14495A" stroke-width="2"/>
+  <path d="M112 440C118 412 146 400 190 400C176 418 170 440 176 460Z" fill="#F7F1E1" stroke="#14495A" stroke-width="2"/>
+  <!-- surfer on the wave -->
+  <g stroke="#14495A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M86 428l64-10" stroke-width="6" stroke="#C8432F"/>
+    <path d="M114 422l6-26l12 24M120 396l-12-12M120 396l16-6" fill="none"/>
+    <circle cx="123" cy="381" r="6" fill="#B5703A"/>
+  </g>
+  <!-- kayak towards the arch -->
+  <g stroke="#14495A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M268 470h70q-8 10-35 10t-35-10z" fill="#F2C14E"/>
+    <path d="M290 446l30 34" stroke-width="2.4"/>
+    <path d="M300 468v-14" stroke-width="5"/>
+    <circle cx="300" cy="448" r="5" fill="#B5703A"/>
+  </g>
+  <g fill="none" stroke="#F7F1E1" stroke-width="1.6" opacity="0.75">
+    <path d="M200 500q20-7 40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+    <path d="M-20 530q20-7 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/>
+    <path d="M330 450q16-6 32 0t32 0t32 0t32 0"/>
+  </g>
+  <rect x="10" y="10" width="480" height="540" fill="none" stroke="#7A3B12" stroke-width="4"/>
+  <rect x="20" y="20" width="460" height="520" fill="none" stroke="#7A3B12" stroke-width="1.5"/>
+</svg>

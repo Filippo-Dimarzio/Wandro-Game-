@@ -7,7 +7,7 @@ import { chromium } from 'playwright';
 
 const assets = new URL('../assets', import.meta.url).pathname;
 const S = 600;
-const cities = ['sintra', 'lisbon', 'porto', 'evora', 'aveiro'];
+const cities = ['sintra', 'lisbon', 'porto', 'evora', 'aveiro', 'algarve'];
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH });
 const page = await browser.newPage();

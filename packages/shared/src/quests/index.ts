@@ -1,4 +1,5 @@
 import type { Place } from '../types';
+import { ALGARVE_PLACES } from './algarve';
 import { CULTURE_THEME_QUESTS } from './culture';
 import { CURIOSITY_QUESTS } from './curiosities';
 import { PORTUGAL_QUESTS } from './portugal';
@@ -8,4 +9,5 @@ export const EUROPE_QUESTS: Place[] = [
   ...PORTUGAL_QUESTS,
   ...CULTURE_THEME_QUESTS,
   ...CURIOSITY_QUESTS,
+  ...ALGARVE_PLACES,
 ];

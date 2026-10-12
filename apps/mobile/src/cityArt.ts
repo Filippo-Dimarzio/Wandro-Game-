@@ -26,6 +26,10 @@ export const CITY_ART: Record<string, { found: ImageSource; locked: ImageSource 
     found: require('../assets/cities/aveiro.jpg'),
     locked: require('../assets/cities/aveiro-locked.jpg'),
   },
+  algarve: {
+    found: require('../assets/cities/algarve.jpg'),
+    locked: require('../assets/cities/algarve-locked.jpg'),
+  },
 };
 
 /**
@@ -38,5 +42,6 @@ export const STAMP_ART: Record<string, ImageSource> = {
   porto: require('../assets/stamps/porto.jpg'),
   evora: require('../assets/stamps/evora.jpg'),
   aveiro: require('../assets/stamps/aveiro.jpg'),
+  algarve: require('../assets/stamps/algarve.jpg'),
 };
 /* eslint-enable @typescript-eslint/no-require-imports */

@@ -6,7 +6,7 @@ insert into auth.users (id, raw_user_meta_data) values
   ('00000000-0000-0000-0000-00000000ee02', '{"username":"pal"}');
 
 select pg_temp.check((select array_agg(slug order by slug) from regions where is_active)
-                     = array['aveiro', 'evora', 'lisbon', 'porto', 'sintra'],
+                     = array['algarve', 'aveiro', 'evora', 'lisbon', 'porto', 'sintra'],
   'only the Portuguese cities are active');
 select pg_temp.check((select count(*) from regions where not is_active) >= 18,
   'the other cities are kept, switched off');

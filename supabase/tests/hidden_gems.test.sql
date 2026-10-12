@@ -4,7 +4,7 @@ insert into auth.users (id, raw_user_meta_data) values
   ('00000000-0000-0000-0000-0000000000f1', '{"username":"gem_hunter"}'),
   ('00000000-0000-0000-0000-0000000000f2', '{"username":"bystander"}');
 
-select pg_temp.check((select count(*) from regions where is_active) = 5, 'the Portuguese launch cities are seeded');
+select pg_temp.check((select count(*) from regions where is_active) = 6, 'the Portuguese launch cities and the Algarve are seeded');
 select pg_temp.check(region_at(41.1407, -8.6131) = 'porto' and region_at(38.7876, -9.3906) = 'sintra',
   'region_at finds the city for a point');
 

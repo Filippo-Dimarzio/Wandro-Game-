@@ -58,6 +58,10 @@ export const LANDMARK_MARKERS: Record<string, { found: number; locked: number }>
     found: require('../../assets/markers/landmark-aveiro.png'),
     locked: require('../../assets/markers/landmark-aveiro-locked.png'),
   },
+  algarve: {
+    found: require('../../assets/markers/landmark-algarve.png'),
+    locked: require('../../assets/markers/landmark-algarve-locked.png'),
+  },
 };
 /* eslint-enable @typescript-eslint/no-require-imports */
 
@@ -68,6 +72,7 @@ export const LANDMARK_NAMES: Record<string, string> = {
   porto: 'Dom Luís I Bridge',
   evora: 'Roman Temple of Évora',
   aveiro: 'Moliceiro Boat Ride',
+  algarve: 'Ponta da Piedade',
 };
 
 /** The city whose signature landmark this place is, or '' for every other place. */

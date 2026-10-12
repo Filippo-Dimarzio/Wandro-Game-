@@ -301,7 +301,6 @@ export const en = {
   'collections.gems': 'Hidden gems',
 
   'profile.title': 'Profile',
-  'profile.customise': 'Customise',
   'profile.xp': '{xp}/{next} XP',
   'profile.progressHint': 'Opens the leaderboard',
   'customise.title': 'Customise your explorer',
@@ -423,6 +422,20 @@ export const en = {
   'intro.go': 'Let’s go!',
   'intro.seeOnMap': 'See it on the map',
   'intro.more': 'Read more first',
+  'location.title': 'Allow Wandro to use your location?',
+  'location.body':
+    'Your explorer walks with you in real time, so the map guides you step by step to the challenge you picked.',
+  'location.point1': 'Only while you’re using the app, never in the background',
+  'location.point2': 'Your location is never shown to anyone else',
+  'location.point3': 'Check in the moment you arrive',
+  'location.allow': 'Allow location',
+  'location.later': 'Not now',
+  'location.turnOn': 'Turn on location',
+  'location.blocked': 'Location is off',
+  'location.blockedHint': 'Opens your settings to turn location on for Wandro',
+  'location.howtoWeb':
+    'Allow location for this site in your browser’s address bar or settings, then reload.',
+  'location.howtoPhone': 'Tap to open Settings and turn on Location for Wandro.',
   'photo.camera': 'Camera',
   'photo.live': 'Live',
   'photo.library': 'Camera roll',
@@ -561,14 +574,6 @@ export const en = {
   'hud.stop': 'Stop guiding',
   'hud.guide': 'Guide me',
   'nudge.near': '💎 Olha! {name} is just {distance} away',
-  'walk.toggle': 'Walk',
-  'walk.toggleOff': 'Stop walking',
-  'walk.hint': 'Walk with WASD or the arrow keys (Shift = slow).',
-  'walk.pad': 'Walking controls',
-  'walk.up': 'Walk north',
-  'walk.down': 'Walk south',
-  'walk.left': 'Walk west',
-  'walk.right': 'Walk east',
   'shop.title': 'Store',
   'shop.balance': 'Your coins',
   'shop.earn':
@@ -763,6 +768,7 @@ export const en = {
   'landmark.porto': 'Dom Luís I Bridge',
   'landmark.evora': 'Roman Temple of Évora',
   'landmark.aveiro': 'Moliceiro boats and striped houses',
+  'landmark.algarve': 'Golden sea arches, a lighthouse and a surfer on a wave',
 };
 
 export type TranslationKey = keyof typeof en;

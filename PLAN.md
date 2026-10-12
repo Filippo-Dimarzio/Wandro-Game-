@@ -2,11 +2,11 @@
 
 Status: **v2.0 — Phases 0–8 built.** This plan records the decisions; `README.md` describes the product as shipped.
 
-Wandro is a photo-first, community-driven exploration game. Players uncover real places (lesser-known museums, castles, heritage sites, parks, viewpoints, music venues, nature spots) by physically visiting them. Launch regions: **Sintra (the pilot), Lisbon, Porto, Évora and Aveiro, Portugal**. The mascot is an octopus (eight arms reaching out in every direction).
+Wandro is a photo-first, community-driven exploration game. Players uncover real places (lesser-known museums, castles, heritage sites, parks, viewpoints, music venues, nature spots) by physically visiting them. Launch regions: **Sintra (the pilot), Lisbon, Porto, Évora, Aveiro and the Algarve, Portugal**. The mascot is an octopus (eight arms reaching out in every direction).
 
 ## 0. Business plan (agreed with the co-founders)
 
-- **Portugal first.** Sintra, Lisbon, Porto, Évora and Aveiro only, until we've proven players come back. The European cities are paused (Phase 10), not deleted; their content is kept on the `archive/europe-v3` branch (`archive/europe-v2` is an older snapshot).
+- **Portugal first.** Sintra, Lisbon, Porto, Évora, Aveiro and the Algarve (the whole south coast as one region, flying into Faro) only, until we've proven players come back. The European cities are paused (Phase 10), not deleted; their content is kept on the `archive/europe-v3` branch (`archive/europe-v2` is an older snapshot).
 - **Business phases:** (1) Foundation, Oct–Nov 2026; (2) closed beta of about 200 players in Sintra and Lisbon, Dec 2026–Mar 2027; (3) public launch in Portugal, Apr–Jun 2027; (4) monetise and expand, from Jul 2027.
 - **Free and fair:** coins and rank can never be bought, and every reward stays checked on the server.
 - **Players:** city-breakers aged 22–34, plus locals and expats in Lisbon and Sintra. Locals are the year-round core.
@@ -274,4 +274,4 @@ Comments, food challenges (venue QR codes for proof), Instagram sharing via the 
 
 **Monetisation (decided for v2.0):** coins only, no subscription and no payments. Coins are earned by playing and spent in the in-game store on equipment (incense trail) and cosmetics. Coins can never be bought, so leaderboards stay fair. If paid features come later, digital purchases on iOS/Android must use the stores' in-app purchase systems.
 
-**Walking (decided for v2.0):** your explorer is you on the map (Find-My-style). Real discoveries need real GPS with a backend; in demo mode and on desktop you can walk virtually with the keyboard or on-screen pad, and those virtual visits count on that device.
+**Walking (decided for v2.0, updated):** your explorer is you on the map (Find-My-style). The map first explains why it wants your location, then shows the phone's or browser's own prompt; once allowed, your explorer follows your real position as you walk (foreground only). The keyboard/on-screen joystick was removed; demo mode keeps Teleport in a place's sheet for testing.

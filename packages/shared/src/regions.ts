@@ -92,6 +92,20 @@ export const REGIONS: readonly Region[] = [
     lat: 41.2481,
     lng: -8.6814,
   }),
+  {
+    // The whole south coast, Sagres to Tavira and up to Monchique: one region with Faro's airport.
+    ...r(
+      'algarve',
+      'Algarve',
+      'Portugal',
+      '🇵🇹',
+      37.0891,
+      -8.2479,
+      { code: 'FAO', lat: 37.0144, lng: -7.9659 },
+      true,
+    ),
+    bbox: [36.9, -9.05, 37.4, -7.38],
+  },
 ];
 
 export const DEFAULT_REGION = REGIONS[0]!;
@@ -135,8 +149,13 @@ const GROUND_MINUTES: Record<string, { train: number; bus: number }> = {
   'evora|porto': { train: 285, bus: 255 },
   'aveiro|porto': { train: 60, bus: 75 },
   'aveiro|evora': { train: 255, bus: 225 },
+  'algarve|sintra': { train: 220, bus: 210 },
+  'algarve|lisbon': { train: 180, bus: 170 },
+  'algarve|porto': { train: 330, bus: 360 },
+  'algarve|evora': { train: 270, bus: 180 },
+  'algarve|aveiro': { train: 300, bus: 330 },
 };
-/** Lisbon ↔ Porto by air. */
+/** A domestic flight between two airports (Lisbon, Porto, Faro). */
 export const FLIGHT_MINUTES = 55;
 
 export function groundMinutes(a: string, b: string): { train: number; bus: number } | undefined {

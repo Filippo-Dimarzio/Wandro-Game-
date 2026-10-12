@@ -25,7 +25,6 @@ import {
   PIN_SORT,
 } from './markers';
 import type { PlaceMapProps } from './types';
-import { nearestOnLines, setStreetSnapper } from './streets';
 import { accuracyGeoJson, guidanceGeoJson, placesGeoJson, useFog } from './useFog';
 
 export type { PlaceMapProps } from './types';
@@ -64,40 +63,6 @@ const FALLBACK_STYLE: maplibregl.StyleSpecification = {
     },
   ],
 };
-
-const STREET_LAYERS = ['sb-street', 'sb-avenue'];
-
-/** Snaps a point to the nearest street drawn on the map (demo walking keeps to the roads). */
-function streetSnapper(m: MLMap) {
-  return (p: { lat: number; lng: number }, maxM: number) => {
-    const layers = STREET_LAYERS.filter((l) => m.getLayer(l));
-    if (!layers.length) return undefined;
-    const metresPerPx = (156543.03392 * Math.cos((p.lat * Math.PI) / 180)) / 2 ** m.getZoom();
-    const r = Math.max(4, maxM / metresPerPx);
-    const at = m.project([p.lng, p.lat]);
-    const features = m.queryRenderedFeatures(
-      [
-        [at.x - r, at.y - r],
-        [at.x + r, at.y + r],
-      ],
-      { layers },
-    );
-    const lines = features.flatMap((f) => {
-      const g = f.geometry;
-      const parts =
-        g.type === 'LineString'
-          ? [g.coordinates]
-          : g.type === 'MultiLineString'
-            ? g.coordinates
-            : [];
-      return parts.map((line) => line.map(([lng, lat]) => m.project([lng!, lat!])));
-    });
-    const best = nearestOnLines(at, lines);
-    if (!best || best.dist > r) return null;
-    const ll = m.unproject([best.point.x, best.point.y]);
-    return { lat: ll.lat, lng: ll.lng };
-  };
-}
 
 /** If the vector tiles can't load, fall back to plain OpenStreetMap raster tiles under the game layers. */
 function addRasterFallback(m: MLMap) {
@@ -319,7 +284,6 @@ export function PlaceMap({
       m.on('mouseenter', 'places', () => (m.getCanvas().style.cursor = 'pointer'));
       m.on('mouseleave', 'places', () => (m.getCanvas().style.cursor = ''));
       ready.current = true;
-      setStreetSnapper(streetSnapper(m));
     });
 
     // Marching-ants animation on the incense trail.
@@ -342,7 +306,6 @@ export function PlaceMap({
     if (!reduceMotion) frame = requestAnimationFrame(animate);
 
     return () => {
-      setStreetSnapper(null);
       clearTimeout(slow);
       cancelAnimationFrame(frame);
       ready.current = false;

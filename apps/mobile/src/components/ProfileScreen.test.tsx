@@ -31,9 +31,10 @@ describe('Profile', () => {
     expect(screen.getByTestId('home-city')).toHaveTextContent('🇵🇹Lisbon');
   });
 
-  it('has a Customise button that opens the explorer customiser', async () => {
+  it('opens the explorer customiser from the profile picture, with no separate button', async () => {
     await render(<Profile />, { wrapper: queryWrapper() });
-    await fireEvent.press(screen.getByTestId('customise-button'));
+    expect(screen.queryByRole('button', { name: 'Customise' })).toBeNull();
+    await fireEvent.press(screen.getByTestId('customise-avatar'));
     expect(router.push).toHaveBeenCalledWith('/customise');
   });
 

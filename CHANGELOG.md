@@ -6,6 +6,15 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- The Algarve: a new region in Collections (with its own vintage stamp of golden sea arches, a
+  lighthouse and a surfer) and 40 challenges in English across every category, including surfing at
+  Arrifana, Amado and Tonel, kayaking or a boat trip to Benagil Cave, snorkelling at Marinha, the
+  Ponta da Piedade grottoes and kitesurfing at Meia Praia, plus two hidden gems and two city sets.
+  It flies into Faro, so Lisbon or Porto ↔ Algarve is a flight.
+- Location the way other apps ask for it: the map explains why (your explorer walks with you and
+  guides you to your challenge), then shows the phone's or browser's prompt. Once allowed, your
+  explorer follows your real position in real time, everywhere in the app at once.
+
 - Customise your explorer: a Customise button on Profile (and a palette badge on your avatar) opens
   your explorer on a little stage with Explorer, Outfit and Hat tabs. Tap to swap explorer or wear
   anything you own; things you don't own yet show a lock and take you to the Store.
@@ -235,6 +244,12 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 - Animated cards: they slide in and press down softly; Reduce Motion turns this off.
 
 ### Changed
+
+- More realistic explorers: all eight are redrawn as shaded, painted portraits (lit skin, real eyes,
+  soft hair, a lit jacket), in every outfit.
+- Customise opens from the badge on your profile picture; the separate Customise button is gone.
+- The walking joystick, the Walk button and WASD/arrow-key walking are removed: your real location
+  moves your explorer instead (Teleport stays in demo mode for testing).
 
 - Profile is simpler: the progress card shows only your level, its rank and your XP, with a thicker
   bar that fills as you earn XP; your home city is a chip with its flag (🇵🇹 Lisbon); the Find

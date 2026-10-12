@@ -13,9 +13,9 @@ const wrapper = queryWrapper();
 describe('Collections', () => {
   beforeEach(() => useSession.getState().reset());
 
-  it('shows a box per Portuguese city, greyed out until you discover a place there', async () => {
+  it('shows a box per Portuguese city and the Algarve, greyed out until you discover a place there', async () => {
     await render(<Collections />, { wrapper });
-    for (const slug of ['sintra', 'lisbon', 'porto', 'evora', 'aveiro'])
+    for (const slug of ['sintra', 'lisbon', 'porto', 'evora', 'aveiro', 'algarve'])
       expect(screen.getByTestId(`city-card-${slug}`)).toBeOnTheScreen();
     expect(screen.queryByTestId('city-card-paris')).toBeNull();
     expect(screen.getByTestId('city-locked-evora')).toBeOnTheScreen();

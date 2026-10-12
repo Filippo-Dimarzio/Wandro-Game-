@@ -27,6 +27,9 @@ describe('regions', () => {
     expect(regionFor({ lat: 41.1407, lng: -8.6131 })?.slug).toBe('porto');
     expect(regionFor({ lat: 38.5728, lng: -7.9073 })?.slug).toBe('evora');
     expect(regionFor({ lat: 40.6405, lng: -8.6538 })?.slug).toBe('aveiro');
+    // The Algarve is one region along the whole south coast.
+    expect(regionFor({ lat: 37.0058, lng: -8.9442 })?.slug).toBe('algarve'); // Sagres
+    expect(regionFor({ lat: 37.1268, lng: -7.6488 })?.slug).toBe('algarve'); // Tavira
     expect(regionFor({ lat: 38.7876, lng: -9.3906 })?.slug).toBe('sintra');
     expect(regionFor({ lat: 38.6916, lng: -9.216 })?.slug).toBe('lisbon');
   });
@@ -81,8 +84,15 @@ describe('regions', () => {
 });
 
 describe('Portugal focus', () => {
-  it('launches in five Portuguese cities, Sintra first', () => {
-    expect(REGIONS.map((r) => r.slug)).toEqual(['sintra', 'lisbon', 'porto', 'evora', 'aveiro']);
+  it('launches in six Portuguese cities and regions, Sintra first', () => {
+    expect(REGIONS.map((r) => r.slug)).toEqual([
+      'sintra',
+      'lisbon',
+      'porto',
+      'evora',
+      'aveiro',
+      'algarve',
+    ]);
     expect(REGIONS.every((r) => r.country === 'Portugal')).toBe(true);
   });
 
@@ -99,7 +109,13 @@ describe('arrivalTrip', () => {
     const f = arrivalTrip('lisbon', 'porto');
     expect(f).toMatchObject({ mode: 'plane', minutes: FLIGHT_MINUTES });
     expect(f!.km).toBeGreaterThan(250);
-    expect(REGIONS.filter((r) => r.hasAirport).map((r) => r.slug)).toEqual(['lisbon', 'porto']);
+    expect(REGIONS.filter((r) => r.hasAirport).map((r) => r.slug)).toEqual([
+      'lisbon',
+      'porto',
+      'algarve',
+    ]);
+    expect(arrivalTrip('lisbon', 'algarve')).toMatchObject({ mode: 'plane' });
+    expect(arrivalTrip('evora', 'algarve')).toMatchObject({ mode: 'bus', minutes: 180 });
   });
 
   it('takes the quicker of train and coach when a city has no airport', () => {
@@ -122,7 +138,7 @@ describe('arrivalTrip', () => {
   });
 
   it('only Portuguese airports are used', () => {
-    expect([...new Set(REGIONS.map((r) => r.airport.code))].sort()).toEqual(['LIS', 'OPO']);
+    expect([...new Set(REGIONS.map((r) => r.airport.code))].sort()).toEqual(['FAO', 'LIS', 'OPO']);
   });
 
   it('every city has an airport within 120 km (Évora flies into Lisbon)', () => {

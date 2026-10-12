@@ -9,7 +9,7 @@ trams and funiculars, and nature spots. Places start
 hidden under fog; visiting one unlocks it, clears the fog around it and earns **coins** for your
 explorer. Hidden gems are worth the most.
 
-- **Where:** Portugal — Sintra (the pilot), Lisbon, Porto, Évora and Aveiro, each with at least
+- **Where:** Portugal — Sintra (the pilot), Lisbon, Porto, Évora, Aveiro and the Algarve, each with at least
   five side quests in every category. We're focusing on Portugal until players prove they come
   back; the earlier European cities are kept on the `archive/europe-v3` branch (`archive/europe-v2` is an older snapshot)
 - **Status:** v2.0 — the full game loop (Phases 0–8). See the [roadmap](#roadmap).
@@ -62,8 +62,8 @@ key moments; the player is always the hero.
 2. **Pick an adventure.** Tap a place and **Guide me**: a card shows the distance, walking time and
    how close you are (_On your way → Getting warmer → Almost there → You're here!_), with
    **Directions in Google Maps**. When a hidden gem is within 150 m, the app nudges you.
-3. **Go there.** On a phone you walk there for real. In the browser or the desktop app (demo
-   mode) you can walk your explorer with **WASD / arrow keys** (Shift = slow) or the on-screen pad.
+3. **Go there.** Allow location when the map asks, and your explorer walks with you in real time
+   while the map guides you. In demo mode, **Teleport here** in a place's sheet jumps you there.
 4. **Check in.** Inside the place's geofence (75 m), hold **Hold to check in**: no waiting. The
    server checks location, accuracy, mock locations and impossible speed — it never trusts the
    phone for coins. Add a photo first (camera, camera roll, files or a live photo) and it posts
@@ -244,7 +244,7 @@ cd apps/mobile && npx expo run:ios   # or: npx expo run:android
 ### Demo mode
 
 Without Supabase credentials the app runs in **demo mode**: sample places in Sintra, Lisbon, Porto,
-Évora and Aveiro, progress saved on your device only. The other players you see are fictional demo
+Évora, Aveiro and the Algarve, progress saved on your device only. The other players you see are fictional demo
 explorers; real players appear once a Supabase project is connected.
 
 - **Teleport here (demo)** in a place's sheet moves you there, so you can try a discovery from
@@ -264,10 +264,10 @@ To use a real backend, copy `.env.example` to `.env`, fill in `EXPO_PUBLIC_SUPAB
 4. Tap **Teleport here (demo)** on a heritage place, open **Discover**, hold **Start discovery** and
    wait for the ring. Back on **Explore**, the fog has cleared around it.
 5. On **Home**, hold **Hold to confirm** on today's challenge to claim +75.
-6. Check **Profile** for your level, explorer rank and badges; tap **Change your explorer** to pick another.
+6. Check **Profile** for your level, explorer rank and badges; tap your profile picture to customise your explorer.
 7. On **Explore**, open the **Adventures** sidebar (the compass tab on the left edge): accept
-   ines.wanders's challenge, read the hidden-gem hint, then use **Walk** to head east from the
-   town centre until the **Moorish Fountain** gem appears.
+   ines.wanders's challenge, read the hidden-gem hint, then allow location (or teleport near it)
+   until the **Moorish Fountain** gem appears.
 8. Tap the city button in the sidebar and pick **Porto** to watch the arrival flight (LIS ✈ OPO).
 9. On **Home**, tap the people icon: accept sofia.sees's friend request and **Challenge** a friend.
 

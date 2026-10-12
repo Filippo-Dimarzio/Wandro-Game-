@@ -27,7 +27,6 @@ import { ChallengeSidebar, SIDEBAR_WIDTH } from '@/components/ChallengeSidebar';
 import { CityPicker } from '@/components/CityPicker';
 import { PlaceSheet } from '@/components/PlaceSheet';
 import { ProximityHud } from '@/components/ProximityHud';
-import { WalkPad } from '@/components/WalkPad';
 import { nearestLocked } from '@/data/discovery';
 import { useFriendChallenges, type FriendChallengeView } from '@/data/friends';
 import { useHiddenGems } from '@/data/hidden';
@@ -37,7 +36,7 @@ import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t } from '@/i18n';
 import { isDemo } from '@/lib/env';
 import { useLocation } from '@/lib/useLocation';
-import { useWalkControls } from '@/lib/walk';
+import { LocationPrompt } from '@/components/LocationPrompt';
 import { MapKey } from '@/components/MapKey';
 import { MapAmbience } from '@/map/MapAmbience';
 import { PlaceMap } from '@/map/PlaceMap';
@@ -90,10 +89,8 @@ export default function Explore() {
   const [category, setCategory] = useState<Category | null>(null);
   const [selected, setSelected] = useState<Place | null>(null);
   const [guideTo, setGuideTo] = useState<Place | null>(null);
-  const [walking, setWalking] = useState(false);
   const [recenter, setRecenter] = useState(0);
   const guideStart = useRef(0);
-  const walk = useWalkControls(isDemo && walking, loc.position);
 
   const all = useMemo(() => places.data ?? [], [places.data]);
   const visible = useMemo(
@@ -185,6 +182,8 @@ export default function Explore() {
   };
 
   const backToMe = () => {
+    // With location on, "my location" is the real one, not where the demo teleported you.
+    if (isDemo && loc.permission === 'granted') setTeleport(null);
     setBrowse(null);
     setFocus(null);
     setRecenter((n) => n + 1);
@@ -246,6 +245,7 @@ export default function Explore() {
         </SafeAreaView>
       )}
       <View style={{ flex: 1 }}>
+        {/* Once location is on, the map follows your explorer as you walk. */}
         <PlaceMap
           places={visible}
           unlockedIds={ids}
@@ -254,7 +254,7 @@ export default function Explore() {
           target={target}
           trail={loadout.trailActive && !!target}
           avatar={{ explorer, skin: loadout.skin, hat: loadout.hat }}
-          follow={walking}
+          follow={loc.isReal && !browse}
           onSelect={tapPlace}
           recenterSignal={recenter}
           focus={focus}
@@ -271,29 +271,7 @@ export default function Explore() {
               toExplore={visible.filter((p) => !ids.has(p.id)).length}
               discovered={visible.filter((p) => ids.has(p.id)).length}
             />
-            {isDemo && (
-              <Pressable
-                onPress={() => {
-                  if (!walking && !useSession.getState().teleport) setTeleport(loc.position);
-                  setWalking((w) => !w);
-                }}
-                accessibilityRole="button"
-                accessibilityState={{ selected: walking }}
-                accessibilityHint={t('walk.hint')}
-                style={[styles.walkToggle, { backgroundColor: walking ? c.accent : c.card }]}
-                testID="walk-toggle"
-              >
-                <Text style={{ color: walking ? c.accentOn : c.text, fontWeight: '800' }}>
-                  🎮 {walking ? t('walk.toggleOff') : t('walk.toggle')}
-                </Text>
-              </Pressable>
-            )}
           </View>
-          {walking && Platform.OS === 'web' && (
-            <Text style={[styles.hint, { backgroundColor: c.card, color: c.textMuted }]}>
-              {t('walk.hint')}
-            </Text>
-          )}
           {nudge && (
             <Pressable
               onPress={() => startGuide(nudge.place)}
@@ -340,15 +318,6 @@ export default function Explore() {
             </Pressable>
           )}
         </SafeAreaView>
-
-        {walking && (
-          <View
-            style={[styles.pad, { bottom: target ? 230 : space.xl + 56 }]}
-            pointerEvents="box-none"
-          >
-            <WalkPad press={walk.press} release={walk.release} />
-          </View>
-        )}
 
         {!selected && !target && (
           <Pressable
@@ -461,6 +430,7 @@ export default function Explore() {
         </>
       )}
 
+      <LocationPrompt permission={loc.permission} onRequest={loc.request} />
       <CityPicker
         visible={pickerOpen}
         current={region?.slug ?? null}
@@ -522,20 +492,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
   dot: { width: 10, height: 10, borderRadius: 5 },
-  walkToggle: {
-    borderRadius: radius.pill,
-    paddingHorizontal: 14,
-    minHeight: 40,
-    justifyContent: 'center',
-    ...shadow,
-  },
-  hint: {
-    alignSelf: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: radius.pill,
-    fontSize: 12,
-  },
   nudge: {
     alignSelf: 'center',
     marginHorizontal: space.lg,
@@ -544,7 +500,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     ...shadow,
   },
-  pad: { position: 'absolute', left: space.lg },
   suggest: {
     position: 'absolute',
     left: space.lg,

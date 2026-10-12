@@ -263,7 +263,47 @@ from (values
   ('aveiro', 'aveiro-santo-andre', 'Santo André Museum Ship', 'A real cod-fishing trawler from 1948, now a museum ship you can walk through. Quest: find the cod hold.', 'other', 60, 40.634, -8.7135, false, null),
   ('aveiro', 'aveiro-baixa-santo-antonio', 'Baixa de Santo António Park', 'A green valley of lawns, ponds and old trees running below the city centre. Quest: find a bench by the water.', 'nature', 80, 40.6377, -8.6468, false, null),
   ('aveiro', 'aveiro-senhor-das-barrocas', 'Senhor das Barrocas Chapel', 'A small Baroque chapel built on an eight-sided plan, rare in Portugal. Quest: count its sides from outside.', 'other', 60, 40.6397, -8.6423, false, null),
-  ('aveiro', 'aveiro-cais-do-bico', 'Cais do Bico, Murtosa', 'A quiet lagoon quay where painted moliceiro boats are still built and moored. Quest: find a prow with a cheeky painted joke.', 'other', 60, 40.733, -8.654, false, null)
+  ('aveiro', 'aveiro-cais-do-bico', 'Cais do Bico, Murtosa', 'A quiet lagoon quay where painted moliceiro boats are still built and moored. Quest: find a prow with a cheeky painted joke.', 'other', 60, 40.733, -8.654, false, null),
+  ('algarve', 'algarve-arrifana', 'Arrifana Beach', 'A cove under high cliffs on the west coast and one of Portugal’s classic surf spots, with schools on the sand. Quest: take a surf lesson, or watch the surfers from the clifftop.', 'coast', 80, 37.2945, -8.8665, false, null),
+  ('algarve', 'algarve-amado', 'Praia do Amado', 'A wide Atlantic beach on the Costa Vicentina, home to surf camps and contests. Quest: catch a wave, or a photo of someone catching one.', 'coast', 80, 37.1675, -8.9036, false, null),
+  ('algarve', 'algarve-tonel', 'Tonel Beach, Sagres', 'Sagres’s surf beach, facing the open Atlantic below the fortress. Quest: surf or bodyboard here with a local school.', 'coast', 80, 37.0058, -8.9442, false, null),
+  ('algarve', 'algarve-benagil', 'Benagil Cave', 'A sea cave with a round hole in its roof and a hidden beach, reached only from the water. Quest: see it from a kayak, paddleboard or boat trip (landing on its beach isn’t allowed).', 'coast', 80, 37.0874, -8.4258, false, null),
+  ('algarve', 'algarve-marinha', 'Praia da Marinha', 'Golden cliffs, arches and clear water, often named one of Europe’s most beautiful beaches. Quest: snorkel along the rocks on a calm day.', 'coast', 80, 37.0899, -8.4122, false, null),
+  ('algarve', 'algarve-meia-praia', 'Meia Praia, Lagos', 'Four kilometres of sand where kitesurfers and windsurfers fly on breezy afternoons. Quest: try a kitesurf or windsurf lesson, or watch the kites.', 'coast', 80, 37.1144, -8.6578, false, null),
+  ('algarve', 'algarve-ponta-piedade', 'Ponta da Piedade', 'Sea stacks and grottoes of golden rock south of Lagos, with steps down to the water. Quest: tour the grottoes by kayak or with a fisherman’s boat from the jetty.', 'coast', 80, 37.0806, -8.6693, false, null),
+  ('algarve', 'algarve-ludo', 'Ludo Trail, Ria Formosa', 'Salt pans and lagoon paths in the Ria Formosa Natural Park, right beside Faro. Quest: spot a flamingo.', 'nature', 80, 37.0245, -8.0013, false, null),
+  ('algarve', 'algarve-seven-valleys', 'Seven Hanging Valleys Trail', 'A clifftop path from Praia da Marinha past sea caves and arches. Quest: walk to the viewpoint above Benagil, keeping to the marked trail.', 'nature', 80, 37.0886, -8.4127, false, null),
+  ('algarve', 'algarve-foia', 'Fóia, Monchique', 'The Algarve’s highest point, 902 m up in the cork-oak hills of Monchique. Quest: find the sea on both sides from the top.', 'nature', 80, 37.3153, -8.5953, false, null),
+  ('algarve', 'algarve-rocha-da-pena', 'Rocha da Pena', 'A limestone ridge inland from Loulé with a short loop trail and wide views. Quest: reach the plateau at the top.', 'nature', 80, 37.2433, -8.1081, false, null),
+  ('algarve', 'algarve-salgados', 'Salgados Lagoon', 'A freshwater lagoon behind the dunes, busy with herons, flamingos and coots. Quest: spot a purple swamphen.', 'nature', 80, 37.0889, -8.3372, false, null),
+  ('algarve', 'algarve-silves-castle', 'Silves Castle', 'The red sandstone walls of the old Moorish capital of the Algarve. Quest: walk the battlements.', 'heritage', 120, 37.1906, -8.4392, false, null),
+  ('algarve', 'algarve-sagres-fortress', 'Sagres Fortress', 'A walled headland linked to Portugal’s age of discovery, with a giant compass rose laid in stones. Quest: find the wind rose.', 'heritage', 120, 37.0006, -8.9478, false, null),
+  ('algarve', 'algarve-cape-st-vincent', 'Cape St Vincent', 'Europe’s south-western tip, with a lighthouse sailors have watched for since 1846. Quest: watch the sun go down over the Atlantic from behind the wall.', 'heritage', 120, 37.0228, -8.9966, false, null),
+  ('algarve', 'algarve-faro-arco', 'Arco da Vila, Faro', 'The grand gate into Faro’s walled old town, with storks nesting on top. Quest: spot the storks.', 'heritage', 120, 37.0157, -7.9349, false, null),
+  ('algarve', 'algarve-bandeira-fort', 'Ponta da Bandeira Fort', 'A small 17th-century fort guarding the harbour of Lagos, with a drawbridge over the moat. Quest: cross the drawbridge.', 'heritage', 120, 37.0988, -8.6706, false, null),
+  ('algarve', 'algarve-milreu', 'Roman Ruins of Milreu', 'A Roman villa near Estoi whose baths are decorated with fish mosaics. Quest: find a fish in the mosaics.', 'heritage', 120, 37.0975, -7.9054, true, null),
+  ('algarve', 'algarve-olhao-market', 'Olhão Market', 'Two red-brick market halls on the waterfront, full of fish and clams from the lagoon. Quest: find the octopus.', 'culture', 100, 37.0263, -7.8414, false, null),
+  ('algarve', 'algarve-loule-market', 'Loulé Market', 'A market hall with Moorish-style domes, selling figs, almonds and local honey. Quest: taste a fig or almond sweet.', 'culture', 100, 37.1376, -8.0228, false, null),
+  ('algarve', 'algarve-tavira-bridge', 'Tavira Old Bridge', 'The old stone bridge over the Gilão river in the middle of Tavira. Quest: cross it and count its arches.', 'culture', 100, 37.1268, -7.6488, false, null),
+  ('algarve', 'algarve-alte', 'Alte Village', 'A whitewashed hill village with springs, a stream and tiled fountains. Quest: find the Fonte Grande.', 'culture', 100, 37.2358, -8.1758, false, null),
+  ('algarve', 'algarve-cacela-velha', 'Cacela Velha', 'A tiny village on a bluff above the Ria Formosa, with a church, a fort and a view over the sandbanks. Quest: watch the tide from the church square.', 'culture', 100, 37.1557, -7.5459, false, null),
+  ('algarve', 'algarve-monchique', 'Monchique Village', 'A hill town of steep lanes, cork and medronho, the Algarve’s strawberry-tree spirit. Quest: find a shop selling medronho honey.', 'culture', 100, 37.3176, -8.5551, false, null),
+  ('algarve', 'algarve-portimao-museum', 'Museum of Portimão', 'A museum in an old sardine cannery that tells the story of the town’s fishing and canning. Quest: find the canning line.', 'art', 100, 37.1305, -8.5339, false, null),
+  ('algarve', 'algarve-faro-museum', 'Faro Municipal Museum', 'A Renaissance convent cloister holding a Roman mosaic of the god Ocean. Quest: find Ocean’s face.', 'art', 100, 37.0145, -7.9346, false, null),
+  ('algarve', 'algarve-sao-lourenco', 'São Lourenço Church, Almancil', 'A small church covered inside in blue-and-white tiles from the 1730s. Quest: find Saint Lawrence in the tiles.', 'art', 100, 37.0897, -8.0289, false, null),
+  ('algarve', 'algarve-santo-antonio', 'Santo António Church, Lagos', 'A baroque church glowing with gilded wood carving from floor to ceiling. Quest: count the cherubs you can see from the door.', 'art', 100, 37.1004, -8.6741, false, null),
+  ('algarve', 'algarve-lagos-cultural-centre', 'Lagos Cultural Centre', 'The town’s gallery and stage for exhibitions by Algarve artists. Quest: find this month’s exhibition.', 'art', 100, 37.1025, -8.6743, false, null),
+  ('algarve', 'algarve-festival-f', 'Festival F, Faro', 'Every September Faro’s walled old town turns into a music festival. Quest: hear a concert inside the walls.', 'music_events', 100, 37.0123, -7.9337, false, null),
+  ('algarve', 'algarve-silves-medieval-fair', 'Silves Medieval Fair', 'Each August Silves goes back to the Middle Ages with knights, music and markets under the castle. Quest: watch a parade or a joust.', 'music_events', 100, 37.1925, -8.4375, false, null),
+  ('algarve', 'algarve-sardine-festival', 'Portimão Sardine Festival', 'Summer concerts and grills by the river celebrate the town’s sardines. Quest: eat grilled sardines on bread.', 'music_events', 100, 37.1355, -8.5362, false, null),
+  ('algarve', 'algarve-teatro-figuras', 'Teatro das Figuras, Faro', 'Faro’s modern theatre, with concerts, dance and opera through the year. Quest: catch a show.', 'music_events', 100, 37.0225, -7.9228, false, null),
+  ('algarve', 'algarve-festival-med', 'Festival MED, Loulé', 'World music fills the old town of Loulé every summer. Quest: dance to a band from another continent.', 'music_events', 100, 37.1383, -8.0213, false, null),
+  ('algarve', 'algarve-faro-bones', 'Chapel of Bones, Faro', 'Behind Carmo Church, a chapel lined with the bones and skulls of monks. Quest: read the inscription over the door.', 'other', 60, 37.0193, -7.9326, false, null),
+  ('algarve', 'algarve-tavira-camera', 'Tavira Camera Obscura', 'An old water tower turned into a camera obscura that projects live views of Tavira. Quest: spot the old bridge in the dish.', 'other', 60, 37.1256, -7.6522, false, null),
+  ('algarve', 'algarve-ilha-deserta', 'Ilha Deserta', 'A deserted sandbar island reached by ferry from Faro, home to mainland Portugal’s southernmost point. Quest: stand at the southern tip.', 'other', 60, 36.9608, -7.8836, false, null),
+  ('algarve', 'algarve-algar-seco', 'Algar Seco, Carvoeiro', 'Rock arches and pools carved by the sea, with a stone window called "A Boneca", the doll. Quest: look out through the window.', 'other', 60, 37.0928, -8.4594, false, null),
+  ('algarve', 'algarve-culatra', 'Culatra Island', 'A fishing village on an island with sandy lanes and no cars, a ferry ride from Olhão. Quest: count the boats on the beach.', 'other', 60, 36.9926, -7.8382, false, null),
+  ('algarve', 'algarve-pego-inferno', 'Pego do Inferno', 'A green pool under a small waterfall, hidden in the hills behind Tavira. Quest: find the waterfall.', 'other', 60, 37.1726, -7.6801, true, null)
 ) as v(region, source_id, name, description, category, base_points, lat, lng, hidden, hours)
 join public.regions r on r.slug = v.region
 on conflict (source, source_id) do nothing;
@@ -279,7 +319,9 @@ from (values
   ('evora-icons', 'evora', 'Évora icons', 'The landmarks everyone talks about.'),
   ('evora-art', 'evora', 'Évora art & museums', 'Five galleries, studios and works of art.'),
   ('aveiro-icons', 'aveiro', 'Aveiro icons', 'The landmarks everyone talks about.'),
-  ('aveiro-art', 'aveiro', 'Aveiro art & museums', 'Five galleries, studios and works of art.')
+  ('aveiro-art', 'aveiro', 'Aveiro art & museums', 'Five galleries, studios and works of art.'),
+  ('algarve-icons', 'algarve', 'Algarve icons', 'The landmarks everyone talks about.'),
+  ('algarve-art', 'algarve', 'Algarve art & museums', 'Five galleries, studios and works of art.')
 ) as v(slug, region, title, description)
 join public.regions r on r.slug = v.region
 on conflict (slug) do nothing;
@@ -326,7 +368,17 @@ from (values
   ('aveiro-art', 'aveiro-moliceiros', 2),
   ('aveiro-art', 'aveiro-cooperativa', 3),
   ('aveiro-art', 'aveiro-capitania', 4),
-  ('aveiro-art', 'aveiro-palheiros', 5)
+  ('aveiro-art', 'aveiro-palheiros', 5),
+  ('algarve-icons', 'algarve-benagil', 1),
+  ('algarve-icons', 'algarve-ponta-piedade', 2),
+  ('algarve-icons', 'algarve-cape-st-vincent', 3),
+  ('algarve-icons', 'algarve-marinha', 4),
+  ('algarve-icons', 'algarve-sagres-fortress', 5),
+  ('algarve-art', 'algarve-portimao-museum', 1),
+  ('algarve-art', 'algarve-faro-museum', 2),
+  ('algarve-art', 'algarve-sao-lourenco', 3),
+  ('algarve-art', 'algarve-santo-antonio', 4),
+  ('algarve-art', 'algarve-lagos-cultural-centre', 5)
 ) as v(slug, source_id, pos)
 join public.collections c on c.slug = v.slug
 join public.places p on p.source = 'seed' and p.source_id = v.source_id

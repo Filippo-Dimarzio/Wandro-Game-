@@ -113,7 +113,7 @@ for (const [cat, [color, glyph]] of Object.entries(CATS))
   for (const locked of [false, true])
     save(`${cat}${locked ? '-locked' : ''}`, await render(pin(color, glyph, locked), W, H));
 
-for (const city of ['sintra', 'lisbon', 'porto', 'evora', 'aveiro']) {
+for (const city of ['sintra', 'lisbon', 'porto', 'evora', 'aveiro', 'algarve']) {
   const art = `data:image/jpeg;base64,${readFileSync(`${root}/stamps/${city}.jpg`).toString('base64')}`;
   for (const locked of [false, true])
     save(`landmark-${city}${locked ? '-locked' : ''}`, await render(badge(art, locked), B, BH));
