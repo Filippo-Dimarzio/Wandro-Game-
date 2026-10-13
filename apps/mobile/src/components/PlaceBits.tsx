@@ -1,5 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { formatDistance, pointsForVisit, type Category, type Place } from '@wandro/shared';
 import { categoryIcon, placeImage } from '@/categories';
@@ -97,6 +99,61 @@ export function PlaceCard({ place, distanceM, unlocked, onPress, width, index }:
   );
 }
 
+/**
+ * Portrait place card for two-column grids, styled like the city collection cards: the picture
+ * fills the card and the name sits on a dark fade at the bottom so it stays readable on any art.
+ */
+export function PlaceTile({ place, distanceM, unlocked, onPress, index }: CardProps) {
+  const c = useColors();
+  const points = pointsForVisit(place.category, place.uniqueVisitors, place.basePoints).total;
+  return (
+    <AnimatedCard
+      index={index}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${place.name}, ${t(`category.${place.category}`)}, ${formatDistance(distanceM)}, ${
+        unlocked ? t('place.discovered') : t('place.points', { points })
+      }`}
+      style={[styles.tile, shadow, { backgroundColor: c.card }]}
+      testID={`place-tile-${place.id}`}
+    >
+      <Image
+        source={placeImage(place)}
+        style={StyleSheet.absoluteFill}
+        contentFit="cover"
+        accessible={false}
+      />
+      <LinearGradient
+        colors={['rgba(14,26,36,0)', 'rgba(14,26,36,0.88)']}
+        locations={[0.35, 1]}
+        style={StyleSheet.absoluteFill}
+      />
+      <View style={styles.tileTop}>
+        <View
+          style={[styles.lock, { backgroundColor: unlocked ? c.accent : 'rgba(14,26,36,0.6)' }]}
+        >
+          <Ionicons name={unlocked ? 'checkmark' : 'lock-closed'} size={12} color="#fff" />
+        </View>
+        <PhotoButton place={place} />
+      </View>
+      <View style={styles.tileBody}>
+        <Text style={styles.tileName} numberOfLines={3}>
+          {place.name}
+        </Text>
+        <Text style={styles.tileMeta} numberOfLines={1}>
+          {formatDistance(distanceM)} ·{' '}
+          {unlocked ? t('place.discovered') : t('place.points', { points })}
+        </Text>
+      </View>
+    </AnimatedCard>
+  );
+}
+
+/** Two-column grid of place tiles. */
+export function PlaceGrid({ children }: { children: ReactNode }) {
+  return <View style={styles.grid}>{children}</View>;
+}
+
 const styles = StyleSheet.create({
   pill: {
     flexDirection: 'row',
@@ -121,4 +178,20 @@ const styles = StyleSheet.create({
   photo: { position: 'absolute', right: space.sm, bottom: space.sm },
   body: { padding: space.md, gap: 4 },
   name: { fontWeight: '800', fontSize: 15 },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: space.md,
+  },
+  tile: { width: '48%', aspectRatio: 0.82, borderRadius: radius.lg, overflow: 'hidden' },
+  tileTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    padding: space.sm,
+  },
+  tileBody: { position: 'absolute', left: 0, right: 0, bottom: 0, padding: space.md, gap: 2 },
+  tileName: { color: '#fff', fontWeight: '900', fontSize: 16, lineHeight: 20 },
+  tileMeta: { color: 'rgba(255,255,255,0.88)', fontWeight: '700', fontSize: 12 },
 });

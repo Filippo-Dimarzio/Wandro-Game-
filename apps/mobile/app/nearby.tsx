@@ -2,7 +2,7 @@ import { FlatList, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { haversineMeters } from '@wandro/shared';
 import { GameBackdrop } from '@/components/GameBackdrop';
-import { PlaceCard } from '@/components/PlaceBits';
+import { PlaceTile } from '@/components/PlaceBits';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t } from '@/i18n';
@@ -29,9 +29,11 @@ export default function Nearby() {
       <FlatList
         data={rows}
         keyExtractor={({ p }) => p.id}
+        numColumns={2}
+        columnWrapperStyle={styles.row}
         contentContainerStyle={[styles.list, column]}
         renderItem={({ item: { p, d }, index }) => (
-          <PlaceCard
+          <PlaceTile
             index={index}
             place={p}
             distanceM={d}
@@ -50,4 +52,5 @@ export default function Nearby() {
 
 const styles = StyleSheet.create({
   list: { padding: space.lg, gap: space.md },
+  row: { justifyContent: 'space-between' },
 });

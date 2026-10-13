@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CATEGORIES, formatDistance, haversineMeters, type Category } from '@wandro/shared';
 import { CATEGORY_META, learnKey } from '@/categories';
 import { CategoryMark } from '@/components/CategoryMark';
-import { PlaceCard } from '@/components/PlaceBits';
+import { PlaceCard, PlaceGrid, PlaceTile } from '@/components/PlaceBits';
 import { useDailyChallenge } from '@/data/challenge';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t, type TranslationKey } from '@/i18n';
@@ -176,16 +176,18 @@ function CategoryContent({ cat }: { cat: Category }) {
               {places.length === 0 && (
                 <Text style={{ color: c.textMuted }}>{t('discover.empty')}</Text>
               )}
-              {places.map(({ p, d }, i) => (
-                <PlaceCard
-                  index={i}
-                  key={p.id}
-                  place={p}
-                  distanceM={d}
-                  unlocked={ids.has(p.id)}
-                  onPress={() => showIntro(p)}
-                />
-              ))}
+              <PlaceGrid>
+                {places.map(({ p, d }, i) => (
+                  <PlaceTile
+                    index={i}
+                    key={p.id}
+                    place={p}
+                    distanceM={d}
+                    unlocked={ids.has(p.id)}
+                    onPress={() => showIntro(p)}
+                  />
+                ))}
+              </PlaceGrid>
             </View>
           )}
 
