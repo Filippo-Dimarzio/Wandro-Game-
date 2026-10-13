@@ -6,8 +6,10 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
-- Category pages and Nearby show places as a two-column grid of portrait cards, in the style of
-  the city collection cards, instead of long full-width rows.
+- Category pages and Nearby show places as a grid of portrait cards, in the style of the city
+  collection cards, instead of long full-width rows. Cards are never wider than a collection card
+  (more columns on wide screens), and each shows its art 40% transparent over a colour wash that
+  changes from card to card, so repeated artwork doesn't look identical.
 - The Algarve: a new region in Collections (with its own vintage stamp of golden sea arches, a
   lighthouse and a surfer) and 40 challenges in English across every category, including surfing at
   Arrifana, Amado and Tonel, kayaking or a boat trip to Benagil Cave, snorkelling at Marinha, the

@@ -1,9 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import type { ReactNode } from 'react';
+import { Children, cloneElement, isValidElement, useState, type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { formatDistance, pointsForVisit, type Category, type Place } from '@wandro/shared';
+import {
+  CATEGORIES,
+  formatDistance,
+  pointsForVisit,
+  type Category,
+  type Place,
+} from '@wandro/shared';
 import { categoryIcon, placeImage } from '@/categories';
 import { AnimatedCard } from '@/components/AnimatedCard';
 import { PhotoButton } from '@/components/PhotoSheet';
@@ -103,8 +109,12 @@ export function PlaceCard({ place, distanceM, unlocked, onPress, width, index }:
  * Portrait place card for two-column grids, styled like the city collection cards: the picture
  * fills the card and the name sits on a dark fade at the bottom so it stays readable on any art.
  */
-export function PlaceTile({ place, distanceM, unlocked, onPress, index }: CardProps) {
+export function PlaceTile({ place, distanceM, unlocked, onPress, index = 0, width }: CardProps) {
   const c = useColors();
+  const tone = TILE_TONES[index % TILE_TONES.length]!;
+  // Start from the place's own category colour, then rotate through the others.
+  const own = CATEGORIES.indexOf(place.category);
+  const washColor = c.category[CATEGORIES[(own + index) % CATEGORIES.length]!];
   const points = pointsForVisit(place.category, place.uniqueVisitors, place.basePoints).total;
   return (
     <AnimatedCard
@@ -114,13 +124,20 @@ export function PlaceTile({ place, distanceM, unlocked, onPress, index }: CardPr
       accessibilityLabel={`${place.name}, ${t(`category.${place.category}`)}, ${formatDistance(distanceM)}, ${
         unlocked ? t('place.discovered') : t('place.points', { points })
       }`}
-      style={[styles.tile, shadow, { backgroundColor: c.card }]}
+      style={[styles.tile, shadow, { backgroundColor: c.card }, width ? { width } : null]}
       testID={`place-tile-${place.id}`}
     >
+      {/* Places in a category often share one illustration: a different wash of the category
+          colour and a different crop per card keeps a long grid from repeating itself. */}
+      <View
+        style={[StyleSheet.absoluteFill, { backgroundColor: washColor, opacity: tone.wash }]}
+        testID="tile-wash"
+      />
       <Image
         source={placeImage(place)}
-        style={StyleSheet.absoluteFill}
+        style={[StyleSheet.absoluteFill, { opacity: TILE_IMAGE_OPACITY }]}
         contentFit="cover"
+        contentPosition={tone.crop}
         accessible={false}
       />
       <LinearGradient
@@ -149,9 +166,39 @@ export function PlaceTile({ place, distanceM, unlocked, onPress, index }: CardPr
   );
 }
 
-/** Two-column grid of place tiles. */
+/** The card art shows through at 60% (40% transparent) over the colour wash. */
+export const TILE_IMAGE_OPACITY = 0.6;
+const TILE_TONES = [
+  { wash: 1, crop: 'center' },
+  { wash: 0.75, crop: 'top' },
+  { wash: 0.9, crop: 'bottom' },
+  { wash: 0.65, crop: 'left' },
+  { wash: 0.85, crop: 'right' },
+] as const;
+
+/** Tiles are never wider than a city collection card (half of the 600 px column, less the gap). */
+export const TILE_MAX_WIDTH = 288;
+
+/**
+ * Grid of place tiles: two columns on phones, more on wide screens, so a tile is never bigger
+ * than a collection card.
+ */
 export function PlaceGrid({ children }: { children: ReactNode }) {
-  return <View style={styles.grid}>{children}</View>;
+  const [width, setWidth] = useState(0);
+  const gap = space.md;
+  const cols = Math.max(2, Math.ceil((width + gap) / (TILE_MAX_WIDTH + gap)));
+  const tile = width ? Math.floor((width - gap * (cols - 1)) / cols) : undefined;
+  return (
+    <View
+      style={[styles.grid, { gap }]}
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      testID="place-grid"
+    >
+      {Children.map(children, (child) =>
+        isValidElement<CardProps>(child) ? cloneElement(child, { width: tile }) : child,
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -178,12 +225,7 @@ const styles = StyleSheet.create({
   photo: { position: 'absolute', right: space.sm, bottom: space.sm },
   body: { padding: space.md, gap: 4 },
   name: { fontWeight: '800', fontSize: 15 },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: space.md,
-  },
+  grid: { flexDirection: 'row', flexWrap: 'wrap' },
   tile: { width: '48%', aspectRatio: 0.82, borderRadius: radius.lg, overflow: 'hidden' },
   tileTop: {
     flexDirection: 'row',
