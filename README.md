@@ -1,345 +1,266 @@
-# Wandro — the map collection game
+# Wandro
 
-**Lift the fog. Find the places most people walk past.**
+Wandro is a location-based exploration game. The map starts under fog; you clear it by physically
+visiting places, and the less visited a place is, the more it pays. Underneath, it is an Expo /
+React Native app on a Supabase (Postgres + PostGIS) backend, where every reward is computed and
+written server-side.
 
-Wandro is a photo-first, location-based exploration game and community app. It gives you the
-"map reveal" feeling of open-world games, but the missions are real places: lesser-known museums,
-castles, galleries and street art, parks, viewpoints, beaches, music venues, historic stations,
-trams and funiculars, and nature spots. Places start
-hidden under fog; visiting one unlocks it, clears the fog around it and earns **coins** for your
-explorer. Hidden gems are worth the most.
-
-- **Where:** Portugal — Sintra (the pilot), Lisbon, Porto, Évora, Aveiro and the Algarve, each with at least
-  five side quests in every category. We're focusing on Portugal until players prove they come
-  back; the earlier European cities are kept on the `archive/europe-v3` branch (`archive/europe-v2` is an older snapshot)
-- **Status:** v2.0 — the full game loop (Phases 0–8). See the [roadmap](#roadmap).
-- **Play in your browser:** <https://filippo-dimarzio.github.io/Wandro-Game-/> (demo mode — click
-  **Install app** to put it on your desktop)
-- **Join the beta:** <https://filippo-dimarzio.github.io/Wandro-Game-/join>. Sign-ups go to a Google
-  Sheet until the backend is live (setup: [`docs/waitlist`](docs/waitlist/README.md)).
-- **See a pull request before it ships:** every PR runs the **PR preview** workflow, which
-  screenshots each main screen (download **app-screenshots** from the run)
-- **Download for desktop:** Windows, macOS and Linux installers on the
+- **Play the demo:** <https://filippo-dimarzio.github.io/Wandro-Game-/> (web build, demo mode,
+  installable as a PWA)
+- **Beta waitlist:** <https://filippo-dimarzio.github.io/Wandro-Game-/join>
+- **Desktop builds:** Windows, macOS and Linux installers on the
   [latest release](https://github.com/Filippo-Dimarzio/Wandro-Game-/releases/latest)
 
----
+Launch regions are all in Portugal: **Sintra** (the pilot), **Lisbon**, **Porto**, **Évora**,
+**Aveiro** and the **Algarve**, 279 seeded places in total. Other European cities are paused until
+retention justifies them; that data lives on the `archive/europe-v3` branch.
 
 ## Contents
 
-- [The idea](#the-idea)
-- [How it plays](#how-it-plays)
-- [Look and feel](#look-and-feel)
-- [Screens](#screens)
-- [Scoring and progression](#scoring-and-progression)
-- [Fair play, privacy and a civil community](#fair-play-privacy-and-a-civil-community)
-- [Roadmap](#roadmap)
-- [Run it yourself](#run-it-yourself)
-- [Tech stack and repository layout](#tech-stack-and-repository-layout)
-- [Developer commands](#developer-commands)
-- [Hosting the web app](#hosting-the-web-app)
-- [Releases](#releases)
-- [Working together](#working-together)
+- [Game mechanics](#game-mechanics)
+- [Scoring](#scoring)
+- [Place content](#place-content)
+- [Architecture](#architecture)
+- [Check-in verification](#check-in-verification)
+- [Privacy and safety](#privacy-and-safety)
+- [Repository layout](#repository-layout)
+- [Running it](#running-it)
+- [Commands](#commands)
+- [CI, deployment and releases](#ci-deployment-and-releases)
+- [Contributing](#contributing)
 - [Credits and licences](#credits-and-licences)
 
-## The idea
+## Game mechanics
 
-Most travel apps send everyone to the same ten sights. Wandro rewards the opposite: **points scale
-inversely with how often a place has been visited**, so a quiet convent in the forest is worth far
-more than the most famous palace. Around the game sits a community layer: profiles, following
-friends, a photo feed of discoveries, leaderboards and curated collections.
+**Map and fog.** Undiscovered places are greyed out under a fog layer that never covers pins or
+labels. Discovering a place clears a radius around it. On the web the map is MapLibre GL over
+restyled OpenStreetMap raster tiles; native builds use `@rnmapbox/maps`.
 
-**Why "Wandro"?** The name comes from "wander": short, easy to say in any language and
-memorable. The logo is a **W** drawn as a wandering route with a "you are here" dot. Each player
-picks one of eight drawn **explorers** as their avatar, and as you level up your explorer's kit
-grows: **Wanderer → Explorer** (a map) **→ Navigator** (a backpack) **→ Cartographer** (a camera).
-**Wandro** himself is the brand's host, a wandering street musician who appears in marketing and at
-key moments; the player is always the hero.
+**Challenge cards.** Tapping a place you haven't done opens a stamp card first: the place as a
+postage stamp, its reward, a teaser and something to look for. _Let's go!_ starts map guidance.
 
-## How it plays
+**Place cards.** The full sheet has three tabs: _About_ (description, hours, photo
+credit), _Learn_ (teaser, facts, something to look for) and _Plan_ (time needed, cost, access,
+safety tips, a nearby place to pair it with). Cards with facts open straight on _Learn_.
 
-1. **Explore the map.** Places near you are fogged and greyed out until you discover them. Your
-   explorer marks where you are, with a pulsing accuracy circle like _Find My_.
-2. **Pick an adventure.** Tap a place and **Guide me**: a card shows the distance, walking time and
-   how close you are (_On your way → Getting warmer → Almost there → You're here!_), with
-   **Directions in Google Maps**. When a hidden gem is within 150 m, the app nudges you.
-3. **Go there.** Allow location when the map asks, and your explorer walks with you in real time
-   while the map guides you. In demo mode, **Teleport here** in a place's sheet jumps you there.
-4. **Check in.** Inside the place's geofence (75 m), hold **Hold to check in**: no waiting. The
-   server checks location, accuracy, mock locations and impossible speed — it never trusts the
-   phone for coins. Add a photo first (camera, camera roll, files or a live photo) and it posts
-   itself to today's moments.
-5. **Unlock it.** The fog clears in a circle, coins land in your explorer's pouch, you may earn
-   badges, and you can share a photo (its location data is stripped first).
-6. **Daily challenge — double coins.** Each day brings a new challenge (e.g. _"Step into history:
-   discover any heritage site"_), open for 24 hours from when you first see it. Every category
-   gets a day, and set dates bring special ones (Santos Populares in June, Museum Day on 18 May,
-   Car-Free Day on 22 September). After a matching discovery, **press and hold** to claim it: you
-   get that discovery's coins **again**.
-7. **Collect.** Collections like _"Sintra's palaces"_ pay a 200-coin bonus when complete.
-8. **Spend coins in the Store.** The **incense trail** wraps your explorer in a glowing circle and
-   draws a guiding line to your next adventure for 30 minutes or 2 hours. Outfits and hats
-   are forever. Coins are only earned by playing — never bought — and spending never lowers your
-   rank.
-9. **Play together.** Follow explorers, like their discoveries, climb the leaderboards, and
-   suggest new places, which moderators **approve as new missions**.
-10. **Hunt hidden gems.** Every city hides secret places that aren't on the map at all. The
-    **Adventures** sidebar hints how close the nearest one is (_under 500 m_, _within 1 km_…);
-    walk within **200 m** and it appears on your map.
-11. **Make friends.** Send friend requests (accepted friends can see each other's activity,
-    even on private profiles) and **challenge a friend** to a place with a short idea —
-    _"Go at golden hour!"_. It's ticked off when they discover it.
-12. **Travel Portugal.** Land in a city served by another airport, open Wandro and a **flight
-    animation** takes your explorer from your old airport to the new one (LIS ✈ OPO) before the
-    map flies there. Sintra, Lisbon and Évora share Lisbon's airport, Aveiro shares Porto's, so
-    moving between those needs no flight. In the browser demo, pick a city from
-    **Explore → Adventures → city** to go there.
+**Getting there.** _Guide me_ shows distance, walking time and a hot/cold status. _Directions_ opens
+Google Maps with a mode chosen by distance: walking up to 3 km, Google's default up to 50 km, a place
+search beyond that. Location is requested with an in-app explainer first; once granted, the
+explorer marker follows the device's foreground position.
 
-## Look and feel
+**Checking in.** Inside a place's geofence you hold to check in. Verification is instant (no dwell
+timer) and happens entirely on the server; see [Check-in verification](#check-in-verification).
+An optional photo (camera, live photo with a selfie inset, camera roll or file) is attached and
+posted to the day's _moments_.
 
-- **Realistic, photo-first, not illustrated.** Real photos and real people, laid out like
-  Instagram, with a Google/Apple Maps-style home for places and collections.
-- **Fog of war.** Locked areas sit under a soft, muted fog; discovered places are in full colour.
-  The fog never hides place names or pins (accessibility first).
-- **Portrait only**, light and dark mode following the phone, clean neutral UI so photos carry the
-  colour, one teal accent from the W logo.
-- **Warm, respectful tone** in all copy and community guidelines.
-- **English first**, with every string in an i18n layer so Portuguese, Spanish, Italian and French
-  can follow without refactoring.
+**Categories.** Seven: Beaches & coast, Nature, Heritage, Culture, Art & museums, Music & events,
+Curiosities. Each has a category page with an overview, a grid of its places and a Learn tab.
 
-## Screens
+**Hidden gems.** Some places are never sent to the client until you're within 200 m. The
+_Adventures_ sidebar only hints at coarse distance bands. All of a city's gems unlock after five
+discoveries there.
 
-| Screen           | What it does                                                                                                                                                        |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Entry portal** | Full-screen view under fog; hold to clear it and reveal Wandro.                                                                                                     |
-| **Registration** | Sign-up (email, Google, Apple), username, home city, then **pick your explorer style** (castles, nature, museums, music, beaches, hidden gems).                     |
-| **Home**         | A slim progress strip (level, explorer rank, coins), interests, today's challenge, places near you.                                                                 |
-| **Explore**      | Map with locked/discovered places, category chips, legend, recenter button, and a bottom sheet with photo, category, distance, points, rarity and directions.       |
-| **Check in (+)** | Nearest place, instant hold-to-check-in with an optional photo, reward card; below it today's moments (small boxes, unlocked by sharing your own, gone after 24 h). |
-| **Collections**  | One card per city that opens with an animation to show its sets of 5 places and your progress.                                                                      |
-| **Passport**     | Every moment you've shared, stamped by city. Only you see it.                                                                                                       |
-| **Profile**      | "Map of you" (your cleared fog), discoveries, points, level, explorer rank and badges.                                                                              |
+**Daily challenge.** One per day on a rotating calendar, plus dated ones (Santos Populares in June,
+International Museum Day on 18 May, Car-Free Day on 22 September). A matching discovery pays its
+coins a second time. Completing a challenge each day keeps a day streak running.
 
-Navigation is a bottom tab bar like Instagram: Home · Explore · Check in · Collections · Profile.
+**Collections.** Each city has sets of five or six places and a vintage stamp that starts blurred
+and sharpens as you play there. Sets pay a per-place bonus and a completion bonus.
 
-## Scoring and progression
+**Social.** Follows, friends (who can see activity on private profiles), friend challenges with a
+short note, likes, and a single Portugal leaderboard ranked by XP. Other
+players' moments are visible for 24 hours; after that only the author sees them, in their passport.
+Players can suggest places; moderators approve them through a safety checklist before they become
+missions.
 
-| Rule              | Value                                                                                                         |
-| ----------------- | ------------------------------------------------------------------------------------------------------------- |
-| Base coins        | Culture 100 · Heritage 120 · Nature 80 · Music & events 100 · Other 60                                        |
-| Rarity multiplier | `1 + 4 / (1 + n/10)`, where _n_ = unique visitors so far (0 → 5×, 10 → 3×, 100 → ~1.4×)                       |
-| First discoverer  | +50 coins                                                                                                     |
-| Daily challenge   | Double coins: the qualifying discovery pays again (at least 75), once a day                                   |
-| Sets              | +20 coins per place from a set, +50 for finishing the set                                                     |
-| Levels            | 50 XP per completed challenge; level 2 at 250 XP, then each level needs double the last step                  |
-| Badges            | Category ("3 heritage sites"), region ("Sintra complete"), rarity ("Hidden gem hunter"), streak and community |
+**Travel.** Moving between cities triggers an arrival animation: a flight between airport cities
+(Lisbon, Porto, Faro), otherwise a train or coach. The server stores the last city, never
+coordinates.
 
-Coins and XP are written to an append-only ledger, so later changes in rarity never change past
-rewards. Each player can complete each place **once**. XP (50 per challenge) never goes down;
-the leaderboard (one board for Portugal) ranks by XP, so shopping never costs you rank.
-Complete a challenge every day to keep your 🔥 day streak, Duolingo style.
+**Explorers and the Store.** Players pick one of eight explorers and dress them on the Customise
+screen. The Store sells cosmetics and timed boosts for coins: the incense trail (a guide line to the
+nearest undiscovered place, 30 min or 2 h), outfits, hats, a time-of-day key, gold stamp ink and a
+friend beacon. Coins are earned only by playing; there is no way to buy them, and spending never
+affects rank, which is XP-based.
 
-## The Store
+## Scoring
 
-| Item                            | Price     | What it does                                                                                                     |
-| ------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------- |
-| 🪔 Incense trail · 30 min / 2 h | 150 / 400 | Glowing circle around your explorer and a guiding line to the nearest undiscovered place; buying again adds time |
-| 🧥 Outfits                      | 300–1200  | Your explorer's jacket colour on the map, profile and store                                                      |
-| 🌺🧢🎩👑 Hats                   | 200–1500  | A hat for your explorer                                                                                          |
+All values live in `packages/shared/src/constants.ts` and are mirrored in SQL; sync tests fail if
+the two drift.
 
-There is no subscription and no way to buy coins.
+| Rule              | Value                                                                                    |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| Base coins        | Heritage 120 · Culture, Art, Music & events 100 · Coast, Nature 80 · Curiosities 60      |
+| Rarity multiplier | `1 + 4 / (1 + n/10)`, _n_ = unique visitors so far (0 → 5×, 10 → 3×, 100 → ~1.36×)       |
+| First discoverer  | +50 coins                                                                                |
+| Daily challenge   | the qualifying discovery pays again (minimum 75), once per day                           |
+| Sets              | +20 per place in a set, +50 on completion                                                |
+| XP and levels     | 50 XP per completed challenge; level 2 at 250 XP, each later level needs double the last |
 
-## Fair play, privacy and a civil community
+Coins and XP go into an append-only `points_ledger`, so later changes to a place's rarity never
+alter past rewards. A unique constraint on `(user_id, place_id)` in `visits` enforces one completion
+per player per place.
 
-**The server decides everything that matters.** Points, unlocks, XP, badges and rarity are written
-only by server functions. The database's row-level security stops the app from writing them
-directly, and this is covered by automated tests.
+## Place content
 
-**Location privacy (GDPR).**
+Places come from two sources: a hand-curated seed (the place and quest modules in `packages/shared/src`,
+generated into `supabase/seed/seed.sql`) and an OpenStreetMap/Wikidata importer that writes new places as `draft`
+for curator review. The importer upserts on `(source, source_id)`, so it is safe to re-run.
 
-- Location is used **only while the app is open** — never in the background.
-- Only what's needed to verify a visit is stored; raw location pings are deleted once a visit is
-  verified (24 hours at most).
-- Nobody's live location is ever shown to anyone.
-- Data export and account deletion are built in. Minimum age: 16.
-- Hidden gems are kept out of the app until you're within 200 m: the server never sends their
-  location early, hints are coarse distance bands, and reveals are capped per day.
-- For arrival flights the server remembers only the **city** you last opened the app in, never
-  coordinates, and nobody else can see it.
+Learn content is stored as a `details` JSONB column (`PlaceDetails` in `packages/shared/src/types.ts`):
+a teaser, one to three facts, and optional look-for, best time, duration, cost, access and tip
+fields. Sintra, Lisbon, Porto and Évora are covered (195 places, about 450 facts); Aveiro and the
+Algarve are not yet. Every fact keeps the URL it was checked against in a `source` field, which the
+app does not display. Facts that came from research rather than a curator carry `needsReview: true`.
+`details.test.ts` checks length limits, that each entry maps to a real place, and that the latest
+migration re-applies exactly what the TypeScript source contains.
 
-**Safety.** No challenges on private property or in dangerous spots — enforced in the database. Every
-suggested place goes through moderation with a safety checklist.
+A place flagged as private property can never be active: the `active_not_private` check
+constraint enforces it in the database. Unsafe spots are filtered out at moderation.
 
-**Civil community.** Reporting, blocking and moderation ship together with any user-generated
-content. Photo metadata (EXIF/GPS) is stripped on upload. Nearby-place alerts are in-app only.
+## Architecture
 
-**Accessibility.** WCAG AA contrast, screen-reader labels, support for small screens and large text,
-and alternatives to press-and-hold gestures.
+| Layer        | Choice                                                                                  |
+| ------------ | --------------------------------------------------------------------------------------- |
+| App          | Expo SDK 57, React Native, Expo Router, TypeScript strict; iOS, Android, web            |
+| Desktop      | Electron shell around the static web build                                              |
+| Maps         | `@rnmapbox/maps` on device; MapLibre GL + OSM raster tiles on web                       |
+| Client state | TanStack Query for server state, Zustand (persisted) for session and UI state           |
+| Backend      | Supabase: Postgres 16 + PostGIS, Auth, row-level security, Storage, Deno Edge Functions |
+| Server logic | `SECURITY DEFINER` Postgres functions (RPCs) in `supabase/migrations`                   |
+| Shared code  | `@wandro/shared`: scoring, levels, geo, fog, hours, catalogue, seed data                |
+| Tests        | Jest + React Native Testing Library; SQL tests run against PostGIS                      |
 
-## Roadmap
+**Server-authoritative writes.** Clients have no write access to `visits`, `points_ledger`,
+`user_badges`, `place_stats`, `user_inventory`, `hidden_reveals`, `friendships`,
+`friend_challenges`, `player_regions` or `city_stamps`. Every table has RLS enabled, and
+`supabase/tests/rls.test.sql` asserts that a user can't read another's private data or write any
+of those tables directly. RPCs validate input, are idempotent, and raise stable error codes
+(`too_far`, `low_accuracy`, …) that the app maps to i18n strings.
 
-| Phase | Scope                                                                                                                                              | Status          |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
-| 0     | Monorepo, tooling, CI, environment config                                                                                                          | ✅ v1.0         |
-| 1     | Database schema + security rules, auth, profiles, Sintra seed + importer                                                                           | ✅ v1.0         |
-| 2     | Map with fog, locked/unlocked places, filters, place details, app screens                                                                          | ✅ v1.0         |
-| —     | Daily challenge (touch to confirm) and approved missions (submission moderation)                                                                   | ✅ v1.0 (early) |
-| 3     | Server-verified check-ins, coins, levels, streaks, badges                                                                                          | ✅ v2.0         |
-| 4     | Photo posts, follows, feed, likes, report/block, leaderboards, collections, place submissions, moderation                                          | ✅ v2.0         |
-| 5     | Settings, data export, account deletion, privacy page, onboarding guide, store-build config                                                        | ✅ v2.0         |
-| 6     | Desktop app (Windows, macOS, Linux) and installable web app                                                                                        | ✅ v2.0         |
-| 7     | Find-My-style walking: explorer marker, proximity guidance, Google Maps directions, keyboard walking                                               | ✅ v2.0         |
-| 8     | Coin economy: double daily coins, Store with incense trail, skins and hats                                                                         | ✅ v2.0         |
-| 9     | Europe (12 cities), hidden gems revealed at 200 m, friends and friend challenges, Adventures sidebar, arrival flights, log out, cleaner tab labels | ✅ Unreleased   |
-| 10    | Portugal focus: Sintra, Lisbon, Porto, Évora, Aveiro; other cities paused; gems after 5 discoveries; landmark city cards; flights by airport       | ✅ Unreleased   |
-| 10.1  | Culture themes (food, traditions, neighbourhoods); daily challenge calendar with dated challenges                                                  | ✅ Unreleased   |
-| 15    | Explorers replace the octopus: eight drawn explorers to choose from, outfits, kit by rank (Wanderer → Cartographer), the W logo and app icons      | ✅ Unreleased   |
-| Later | Comments, food challenges, Instagram share cards, events, teams, offline maps, more languages, more cities, push notifications for friend activity | Ideas           |
+**Edge Functions.** `check-photo` runs with the service-role key (which never ships in the app) and
+removes blank uploads (black frames, flat colour), including a live photo's selfie.
 
-The full plan — architecture, data model, check-in validation and every decision — is in
-[`PLAN.md`](PLAN.md). Project rules for contributors (and Claude Code) are in
-[`CLAUDE.md`](CLAUDE.md). Progress is tracked in [GitHub Issues](../../issues).
+**Demo mode.** Without Supabase env vars the app runs entirely on-device against the shared seed,
+with `apps/mobile/src/demo` mirroring the server rules. The deployed web build is demo mode.
+Catalogue sync tests keep demo and SQL codes and prices identical.
 
-## Run it yourself
+**i18n.** No user-facing string is hard-coded; everything goes through `apps/mobile/src/i18n`.
+English is the only locale shipped so far.
 
-You need **Node 22+** and **pnpm 10** (`npm i -g pnpm`).
+## Check-in verification
+
+1. `start_checkin(place_id, lat, lng, accuracy, is_mock)` checks the fix is inside the geofence
+   (75 m by default, plus up to 25 m of accuracy slack) and that accuracy is ≤ 50 m.
+2. The client sends pings every 5 s while the sheet is open.
+3. `complete_checkin(session_id)` verifies immediately if the latest fix is still inside. Mocked
+   locations, jumps faster than 50 m/s and impossible travel since the previous visit are held for
+   a moderator instead of paying out.
+4. On success it writes the visit, ledger entries, badge awards and stats in one transaction, then
+   deletes the session's raw pings.
+
+`supabase/tests/checkins.test.sql` covers too-far, walked-away, low accuracy, mock flag, impossible
+speed, replay and concurrent first-discoverer.
+
+## Privacy and safety
+
+- Foreground location only. Raw pings are deleted once a visit is verified (24 h at most), and no
+  player's live location is ever exposed to another.
+- Hidden gem coordinates are not sent until revealed. Arrival flights store the city only.
+- EXIF and GPS metadata are stripped before upload.
+- Report, block and moderation ship with every user-generated surface.
+- Data export and account deletion are built in. Minimum age is 16.
+- Accessibility target is WCAG AA: screen-reader labels on interactive elements, dynamic type,
+  small-screen layouts and alternatives to press-and-hold.
+
+## Repository layout
+
+```
+apps/mobile/          Expo app: routes in app/, components, map, data hooks, demo, i18n
+apps/desktop/         Electron wrapper around the web build
+packages/shared/      scoring, geo, fog, catalogue, seed places and place details
+supabase/migrations/  forward-only migrations, YYYYMMDDHHMMSS_description.sql
+supabase/functions/   Deno Edge Functions (check-photo)
+supabase/seed/        generated dev seed
+supabase/tests/       SQL tests (RLS, check-ins, scoring, social, shop, …)
+scripts/importer/     OSM Overpass + Wikidata importer
+docs/                 release notes, waitlist setup
+.github/workflows/    CI, web deploy, PR screenshots, releases
+```
+
+[`PLAN.md`](PLAN.md) has the data model and design decisions. [`CLAUDE.md`](CLAUDE.md) holds the
+project rules for contributors. [`CHANGELOG.md`](CHANGELOG.md) tracks what has shipped.
+
+## Running it
+
+Requires Node 22+ and pnpm 10.
 
 ```bash
 git clone https://github.com/Filippo-Dimarzio/Wandro-Game-.git wandro
 cd wandro
 pnpm install
+pnpm web                       # Expo web on http://localhost:8081, demo mode
 ```
 
-**In your browser (fastest):**
+**Expo Go:** `pnpm --filter mobile start` and scan the QR code. Expo Go can't load the Mapbox
+native module, so the map falls back to a schematic view.
+
+**Native build with Mapbox:** set `EXPO_PUBLIC_MAPBOX_TOKEN` and `RNMAPBOX_MAPS_DOWNLOAD_TOKEN` in
+`.env`, then `cd apps/mobile && npx expo run:ios` (or `run:android`), or build with EAS.
+
+**Real backend:** copy `.env.example` to `.env`, set `EXPO_PUBLIC_SUPABASE_URL` and
+`EXPO_PUBLIC_SUPABASE_ANON_KEY`, and apply `supabase/migrations` to the project. Never put the
+service-role key or the Mapbox secret token in the app's environment.
+
+**Demo shortcuts:** _Teleport here_ on a place sheet moves you there, and the city picker in the
+_Adventures_ sidebar switches region. Demo friends accept requests instantly.
+
+## Commands
 
 ```bash
-pnpm web          # opens http://localhost:8081 (press w if it doesn't)
+pnpm lint                              # ESLint
+pnpm format                            # Prettier (CI runs format:check)
+pnpm typecheck                         # tsc --noEmit in every workspace
+pnpm test                              # Jest unit and component tests
+pnpm test:db                           # SQL tests; needs Postgres 16 + PostGIS on localhost:5432
+pnpm import:places [--dry-run]         # OSM/Wikidata importer
+pnpm --filter @wandro/shared seed      # regenerate supabase/seed/seed.sql
+pnpm --filter mobile build:web         # static web build into apps/mobile/dist
+pnpm --filter desktop start            # build web, open in Electron
+pnpm --filter desktop dist             # installer for the host OS
 ```
 
-Use your browser's device toolbar (F12 → phone icon) for a phone-sized view.
-
-**On your phone with Expo Go (no build needed):**
-
-```bash
-pnpm --filter mobile start
-```
-
-Scan the QR code with the **Expo Go** app. Expo Go can't load the Mapbox module, so the map shows a
-simplified schematic view; everything else works.
-
-**Desktop app from source:**
-
-```bash
-pnpm --filter desktop start   # builds the web app, then opens the Electron window
-pnpm --filter desktop dist    # builds an installer for your OS into apps/desktop/dist
-```
-
-**Full native build with the real Mapbox map:** needs a Mapbox account
-(`EXPO_PUBLIC_MAPBOX_TOKEN` and `RNMAPBOX_MAPS_DOWNLOAD_TOKEN` in `.env`) and Xcode/Android Studio
-or an [EAS](https://expo.dev/eas) account:
-
-```bash
-cd apps/mobile && npx expo run:ios   # or: npx expo run:android
-```
-
-### Demo mode
-
-Without Supabase credentials the app runs in **demo mode**: sample places in Sintra, Lisbon, Porto,
-Évora, Aveiro and the Algarve, progress saved on your device only. The other players you see are fictional demo
-explorers; real players appear once a Supabase project is connected.
-
-- **Teleport here (demo)** in a place's sheet moves you there, so you can try a discovery from
-  anywhere.
-- **Explore → Adventures → city** moves your explorer to another city (a flight between Lisbon and Porto).
-- Demo friends (ines.wanders, mia.maps…) answer requests straight away and have sent you challenges.
-- **Profile → Log out** returns to the portal and, as there's no account in the demo, starts over.
-
-To use a real backend, copy `.env.example` to `.env`, fill in `EXPO_PUBLIC_SUPABASE_URL` and
-`EXPO_PUBLIC_SUPABASE_ANON_KEY`, and apply `supabase/migrations` to your Supabase project.
-
-### Things to try
-
-1. Hold the button on the entry portal to clear the fog, then tap **Start exploring**.
-2. Register: username, home city, explorer style.
-3. **Explore:** filter by category, tap a place, tap the sheet handle to expand it.
-4. Tap **Teleport here (demo)** on a heritage place, open **Discover**, hold **Start discovery** and
-   wait for the ring. Back on **Explore**, the fog has cleared around it.
-5. On **Home**, hold **Hold to confirm** on today's challenge to claim +75.
-6. Check **Profile** for your level, explorer rank and badges; tap your profile picture to customise your explorer.
-7. On **Explore**, open the **Adventures** sidebar (the compass tab on the left edge): accept
-   ines.wanders's challenge, read the hidden-gem hint, then allow location (or teleport near it)
-   until the **Moorish Fountain** gem appears.
-8. Tap the city button in the sidebar and pick **Porto** to watch the arrival flight (LIS ✈ OPO).
-9. On **Home**, tap the people icon: accept sofia.sees's friend request and **Challenge** a friend.
-
-## Tech stack and repository layout
-
-- **App:** React Native + Expo (TypeScript, Expo Router), iOS, Android and web
-- **Maps:** Mapbox (`@rnmapbox/maps`) on phones; MapLibre + OpenStreetMap tiles on the web
-- **State:** TanStack Query (server data) + Zustand (on-device state)
-- **Backend:** Supabase — Postgres + PostGIS, Auth, row-level security, Storage, Edge Functions
-- **Place data:** OpenStreetMap (Overpass API) + Wikidata/Wikimedia Commons, imported idempotently
-- **Quality:** Jest + React Native Testing Library, SQL tests for security rules and game logic,
-  ESLint, Prettier, GitHub Actions
-
-```
-apps/mobile/        Expo app: screens (app/), components, map, data hooks, i18n
-apps/desktop/       Electron desktop app wrapping the web build
-packages/shared/    scoring, levels, geo and fog helpers shared by app and server
-supabase/           database migrations, seed data and SQL tests
-scripts/importer/   OpenStreetMap + Wikidata place importer
-.github/workflows/  CI, web deployment, releases
-docs/releases/      release notes
-```
-
-## Developer commands
-
-```bash
-pnpm lint            # ESLint
-pnpm format          # Prettier (format:check runs in CI)
-pnpm typecheck       # TypeScript in every package
-pnpm test            # unit and component tests
-pnpm test:db         # SQL tests: schema, security rules, daily challenge, submissions
-pnpm import:places   # OSM + Wikidata importer (add --dry-run to only print)
-pnpm --filter mobile build:web   # static web build in apps/mobile/dist
-pnpm --filter desktop dist       # desktop installer for this OS
-```
-
-`pnpm test:db` needs Postgres 16 with PostGIS on `localhost:5432` (user and password `postgres`):
+For `test:db`:
 
 ```bash
 docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgis/postgis:16-3.4
 ```
 
-**Continuous integration** (`.github/workflows/ci.yml`) runs lint, format check, typecheck, unit
-tests and the database tests on every pull request and on `main`.
+Run `pnpm lint && pnpm typecheck && pnpm test && pnpm test:db` before pushing.
 
-## Hosting the web app
+## CI, deployment and releases
 
-`.github/workflows/deploy-web.yml` builds the web version (demo mode) and publishes it to
-**GitHub Pages** on every push to `main`.
+- **CI** (`ci.yml`): lint, format check, typecheck, Jest and SQL tests on every PR and on `main`.
+- **Deploy web app** (`deploy-web.yml`): builds the demo web app and publishes it to GitHub Pages
+  on every push to `main`. `index.html` is copied to `404.html` so deep links such as
+  `/explore?place=demo-pena` resolve.
+- **PR preview**: screenshots every main screen and uploads them as the `app-screenshots` artifact.
+- **Release**: pushing a `v*` tag publishes a GitHub Release from `docs/releases/<tag>.md` and
+  attaches unsigned Windows (`.exe`), macOS (`.dmg`) and Linux (`.AppImage`) installers. Gatekeeper
+  and SmartScreen will warn on first launch.
 
-One-time setup by a repository admin: **Settings → Pages → Build and deployment → Source: GitHub
-Actions**. The app is then live at `https://filippo-dimarzio.github.io/<repository-name>/`. Add
-that link to the repository's **About → Website** field.
+## Contributing
 
-## Releases
-
-Pushing a tag such as `v2.0.0` (or running the **Release** workflow manually with the tag name) publishes a GitHub
-Release using the notes in `docs/releases/<tag>.md`, then builds the Windows (`.exe`), macOS
-(`.dmg`) and Linux (`.AppImage`) installers and attaches them. The installers are unsigned for
-now, so Windows SmartScreen and macOS Gatekeeper will warn on first launch (macOS: right-click →
-Open). See [`CHANGELOG.md`](CHANGELOG.md).
-
-## Working together
-
-- Work on a branch per phase or feature (`phase-3-checkin-scoring`, `feature/…`) and open a pull
-  request; CI must be green before merging.
-- Read [`CLAUDE.md`](CLAUDE.md) first — it holds the rules both people and Claude Code follow
-  (server-side scoring, location privacy, safety, accessibility, no hard-coded strings).
-- Never commit secrets: use `.env` (git-ignored) and keep `.env.example` up to date.
+- Read [`CLAUDE.md`](CLAUDE.md) first. Its rules on server-side scoring, RLS, location privacy,
+  safety and i18n are non-negotiable.
+- Database changes go in a new migration; existing migrations are never edited.
+- Shared constants belong in `packages/shared` with unit tests; demo mode has to stay in sync with
+  the SQL.
+- Secrets stay in `.env` (git-ignored); keep `.env.example` current.
 
 ## Credits and licences
 
-- Map data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) (ODbL).
-- Place photos from Wikimedia Commons keep their original licence and attribution.
-- Place descriptions enriched from Wikidata (CC0).
+- Map data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), ODbL.
+- Place photos from Wikimedia Commons keep their original licence; author, licence and source URL
+  are stored and shown with each photo.
+- Place descriptions are partly derived from Wikidata (CC0).
