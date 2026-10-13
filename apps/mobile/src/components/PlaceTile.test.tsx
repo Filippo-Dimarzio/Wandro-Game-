@@ -6,8 +6,8 @@ import { PlaceGrid, PlaceTile } from './PlaceBits';
 jest.mock('@expo/vector-icons', () => ({ Ionicons: () => null }));
 jest.mock('expo-router', () => ({ router: { push: jest.fn() } }));
 
-const [pena, mouros] = ['demo-pena', 'demo-mouros'].map(
-  (id) => DEMO_PLACES.find((p) => p.id === id)!,
+const [pena, mouros] = ['demo-pena', 'demo-mouros'].map((id) =>
+  DEMO_PLACES.find((p) => p.id === id)!,
 );
 
 describe('PlaceTile', () => {
