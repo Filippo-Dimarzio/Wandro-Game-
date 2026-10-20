@@ -18,9 +18,10 @@ import { CategoryMark } from '@/components/CategoryMark';
 import { Check } from '@/components/Check';
 import { CredentialsForm } from '@/components/CredentialsForm';
 import { ExplorerPicker } from '@/components/ExplorerPicker';
-import { loadServerProfile, USERNAME_RULE } from '@/data/account';
+import { loadServerProfile, useUsernameStatus } from '@/data/account';
+import { UsernameHint } from '@/components/UsernameHint';
 import { t, type TranslationKey } from '@/i18n';
-import { signInWithProvider, useAuthSession } from '@/lib/auth';
+import { appLink, signInWithProvider, useAuthSession } from '@/lib/auth';
 import { confirmAction } from '@/lib/confirm';
 import { isDemo } from '@/lib/env';
 import {
@@ -45,8 +46,6 @@ const STYLES: { id: string; category: Category }[] = [
   { id: 'music', category: 'music_events' },
   { id: 'hidden', category: 'other' },
 ];
-
-const USERNAME = USERNAME_RULE;
 
 export default function Register() {
   const c = useColors();
@@ -73,6 +72,7 @@ export default function Register() {
   const [busy, setBusy] = useState(false);
 
   const currentStep = step === 'account' && session ? 'profile' : step;
+  const nameStatus = useUsernameStatus(username);
 
   // Someone who already has a server profile (e.g. back from Google / Apple) goes straight in.
   useEffect(() => {
@@ -105,10 +105,18 @@ export default function Register() {
         await offerToSavePassword({ email: login, password });
         return setStep('profile');
       }
-      const res = await supabase!.auth.signUp({ email: email.trim(), password });
+      const res = await supabase!.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { emailRedirectTo: appLink('/register') },
+      });
       if (res.error) return setMessage(res.error.message);
       await offerToSavePassword({ email: email.trim(), password });
-      if (!res.data.session) return setMessage(t('register.checkEmail'));
+      if (!res.data.session)
+        return router.push({
+          pathname: '/check-email',
+          params: { email: email.trim(), kind: 'confirm' },
+        });
       setStep('profile');
     } finally {
       setBusy(false);
@@ -125,6 +133,11 @@ export default function Register() {
         .eq('id', session.user.id);
       if (error) {
         setBusy(false);
+        // 23505: someone took the name between the check and now. Back to the username.
+        if (error.code === '23505') {
+          setStep('profile');
+          return setMessage(t('settings.usernameTaken'));
+        }
         return setMessage(error.message);
       }
     }
@@ -220,14 +233,7 @@ export default function Register() {
                 accessibilityLabel={t('register.username')}
                 testID="username"
               />
-              <Text
-                style={{
-                  color: username && !USERNAME.test(username) ? c.danger : c.textMuted,
-                  fontSize: 13,
-                }}
-              >
-                {t('register.usernameHint')}
-              </Text>
+              <UsernameHint status={nameStatus} />
               <Text style={[styles.label, { color: c.text }]}>{t('register.homeCity')}</Text>
               <TextInput
                 style={input}
@@ -243,7 +249,7 @@ export default function Register() {
               <Primary
                 label={t('register.next')}
                 onPress={() => setStep('style')}
-                disabled={!USERNAME.test(username)}
+                disabled={nameStatus !== 'available'}
                 testID="profile-next"
               />
             </View>

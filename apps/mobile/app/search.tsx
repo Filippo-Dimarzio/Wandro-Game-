@@ -6,6 +6,7 @@ import { GameBackdrop } from '@/components/GameBackdrop';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useSearchProfiles } from '@/data/social';
 import { t } from '@/i18n';
+import { isDemo } from '@/lib/env';
 import { column, radius, space, useColors } from '@/theme';
 
 export default function Search() {
@@ -32,10 +33,21 @@ export default function Search() {
         data={results}
         keyExtractor={(u) => u.id}
         contentContainerStyle={[{ padding: space.lg, gap: space.sm }, column]}
+        ListHeaderComponent={
+          isDemo ? (
+            <Text style={{ color: c.textMuted, fontSize: 13 }} testID="search-demo-note">
+              {t('search.demoNote')}
+            </Text>
+          ) : null
+        }
         ListEmptyComponent={<Text style={{ color: c.textMuted }}>{t('search.empty')}</Text>}
         renderItem={({ item }) => (
           <Pressable
-            onPress={() => router.push({ pathname: '/user/[id]', params: { id: item.id } })}
+            onPress={() =>
+              item.isMe
+                ? router.push('/(tabs)/profile')
+                : router.push({ pathname: '/user/[id]', params: { id: item.id } })
+            }
             accessibilityRole="link"
             style={[styles.row, { backgroundColor: c.surface }]}
           >
@@ -45,6 +57,9 @@ export default function Search() {
               </Text>
             </View>
             <Text style={{ color: c.text, fontWeight: '700', flex: 1 }}>{item.username}</Text>
+            {item.isMe && (
+              <Text style={{ color: c.accent, fontWeight: '800' }}>{t('search.you')}</Text>
+            )}
             {item.isPrivate && <Text accessibilityLabel="private">🔒</Text>}
           </Pressable>
         )}

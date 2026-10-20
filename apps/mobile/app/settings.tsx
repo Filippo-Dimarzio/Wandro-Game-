@@ -23,11 +23,12 @@ import { GameBackdrop } from '@/components/GameBackdrop';
 import { LogOutButton } from '@/components/LogOutButton';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SOCIAL_ICONS } from '@/components/SocialChips';
+import { UsernameHint } from '@/components/UsernameHint';
 import {
   useDeleteAccount,
   useExportData,
-  USERNAME_RULE,
   useUpdateAccount,
+  useUsernameStatus,
   useUpdatePrivacy,
 } from '@/data/account';
 import { t } from '@/i18n';
@@ -167,7 +168,8 @@ function AccountSection() {
   const [username, setUsername] = useState(current);
   const [saved, setSaved] = useState(false);
   const changed = username !== current;
-  const valid = USERNAME_RULE.test(username);
+  const status = useUsernameStatus(username, current);
+  const valid = status === 'available';
   // A demo explorer without a login has no password to change yet.
   const hasPassword = !isDemo || !!account;
   const error = update.error?.message;
@@ -195,9 +197,7 @@ function AccountSection() {
         style={[styles.input, { color: c.text, borderColor: c.border }]}
         testID="settings-username"
       />
-      <Text style={{ color: username && !valid ? c.danger : c.textMuted, fontSize: 13 }}>
-        {error === 'username_taken' ? t('settings.usernameTaken') : t('register.usernameHint')}
-      </Text>
+      <UsernameHint status={error === 'username_taken' ? 'taken' : changed ? status : 'idle'} />
       <Pressable
         onPress={() => update.mutate({ username }, { onSuccess: () => setSaved(true) })}
         disabled={!changed || !valid || update.isPending}

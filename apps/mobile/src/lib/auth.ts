@@ -7,6 +7,17 @@ import { supabase } from './supabase';
 
 WebBrowser.maybeCompleteAuthSession();
 
+/**
+ * A link back into the app for auth emails and sign-in redirects. On the web it keeps the site's
+ * base path (GitHub Pages serves the app under /<repo>), which Linking.createURL drops.
+ */
+export function appLink(path: string): string {
+  if (Platform.OS !== 'web') return Linking.createURL(path);
+  if (typeof window === 'undefined') return path;
+  const base = (process.env.EXPO_PUBLIC_BASE_URL ?? '').replace(/\/$/, '');
+  return `${window.location.origin}${base}${path}`;
+}
+
 export function useAuthSession(): { session: Session | null; loading: boolean } {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(!!supabase);
@@ -25,7 +36,7 @@ export function useAuthSession(): { session: Session | null; loading: boolean } 
 /** Google / Apple sign-in through Supabase OAuth (PKCE). */
 export async function signInWithProvider(provider: 'google' | 'apple'): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
-  const redirectTo = Linking.createURL('/register');
+  const redirectTo = appLink('/register');
   if (Platform.OS === 'web') {
     const { error } = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo } });
     if (error) throw error;

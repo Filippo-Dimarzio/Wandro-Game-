@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import Register from '../../app/register';
 import { verifyPassword } from '@/lib/password';
 import { useSession } from '@/state/session';
+import { queryWrapper } from '@/test/queryWrapper';
 
 jest.mock('expo-router', () => ({
   router: { back: jest.fn(), push: jest.fn(), replace: jest.fn(), canGoBack: () => true },
@@ -46,7 +47,7 @@ describe('Create an account (demo)', () => {
   });
 
   it('asks for a new password the password manager can save', async () => {
-    await render(<Register />);
+    await render(<Register />, { wrapper: queryWrapper() });
     expect(screen.getByTestId('password').props.autoComplete).toBe('new-password');
     expect(screen.getByTestId('password').props.textContentType).toBe('newPassword');
     await createAccount('fil@example.com', 'short');
@@ -54,7 +55,7 @@ describe('Create an account (demo)', () => {
   });
 
   it('saves the login as a hash with the new explorer, then logs in', async () => {
-    await render(<Register />);
+    await render(<Register />, { wrapper: queryWrapper() });
     await createAccount('Fil@Example.com', 'sintra-sunset-9');
     await finishProfile('fil_dm7');
     await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/(tabs)'));
@@ -66,12 +67,25 @@ describe('Create an account (demo)', () => {
     expect(await verifyPassword('sintra-sunset-9', s.account!)).toBe(true);
   });
 
+  it('says when a username is already taken, and only lets a free one through', async () => {
+    await render(<Register />, { wrapper: queryWrapper() });
+    await createAccount('fil@example.com', 'sintra-sunset-9');
+    await fireEvent.changeText(await screen.findByTestId('username'), 'Ines.Wanders');
+    expect(screen.getByTestId('username-status')).toHaveTextContent(
+      'Username already taken. Try another one.',
+    );
+    expect(screen.getByTestId('profile-next')).toBeDisabled();
+    await fireEvent.changeText(screen.getByTestId('username'), 'fil_dm7');
+    expect(screen.getByTestId('username-status')).toHaveTextContent('✓ Username available');
+    expect(screen.getByTestId('profile-next')).toBeEnabled();
+  });
+
   it('sends an existing email to the login instead', async () => {
-    await render(<Register />);
+    await render(<Register />, { wrapper: queryWrapper() });
     await createAccount('fil@example.com', 'sintra-sunset-9');
     await finishProfile('fil_dm7');
     useSession.getState().signOut();
-    await render(<Register />);
+    await render(<Register />, { wrapper: queryWrapper() });
     await createAccount('fil@example.com', 'another-pass-1');
     expect(await screen.findByText(/Log in instead/)).toBeOnTheScreen();
   });
@@ -81,7 +95,7 @@ describe('Create an account (demo)', () => {
       .getState()
       .completeOnboarding({ username: 'old_one', homeCity: '', explorerStyles: ['nature'] });
     mockConfirm = false;
-    await render(<Register />);
+    await render(<Register />, { wrapper: queryWrapper() });
     await createAccount('new@example.com', 'sintra-sunset-9');
     expect(useSession.getState().profile?.username).toBe('old_one');
     expect(screen.queryByTestId('username')).toBeNull();
