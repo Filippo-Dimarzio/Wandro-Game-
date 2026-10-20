@@ -46,7 +46,7 @@ describe('Settings', () => {
     expect(screen.getByTestId('save-username')).toBeDisabled();
     await fireEvent.changeText(box, 'ines.wanders');
     await fireEvent.press(screen.getByTestId('save-username'));
-    expect(await screen.findByText('That username is taken. Try another one.')).toBeOnTheScreen();
+    expect(await screen.findByText('Username already taken. Try another one.')).toBeOnTheScreen();
     expect(useSession.getState().profile?.username).toBe('filippo');
     await fireEvent.changeText(box, 'fil_dm7');
     await fireEvent.press(screen.getByTestId('save-username'));

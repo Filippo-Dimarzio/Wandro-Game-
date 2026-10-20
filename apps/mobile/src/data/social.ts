@@ -398,30 +398,43 @@ export function useReport() {
   });
 }
 
-export function useSearchProfiles(q: string) {
+/** Search results; `isMe` marks your own profile (search shows you too). */
+export interface SearchResultRow {
+  id: string;
+  username: string;
+  isPrivate: boolean;
+  isMe: boolean;
+}
+
+export function useSearchProfiles(q: string): SearchResultRow[] {
   const blocked = useSession((s) => s.blocked);
+  const me = useSession((s) => s.profile);
+  const needle = q.trim().replace(/^@/, '').toLowerCase();
   const server = useQuery({
-    queryKey: ['search', q],
-    enabled: !isDemo && q.trim().length >= 2,
+    queryKey: ['search', needle],
+    enabled: !isDemo && needle.length >= 2,
     queryFn: async () => {
-      const { data, error } = await supabase!.rpc('search_profiles', { q: q.trim() });
+      const { data, error } = await supabase!.rpc('search_profiles', { q: needle });
       if (error) throw error;
+      const myId = (await supabase!.auth.getUser()).data.user?.id;
       return (data as { id: string; username: string; is_private: boolean }[]).map((r) => ({
         id: r.id,
         username: r.username,
         isPrivate: r.is_private,
+        isMe: r.id === myId,
       }));
     },
   });
   if (!isDemo) return server.data ?? [];
-  const needle = q.trim().toLowerCase();
-  return DEMO_USERS.filter(
-    (u) => !blocked.includes(u.id) && (!needle || u.username.includes(needle)),
-  ).map((u) => ({
-    id: u.id,
-    username: u.username,
-    isPrivate: u.isPrivate,
-  }));
+  const mine =
+    me && (!needle || me.username.toLowerCase().includes(needle))
+      ? [{ id: 'me', username: me.username, isPrivate: !!me.isPrivate, isMe: true }]
+      : [];
+  const others = DEMO_USERS.filter(
+    (u) => !blocked.includes(u.id) && (!needle || u.username.toLowerCase().includes(needle)),
+  ).map((u) => ({ id: u.id, username: u.username, isPrivate: u.isPrivate, isMe: false }));
+  const exact = (u: SearchResultRow) => (u.username.toLowerCase() === needle ? 0 : 1);
+  return [...mine, ...others].sort((a, b) => exact(a) - exact(b));
 }
 
 /** Portugal (everyone), one city, or your friends. Every board ranks by XP. */

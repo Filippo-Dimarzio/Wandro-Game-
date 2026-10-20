@@ -1,4 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { cleanSocialLinks, type SocialLinks } from '@wandro/shared';
 import { DEMO_USERS } from '@/demo/social';
 import { isDemo } from '@/lib/env';
@@ -32,6 +33,41 @@ export async function loadServerProfile(userId: string): Promise<LocalProfile | 
 export type AccountError = 'username_taken' | 'username_invalid' | 'unknown';
 
 export const USERNAME_RULE = /^[a-zA-Z0-9_.]{3,24}$/;
+
+export type UsernameStatus = 'idle' | 'invalid' | 'checking' | 'available' | 'taken';
+
+/**
+ * Is this username free? Asks the server as you type (debounced); the database's unique index
+ * still has the last word when you save. The demo can only check its own made-up explorers.
+ */
+export function useUsernameStatus(name: string, current?: string): UsernameStatus {
+  const [debounced, setDebounced] = useState(name);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(name), 350);
+    return () => clearTimeout(id);
+  }, [name]);
+  const valid = USERNAME_RULE.test(name);
+  const mine = !!current && name.toLowerCase() === current.toLowerCase();
+  const server = useQuery({
+    queryKey: ['username-available', debounced.toLowerCase()],
+    enabled: !isDemo && valid && !mine && debounced === name,
+    queryFn: async () => {
+      const { data, error } = await supabase!.rpc('username_available', { p_name: debounced });
+      if (error) throw error;
+      return data as boolean;
+    },
+    staleTime: 10_000,
+  });
+  if (!name) return 'idle';
+  if (!valid) return 'invalid';
+  if (mine) return 'available';
+  if (isDemo)
+    return DEMO_USERS.some((u) => u.username.toLowerCase() === name.toLowerCase())
+      ? 'taken'
+      : 'available';
+  if (debounced !== name || server.isFetching || server.data === undefined) return 'checking';
+  return server.data ? 'available' : 'taken';
+}
 
 /** Change your username and / or social links (server: your own profiles row only). */
 export function useUpdateAccount() {

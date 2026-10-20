@@ -1,6 +1,6 @@
 name: Deploy web app
 
-# Builds the Expo web app (demo mode) and publishes it to GitHub Pages.
+# Builds the Expo web app (connected to the Wandro Supabase project) and publishes it to GitHub Pages.
 # One-time setup: Settings -> Pages -> Source: "GitHub Actions".
 on:
   push:
@@ -24,6 +24,10 @@ jobs:
       EXPO_PUBLIC_BASE_URL: /${{ github.event.repository.name }}
       # Where /join sends beta sign-ups: Settings -> Secrets and variables -> Actions -> Variables.
       EXPO_PUBLIC_WAITLIST_URL: ${{ vars.WAITLIST_URL }}
+      # The Wandro Supabase project. Both values are public by design (they ship in every
+      # client); Row Level Security and server functions protect the data. Variables override.
+      EXPO_PUBLIC_SUPABASE_URL: ${{ vars.SUPABASE_URL || 'https://abpwwchcyxwrhscdqxtz.supabase.co' }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY || 'sb_publishable_9TvgN5CXd8pvksmJowkFMw_D-xAhp9p' }}
       EXPO_NO_TELEMETRY: 1
       ELECTRON_SKIP_BINARY_DOWNLOAD: 1
     steps:

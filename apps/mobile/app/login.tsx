@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import * as Linking from 'expo-linking';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -17,7 +16,7 @@ import { GameBackdrop } from '@/components/GameBackdrop';
 import { WandroLogo } from '@/components/WandroLogo';
 import { loadServerProfile } from '@/data/account';
 import { t } from '@/i18n';
-import { signInWithProvider } from '@/lib/auth';
+import { appLink, signInWithProvider } from '@/lib/auth';
 import { isDemo } from '@/lib/env';
 import { looksLikeEmail, normaliseEmail, verifyPassword } from '@/lib/password';
 import { offerToSavePassword } from '@/lib/passwordManager';
@@ -80,11 +79,11 @@ export default function Login() {
       return setMessage({ tone: 'error', text: t('login.forgotNeedsEmail') });
     setBusy(true);
     await supabase!.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: Linking.createURL('/reset-password'),
+      redirectTo: appLink('/reset-password'),
     });
     setBusy(false);
-    // Same answer whether or not the email has an account, so it can't be used to probe.
-    setMessage({ tone: 'info', text: t('login.resetSent') });
+    // Same screen whether or not the email has an account, so it can't be used to probe.
+    router.push({ pathname: '/check-email', params: { email: email.trim(), kind: 'reset' } });
   };
 
   return (

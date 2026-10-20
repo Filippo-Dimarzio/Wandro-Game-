@@ -1,0 +1,54 @@
+<!-- Password reset email ("Reset your Wandro password"), sent by Wandro Support. -->
+<html>
+  <body
+    style="
+      margin: 0;
+      padding: 24px;
+      background: #f4f1ea;
+      font-family: Helvetica, Arial, sans-serif;
+      color: #1d2430;
+    "
+  >
+    <table
+      role="presentation"
+      width="100%"
+      style="
+        max-width: 480px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 28px;
+      "
+    >
+      <tr>
+        <td>
+          <p style="font-size: 22px; font-weight: 800; margin: 0 0 4px">Wandro</p>
+          <p style="font-size: 13px; color: #5b6573; margin: 0 0 24px">Wandro Support</p>
+          <h1 style="font-size: 20px; margin: 0 0 12px">Reset your password</h1>
+          <p style="font-size: 15px; line-height: 1.5; margin: 0 0 20px">
+            Someone asked to reset the password for the Wandro account on this email address. Tap
+            the button to choose a new one. The link works once and expires in an hour.
+          </p>
+          <p style="margin: 0 0 24px">
+            <a
+              href="{{ .ConfirmationURL }}"
+              style="
+                display: inline-block;
+                background: #0e7c66;
+                color: #ffffff;
+                text-decoration: none;
+                font-weight: 700;
+                padding: 14px 24px;
+                border-radius: 999px;
+              "
+              >Choose a new password</a
+            >
+          </p>
+          <p style="font-size: 13px; line-height: 1.5; color: #5b6573; margin: 0">
+            Didn't ask for this? You can ignore this email: your password stays the same.
+          </p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
