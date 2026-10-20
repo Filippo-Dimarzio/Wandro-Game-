@@ -1,8 +1,6 @@
 export const en = {
   'app.name': 'Wandro',
   'portal.tagline': 'Lift the fog. Find the places most people walk past.',
-  'portal.hold': 'Hold to clear the fog',
-  'portal.holdA11y': 'Press and hold to reveal Wandro',
   'portal.join': 'Or join the Lisbon & Sintra beta →',
   'joinCard.title': 'Liking it so far?',
   'joinCard.body':

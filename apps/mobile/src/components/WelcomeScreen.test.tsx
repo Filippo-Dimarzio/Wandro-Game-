@@ -1,28 +1,21 @@
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import Welcome from '../../app/welcome';
 
-jest.mock('expo-router', () => ({ router: { replace: jest.fn() } }));
+jest.mock('expo-router', () => ({ router: { replace: jest.fn(), push: jest.fn() } }));
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaView: ({ children }: { children: ReactNode }) => children,
 }));
 jest.mock('expo-linear-gradient', () => ({ LinearGradient: () => null }));
 
-describe('Entry portal', () => {
-  it('stays revealed after releasing the hold', async () => {
-    jest.useFakeTimers();
+describe('Title screen', () => {
+  it('needs no hold: one tap starts, and login is right there', async () => {
     await render(<Welcome />);
-    await fireEvent(screen.getByTestId('portal-hold'), 'pressIn');
-    await act(async () => void jest.advanceTimersByTime(1500));
-    expect(screen.getByText('Bora? Start exploring')).toBeOnTheScreen();
-    jest.useRealTimers();
-  });
-
-  it('screen-reader activate reveals without holding', async () => {
-    await render(<Welcome />);
-    await fireEvent(screen.getByTestId('portal-hold'), 'accessibilityAction', {
-      nativeEvent: { actionName: 'activate' },
-    });
-    expect(screen.getByText('Bora? Start exploring')).toBeOnTheScreen();
+    expect(screen.queryByText(/Hold/)).toBeNull();
+    await fireEvent.press(screen.getByTestId('portal-start'));
+    expect(router.replace).toHaveBeenCalledWith('/register');
+    await fireEvent.press(screen.getByTestId('portal-login'));
+    expect(router.replace).toHaveBeenCalledWith('/login');
   });
 });
