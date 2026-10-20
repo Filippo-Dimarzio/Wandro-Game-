@@ -1,0 +1,18 @@
+/* Phones: long-pressing a button shouldn't select its text or open the copy / look-up popup. */
+html,
+body {
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+/* Typing still works everywhere text is entered. */
+input,
+textarea,
+[contenteditable='true'] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}

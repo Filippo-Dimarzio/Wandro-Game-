@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ChallengeIntro } from '@/components/ChallengeIntro';
 import { queryClient } from '@/data/queryClient';
 import { setupPwa } from '@/lib/pwa';
+import '@/lib/webStyles';
 import { useColors, useIsDark } from '@/theme';
 
 setupPwa();
