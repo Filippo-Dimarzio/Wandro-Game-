@@ -9,6 +9,15 @@ eu-west-3 Paris), so accounts, progress, friends and search work on every device
   database password never go in the repo or the app.
 - Dashboard: <https://supabase.com/dashboard/project/abpwwchcyxwrhscdqxtz>
 
+## Going live (in this order)
+
+1. Add the two repository secrets below (Database changes), then run **Actions → Supabase
+   database → Run workflow**. It loads every migration, the places seed and the Edge Function.
+2. Do the dashboard settings below (URL configuration and the Wandro Support sender).
+3. Add the repository **variable** `SUPABASE_LIVE` = `true` (Settings → Secrets and variables →
+   Actions → Variables) and re-run **Deploy web app**. Until then the site stays in on-device demo
+   mode, so it never points at an empty database.
+
 ## One-time dashboard settings (Auth)
 
 These live in the dashboard, not in migrations.
