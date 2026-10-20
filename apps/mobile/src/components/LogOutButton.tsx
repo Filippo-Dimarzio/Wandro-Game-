@@ -10,19 +10,31 @@ import { radius, useColors } from '@/theme';
 
 export function useLogOut() {
   const reset = useSession((s) => s.reset);
+  const signOut = useSession((s) => s.signOut);
+  // Demo explorers with a login stay on the device; ones without would be lost.
+  const keepsExplorer = useSession((s) => !isDemo || !!s.account);
   const qc = useQueryClient();
   return async () => {
     const ok = await confirmAction(
       t('logout.title'),
-      isDemo ? t('logout.demoBody') : t('logout.body'),
+      !isDemo
+        ? t('logout.body')
+        : keepsExplorer
+          ? t('logout.demoAccountBody')
+          : t('logout.demoBody'),
       t('logout.confirm'),
       t('common.cancel'),
     );
     if (!ok) return false;
+    qc.clear();
+    if (isDemo && keepsExplorer) {
+      signOut();
+      router.replace('/login');
+      return true;
+    }
     await supabase?.auth.signOut();
     reset();
-    qc.clear();
-    router.replace('/welcome');
+    router.replace(isDemo ? '/welcome' : '/login');
     return true;
   };
 }

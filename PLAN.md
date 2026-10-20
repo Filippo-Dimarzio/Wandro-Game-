@@ -61,6 +61,10 @@ wandro/
 
 - **Client:** Expo Router, TanStack Query (server state), Zustand (UI/session state), `@rnmapbox/maps`, `expo-location` (foreground only), `expo-notifications`, `expo-image` for fast photo rendering.
 - **Backend:** Supabase Postgres + PostGIS, Auth (email, Google, Apple), Row Level Security, Storage, Edge Functions (Deno).
+- **Logins:** Supabase Auth checks passwords; the app never stores one. Login forms are real
+  `<form>`s on the web with `autocomplete` username / current-password / new-password (and
+  `textContentType` on iOS) so password managers save and fill them. Demo mode keeps a salted
+  PBKDF2 hash on the device instead.
 - **Trust boundary:** the client is never trusted. All points, unlocks, XP and badges are written only by server functions: `SECURITY DEFINER` Postgres functions called over RPC (chosen over Deno Edge Functions so validation and scoring run in one transaction and are covered by the SQL test suite). Clients cannot insert or update `visits`, `points_ledger`, `user_badges`, `place_stats`, inventory or coins.
 - **Desktop:** `apps/desktop` wraps the web build in Electron (Windows, macOS, Linux installers built by the Release workflow). The web app is also installable from the browser.
 - **Expo + Mapbox:** `@rnmapbox/maps` needs a development build (not Expo Go). EAS Build is set up in Phase 0.

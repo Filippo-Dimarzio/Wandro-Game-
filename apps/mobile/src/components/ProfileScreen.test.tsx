@@ -31,6 +31,19 @@ describe('Profile', () => {
     expect(screen.getByTestId('home-city')).toHaveTextContent('🇵🇹Lisbon');
   });
 
+  it('shows social handles next to the home city, linking to the profiles', async () => {
+    const { Linking } = jest.requireActual('react-native');
+    const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+    useSession.getState().updateProfile({ socials: { instagram: 'fil.dm7', tripbff: 'fil-dm7' } });
+    await render(<Profile />, { wrapper: queryWrapper() });
+    expect(screen.getByTestId('social-chip-instagram')).toHaveTextContent('@fil.dm7');
+    expect(screen.getByTestId('social-chip-tripbff')).toHaveTextContent('@fil-dm7');
+    expect(screen.queryByTestId('social-chip-x')).toBeNull();
+    await fireEvent.press(screen.getByTestId('social-chip-instagram'));
+    expect(open).toHaveBeenCalledWith('https://www.instagram.com/fil.dm7');
+    open.mockRestore();
+  });
+
   it('opens the explorer customiser from the profile picture, with no separate button', async () => {
     await render(<Profile />, { wrapper: queryWrapper() });
     expect(screen.queryByRole('button', { name: 'Customise' })).toBeNull();

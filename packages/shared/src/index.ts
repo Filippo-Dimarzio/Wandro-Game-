@@ -22,3 +22,4 @@ export * from './explorers';
 export * from './waitlist';
 export * from './details';
 export * from './profile-stats';
+export * from './socials';

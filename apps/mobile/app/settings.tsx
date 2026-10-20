@@ -1,3 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
+import {
+  parseSocialHandle,
+  SOCIAL_NETWORKS,
+  type SocialLinks,
+  type SocialNetwork,
+} from '@wandro/shared';
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -15,8 +22,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { GameBackdrop } from '@/components/GameBackdrop';
 import { LogOutButton } from '@/components/LogOutButton';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { useDeleteAccount, useExportData, useUpdatePrivacy } from '@/data/account';
+import { SOCIAL_ICONS } from '@/components/SocialChips';
+import {
+  useDeleteAccount,
+  useExportData,
+  USERNAME_RULE,
+  useUpdateAccount,
+  useUpdatePrivacy,
+} from '@/data/account';
 import { t } from '@/i18n';
+import { isDemo } from '@/lib/env';
 import { setDailyReminder } from '@/lib/notifications';
 import { useSession } from '@/state/session';
 import { column, radius, space, useColors, useIsDark } from '@/theme';
@@ -65,6 +80,10 @@ export default function Settings() {
             />
           </Row>
         </Section>
+
+        <AccountSection />
+
+        <SocialSection />
 
         <Section title={t('settings.notifications')}>
           <Row
@@ -139,6 +158,159 @@ export default function Settings() {
   );
 }
 
+/** Login, username and password, right under Dark mode. */
+function AccountSection() {
+  const c = useColors();
+  const account = useSession((s) => s.account);
+  const current = useSession((s) => s.profile?.username ?? '');
+  const update = useUpdateAccount();
+  const [username, setUsername] = useState(current);
+  const [saved, setSaved] = useState(false);
+  const changed = username !== current;
+  const valid = USERNAME_RULE.test(username);
+  // A demo explorer without a login has no password to change yet.
+  const hasPassword = !isDemo || !!account;
+  const error = update.error?.message;
+
+  return (
+    <Section title={t('settings.account')}>
+      {isDemo && account && (
+        <Text style={{ color: c.textMuted }} testID="logged-in-as">
+          {t('settings.loggedInAs', { email: account.email })}
+        </Text>
+      )}
+      <Text style={{ color: c.text, fontWeight: '600' }}>{t('settings.username')}</Text>
+      <TextInput
+        value={username}
+        onChangeText={(v) => {
+          setUsername(v);
+          setSaved(false);
+          update.reset();
+        }}
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="off"
+        maxLength={24}
+        accessibilityLabel={t('settings.username')}
+        style={[styles.input, { color: c.text, borderColor: c.border }]}
+        testID="settings-username"
+      />
+      <Text style={{ color: username && !valid ? c.danger : c.textMuted, fontSize: 13 }}>
+        {error === 'username_taken' ? t('settings.usernameTaken') : t('register.usernameHint')}
+      </Text>
+      <Pressable
+        onPress={() => update.mutate({ username }, { onSuccess: () => setSaved(true) })}
+        disabled={!changed || !valid || update.isPending}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: !changed || !valid }}
+        style={[styles.button, { backgroundColor: changed && valid ? c.accent : c.surface }]}
+        testID="save-username"
+      >
+        <Text style={{ color: changed && valid ? c.accentOn : c.textMuted, fontWeight: '800' }}>
+          {saved && !changed ? t('settings.saved') : t('settings.usernameSave')}
+        </Text>
+      </Pressable>
+
+      <Text style={{ color: c.text, fontWeight: '600', marginTop: space.sm }}>
+        {t('settings.password')}
+      </Text>
+      {hasPassword ? (
+        <Pressable
+          onPress={() => router.push('/change-password')}
+          accessibilityRole="button"
+          style={[styles.button, { backgroundColor: c.surface }]}
+          testID="change-password"
+        >
+          <Text style={{ color: c.text, fontWeight: '700' }}>
+            🔑 {t('settings.changePassword')}
+          </Text>
+        </Pressable>
+      ) : (
+        <>
+          <Text style={{ color: c.textMuted }}>{t('settings.addLoginHint')}</Text>
+          <Pressable
+            onPress={() => router.push('/add-login')}
+            accessibilityRole="button"
+            style={[styles.button, { backgroundColor: c.accent }]}
+            testID="add-login"
+          >
+            <Text style={{ color: c.accentOn, fontWeight: '800' }}>{t('settings.addLogin')}</Text>
+          </Pressable>
+        </>
+      )}
+    </Section>
+  );
+}
+
+/** Instagram, Facebook, X and TripBFF handles, shown next to the city on the profile. */
+function SocialSection() {
+  const c = useColors();
+  const stored = useSession((s) => s.profile?.socials);
+  const update = useUpdateAccount();
+  const [draft, setDraft] = useState<Record<SocialNetwork, string>>(
+    () =>
+      Object.fromEntries(
+        SOCIAL_NETWORKS.map((n) => [n, stored?.[n] ? `@${stored[n]}` : '']),
+      ) as Record<SocialNetwork, string>,
+  );
+  const [saved, setSaved] = useState(false);
+  const parsed = SOCIAL_NETWORKS.map((n) => [n, parseSocialHandle(n, draft[n])] as const);
+  const invalid = parsed.filter(([, h]) => h === null).map(([n]) => n);
+
+  const save = () => {
+    const socials: SocialLinks = {};
+    for (const [n, h] of parsed) if (h) socials[n] = h;
+    update.mutate({ socials }, { onSuccess: () => setSaved(true) });
+  };
+
+  return (
+    <Section title={t('settings.socials')}>
+      <Text style={{ color: c.textMuted }}>{t('settings.socialsHint')}</Text>
+      {SOCIAL_NETWORKS.map((n) => (
+        <View key={n} style={styles.social}>
+          <Ionicons name={SOCIAL_ICONS[n]} size={22} color={c.text} />
+          <TextInput
+            value={draft[n]}
+            onChangeText={(v) => {
+              setDraft((d) => ({ ...d, [n]: v }));
+              setSaved(false);
+            }}
+            placeholder={`${t(`social.${n}`)}: ${t('social.placeholder')}`}
+            placeholderTextColor={c.textMuted}
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="off"
+            accessibilityLabel={t(`social.${n}`)}
+            style={[
+              styles.input,
+              { flex: 1, color: c.text, borderColor: invalid.includes(n) ? c.danger : c.border },
+            ]}
+            testID={`social-${n}`}
+          />
+        </View>
+      ))}
+      {invalid.map((n) => (
+        <Text key={n} style={{ color: c.danger, fontSize: 13 }}>
+          {t('social.invalid', { network: t(`social.${n}`) })}
+        </Text>
+      ))}
+      {update.isError && <Text style={{ color: c.danger }}>{t('common.error')}</Text>}
+      <Pressable
+        onPress={save}
+        disabled={invalid.length > 0 || update.isPending}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: invalid.length > 0 }}
+        style={[styles.button, { backgroundColor: invalid.length ? c.surface : c.accent }]}
+        testID="save-socials"
+      >
+        <Text style={{ color: invalid.length ? c.textMuted : c.accentOn, fontWeight: '800' }}>
+          {saved ? t('settings.saved') : t('settings.socialsSave')}
+        </Text>
+      </Pressable>
+    </Section>
+  );
+}
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   const c = useColors();
   return (
@@ -181,6 +353,7 @@ const styles = StyleSheet.create({
     gap: space.sm,
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 44 },
+  social: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   button: {
     borderRadius: radius.pill,
     minHeight: 48,

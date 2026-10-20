@@ -11,6 +11,7 @@ import {
   type Category,
   type LatLng,
   type Place,
+  type SocialLinks,
 } from '@wandro/shared';
 import {
   applyDailyChallenge,
@@ -31,6 +32,7 @@ import {
   type FriendStatus,
 } from '@/demo/friends';
 import { DEMO_USERS } from '@/demo/social';
+import type { PasswordHash } from '@/lib/password';
 
 export type { DemoUnlock } from '@/demo/engine';
 
@@ -44,6 +46,8 @@ export interface LocalProfile {
   isPrivate?: boolean;
   /** The explorer the player chose as their avatar (EXPLORER_IDS). */
   explorer?: string;
+  /** Instagram / Facebook / X / TripBFF handles, shown next to the home city. */
+  socials?: SocialLinks;
 }
 
 export interface DemoChallengeState {
@@ -80,6 +84,14 @@ export interface DemoReport {
   at: string;
 }
 
+/**
+ * Demo login kept on this device: the email and a salted hash of the password (never the
+ * password itself), so logging out no longer wipes the explorer.
+ */
+export interface DemoAccount extends PasswordHash {
+  email: string;
+}
+
 /** Equipment bought in the shop: owned items, and timed boosts with an expiry. */
 export interface Inventory {
   owned: Record<string, string>;
@@ -90,6 +102,10 @@ export interface Inventory {
 interface SessionState extends DemoProgress {
   onboarded: boolean;
   profile: LocalProfile | null;
+  /** Demo login for this device; null for explorers made before logins existed. */
+  account: DemoAccount | null;
+  /** Demo: logged in on this device (the server keeps its own session). */
+  signedIn: boolean;
   challenge: DemoChallengeState | null;
   /** Demo position (teleport / keyboard walking). Null means real GPS. */
   teleport: LatLng | null;
@@ -131,7 +147,12 @@ interface SessionState extends DemoProgress {
     streakCelebrated?: string;
   };
 
-  completeOnboarding: (profile: LocalProfile) => void;
+  completeOnboarding: (profile: LocalProfile, account?: DemoAccount) => void;
+  /** Add a login to an explorer made before logins existed. */
+  setAccount: (account: DemoAccount) => void;
+  signIn: () => void;
+  /** Demo: log out but keep the explorer on the device for the next login. */
+  signOut: () => void;
   updateProfile: (patch: Partial<LocalProfile>) => void;
   recordVisit: (place: Place, places: Place[]) => VisitResult | null;
   completeChallenge: (qualifying: string[], challengeId: string, places: Place[]) => number;
@@ -173,6 +194,8 @@ const initial = {
   ...EMPTY_PROGRESS,
   onboarded: false,
   profile: null,
+  account: null as DemoAccount | null,
+  signedIn: false,
   challenge: null,
   teleport: null,
   justUnlocked: null,
@@ -237,7 +260,11 @@ export const useSession = create<SessionState>()(
   persist(
     (set, get) => ({
       ...initial,
-      completeOnboarding: (profile) => set({ onboarded: true, profile }),
+      completeOnboarding: (profile, account) =>
+        set((s) => ({ onboarded: true, signedIn: true, profile, account: account ?? s.account })),
+      setAccount: (account) => set({ account }),
+      signIn: () => set({ signedIn: true }),
+      signOut: () => set({ signedIn: false, teleport: null }),
       updateProfile: (patch) =>
         set((s) => ({ profile: s.profile ? { ...s.profile, ...patch } : s.profile })),
       recordVisit: (place, places) => {
@@ -462,7 +489,7 @@ export const useSession = create<SessionState>()(
     }),
     {
       name: 'wandro-session',
-      version: 3,
+      version: 4,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: ({
         justUnlocked: _j,
@@ -512,6 +539,11 @@ export const useSession = create<SessionState>()(
               ? { ...p, photoUri: undefined }
               : p,
           );
+        }
+        // v4 added logins: explorers made before then stay logged in, without one.
+        if (version < 4) {
+          old.signedIn = !!old.onboarded;
+          old.account = null;
         }
         return old as unknown as SessionState;
       },

@@ -18,6 +18,7 @@ import { classTitle, Records, StyleBars, TrophyShelf } from '@/components/Profil
 import { useExplorerStats } from '@/data/explorerStats';
 import { isDemo } from '@/lib/env';
 import { homeCityLabel } from '@/lib/homeCity';
+import { SocialChips } from '@/components/SocialChips';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { PlaceMap } from '@/map/PlaceMap';
@@ -77,6 +78,7 @@ export default function Profile() {
                   <Text style={{ color: c.text, fontWeight: '700' }}>{city.name}</Text>
                 </View>
               )}
+              <SocialChips links={profile?.socials} />
             </View>
           </View>
         </View>

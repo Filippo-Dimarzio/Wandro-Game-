@@ -6,6 +6,20 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Log in: the app opens on a login screen once you have an account (the portal also has "I
+  already have an account · Log in"), with email and password, show/hide password, "Forgot
+  password?", and Google / Apple when the server is connected. The fields are a real form marked
+  `username` / `current-password` / `new-password`, so Brave, Chrome, Safari, iCloud Keychain and
+  Google Password Manager offer to save and fill the login. Wandro never stores your password: the
+  server keeps only Supabase Auth's hash, and the demo keeps a salted PBKDF2 hash on the device.
+- Demo logins: signing up in the demo asks for an email and password, and logging out now keeps
+  your explorer on the device for the next login instead of wiping it. Explorers made before
+  logins stay logged in and can add one from Settings.
+- Settings, under Dark mode: change your username (taken or invalid names are refused), change
+  your password (current one first), and add Instagram, Facebook, X and TripBFF handles. They
+  show as chips next to your city on Profile and on your public profile; Instagram, Facebook and X
+  open the profile. Only handles are stored, never links (migration `20261031090000_social_links`).
+
 - Category pages and Nearby show places as a grid of portrait cards, in the style of the city
   collection cards, instead of long full-width rows. Cards are never wider than a collection card
   (more columns on wide screens), and each shows its art 40% transparent over a colour wash that

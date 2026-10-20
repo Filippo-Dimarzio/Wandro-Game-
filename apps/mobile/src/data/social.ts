@@ -1,5 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CHALLENGE_XP, DEMO_PLACES, MOMENT_VISIBLE_HOURS, type Category } from '@wandro/shared';
+import {
+  CHALLENGE_XP,
+  cleanSocialLinks,
+  DEMO_PLACES,
+  MOMENT_VISIBLE_HOURS,
+  type Category,
+  type SocialLinks,
+} from '@wandro/shared';
 import { DEMO_USERS, demoUser } from '@/demo/social';
 import { walletOf } from '@/demo/engine';
 import { isDemo } from '@/lib/env';
@@ -275,6 +282,7 @@ export interface ProfileCard {
   followStatus: 'pending' | 'accepted' | null;
   canSee: boolean;
   discoveries: number | null;
+  socials?: SocialLinks;
 }
 
 export function useProfileCard(userId: string) {
@@ -299,6 +307,7 @@ export function useProfileCard(userId: string) {
         followStatus: (d.follow_status as ProfileCard['followStatus']) ?? null,
         canSee: !!d.can_see,
         discoveries: d.discoveries === null ? null : Number(d.discoveries),
+        socials: cleanSocialLinks(d.social_links as SocialLinks | null),
       };
     },
   });

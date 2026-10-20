@@ -7,6 +7,8 @@ import { useHydrated } from '@/state/useHydrated';
 
 export default function Index() {
   const onboarded = useSession((s) => s.onboarded);
+  const signedIn = useSession((s) => s.signedIn);
+  const hasDemoLogin = useSession((s) => !!s.account);
   const hydrated = useHydrated();
   const { session, loading } = useAuthSession();
 
@@ -17,7 +19,11 @@ export default function Index() {
       </View>
     );
   }
-  if (!onboarded) return <Redirect href="/welcome" />;
-  if (!isDemo && !session) return <Redirect href="/register" />;
-  return <Redirect href="/(tabs)" />;
+  const loggedIn = isDemo ? signedIn : !!session;
+  if (loggedIn && onboarded) return <Redirect href="/(tabs)" />;
+  // Signed in to the server but sign-up isn't finished: pick a username and style.
+  if (loggedIn) return <Redirect href="/register" />;
+  // Logged out with an explorer to come back to: straight to the login.
+  if (hasDemoLogin || (!isDemo && onboarded)) return <Redirect href="/login" />;
+  return <Redirect href="/welcome" />;
 }

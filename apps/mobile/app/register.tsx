@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -16,12 +16,23 @@ import { DEFAULT_EXPLORER, type Category, type ExplorerId } from '@wandro/shared
 import { GameBackdrop } from '@/components/GameBackdrop';
 import { CategoryMark } from '@/components/CategoryMark';
 import { Check } from '@/components/Check';
+import { CredentialsForm } from '@/components/CredentialsForm';
 import { ExplorerPicker } from '@/components/ExplorerPicker';
+import { loadServerProfile, USERNAME_RULE } from '@/data/account';
 import { t, type TranslationKey } from '@/i18n';
 import { signInWithProvider, useAuthSession } from '@/lib/auth';
+import { confirmAction } from '@/lib/confirm';
 import { isDemo } from '@/lib/env';
+import {
+  canHashPasswords,
+  hashPassword,
+  looksLikeEmail,
+  MIN_PASSWORD_LENGTH,
+  normaliseEmail,
+} from '@/lib/password';
+import { offerToSavePassword } from '@/lib/passwordManager';
 import { supabase } from '@/lib/supabase';
-import { useSession } from '@/state/session';
+import { useSession, type DemoAccount } from '@/state/session';
 import { radius, space, useColors } from '@/theme';
 
 // Each explorer style wears the colour of the category it maps to.
@@ -35,13 +46,22 @@ const STYLES: { id: string; category: Category }[] = [
   { id: 'hidden', category: 'other' },
 ];
 
-const USERNAME = /^[a-zA-Z0-9_.]{3,24}$/;
+const USERNAME = USERNAME_RULE;
 
 export default function Register() {
   const c = useColors();
   const { session } = useAuthSession();
   const completeOnboarding = useSession((s) => s.completeOnboarding);
-  const [step, setStep] = useState<'account' | 'profile' | 'style'>(isDemo ? 'profile' : 'account');
+  const existing = useSession((s) => (s.onboarded ? (s.profile?.username ?? '') : null));
+  const deviceAccount = useSession((s) => s.account);
+  const resetDevice = useSession((s) => s.reset);
+  // A native demo build without WebCrypto can't check passwords, so it skips the login step.
+  const withAccount = !isDemo || canHashPasswords();
+  const [step, setStep] = useState<'account' | 'profile' | 'style'>(
+    withAccount ? 'account' : 'profile',
+  );
+  /** Demo login to save with the profile at the end. */
+  const [pending, setPending] = useState<DemoAccount | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -54,18 +74,45 @@ export default function Register() {
 
   const currentStep = step === 'account' && session ? 'profile' : step;
 
-  const auth = async (mode: 'signUp' | 'signIn') => {
-    if (!supabase) return;
+  // Someone who already has a server profile (e.g. back from Google / Apple) goes straight in.
+  useEffect(() => {
+    if (!session) return;
+    loadServerProfile(session.user.id).then((p) => {
+      if (!p) return;
+      completeOnboarding(p);
+      router.replace('/(tabs)');
+    });
+  }, [session, completeOnboarding]);
+
+  const createAccount = async () => {
     setBusy(true);
     setMessage(null);
-    const res =
-      mode === 'signUp'
-        ? await supabase.auth.signUp({ email, password })
-        : await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
-    if (res.error) return setMessage(res.error.message);
-    if (!res.data.session) return setMessage(t('register.checkEmail'));
-    setStep('profile');
+    try {
+      if (isDemo) {
+        const login = normaliseEmail(email);
+        if (deviceAccount?.email === login) return setMessage(t('login.exists'));
+        if (existing !== null || deviceAccount) {
+          const ok = await confirmAction(
+            t('login.replaceTitle'),
+            t('login.replaceBody', { username: existing ?? '' }),
+            t('login.replaceConfirm'),
+            t('common.cancel'),
+          );
+          if (!ok) return;
+          resetDevice();
+        }
+        setPending({ email: login, ...(await hashPassword(password)) });
+        await offerToSavePassword({ email: login, password });
+        return setStep('profile');
+      }
+      const res = await supabase!.auth.signUp({ email: email.trim(), password });
+      if (res.error) return setMessage(res.error.message);
+      await offerToSavePassword({ email: email.trim(), password });
+      if (!res.data.session) return setMessage(t('register.checkEmail'));
+      setStep('profile');
+    } finally {
+      setBusy(false);
+    }
   };
 
   const finish = async () => {
@@ -81,7 +128,10 @@ export default function Register() {
         return setMessage(error.message);
       }
     }
-    completeOnboarding({ username, homeCity, explorerStyles: styles_, explorer });
+    completeOnboarding(
+      { username, homeCity, explorerStyles: styles_, explorer },
+      pending ?? undefined,
+    );
     setBusy(false);
     router.replace('/(tabs)');
   };
@@ -99,69 +149,67 @@ export default function Register() {
           <Text style={[styles.title, { color: c.text }]} accessibilityRole="header">
             {t('register.title')}
           </Text>
-          <StepDots step={currentStep} demo={isDemo} />
+          <StepDots step={currentStep} withAccount={withAccount} />
 
           {currentStep === 'account' && (
             <View style={styles.section}>
-              <Pressable
-                style={[styles.oauth, { backgroundColor: c.text }]}
-                onPress={() =>
-                  signInWithProvider('apple').catch((e) => setMessage(String(e.message ?? e)))
-                }
-                accessibilityRole="button"
-              >
-                <Ionicons name="logo-apple" size={18} color={c.bg} />
-                <Text style={{ color: c.bg, fontWeight: '700' }}>{t('register.apple')}</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.oauth, { borderColor: c.border, borderWidth: 1 }]}
-                onPress={() =>
-                  signInWithProvider('google').catch((e) => setMessage(String(e.message ?? e)))
-                }
-                accessibilityRole="button"
-              >
-                <Ionicons name="logo-google" size={18} color={c.text} />
-                <Text style={{ color: c.text, fontWeight: '700' }}>{t('register.google')}</Text>
-              </Pressable>
-              <TextInput
-                style={input}
-                placeholder={t('register.email')}
-                placeholderTextColor={c.textMuted}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                autoComplete="email"
-                value={email}
-                onChangeText={setEmail}
-                accessibilityLabel={t('register.email')}
+              {isDemo ? (
+                <Text style={{ color: c.textMuted }}>{t('login.demoNote')}</Text>
+              ) : (
+                <>
+                  <Pressable
+                    style={[styles.oauth, { backgroundColor: c.text }]}
+                    onPress={() =>
+                      signInWithProvider('apple').catch((e) => setMessage(String(e.message ?? e)))
+                    }
+                    accessibilityRole="button"
+                  >
+                    <Ionicons name="logo-apple" size={18} color={c.bg} />
+                    <Text style={{ color: c.bg, fontWeight: '700' }}>{t('register.apple')}</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.oauth, { borderColor: c.border, borderWidth: 1 }]}
+                    onPress={() =>
+                      signInWithProvider('google').catch((e) => setMessage(String(e.message ?? e)))
+                    }
+                    accessibilityRole="button"
+                  >
+                    <Ionicons name="logo-google" size={18} color={c.text} />
+                    <Text style={{ color: c.text, fontWeight: '700' }}>{t('register.google')}</Text>
+                  </Pressable>
+                  <Text style={{ color: c.textMuted, textAlign: 'center' }}>{t('login.or')}</Text>
+                </>
+              )}
+              <CredentialsForm
+                mode="create"
+                email={email}
+                onEmailChange={setEmail}
+                password={password}
+                onPasswordChange={setPassword}
+                submitLabel={t('register.signUp')}
+                canSubmit={looksLikeEmail(email) && password.length >= MIN_PASSWORD_LENGTH}
+                busy={busy}
+                onSubmit={createAccount}
               />
-              <TextInput
-                style={input}
-                placeholder={t('register.password')}
-                placeholderTextColor={c.textMuted}
-                secureTextEntry
-                autoComplete="password"
-                value={password}
-                onChangeText={setPassword}
-                accessibilityLabel={t('register.password')}
-              />
-              <Primary
-                label={t('register.signUp')}
-                onPress={() => auth('signUp')}
-                disabled={busy || !email || password.length < 8}
-              />
-              <Pressable
-                onPress={() => auth('signIn')}
-                accessibilityRole="button"
-                style={styles.link}
-              >
-                <Text style={{ color: c.accent, fontWeight: '700' }}>{t('register.signIn')}</Text>
-              </Pressable>
+              <View style={styles.footer}>
+                <Text style={{ color: c.textMuted }}>{t('login.haveAccount')}</Text>
+                <Pressable
+                  onPress={() => router.replace('/login')}
+                  accessibilityRole="link"
+                  hitSlop={8}
+                  testID="go-login"
+                >
+                  <Text style={{ color: c.accent, fontWeight: '800' }}>{t('login.submit')}</Text>
+                </Pressable>
+              </View>
             </View>
           )}
 
           {currentStep === 'profile' && (
             <View style={styles.section}>
-              {isDemo && <Text style={{ color: c.textMuted }}>{t('register.demoNote')}</Text>}
+              {isDemo && !withAccount && (
+                <Text style={{ color: c.textMuted }}>{t('register.demoNote')}</Text>
+              )}
               <Text style={[styles.label, { color: c.text }]}>{t('register.username')}</Text>
               <TextInput
                 style={input}
@@ -271,9 +319,9 @@ export default function Register() {
   );
 }
 
-function StepDots({ step, demo }: { step: string; demo: boolean }) {
+function StepDots({ step, withAccount }: { step: string; withAccount: boolean }) {
   const c = useColors();
-  const steps = demo ? ['profile', 'style'] : ['account', 'profile', 'style'];
+  const steps = withAccount ? ['account', 'profile', 'style'] : ['profile', 'style'];
   return (
     <View
       style={styles.dots}
@@ -342,7 +390,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: space.sm,
   },
-  link: { alignItems: 'center', padding: space.sm },
+  footer: {
+    flexDirection: 'row',
+    gap: space.xs,
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+  },
   dots: { flexDirection: 'row', gap: 6 },
   dot: { width: 28, height: 5, borderRadius: 3 },
   guidelines: { borderRadius: radius.md, padding: space.md, gap: space.xs },

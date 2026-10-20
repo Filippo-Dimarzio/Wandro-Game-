@@ -74,30 +74,41 @@ export default function Welcome() {
           <Text style={styles.tagline}>{t('portal.tagline')}</Text>
         </Animated.View>
 
-        {revealed ? (
-          <Pressable
-            key="cta"
-            style={styles.cta}
-            onPress={() => Date.now() - revealedAt.current > 500 && router.replace('/register')}
-            accessibilityRole="button"
-          >
-            <Text style={styles.ctaText}>{t('portal.start')}</Text>
-          </Pressable>
-        ) : (
-          <Pressable
-            key="hold"
-            onPressIn={hold}
-            onPressOut={release}
-            accessibilityRole="button"
-            accessibilityLabel={t('portal.holdA11y')}
-            accessibilityActions={[{ name: 'activate' }]}
-            onAccessibilityAction={reveal}
-            style={styles.holdButton}
-            testID="portal-hold"
-          >
-            <Text style={styles.holdText}>{t('portal.hold')}</Text>
-          </Pressable>
-        )}
+        <View style={{ alignItems: 'center' }}>
+          {revealed ? (
+            <Pressable
+              key="cta"
+              style={styles.cta}
+              onPress={() => Date.now() - revealedAt.current > 500 && router.replace('/register')}
+              accessibilityRole="button"
+            >
+              <Text style={styles.ctaText}>{t('portal.start')}</Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              key="hold"
+              onPressIn={hold}
+              onPressOut={release}
+              accessibilityRole="button"
+              accessibilityLabel={t('portal.holdA11y')}
+              accessibilityActions={[{ name: 'activate' }]}
+              onAccessibilityAction={reveal}
+              style={styles.holdButton}
+              testID="portal-hold"
+            >
+              <Text style={styles.holdText}>{t('portal.hold')}</Text>
+            </Pressable>
+          )}
+          {revealed && (
+            <Pressable
+              onPress={() => router.replace('/login')}
+              accessibilityRole="link"
+              testID="portal-login"
+            >
+              <Text style={styles.loginLink}>{t('portal.login')}</Text>
+            </Pressable>
+          )}
+        </View>
         {revealed && isDemo && (
           <Pressable
             onPress={() => router.push('/join?src=portal')}
@@ -130,6 +141,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: space.md,
     textDecorationLine: 'underline',
+  },
+  loginLink: {
+    color: '#0E1A24',
+    fontWeight: '800',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: space.md,
   },
   logo: { fontSize: 46, fontWeight: '900', color: '#fff', letterSpacing: -1 },
   tagline: { fontSize: 18, color: '#fff', textAlign: 'center', fontWeight: '600', maxWidth: 320 },

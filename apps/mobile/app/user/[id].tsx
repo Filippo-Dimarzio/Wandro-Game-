@@ -6,6 +6,7 @@ import { explorerStage } from '@wandro/shared';
 import { GameBackdrop } from '@/components/GameBackdrop';
 import { FriendButton } from '@/components/FriendButton';
 import { PlayerAvatar } from '@/components/PlayerAvatar';
+import { SocialChips } from '@/components/SocialChips';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useFriendStatus } from '@/data/friends';
 import { useBlock, useFollow, useProfileCard, useReport } from '@/data/social';
@@ -56,6 +57,11 @@ export default function UserProfile() {
             </Text>
             {isDemo && (
               <Text style={{ color: c.textMuted, fontSize: 12 }}>{t('feed.demoBadge')}</Text>
+            )}
+            {card.socials && Object.keys(card.socials).length > 0 && (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
+                <SocialChips links={card.socials} />
+              </View>
             )}
           </View>
         </View>

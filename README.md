@@ -142,7 +142,9 @@ of those tables directly. RPCs validate input, are idempotent, and raise stable 
 removes blank uploads (black frames, flat colour), including a live photo's selfie.
 
 **Demo mode.** Without Supabase env vars the app runs entirely on-device against the shared seed,
-with `apps/mobile/src/demo` mirroring the server rules. The deployed web build is demo mode.
+with `apps/mobile/src/demo` mirroring the server rules. The deployed web build is demo mode. Demo
+logins live on the device that made them: the email plus a salted PBKDF2 hash of the password
+(never the password itself), so logging out keeps the explorer for the next login.
 Catalogue sync tests keep demo and SQL codes and prices identical.
 
 **i18n.** No user-facing string is hard-coded; everything goes through `apps/mobile/src/i18n`.
