@@ -33,8 +33,12 @@ These live in the dashboard, not in migrations.
 
 ## Database changes
 
-Migrations in `supabase/migrations` are the only way the schema changes. To apply new ones to the
-hosted project, either:
+Migrations in `supabase/migrations` are the only way the schema changes. The **Supabase
+database** workflow (`.github/workflows/supabase.yml`) applies them, with the seed and Edge
+Functions, whenever they change on `main` (or from Actions → Supabase database → Run workflow).
+It needs two repository secrets: `SUPABASE_ACCESS_TOKEN` (from
+<https://supabase.com/dashboard/account/tokens>) and `SUPABASE_DB_PASSWORD` (Project settings →
+Database). Without them it skips. By hand, either:
 
 - `supabase link --project-ref abpwwchcyxwrhscdqxtz` then `supabase db push` (needs the database
   password), or

@@ -1,0 +1,46 @@
+name: Supabase database
+
+# Applies supabase/migrations (and the idempotent seed) to the hosted Wandro project.
+# One-time setup: Settings -> Secrets and variables -> Actions -> New repository secret:
+#   SUPABASE_ACCESS_TOKEN  (supabase.com/dashboard/account/tokens)
+#   SUPABASE_DB_PASSWORD   (Project settings -> Database -> reset/copy the password)
+on:
+  push:
+    branches: [main]
+    paths: ['supabase/migrations/**', 'supabase/seed/**', 'supabase/functions/**']
+  workflow_dispatch:
+
+concurrency:
+  group: supabase
+  cancel-in-progress: false
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      PROJECT_REF: abpwwchcyxwrhscdqxtz
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check secrets
+        id: secrets
+        run: |
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ] || [ -z "$SUPABASE_DB_PASSWORD" ]; then
+            echo "Supabase secrets are not set yet; skipping (see docs/supabase-setup.md)."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: supabase/setup-cli@v1
+        if: steps.secrets.outputs.ready == 'true'
+        with:
+          version: latest
+      - name: Apply migrations and seed
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          supabase link --project-ref "$PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+          supabase db push --include-seed --password "$SUPABASE_DB_PASSWORD"
+      - name: Deploy Edge Functions
+        if: steps.secrets.outputs.ready == 'true'
+        run: supabase functions deploy --project-ref "$PROJECT_REF"
