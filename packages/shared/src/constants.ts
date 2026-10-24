@@ -24,6 +24,14 @@ export const BASE_POINTS: Record<Category, number> = {
   other: 60,
 };
 
+/**
+ * Most coins one completed activity can pay: what one discovered place earns (the visit with its
+ * rarity, pioneer bonus, set step) together, or a daily challenge on its own. Boosts the player
+ * bought (time-of-day key, friend beacon) pay on top. Mirrors points_ledger_coin_cap() in the
+ * database.
+ */
+export const ACTIVITY_COIN_CAP = 50;
+
 export const FIRST_DISCOVERER_BONUS = 50;
 export const DAILY_CHALLENGE_BONUS = 75;
 /** Finishing a whole set (5–6 places). */

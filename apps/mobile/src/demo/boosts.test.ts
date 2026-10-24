@@ -1,5 +1,6 @@
 import { BEACON_BONUS, DEMO_PLACES, TIME_QUEST_BONUS } from '@wandro/shared';
 import { useSession } from '@/state/session';
+import { grantCoins } from '@/test/grantCoins';
 import { applyVisit, EMPTY_PROGRESS, walletOf } from './engine';
 
 const byId = (id: string) => DEMO_PLACES.find((p) => p.id === id)!;
@@ -37,8 +38,9 @@ describe('boosts in the demo session', () => {
     jest.useFakeTimers({ now: NIGHT, doNotFake: ['nextTick', 'setImmediate'] });
     useSession.getState().reset();
     const s = useSession.getState();
-    s.recordVisit(byId('demo-music'), DEMO_PLACES); // 570 coins
+    s.recordVisit(byId('demo-music'), DEMO_PLACES);
     s.recordVisit(byId('demo-pena'), DEMO_PLACES);
+    grantCoins(1000);
   });
   afterEach(() => jest.useRealTimers());
 

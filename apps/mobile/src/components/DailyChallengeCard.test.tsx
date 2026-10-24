@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { DEMO_PLACES } from '@wandro/shared';
+import { ACTIVITY_COIN_CAP, DEMO_PLACES } from '@wandro/shared';
 import { useSession } from '@/state/session';
 import { queryWrapper } from '@/test/queryWrapper';
 import { coverPlace, DailyChallengeCard } from './DailyChallengeCard';
@@ -45,10 +45,8 @@ describe('DailyChallengeCard (demo mode)', () => {
     const state = useSession.getState();
     const daily = state.ledger.filter((e) => e.kind === 'daily_challenge');
     expect(daily).toHaveLength(1);
-    // Double coins: the bonus repeats the best qualifying discovery's coins (never below 75).
-    const best = Math.max(75, ...Object.values(state.unlocked).map((u) => u.points));
-    expect(daily[0].coins).toBeLessThanOrEqual(best);
-    expect(daily[0].coins).toBeGreaterThanOrEqual(75);
+    // Double coins, within the 50-coin cap per completed activity.
+    expect(daily[0].coins).toBe(ACTIVITY_COIN_CAP);
     jest.useRealTimers();
   });
 });

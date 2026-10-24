@@ -6,6 +6,7 @@ import { FriendChallengeCard } from '@/components/FriendChallengeCard';
 import { TimeQuestBadge } from '@/components/TimeQuestBadge';
 import { useFriendChallenges } from '@/data/friends';
 import { useSession } from '@/state/session';
+import { grantCoins } from '@/test/grantCoins';
 import { queryWrapper } from '@/test/queryWrapper';
 
 jest.mock('expo-router', () => ({
@@ -27,7 +28,8 @@ function Challenge({ id }: { id: string }) {
 describe('boosts in the app (demo mode)', () => {
   beforeEach(() => {
     useSession.getState().reset();
-    useSession.getState().recordVisit(byId('demo-music'), DEMO_PLACES); // 570 coins
+    useSession.getState().recordVisit(byId('demo-music'), DEMO_PLACES);
+    grantCoins(1000);
   });
 
   it('a one-use boost shows as ready once bought, and can’t be bought twice', async () => {

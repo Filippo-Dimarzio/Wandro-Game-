@@ -1,4 +1,10 @@
-import { BASE_POINTS, CHALLENGE_XP, FIRST_DISCOVERER_BONUS, LEVEL_UP_XP } from './constants';
+import {
+  ACTIVITY_COIN_CAP,
+  BASE_POINTS,
+  CHALLENGE_XP,
+  FIRST_DISCOVERER_BONUS,
+  LEVEL_UP_XP,
+} from './constants';
 import type { Category } from './types';
 
 /**
@@ -23,9 +29,22 @@ export function pointsForVisit(
   basePoints: number = BASE_POINTS[category],
 ): PointsBreakdown {
   const multiplier = rarityMultiplier(uniqueVisitors);
-  const firstDiscovererBonus = uniqueVisitors === 0 ? FIRST_DISCOVERER_BONUS : 0;
-  const total = Math.round(basePoints * multiplier) + firstDiscovererBonus;
-  return { base: basePoints, multiplier, firstDiscovererBonus, total };
+  const visit = capActivityCoins(0, Math.round(basePoints * multiplier));
+  const firstDiscovererBonus = capActivityCoins(
+    visit,
+    uniqueVisitors === 0 ? FIRST_DISCOVERER_BONUS : 0,
+  );
+  return {
+    base: basePoints,
+    multiplier,
+    firstDiscovererBonus,
+    total: visit + firstDiscovererBonus,
+  };
+}
+
+/** What a reward pays once `paid` coins have already gone to the same activity (ACTIVITY_COIN_CAP). */
+export function capActivityCoins(paid: number, amount: number): number {
+  return Math.max(0, Math.min(amount, ACTIVITY_COIN_CAP - paid));
 }
 
 /**

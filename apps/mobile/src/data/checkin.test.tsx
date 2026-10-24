@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { DEMO_PLACES, pointsForVisit } from '@wandro/shared';
+import { ACTIVITY_COIN_CAP, DEMO_PLACES } from '@wandro/shared';
 import type { UserLocation } from '@/lib/useLocation';
 import { useSession } from '@/state/session';
 import { queryWrapper } from '@/test/queryWrapper';
@@ -26,11 +26,11 @@ describe('useCheckin (demo mode)', () => {
     await act(async () => result.current.start(adraga));
     expect(result.current.phase).toMatchObject({
       kind: 'done',
-      // Adraga is in "The wild coast" set: +20 on top.
+      // Adraga is in "The wild coast" set, but the visit already pays the 50-coin cap.
       outcome: {
         status: 'verified',
-        coins: pointsForVisit('nature', adraga.uniqueVisitors).total + 20,
-        setCoins: 20,
+        coins: ACTIVITY_COIN_CAP,
+        setCoins: 0,
       },
     });
     expect(useSession.getState().unlocked[adraga.id]).toBeDefined();

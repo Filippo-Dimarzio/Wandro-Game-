@@ -1,5 +1,6 @@
 import {
   pointsForVisit,
+  capActivityCoins,
   rarityMultiplier,
   ledgerXp,
   levelFromXp,
@@ -9,7 +10,7 @@ import {
   explorerStage,
 } from './scoring';
 import { haversineMeters, isWithinGeofence, formatDistance } from './geo';
-import { CHALLENGE_XP } from './constants';
+import { ACTIVITY_COIN_CAP, CHALLENGE_XP } from './constants';
 
 describe('rarityMultiplier', () => {
   it('is 5x for undiscovered and falls with visitors', () => {
@@ -33,19 +34,32 @@ describe('rarityMultiplier', () => {
 });
 
 describe('pointsForVisit', () => {
-  it('rewards hidden gems more than tourist sites', () => {
-    const gem = pointsForVisit('heritage', 3).total;
-    const crowd = pointsForVisit('heritage', 5000).total;
-    expect(gem).toBeGreaterThan(crowd);
+  it('rarer places carry a bigger multiplier', () => {
+    expect(pointsForVisit('heritage', 3).multiplier).toBeGreaterThan(
+      pointsForVisit('heritage', 5000).multiplier,
+    );
   });
-  it('adds the first discoverer bonus only for the first visit', () => {
+  it('caps a completed activity at 50 coins, pioneer bonus included', () => {
     const first = pointsForVisit('nature', 0);
-    expect(first.firstDiscovererBonus).toBe(50);
-    expect(first.total).toBe(80 * 5 + 50);
-    expect(pointsForVisit('nature', 1).firstDiscovererBonus).toBe(0);
+    expect(first.total).toBe(ACTIVITY_COIN_CAP);
+    expect(first.firstDiscovererBonus).toBe(0);
+    expect(pointsForVisit('heritage', 5000).total).toBe(ACTIVITY_COIN_CAP);
+    expect(pointsForVisit('other', 10, 200).total).toBe(ACTIVITY_COIN_CAP);
   });
-  it('honours a per-place base override', () => {
-    expect(pointsForVisit('other', 10, 200).total).toBe(600);
+  it('pays a small place in full and tops it up with the pioneer bonus up to the cap', () => {
+    expect(pointsForVisit('other', 1000, 30).total).toBe(31);
+    const first = pointsForVisit('other', 0, 5);
+    expect(first.total - first.firstDiscovererBonus).toBe(25);
+    expect(first.firstDiscovererBonus).toBe(25);
+  });
+});
+
+describe('capActivityCoins', () => {
+  it('pays what is left under the cap, never less than nothing', () => {
+    expect(capActivityCoins(0, 40)).toBe(40);
+    expect(capActivityCoins(30, 40)).toBe(20);
+    expect(capActivityCoins(50, 40)).toBe(0);
+    expect(capActivityCoins(0, 75)).toBe(50);
   });
 });
 

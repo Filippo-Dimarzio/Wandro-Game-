@@ -6,6 +6,12 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- A completed activity pays at most 50 coins: everything one discovered place earns (rarity,
+  pioneer bonus, set step) shares the cap, and a daily challenge is capped on its own. Boosts you
+  bought (time-of-day key, friend beacon) still pay on top. The server enforces it with one ledger
+  rule, and the demo mirrors it.
+- Stamps no longer print a number in the corner.
+- Profile has a Leaderboard button again, and its map shows the explorer you chose.
 - New Lisbon heritage place: the Barcarena Gunpowder Factory in Oeiras, a free public park and
   museum where gunpowder was made from 1540 (migration `20261103090000_barcarena_gunpowder_factory`).
 - New illustrated art for every category (Beaches & coast, Nature, Heritage, Culture, Art &

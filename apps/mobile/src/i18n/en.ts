@@ -834,7 +834,7 @@ export const en = {
   'stamp.country': 'PORTUGAL',
   'stamp.collected': 'Stamp collected',
   'stamp.collectedGold': 'Gold stamp collected ✨',
-  'collections.subtitle': 'Each place in a set pays +{step} coins; finish the set for +{bonus}.',
+  'collections.subtitle': 'Finish a set for +{bonus} coins.',
   'collections.places': '{done}/{total} places',
   'collections.sets': '{count} sets',
   'collections.reward': '+{step} each · +{bonus} for the set',

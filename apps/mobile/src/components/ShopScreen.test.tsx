@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { DEMO_PLACES } from '@wandro/shared';
 import Shop from '../../app/shop';
 import { useSession } from '@/state/session';
+import { grantCoins } from '@/test/grantCoins';
 import { queryWrapper } from '@/test/queryWrapper';
 
 jest.mock('expo-router', () => ({
@@ -27,7 +28,8 @@ describe('Store (demo mode)', () => {
     useSession.getState().recordVisit(
       DEMO_PLACES.find((p) => p.id === 'demo-music')!,
       DEMO_PLACES,
-    ); // 550 coins
+    );
+    grantCoins(500);
     await render(<Shop />, { wrapper });
     await fireEvent.press(screen.getByTestId('buy-incense_30'));
     const s = useSession.getState();
@@ -43,6 +45,7 @@ describe('Store (demo mode)', () => {
       DEMO_PLACES.find((p) => p.id === 'demo-music')!,
       DEMO_PLACES,
     );
+    grantCoins(500);
     await render(<Shop />, { wrapper });
     await fireEvent.press(screen.getByTestId('buy-hat_flower'));
     expect(useSession.getState().inventory.equipped.hat).toBe('hat_flower');
@@ -62,6 +65,7 @@ describe('Store (demo mode)', () => {
   it('once the challenge is done, the skin can be bought', async () => {
     for (const p of DEMO_PLACES.filter((x) => x.category === 'coast' && !x.hidden).slice(0, 3))
       useSession.getState().recordVisit(p, DEMO_PLACES);
+    grantCoins(1000);
     await render(<Shop />, { wrapper });
     expect(screen.getByTestId('item-skin_ocean-challenge')).toHaveTextContent(/3\/3/);
     expect(screen.getByTestId('buy-skin_ocean')).not.toBeDisabled();

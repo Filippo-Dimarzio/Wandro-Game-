@@ -22,6 +22,8 @@ reset role;
 -- Coins to spend: Pena (also collects the Sintra stamp, in plain ink).
 do $$ begin
   perform award_visit('00000000-0000-0000-0000-0000000000c1', pg_temp.place_id('pena'), 38.78, -9.39, 8, 130);
+  -- One discovery pays at most 50 coins; a moderator credit (uncapped) covers the shopping.
+  insert into points_ledger (user_id, kind, points) values ('00000000-0000-0000-0000-0000000000c1', 'moderation', 1000);
 end $$;
 
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1');
@@ -53,7 +55,9 @@ returns boolean language sql stable as $$ select true $$;
 
 create temp table r on commit drop as
   select award_visit('00000000-0000-0000-0000-0000000000c1', pg_temp.place_id('evora-roman-temple'), 38.57, -7.91, 8, 130) as v;
-select pg_temp.check((select (v -> 'breakdown' ->> 'time_quest')::int from r) = 40, 'a night quest with the key pays +40 coins');
+select pg_temp.check((select (v -> 'breakdown' ->> 'time_quest')::int from r) = 40
+  and (select (v ->> 'coins')::int from r) = 50 + 40,
+  'a night quest with the key pays +40 coins on top of the capped 50');
 select pg_temp.check((select (v -> 'stamp' ->> 'gold')::boolean from r), 'stamp ink makes the next city stamp gold');
 select pg_temp.check(not exists (select 1 from user_inventory where user_id = '00000000-0000-0000-0000-0000000000c1' and item_code = 'stamp_ink'),
   'the ink is used up');

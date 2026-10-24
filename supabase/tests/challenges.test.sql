@@ -32,7 +32,7 @@ select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1');
 select pg_temp.check((select is_ready from open_daily_challenge()), 'challenge ready after a verified visit');
 select pg_temp.check((complete_daily_challenge((select challenge_id from ch)) ->> 'status') = 'completed', 'tap to confirm completes');
 select pg_temp.check((complete_daily_challenge((select challenge_id from ch)) ->> 'status') = 'already_completed', 'second tap is idempotent');
-select pg_temp.check(my_total_points() = 75, 'bonus awarded exactly once');
+select pg_temp.check(my_total_points() = 50, 'bonus awarded exactly once, capped at 50 coins');
 select pg_temp.check((select xp from profiles where id = auth.uid()) = (select sum(xp) from points_ledger where user_id = auth.uid()), 'xp updated server-side from the ledger');
 
 -- Submissions

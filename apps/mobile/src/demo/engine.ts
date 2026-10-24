@@ -2,10 +2,10 @@
 // demo plays exactly like the real game; with a backend none of this runs.
 import {
   BEACON_BONUS,
+  capActivityCoins,
   CHALLENGE_XP,
   DAILY_CHALLENGE_BONUS,
   DEMO_PLACES,
-  FIRST_DISCOVERER_BONUS,
   ledgerXp,
   levelFromXp,
   newlyEarnedBadges,
@@ -28,6 +28,7 @@ export type LedgerKind =
   | 'badge'
   | 'collection'
   | 'purchase'
+  | 'moderation'
   | 'time_quest'
   | 'friend_beacon';
 
@@ -137,7 +138,13 @@ function applyBadgesAndCollections(p: DemoProgress, places: Place[], now: Date) 
     if (c.placeIds.every((id) => p.unlocked[id])) {
       collectionsClaimed[c.id] = at;
       collectionsCompleted.push(c.id);
-      ledger.push({ kind: 'collection', coins: c.bonus, xp: 0, at, ref: c.id });
+      ledger.push({
+        kind: 'collection',
+        coins: capActivityCoins(0, c.bonus),
+        xp: 0,
+        at,
+        ref: c.id,
+      });
     }
   }
 
@@ -190,12 +197,20 @@ export function applyVisit(
   if (pts.firstDiscovererBonus) {
     ledger.push({
       kind: 'first_discoverer',
-      coins: FIRST_DISCOVERER_BONUS,
+      coins: pts.firstDiscovererBonus,
       xp: 0,
       at,
       ref: place.id,
     });
   }
+  // What this discovery earns shares one ACTIVITY_COIN_CAP, like the server's ledger rule; bought
+  // boosts (the time key, beacons) pay on top.
+  let paid = pts.total;
+  const pay = (amount: number) => {
+    const coins = capActivityCoins(paid, amount);
+    paid += coins;
+    return coins;
+  };
   const quest = timeQuestFor(place.id);
   const timeQuestBonus =
     quest && boosts.timeKey && timeQuestOpen(quest, now) ? TIME_QUEST_BONUS : 0;
@@ -228,14 +243,15 @@ export function applyVisit(
   let stepCoins = 0;
   for (const c of DEMO_COLLECTIONS) {
     if (!c.placeIds.includes(place.id) || c.stepBonus <= 0) continue;
+    const coins = pay(c.stepBonus);
     afterVisit.ledger.push({
       kind: 'collection',
-      coins: c.stepBonus,
+      coins,
       xp: 0,
       at,
       ref: c.id,
     });
-    stepCoins += c.stepBonus;
+    stepCoins += coins;
   }
   const { progress, newBadges, collectionsCompleted } = applyBadgesAndCollections(
     afterVisit,
@@ -245,7 +261,7 @@ export function applyVisit(
   const setCoins =
     stepCoins +
     DEMO_COLLECTIONS.filter((c) => collectionsCompleted.includes(c.id)).reduce(
-      (a, c) => a + c.bonus,
+      (a, c) => a + capActivityCoins(0, c.bonus),
       0,
     );
   return {
@@ -273,9 +289,9 @@ export function applyDailyChallenge(
   places: Place[],
   now: Date,
 ): { progress: DemoProgress; bonus: number; newBadges: string[] } {
-  const bonus = Math.max(
-    DAILY_CHALLENGE_BONUS,
-    ...qualifyingPlaceIds.map((id) => p.unlocked[id]?.points ?? 0),
+  const bonus = capActivityCoins(
+    0,
+    Math.max(DAILY_CHALLENGE_BONUS, ...qualifyingPlaceIds.map((id) => p.unlocked[id]?.points ?? 0)),
   );
   const at = now.toISOString();
   const next: DemoProgress = {

@@ -10,8 +10,8 @@ end $$;
 select pg_temp.check((select xp from profiles where username = 'walker') = 50,
   'a discovery is one challenge: 50 XP, however many coins it paid');
 select pg_temp.check((select coalesce(sum(points), 0) from points_ledger
-                      where user_id = '00000000-0000-0000-0000-0000000000d1') > 50,
-  'coins are counted separately from XP');
+                      where user_id = '00000000-0000-0000-0000-0000000000d1') = 50,
+  'coins are counted separately from XP, capped at 50 for the discovery');
 
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000d1');
 do $$ begin
@@ -27,6 +27,8 @@ do $$ begin
   perform award_visit('00000000-0000-0000-0000-0000000000d1', pg_temp.place_id('adraga'), 38.82, -9.47, 8, 130);
   perform award_visit('00000000-0000-0000-0000-0000000000d1', pg_temp.place_id('praia-grande'), 38.81, -9.47, 8, 130);
   perform award_visit('00000000-0000-0000-0000-0000000000d1', pg_temp.place_id('azenhas'), 38.84, -9.46, 8, 130);
+  -- 4 capped discoveries pay 200 coins; a moderator credit (uncapped) covers the skin.
+  insert into points_ledger (user_id, kind, points) values ('00000000-0000-0000-0000-0000000000d1', 'moderation', 500);
 end $$;
 select pg_temp.check((select xp from profiles where username = 'walker') = 200, '4 challenges = 200 XP');
 select pg_temp.check((select level from profiles where username = 'walker') = 1, 'still level 1 below 250 XP');
@@ -39,8 +41,9 @@ reset role;
 -- richie has far more coins in Sintra but only one challenge there.
 create temp table rv on commit drop as
   select (award_visit('00000000-0000-0000-0000-0000000000d2', pg_temp.place_id('cruz-alta'), 38.78, -9.39, 8, 130) ->> 'visit_id')::uuid as v;
+-- A moderator credit: not a reward, so neither capped nor worth XP.
 insert into points_ledger (user_id, kind, points, xp, visit_id)
-values ('00000000-0000-0000-0000-0000000000d2', 'first_discoverer', 10000, 999, (select v from rv));
+values ('00000000-0000-0000-0000-0000000000d2', 'moderation', 10000, 999, (select v from rv));
 select pg_temp.check((select xp from points_ledger where points = 10000) = 0, 'reward rows only carry XP for challenges');
 
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000d2');

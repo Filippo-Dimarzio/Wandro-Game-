@@ -25,8 +25,8 @@ select pg_temp.check((select count(*) from points_ledger where user_id = '000000
        and kind = 'collection' and not breakdown ? 'step') = 50,
   'finishing a set pays 50 coins, once');
 select pg_temp.check((select array_agg(points) from points_ledger where user_id = '00000000-0000-0000-0000-0000000000b1'
-                      and kind = 'collection' and breakdown ? 'step') = array[20, 20],
-  'each place from the set pays 20 coins');
+                      and kind = 'collection' and breakdown ? 'step') = array[0, 0],
+  'a set step adds nothing once the visit has paid the 50-coin cap');
 
 -- Bruno posts about his visit; Clara (private) posts too.
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b1');

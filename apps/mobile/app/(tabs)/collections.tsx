@@ -16,7 +16,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLLECTION_COMPLETION_BONUS, COLLECTION_STEP_BONUS, regionFor } from '@wandro/shared';
+import { COLLECTION_COMPLETION_BONUS, regionFor } from '@wandro/shared';
 import { STAMP_ART } from '@/cityArt';
 import { GameBackdrop } from '@/components/GameBackdrop';
 import { AnimatedCard } from '@/components/AnimatedCard';
@@ -50,10 +50,7 @@ export default function Collections() {
           {t('collections.title')}
         </Text>
         <Text style={{ color: c.textMuted }}>
-          {t('collections.subtitle', {
-            step: COLLECTION_STEP_BONUS,
-            bonus: COLLECTION_COMPLETION_BONUS,
-          })}
+          {t('collections.subtitle', { bonus: COLLECTION_COMPLETION_BONUS })}
         </Text>
         <View style={styles.grid}>
           {cities.map((city, i) => (
@@ -281,7 +278,6 @@ function CitySheet({ city, onClose }: { city: City | null; onClose: () => void }
               <View style={[styles.stampRow, { backgroundColor: c.goldSoft }]}>
                 <PostageStamp
                   region={shown.region}
-                  value={shown.done}
                   width={104}
                   tilt={-4}
                   gold={shown.gold}

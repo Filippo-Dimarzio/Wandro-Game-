@@ -13,8 +13,9 @@ end $$;
 
 reset role;
 do $$ begin
-  -- Pena: 120 x 5 + 50 pioneer = 650 coins.
+  -- Pena pays the capped 50 coins; a moderator credit (not a reward, so uncapped) tops it up.
   perform award_visit('00000000-0000-0000-0000-0000000000b9', pg_temp.place_id('pena'), 38.78, -9.39, 8, 130);
+  insert into points_ledger (user_id, kind, points) values ('00000000-0000-0000-0000-0000000000b9', 'moderation', 600);
 end $$;
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b9');
 create temp table before on commit drop as

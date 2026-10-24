@@ -44,12 +44,13 @@ grant select on s1 to authenticated;
 create temp table r1 on commit drop as select complete_checkin((select id from s1)) as r;
 grant select on r1 to authenticated;
 select pg_temp.check((select r ->> 'status' from r1) = 'verified', 'checking in inside the geofence verifies straight away: no waiting');
-select pg_temp.check((select (r ->> 'coins')::int from r1) = 80 * 5 + 50 + 20, 'first discovery pays base x 5 rarity + 50 pioneer bonus + 20 for a place from a set');
+select pg_temp.check((select (r ->> 'coins')::int from r1) = 50, 'a first discovery (80 x 5 rarity + 50 pioneer + 20 set step) is capped at 50 coins');
+select pg_temp.check((select sum(points) from points_ledger where user_id = auth.uid()) = 50, 'the ledger pays exactly the capped 50 coins');
 select pg_temp.check((select r -> 'new_badges' from r1) ?& array['first_step', 'first_discoverer', 'hidden_gem'], 'first badges are awarded');
 select pg_temp.check((select (r ->> 'streak')::int from r1) = 1, 'streak starts at 1');
-select pg_temp.check((complete_checkin((select id from s1)) ->> 'coins')::int = 470, 'replaying a completed session returns the same result');
+select pg_temp.check((complete_checkin((select id from s1)) ->> 'coins')::int = 50, 'replaying a completed session returns the same result');
 select pg_temp.check((select count(*) from visits where user_id = auth.uid()) = 1, 'exactly one visit recorded');
-select pg_temp.check((my_wallet() ->> 'coins')::int = 470, 'wallet shows the coins');
+select pg_temp.check((my_wallet() ->> 'coins')::int = 50, 'wallet shows the coins');
 
 reset role;
 select pg_temp.check((select count(*) from checkin_pings where session_id = (select id from s1)) = 0, 'raw pings are deleted after verification');
@@ -57,10 +58,10 @@ select pg_temp.check((select unique_visitors from place_stats where place_id = p
 select pg_temp.check((select first_discoverer_id from place_stats where place_id = pg_temp.place_id('adraga')) = '00000000-0000-0000-0000-0000000000e1', 'first discoverer recorded');
 select pg_temp.check((select xp from profiles where id = '00000000-0000-0000-0000-0000000000e1') = (select sum(xp) from points_ledger where user_id = '00000000-0000-0000-0000-0000000000e1'), 'profile xp equals the ledger');
 
--- Daily challenge pays double: bonus equals the qualifying discovery's coins.
+-- Daily challenge pays double, within the same 50-coin cap per completed activity.
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1');
-select pg_temp.check((complete_daily_challenge((select challenge_id from ch)) ->> 'bonus_points')::int = 400, 'daily challenge doubles the discovery coins');
-select pg_temp.check((my_wallet() ->> 'coins')::int = 870, 'wallet includes the double reward');
+select pg_temp.check((complete_daily_challenge((select challenge_id from ch)) ->> 'bonus_points')::int = 50, 'the daily challenge bonus is capped at 50 coins');
+select pg_temp.check((my_wallet() ->> 'coins')::int = 100, 'wallet includes the double reward');
 
 do $$ begin
   perform start_checkin(pg_temp.place_id('adraga'), 38.8236, -9.4731, 8);
@@ -92,7 +93,7 @@ grant select on s2 to authenticated;
 reset role;
 select pg_temp.simulate_session((select id from s2), 125);
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000e2');
-select pg_temp.check((complete_checkin((select id from s2)) ->> 'coins')::int = round(80 * (1 + 4.0 / 1.1)) + 20, 'second explorer earns the lower rarity rate (plus the set step)');
+select pg_temp.check((complete_checkin((select id from s2)) ->> 'coins')::int = 50, 'second explorer''s lower rarity rate (80 x 3.7) is still capped at 50 coins');
 
 -- Leaving the geofence is rejected.
 create temp table s3 on commit drop as
