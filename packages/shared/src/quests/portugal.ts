@@ -288,6 +288,15 @@ export const PORTUGAL_QUESTS = [
       'Country seat of the man who rebuilt Lisbon after 1755. Quest: find the waterfall in the gardens.',
     ],
     [
+      'polvora-barcarena',
+      'Barcarena Gunpowder Factory',
+      'heritage',
+      38.741,
+      -9.2846,
+      40,
+      'Gunpowder was made in this valley from 1540, its mills driven by the Barcarena stream. Quest: find a water-powered mill.',
+    ],
+    [
       'museu-lisboa',
       'Lisbon Museum – Pimenta Palace',
       'culture',

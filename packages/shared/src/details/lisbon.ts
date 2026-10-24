@@ -452,6 +452,28 @@ export const LISBON_DETAILS: Record<string, PlaceDetails> = flagForReview({
       },
     ],
   },
+  'demo-lisbon-polvora-barcarena': {
+    teaser: 'Four centuries of gunpowder mills along a stream, now a park and museum.',
+    facts: [
+      {
+        text: 'Gunpowder and arms were made in this valley from 1540, for about four hundred years.',
+        source: 'https://debug.flagra.pt/en/oeiras/fabrica-da-polvora-de-barcarena',
+      },
+      {
+        text: 'Water from the Barcarena stream powered the mills that blended charcoal with sulphur and saltpetre.',
+        source: 'https://www.erih.net/i-want-to-go-there/gunpowder-museum',
+      },
+      {
+        text: 'Oeiras council bought the whole complex in 1995. Today it holds the Black Powder Museum, archaeology rooms and an art gallery.',
+        source: 'https://debug.flagra.pt/en/oeiras/fabrica-da-polvora-de-barcarena',
+      },
+    ],
+    lookFor: 'The stream that splits the upper factory from the lower one.',
+    bestTime: 'Tuesday to Sunday, 11:00–17:00, when the museum is open.',
+    durationMin: 90,
+    cost: 'free',
+    tip: 'The park is free; the Black Powder Museum has a small ticket.',
+  },
   'demo-lisbon-oriente': {
     teaser: 'Portugal’s long story with Asia, in a big old dockside warehouse.',
     facts: [

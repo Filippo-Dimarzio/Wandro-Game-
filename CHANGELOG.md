@@ -6,6 +6,8 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- New Lisbon heritage place: the Barcarena Gunpowder Factory in Oeiras, a free public park and
+  museum where gunpowder was made from 1540 (migration `20261103090000_barcarena_gunpowder_factory`).
 - New illustrated art for every category (Beaches & coast, Nature, Heritage, Culture, Art &
   museums, Music & events and Curiosities): each picture is both the category card and the stamp
   you earn in that category. Category names stay on one line on the Discover cards and the Home
