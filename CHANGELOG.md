@@ -263,6 +263,11 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Changed
 
+- New explorers: the eight characters are redrawn as bold cartoon portraits (thick outlines, big
+  eyes, rosy cheeks, a bright halftone badge) and are now a younger crowd: long wavy brown hair, a
+  blond ponytail, long black hair with a fringe, short black curls, a brown quiff, blond curtains,
+  a high bun with gold hoops, and wavy black hair with round glasses. Drawn in
+  `scripts/explorer-cartoons.mjs`; jackets still change colour with the shop skins.
 - The "new city unlocked" screen is now an illustrated postcard in the cut-paper style of the
   Wandro stamps: a cream page, a hand-lettered welcome, and a landscape where the train, green
   coach or plane crosses from your old city's landmark to the new one's (Pena, a Lisbon tram,

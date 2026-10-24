@@ -1,12 +1,11 @@
 // Renders the explorer avatars (assets/explorers/*.png) and their kit badges, and writes
-// src/explorerArt.ts so the app can require them. The portraits are shaded, semi-realistic
-// paintings drawn in scripts/explorer-portraits.mjs (an illustrator's or photo-real art can replace
-// the PNGs under the same names). Needs Playwright's Chromium: node scripts/render-explorers.mjs
+// src/explorerArt.ts so the app can require them. The portraits are bold cartoon characters drawn
+// in scripts/explorer-cartoons.mjs (an illustrator's art can replace the PNGs under the same names). Needs Playwright's Chromium: node scripts/render-explorers.mjs
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { chromium } from 'playwright';
-import { EXPLORERS, portraitSvg } from './explorer-portraits.mjs';
+import { EXPLORERS, portraitSvg } from './explorer-cartoons.mjs';
 
-const root = new URL('..', import.meta.url).pathname;
+const root = process.env.MOBILE_ROOT ?? new URL('..', import.meta.url).pathname;
 const SIZE = 256; // shown at up to 150 pt on the Customise stage
 const BADGE = 72;
 const INK = '#2F3E7A';
