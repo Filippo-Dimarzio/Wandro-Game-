@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CATEGORIES } from '@wandro/shared';
 import { CATEGORY_META } from '@/categories';
@@ -18,6 +18,14 @@ export default function DiscoverHub() {
   const loc = useLocation();
   const places = usePlaces(loc.position).data ?? [];
   const { ids } = useUnlockedIds();
+  // Names stay on one line: the longest ("Beaches & coast") is about 9 ems wide in this weight,
+  // so size the text to the label's inner width (tile minus its padding and the pill's).
+  const { width } = useWindowDimensions();
+  const tile = (Math.min(width, 600) - space.lg * 2) * 0.48;
+  const nameSize = Math.max(
+    11,
+    Math.min(15, Math.floor((tile - space.sm * 2 - space.md * 2) / 9.2)),
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
@@ -59,12 +67,22 @@ export default function DiscoverHub() {
                   style={StyleSheet.absoluteFill}
                   accessible={false}
                 />
-                <View style={[styles.label, { backgroundColor: c.card }]}>
-                  <Text style={[styles.name, { color: c.category[cat] }]} numberOfLines={2}>
-                    {t(`category.${cat}`)}
-                  </Text>
-                  <Text style={{ color: c.textMuted, fontSize: 12, fontWeight: '700' }}>
+                <View style={[styles.count, { backgroundColor: c.card }]}>
+                  <Text style={{ color: c.textMuted, fontSize: 12, fontWeight: '800' }}>
                     {found}/{inCat.length}
+                  </Text>
+                </View>
+                <View style={[styles.label, { backgroundColor: c.card }]}>
+                  <Text
+                    style={[
+                      styles.name,
+                      { color: c.category[cat], fontSize: nameSize, lineHeight: nameSize + 4 },
+                    ]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.7}
+                  >
+                    {t(`category.${cat}`)}
                   </Text>
                 </View>
               </AnimatedCard>
@@ -98,14 +116,22 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
   },
   tileContent: { justifyContent: 'flex-end', padding: space.sm },
+  count: {
+    position: 'absolute',
+    top: space.sm,
+    right: space.sm,
+    borderRadius: radius.pill,
+    paddingHorizontal: space.sm,
+    paddingVertical: 3,
+  },
   label: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.xs,
+    justifyContent: 'center',
     borderRadius: radius.pill,
     paddingHorizontal: space.md,
     paddingVertical: 6,
     minHeight: 34,
   },
-  name: { flex: 1, fontSize: 14, fontWeight: '900', lineHeight: 17 },
+  name: { flexShrink: 1, fontWeight: '900', textAlign: 'center' },
 });

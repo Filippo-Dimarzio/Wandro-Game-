@@ -54,7 +54,7 @@ export function InterestStories({ places, unlocked }: { places: Place[]; unlocke
                 <CategoryMark category={cat} size={STORY - RING * 2 - 4} />
               </View>
             </LinearGradient>
-            <Text style={[styles.label, { color: c.text }]} numberOfLines={2}>
+            <Text style={[styles.label, { color: c.text }]} numberOfLines={1}>
               {t(`category.${cat}`)}
             </Text>
           </Pressable>
@@ -66,7 +66,8 @@ export function InterestStories({ places, unlocked }: { places: Place[]; unlocke
 
 const styles = StyleSheet.create({
   row: { gap: space.md, paddingRight: space.lg },
-  story: { width: STORY + 8, alignItems: 'center', gap: 4 },
+  // At least the ring wide, and wider for a long name so it stays on one line.
+  story: { minWidth: STORY + 8, alignItems: 'center', gap: 4 },
   ring: {
     width: STORY,
     height: STORY,

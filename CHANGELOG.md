@@ -6,6 +6,10 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- New illustrated art for Beaches & coast, Nature, Heritage, Art & museums and Music & events:
+  each picture is both the category card and the stamp you earn in that category. Category
+  names stay on one line on the Discover cards and the Home row; the Discover count moves to a
+  badge in the card's corner.
 - The stamp you earn for a challenge is now cut out of its category's picture (the same art as
   the category card), instead of the place's own photo.
 - Removed "Volta do Duche Tile Benches" (Sintra): the promenade is real but no source mentions
