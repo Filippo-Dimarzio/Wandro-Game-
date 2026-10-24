@@ -47,11 +47,10 @@ const native = Platform.OS !== 'web';
 
 /**
  * The stamp you collect for a city: its landmark on a perforated paper stamp, cancelled with
- * a Wandro postmark. `value` is printed where a stamp shows its price (places found there).
+ * a Wandro postmark.
  */
 export function PostageStamp({
   region,
-  value,
   width = 120,
   tilt = 0,
   animate = false,
@@ -62,7 +61,6 @@ export function PostageStamp({
   testID,
 }: {
   region: Region;
-  value?: number;
   /** Another picture instead of the city's engraving: a challenge's category art. */
   art?: ImageSource;
   /** Cancelled with the Wandro postmark: collected. An uncollected stamp is clean. */
@@ -126,9 +124,6 @@ export function PostageStamp({
       >
         <View style={styles.art}>
           {art && <FitImage source={art} style={StyleSheet.absoluteFill} accessible={false} />}
-          {!!value && (
-            <Text style={[styles.value, { fontSize: Math.max(9, width * 0.12) }]}>{value}</Text>
-          )}
         </View>
         {!small && (
           <View style={{ alignItems: 'center', paddingTop: 3 }}>
@@ -253,15 +248,6 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: 'rgba(31,42,68,0.4)',
     backgroundColor: '#D9D2C3',
-  },
-  value: {
-    position: 'absolute',
-    left: 3,
-    top: 1,
-    color: '#fff',
-    fontWeight: '900',
-    textShadowColor: 'rgba(0,0,0,0.6)',
-    textShadowRadius: 3,
   },
   country: { color: INK, fontWeight: '800', letterSpacing: 1.5 },
   city: {

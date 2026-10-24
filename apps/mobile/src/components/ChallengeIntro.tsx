@@ -125,7 +125,6 @@ function IntroCard({ place, onClose }: { place: Place; onClose: () => void }) {
               <PostageStamp
                 region={region}
                 art={CATEGORY_META[place.category].art}
-                value={coins}
                 width={150}
                 tilt={-3}
                 postmark={found}

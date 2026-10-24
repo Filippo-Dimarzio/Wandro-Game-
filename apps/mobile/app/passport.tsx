@@ -62,7 +62,6 @@ export default function Passport() {
                 <PostageStamp
                   key={city.region.slug}
                   region={city.region}
-                  value={city.done}
                   width={96}
                   gold={city.gold}
                   tilt={parseFloat(TILT[i % TILT.length])}

@@ -52,7 +52,6 @@ export function CityCelebration({ place, outcome }: { place: Place; outcome: Che
           </Text>
           <PostageStamp
             region={region}
-            value={city.done}
             width={170}
             tilt={-6}
             gold={gold}
