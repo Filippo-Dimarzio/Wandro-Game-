@@ -14,8 +14,8 @@ export const TRIP_SCENE: Record<
   { src: ImageSource; ground: number; cityBase: number; dot: string }
 > = {
   // ground: where the vehicle's wheels sit; cityBase: where each city's landmark stands.
-  train: { src: require('../assets/trip/scene-train.webp'), ground: 0.8, cityBase: 0.785, dot: '' },
-  bus: { src: require('../assets/trip/scene-bus.webp'), ground: 0.835, cityBase: 0.775, dot: '' },
+  train: { src: require('../assets/trip/scene-train.webp'), ground: 0.8, cityBase: 0.735, dot: '' },
+  bus: { src: require('../assets/trip/scene-bus.webp'), ground: 0.835, cityBase: 0.765, dot: '' },
   plane: {
     src: require('../assets/trip/scene-plane.webp'),
     ground: 0,
