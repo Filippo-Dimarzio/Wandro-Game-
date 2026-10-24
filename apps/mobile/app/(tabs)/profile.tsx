@@ -99,6 +99,11 @@ export default function Profile() {
             onPress={() => router.push('/passport')}
           />
           <LinkButton
+            icon="trophy"
+            label={t('leaderboard.title')}
+            onPress={() => router.push('/leaderboard')}
+          />
+          <LinkButton
             icon="storefront"
             label={t('profile.store')}
             onPress={() => router.push('/shop')}
@@ -126,7 +131,13 @@ export default function Profile() {
 
         <Text style={[styles.section, { color: c.text }]}>{t('profile.mapOfYou')}</Text>
         <View style={[styles.map, { borderColor: c.border }]}>
-          <PlaceMap places={places} unlockedIds={ids} userPosition={loc.position} compact />
+          <PlaceMap
+            places={places}
+            unlockedIds={ids}
+            userPosition={loc.position}
+            avatar={{ explorer, skin: loadout.skin, hat: loadout.hat }}
+            compact
+          />
         </View>
 
         <Text style={[styles.section, { color: c.text }]}>{t('profile.trophies')}</Text>

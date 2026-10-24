@@ -13,7 +13,13 @@ jest.mock('react-native-safe-area-context', () => ({
   SafeAreaView: ({ children }: { children: ReactNode }) => children,
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
-jest.mock('@/map/PlaceMap', () => ({ PlaceMap: () => null }));
+const mockMapProps = jest.fn();
+jest.mock('@/map/PlaceMap', () => ({
+  PlaceMap: (props: unknown) => {
+    mockMapProps(props);
+    return null;
+  },
+}));
 
 describe('Profile', () => {
   jest.setTimeout(20_000);
@@ -51,10 +57,25 @@ describe('Profile', () => {
     expect(router.push).toHaveBeenCalledWith('/customise');
   });
 
-  it('no longer has Find explorers, Leaderboard or How to play buttons', async () => {
+  it('no longer has Find explorers or How to play buttons', async () => {
     await render(<Profile />, { wrapper: queryWrapper() });
-    for (const name of ['Find explorers', 'Leaderboard', 'How to play'])
+    for (const name of ['Find explorers', 'How to play'])
       expect(screen.queryByRole('button', { name })).toBeNull();
     expect(screen.getByRole('button', { name: 'Store' })).toBeOnTheScreen();
+  });
+
+  it('opens the leaderboard from its own button', async () => {
+    await render(<Profile />, { wrapper: queryWrapper() });
+    await fireEvent.press(screen.getByRole('button', { name: 'Leaderboard' }));
+    expect(router.push).toHaveBeenCalledWith('/leaderboard');
+  });
+
+  it('shows your chosen explorer on the profile map', async () => {
+    useSession.getState().updateProfile({ explorer: 'e5' });
+    mockMapProps.mockClear();
+    await render(<Profile />, { wrapper: queryWrapper() });
+    expect(mockMapProps).toHaveBeenLastCalledWith(
+      expect.objectContaining({ avatar: expect.objectContaining({ explorer: 'e5' }) }),
+    );
   });
 });
