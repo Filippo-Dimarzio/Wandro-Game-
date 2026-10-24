@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -12,6 +11,7 @@ import { CoinIcon } from '@/components/CoinIcon';
 import { t } from '@/i18n';
 import { radius, shadow, space, useColors } from '@/theme';
 import { HoldToConfirm } from './HoldToConfirm';
+import { FitImage } from '@/components/FitImage';
 
 function formatRemaining(ms: number): string {
   const h = Math.floor(ms / 3_600_000);
@@ -76,10 +76,9 @@ export function DailyChallengeCard({
     >
       <View style={styles.cover}>
         {pictured ? (
-          <Image
+          <FitImage
             source={placeImage(pictured)}
             style={StyleSheet.absoluteFill}
-            contentFit="cover"
             accessible={false}
           />
         ) : (

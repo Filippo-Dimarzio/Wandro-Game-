@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -16,6 +15,7 @@ import {
 } from '@/lib/photo';
 import { useCheckinPhoto } from '@/state/checkinPhoto';
 import { radius, shadow, space, useColors } from '@/theme';
+import { FitImage } from '@/components/FitImage';
 
 type Pick = PhotoSource | 'live';
 const SOURCES: { key: Pick; icon: React.ComponentProps<typeof Ionicons>['name'] }[] = [
@@ -111,18 +111,16 @@ export function PhotoSheet({
           {shot ? (
             <View style={styles.picked}>
               <View>
-                <Image
+                <FitImage
                   source={{ uri: shot.photo }}
                   style={styles.thumb}
-                  contentFit="cover"
                   accessibilityLabel={t('photo.preview')}
                   testID="photo-preview"
                 />
                 {shot.selfie && (
-                  <Image
+                  <FitImage
                     source={{ uri: shot.selfie }}
                     style={[styles.selfie, { borderColor: c.card }]}
-                    contentFit="cover"
                     accessible={false}
                   />
                 )}

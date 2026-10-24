@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -28,6 +27,7 @@ import { radius, space, useColors } from '@/theme';
 import { CategoryPill, HoursChip } from './PlaceBits';
 import { PlaceLearn, PlacePlan } from './PlaceDetailsTabs';
 import { TimeQuestBadge } from './TimeQuestBadge';
+import { FitImage } from '@/components/FitImage';
 
 export { categoryIcon } from '@/categories';
 
@@ -98,10 +98,9 @@ export function PlaceSheet({
       {/* The photo sits on About only, so Learn and Plan fit on small screens. */}
       {expanded && tab === 'about' && (
         <View style={styles.photo}>
-          <Image
+          <FitImage
             source={placeImage(place)}
             style={StyleSheet.absoluteFill}
-            contentFit="cover"
             accessibilityLabel={place.photoUrl ? place.name : undefined}
             accessible={!!place.photoUrl}
           />

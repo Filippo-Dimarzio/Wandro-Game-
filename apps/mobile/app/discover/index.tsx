@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,6 +10,7 @@ import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { column, radius, shadow, space, useColors } from '@/theme';
+import { FitImage } from '@/components/FitImage';
 
 /** All interests at a glance; each opens its colour-coded category page. */
 export default function DiscoverHub() {
@@ -54,10 +54,9 @@ export default function DiscoverHub() {
                 contentStyle={styles.tileContent}
                 testID={`discover-${cat}`}
               >
-                <Image
+                <FitImage
                   source={CATEGORY_META[cat].art}
                   style={StyleSheet.absoluteFill}
-                  contentFit="cover"
                   accessible={false}
                 />
                 <View style={[styles.label, { backgroundColor: c.card }]}>

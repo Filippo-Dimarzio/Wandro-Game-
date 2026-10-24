@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -24,6 +23,7 @@ import { isDemo } from '@/lib/env';
 import { useLocation } from '@/lib/useLocation';
 import { useCheckinPhoto } from '@/state/checkinPhoto';
 import { column, radius, shadow, space, useColors } from '@/theme';
+import { FitImage } from '@/components/FitImage';
 
 export default function Capture() {
   const c = useColors();
@@ -125,10 +125,9 @@ export default function Capture() {
             testID="checkin-card"
           >
             <View style={styles.hero}>
-              <Image
+              <FitImage
                 source={placeImage(nearest.place)}
                 style={StyleSheet.absoluteFill}
-                contentFit="cover"
                 accessible={false}
               />
               <LinearGradient
@@ -184,10 +183,9 @@ export default function Capture() {
               <View style={styles.row}>
                 {photo ? (
                   <View style={styles.attached} testID="checkin-photo">
-                    <Image
+                    <FitImage
                       source={{ uri: photo.photo }}
                       style={styles.attachedThumb}
-                      contentFit="cover"
                       accessibilityLabel={t('photo.preview')}
                     />
                     <Text style={{ color: c.text, flex: 1, fontWeight: '700' }}>

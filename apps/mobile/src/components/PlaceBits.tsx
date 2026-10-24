@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Children, cloneElement, isValidElement, useState, type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -16,6 +15,7 @@ import { PhotoButton } from '@/components/PhotoSheet';
 import { t } from '@/i18n';
 import { hoursStatus } from '@/lib/hours';
 import { radius, shadow, space, useColors } from '@/theme';
+import { FitImage } from '@/components/FitImage';
 
 /** Small coloured label with the category icon. */
 export function CategoryPill({ category, solid }: { category: Category; solid?: boolean }) {
@@ -73,12 +73,7 @@ export function PlaceCard({ place, distanceM, unlocked, onPress, width, index }:
       style={[styles.card, shadow, { backgroundColor: c.card, width }]}
     >
       <View style={styles.imageWrap}>
-        <Image
-          source={placeImage(place)}
-          style={StyleSheet.absoluteFill}
-          contentFit="cover"
-          accessible={false}
-        />
+        <FitImage source={placeImage(place)} style={StyleSheet.absoluteFill} accessible={false} />
         <View style={styles.imageTop}>
           <CategoryPill category={place.category} solid />
           <View
@@ -127,17 +122,14 @@ export function PlaceTile({ place, distanceM, unlocked, onPress, index = 0, widt
       style={[styles.tile, shadow, { backgroundColor: c.card }, width ? { width } : null]}
       testID={`place-tile-${place.id}`}
     >
-      {/* Places in a category often share one illustration: a different wash of the category
-          colour and a different crop per card keeps a long grid from repeating itself. */}
+      {/* Places in a category often share one illustration: a different colour wash per card keeps a long grid from repeating itself. */}
       <View
         style={[StyleSheet.absoluteFill, { backgroundColor: washColor, opacity: tone.wash }]}
         testID="tile-wash"
       />
-      <Image
+      <FitImage
         source={placeImage(place)}
         style={[StyleSheet.absoluteFill, { opacity: TILE_IMAGE_OPACITY }]}
-        contentFit="cover"
-        contentPosition={tone.crop}
         accessible={false}
       />
       <LinearGradient
@@ -169,11 +161,11 @@ export function PlaceTile({ place, distanceM, unlocked, onPress, index = 0, widt
 /** The card art shows through at 60% (40% transparent) over the colour wash. */
 export const TILE_IMAGE_OPACITY = 0.6;
 const TILE_TONES = [
-  { wash: 1, crop: 'center' },
-  { wash: 0.75, crop: 'top' },
-  { wash: 0.9, crop: 'bottom' },
-  { wash: 0.65, crop: 'left' },
-  { wash: 0.85, crop: 'right' },
+  { wash: 1 },
+  { wash: 0.75 },
+  { wash: 0.9 },
+  { wash: 0.65 },
+  { wash: 0.85 },
 ] as const;
 
 /** Tiles are never wider than a city collection card (half of the 600 px column, less the gap). */

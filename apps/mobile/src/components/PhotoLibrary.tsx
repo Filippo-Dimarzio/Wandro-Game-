@@ -1,4 +1,3 @@
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { CATEGORY_META } from '@/categories';
@@ -6,6 +5,7 @@ import { usePassport } from '@/data/social';
 import { t } from '@/i18n';
 import { radius, space, useColors } from '@/theme';
 import { LiveInset } from '@/components/LiveInset';
+import { FitImage } from '@/components/FitImage';
 
 /**
  * Every photo you've posted, kept here for good. Others see a post in Moments for 24 hours only;
@@ -42,10 +42,9 @@ export function PhotoLibrary() {
               style={styles.tile}
               testID="library-photo"
             >
-              <Image
+              <FitImage
                 source={s.photoUrl ? { uri: s.photoUrl } : CATEGORY_META[s.category].art}
                 style={StyleSheet.absoluteFill}
-                contentFit="cover"
                 accessible={false}
               />
               {s.selfieUrl && <LiveInset uri={s.selfieUrl} size={26} />}

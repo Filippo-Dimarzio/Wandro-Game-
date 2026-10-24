@@ -1,4 +1,3 @@
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useEffect, useRef } from 'react';
@@ -17,6 +16,7 @@ import { WandroLogo } from '@/components/WandroLogo';
 import { t } from '@/i18n';
 import { isDemo } from '@/lib/env';
 import { radius, space } from '@/theme';
+import { FitImage } from '@/components/FitImage';
 
 /**
  * Title screen, like a game's: Sintra's stamp at dawn, the fog drifts off it by itself, then one
@@ -93,11 +93,10 @@ export default function Welcome() {
 
         <View style={styles.hero} accessibilityElementsHidden importantForAccessibility="no">
           <View style={[styles.stamp, { width: stampWidth }]}>
-            <Image
+            <FitImage
               // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset for Metro
               source={require('../assets/stamps/sintra.jpg')}
               style={styles.stampArt}
-              contentFit="cover"
             />
           </View>
           <Animated.View pointerEvents="none" style={[styles.fog, { top: -30 }, drift(-320)]}>

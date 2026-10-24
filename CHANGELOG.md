@@ -6,6 +6,8 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Pictures always fit their frame: cards, sheets, stamps, moments and photos show the whole
+  image, never cropped, with a soft blurred copy filling any gap where the shapes differ.
 - Log in: the app opens on a login screen once you have an account (the portal also has "I
   already have an account · Log in"), with email and password, show/hide password, "Forgot
   password?", and Google / Apple when the server is connected. The fields are a real form marked

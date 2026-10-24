@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -30,6 +29,7 @@ import { t, type TranslationKey } from '@/i18n';
 import { stampBlur } from '@/lib/stampBlur';
 import { useLocation } from '@/lib/useLocation';
 import { column, radius, shadow, space, useColors } from '@/theme';
+import { FitImage } from '@/components/FitImage';
 
 /** One box per city with its landmark, greyed out until you've discovered a place there. */
 export default function Collections() {
@@ -142,10 +142,9 @@ function StampFace({ city, style }: { city: City; style: StyleProp<ViewStyle> })
   const blur = stampBlur(city.done, city.total);
   return (
     <View style={style} pointerEvents="none">
-      <Image
+      <FitImage
         source={STAMP_ART[city.region.slug]}
         style={StyleSheet.absoluteFill}
-        contentFit="cover"
         blurRadius={blur}
         transition={400}
         accessibilityLabel={t(`landmark.${city.region.slug}` as TranslationKey)}
@@ -249,10 +248,9 @@ function CitySheet({ city, onClose }: { city: City | null; onClose: () => void }
         >
           <ScrollView contentContainerStyle={{ paddingBottom: space.xl }}>
             <View style={styles.hero}>
-              <Image
+              <FitImage
                 source={STAMP_ART[shown.region.slug]}
                 style={StyleSheet.absoluteFill}
-                contentFit="cover"
                 blurRadius={stampBlur(shown.done, shown.total)}
                 accessibilityLabel={t(`landmark.${shown.region.slug}` as TranslationKey)}
               />

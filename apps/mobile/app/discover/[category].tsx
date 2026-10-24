@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -14,6 +13,7 @@ import { t, type TranslationKey } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { radius, shadow, space, useColors } from '@/theme';
 import { useChallengeIntro } from '@/state/challengeIntro';
+import { FitImage } from '@/components/FitImage';
 
 type Tab = 'overview' | 'places' | 'learn';
 const TABS: { id: Tab; label: TranslationKey }[] = [
@@ -58,10 +58,9 @@ function CategoryContent({ cat }: { cat: Category }) {
     <View style={{ flex: 1, backgroundColor: tint }} testID={`category-page-${cat}`}>
       <ScrollView contentContainerStyle={{ paddingBottom: space.xxl + insets.bottom }}>
         <View style={styles.hero}>
-          <Image
+          <FitImage
             source={CATEGORY_META[cat].art}
             style={StyleSheet.absoluteFill}
-            contentFit="cover"
             accessible={false}
           />
           <View style={[styles.heroBar, { top: insets.top + space.sm }]}>

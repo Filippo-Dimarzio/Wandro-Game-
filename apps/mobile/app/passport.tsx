@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,6 +11,7 @@ import { useCities } from '@/data/cities';
 import { usePassport, type PassportStamp } from '@/data/social';
 import { t } from '@/i18n';
 import { column, radius, shadow, space, useColors } from '@/theme';
+import { FitImage } from '@/components/FitImage';
 
 const TILT = ['-4deg', '3deg', '-2deg', '5deg', '-3deg'];
 
@@ -121,10 +121,9 @@ export default function Passport() {
                     testID="passport-stamp"
                   >
                     <View style={[styles.stampFrame, { borderColor: c.category[s.category] }]}>
-                      <Image
+                      <FitImage
                         source={s.photoUrl ? { uri: s.photoUrl } : CATEGORY_META[s.category].art}
                         style={styles.stampPhoto}
-                        contentFit="cover"
                         accessible={false}
                       />
                     </View>
@@ -151,10 +150,9 @@ export default function Passport() {
         >
           {open && (
             <View style={[styles.detail, { backgroundColor: c.card }]}>
-              <Image
+              <FitImage
                 source={open.photoUrl ? { uri: open.photoUrl } : CATEGORY_META[open.category].art}
                 style={styles.detailPhoto}
-                contentFit="cover"
                 accessibilityLabel={open.caption || open.placeName}
               />
               <View style={{ padding: space.md, gap: 4 }}>

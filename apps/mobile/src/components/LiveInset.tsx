@@ -1,6 +1,6 @@
-import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
 import { t } from '@/i18n';
+import { FitImage } from '@/components/FitImage';
 
 /**
  * A live photo's selfie in the top corner of the main photo, BeReal style, with a small LIVE tag.
@@ -14,10 +14,9 @@ export function LiveInset({ uri, size }: { uri: string; size: number }) {
       pointerEvents="none"
       testID="live-inset"
     >
-      <Image
+      <FitImage
         source={{ uri }}
         style={StyleSheet.absoluteFill}
-        contentFit="cover"
         accessibilityLabel={t('photo.selfie')}
       />
       {!small && (

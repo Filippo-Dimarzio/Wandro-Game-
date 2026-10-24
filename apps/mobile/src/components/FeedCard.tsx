@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -10,6 +9,7 @@ import { timeAgo } from '@/lib/time';
 import { radius, space, useColors } from '@/theme';
 import { CATEGORY_META } from '@/categories';
 import { LiveInset } from '@/components/LiveInset';
+import { FitImage } from '@/components/FitImage';
 
 export function FeedCard({ item }: { item: FeedItem }) {
   const c = useColors();
@@ -108,20 +108,18 @@ export function FeedCard({ item }: { item: FeedItem }) {
       >
         {item.photoUrl ? (
           <View>
-            <Image
+            <FitImage
               source={{ uri: item.photoUrl }}
               style={styles.photo}
-              contentFit="cover"
               accessibilityLabel={item.caption || item.placeName}
             />
             {item.selfieUrl && <LiveInset uri={item.selfieUrl} size={96} />}
           </View>
         ) : (
           <View style={styles.photo}>
-            <Image
+            <FitImage
               source={CATEGORY_META[item.category].art}
               style={StyleSheet.absoluteFill}
-              contentFit="cover"
               accessible={false}
             />
             <View style={[styles.placeLabel, { backgroundColor: c.card }]}>

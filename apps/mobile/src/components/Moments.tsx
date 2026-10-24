@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -25,6 +24,7 @@ import { t } from '@/i18n';
 import { timeAgo } from '@/lib/time';
 import { useLocation } from '@/lib/useLocation';
 import { radius, shadow, space, useColors } from '@/theme';
+import { FitImage } from '@/components/FitImage';
 
 /**
  * Today's moments, as a grid of small boxes. Share a photo of a discovery and you see what the
@@ -183,10 +183,9 @@ function Tile({ item, index, onPress }: { item: FeedItem; index: number; onPress
       style={[styles.tile, shadow, { backgroundColor: c.card }]}
       testID="moment-tile"
     >
-      <Image
+      <FitImage
         source={item.photoUrl ? { uri: item.photoUrl } : CATEGORY_META[item.category].art}
         style={StyleSheet.absoluteFill}
-        contentFit="cover"
         accessible={false}
       />
       {item.selfieUrl && <LiveInset uri={item.selfieUrl} size={28} />}

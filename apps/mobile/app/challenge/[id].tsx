@@ -1,4 +1,3 @@
-import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -19,6 +18,7 @@ import { usePlaces } from '@/data/places';
 import { t, type TranslationKey } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
 import { radius, space, useColors } from '@/theme';
+import { FitImage } from '@/components/FitImage';
 
 /** Pick a place (near you or in any launch city) and send a friend a challenge with an idea. */
 export default function ChallengeFriend() {
@@ -121,12 +121,7 @@ export default function ChallengeFriend() {
                 ]}
                 testID={`pick-${p.id}`}
               >
-                <Image
-                  source={placeImage(p)}
-                  style={styles.thumb}
-                  contentFit="cover"
-                  accessible={false}
-                />
+                <FitImage source={placeImage(p)} style={styles.thumb} accessible={false} />
                 <View style={{ flex: 1, gap: 4 }}>
                   <Text style={{ color: c.text, fontWeight: '800' }} numberOfLines={1}>
                     {p.name}

@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -15,6 +14,7 @@ import { lisbonDate } from '@/demo/engine';
 import { useReport } from '@/data/social';
 import { t } from '@/i18n';
 import { radius, shadow, space, useColors } from '@/theme';
+import { FitImage } from '@/components/FitImage';
 
 /** A friend's "go find this place" challenge, with their note and accept / not now. */
 export function FriendChallengeCard({
@@ -52,10 +52,9 @@ export function FriendChallengeCard({
         accessibilityLabel={`${headline}: ${x.place.name}. ${x.note ?? ''}`}
         style={styles.top}
       >
-        <Image
+        <FitImage
           source={CATEGORY_META[x.place.category].art}
           style={[styles.art, { backgroundColor: c.categoryTint[x.place.category] }]}
-          contentFit="cover"
           accessible={false}
         />
         <View style={{ flex: 1, gap: 2 }}>
