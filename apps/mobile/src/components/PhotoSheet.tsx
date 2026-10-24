@@ -113,6 +113,7 @@ export function PhotoSheet({
               <View>
                 <FitImage
                   source={{ uri: shot.photo }}
+                  whole
                   style={styles.thumb}
                   accessibilityLabel={t('photo.preview')}
                   testID="photo-preview"

@@ -11,7 +11,7 @@ import { useDailyChallenge } from '@/data/challenge';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { t, type TranslationKey } from '@/i18n';
 import { useLocation } from '@/lib/useLocation';
-import { radius, shadow, space, useColors } from '@/theme';
+import { column, radius, shadow, space, useColors } from '@/theme';
 import { useChallengeIntro } from '@/state/challengeIntro';
 import { FitImage } from '@/components/FitImage';
 
@@ -56,7 +56,7 @@ function CategoryContent({ cat }: { cat: Category }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: tint }} testID={`category-page-${cat}`}>
-      <ScrollView contentContainerStyle={{ paddingBottom: space.xxl + insets.bottom }}>
+      <ScrollView contentContainerStyle={[column, { paddingBottom: space.xxl + insets.bottom }]}>
         <View style={styles.hero}>
           <FitImage
             source={CATEGORY_META[cat].art}
@@ -234,7 +234,8 @@ function CategoryContent({ cat }: { cat: Category }) {
 }
 
 const styles = StyleSheet.create({
-  hero: { height: 260 },
+  // The cover fills a 3:2 frame, the shape the category art is drawn for.
+  hero: { width: '100%', aspectRatio: 3 / 2 },
   heroBar: {
     position: 'absolute',
     left: space.lg,
