@@ -70,7 +70,7 @@ const LAUNCH_PLACES: Place[] = [
     'sintra',
     'sintra-ferreira-de-castro',
     'Ferreira de Castro House-Museum',
-    'culture',
+    'art',
     38.7962,
     -9.3913,
     45,

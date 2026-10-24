@@ -47,6 +47,10 @@ select pg_temp.check(
   not exists (select 1 from places where source = 'seed' and source_id = 'brinquedo' and status = 'active'),
   'the closed Toy Museum is never an active place');
 select pg_temp.check(
+  not exists (select 1 from places_public p join places x on x.id = p.id
+              where x.source = 'seed' and x.source_id = 'sintra-volta-duche'),
+  'Volta do Duche Tile Benches (no tiled benches) is closed and hidden from players');
+select pg_temp.check(
   (select status from places where source = 'seed' and source_id = 'sintra-newsmuseum') = 'draft'
   and not exists (select 1 from places_public p join places x on x.id = p.id
                   where x.source_id = 'sintra-newsmuseum'),

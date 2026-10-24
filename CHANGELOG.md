@@ -6,6 +6,9 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Removed "Volta do Duche Tile Benches" (Sintra): the promenade is real but no source mentions
+  tiled benches, so its quest couldn't be done. The Ferreira de Castro House-Museum moves to Art &
+  museums so Sintra keeps five places there.
 - Pictures always fit their frame: cards, sheets, stamps, moments and photos show the whole
   image, never cropped, with a soft blurred copy filling any gap where the shapes differ.
 - Log in: the app opens on a login screen once you have an account (the portal also has "I

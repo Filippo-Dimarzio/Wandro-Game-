@@ -69,15 +69,6 @@ export const PORTUGAL_QUESTS = [
       'An azulejo-clad fountain where villagers once filled their jugs. Quest: read the date painted in its tiles.',
     ],
     [
-      'volta-duche',
-      'Volta do Duche Tile Benches',
-      'art',
-      38.7997,
-      -9.3848,
-      150,
-      'The Romantic promenade into town, lined with tiled benches. Quest: find a bench with a view of the Moorish walls.',
-    ],
-    [
       'olga-cadaval',
       'Olga Cadaval Cultural Centre',
       'music_events',

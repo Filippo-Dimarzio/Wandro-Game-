@@ -80,6 +80,11 @@ describe('place details', () => {
     expect(PLACE_DETAILS['demo-brinquedo']).toBeUndefined();
   });
 
+  it('Volta do Duche has no tiled benches, so it is not a place to visit', () => {
+    expect(DEMO_PLACES.find((p) => p.id === 'demo-sintra-volta-duche')).toBeUndefined();
+    expect(PLACE_DETAILS['demo-sintra-volta-duche']).toBeUndefined();
+  });
+
   it('the database gets the same details (migration)', () => {
     expect(sql).toContain(detailsSql());
   });

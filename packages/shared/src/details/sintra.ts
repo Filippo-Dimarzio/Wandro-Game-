@@ -437,16 +437,6 @@ export const SINTRA_DETAILS: Record<string, PlaceDetails> = {
     cost: 'free',
     access: 'step_free',
   },
-  'demo-sintra-volta-duche': {
-    teaser: 'The Romantic promenade into town, lined with tiled benches.',
-    facts: [
-      { text: 'In the 1800s visitors strolled this road between the new town and the palace.' },
-    ],
-    lookFor: 'A bench with a view of the Moorish walls.',
-    durationMin: 20,
-    cost: 'free',
-    access: 'step_free',
-  },
   'demo-sintra-olga-cadaval': {
     teaser: 'Sintra’s main stage for concerts, theatre and dance.',
     facts: [
