@@ -42,7 +42,9 @@ export const tones = (base) => ({
 });
 
 const css = `.a path,.a rect,.a circle,.a ellipse,.a polygon{stroke:${C.paper};stroke-width:6;stroke-linejoin:round}
-.a .t{stroke-width:3}.a .ns{stroke:none}.a .ln{fill:none;stroke-linecap:round;stroke-linejoin:round}`;
+.a .t{stroke-width:3}.a .ns{stroke:none}.a .ln{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.a.crisp path,.a.crisp rect,.a.crisp circle,.a.crisp ellipse,.a.crisp polygon{stroke-width:3.5}
+.a.crisp .t{stroke-width:2}.a.crisp .ns{stroke:none}`;
 export const ln = (d, color, w) =>
   `<path d="${d}" class="ln" style="stroke:${color};stroke-width:${w}"/>`;
 export const blob = (d, fill) => `<path fill="${fill}" d="${d}"/>`;
@@ -58,11 +60,15 @@ const paperFilter = `
     <feComposite in="g" in2="d" operator="in" result="gg"/>
     <feMerge><feMergeNode in="d"/><feMergeNode in="gg"/></feMerge>
   </filter>`;
-export const svg = (w, h, body, bg = '') =>
+export const svg = (w, h, body, bg = '', { crisp = false } = {}) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
     <defs><style>${css}</style>${paperFilter}</defs>
     ${bg ? `<rect width="${w}" height="${h}" fill="${bg}"/>` : ''}
-    <g class="a" filter="url(#paper)">${body}</g></svg>`;
+    <g class="a${crisp ? ' crisp' : ''}"${crisp ? '' : ' filter="url(#paper)"'}>${body}</g></svg>`;
+
+/** Flat vector with its own strokes (thin ink outlines), no paper gaps or wobble. */
+export const svgClean = (w, h, body) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${body}</svg>`;
 
 /** Renders [file, svg, width, height] entries to WebP in `out`, at `scale` times their size. */
 export async function renderWebp(pages, out, scale = 1.6) {

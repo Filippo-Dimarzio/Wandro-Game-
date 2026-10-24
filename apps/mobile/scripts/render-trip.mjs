@@ -2,7 +2,7 @@
 // travelling, a landmark vignette for each launch city and the three vehicles. Flat shapes with
 // paper-coloured gaps between them, like the Wandro stamps. Needs Playwright's Chromium:
 // node scripts/render-trip.mjs (writes WebP)
-import { blob, C, ln, range, renderWebp, svg } from './paper-art.mjs';
+import { blob, C, ln, range, renderWebp, svg, svgClean } from './paper-art.mjs';
 
 const root = process.env.MOBILE_ROOT ?? new URL('..', import.meta.url).pathname;
 const out = `${root}/assets/trip`;
@@ -48,6 +48,7 @@ const trainScene = svg(
     .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="9" fill="${C.coral}" class="t"/>`)
     .join('')}`,
   C.paper,
+  { crisp: true },
 );
 
 const busScene = svg(
@@ -89,6 +90,7 @@ const busScene = svg(
     .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="9" fill="${C.mustard}" class="t"/>`)
     .join('')}`,
   C.paper,
+  { crisp: true },
 );
 
 const planeScene = svg(
@@ -110,6 +112,7 @@ const planeScene = svg(
   ${blob('M640 556 L860 562 L866 610 L648 606Z', C.mustard)}
   ${ln('M-10 548 C120 520 220 590 360 544 C500 500 600 600 760 548 C860 516 940 560 1010 540', C.cobalt, 16)}`,
   C.paper,
+  { crisp: true },
 );
 
 // ---------- City vignettes: 400 x 400, the ground line at the bottom. ----------
@@ -265,68 +268,94 @@ const cities = {
       .join('')}`,
 };
 
-// ---------- Vehicles, facing right. ----------
+// ---------- Vehicles, facing right: crisp flat vectors with thin ink outlines. ----------
+const INK = '#1F2A44';
+const GLASS = '#22293A';
+const GLASS_HI = '#5C6B85';
+const STEEL = '#C9D2DE';
+const o = (w = 2.2) => `stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"`;
+const bogie = (x, w) =>
+  `<rect x="${x}" y="170" width="${w}" height="12" rx="3" fill="#3A3F4B" ${o(1.6)}/>` +
+  [x + 22, x + w - 22]
+    .map(
+      (cx) =>
+        `<circle cx="${cx}" cy="184" r="13" fill="#2B2F3A" ${o(1.6)}/><circle cx="${cx}" cy="184" r="5" fill="${STEEL}" class="ns"/>`,
+    )
+    .join('');
 const vehicles = {
-  train: svg(
+  train: svgClean(
     700,
     200,
     `
-    ${ln('M190 40 L230 10 L270 40 M470 40 L510 10 L550 40', C.navy, 4)}
-    <rect x="10" y="40" width="330" height="120" rx="20" fill="${C.card}"/>
-    ${blob('M350 40 L600 40 C660 40 690 90 690 130 L690 160 L350 160Z', C.card)}
-    <rect x="10" y="66" width="330" height="40" fill="${C.navy}" class="t"/>
-    <rect x="350" y="66" width="250" height="40" fill="${C.navy}" class="t"/>
-    ${blob('M604 66 C640 70 664 92 672 112 L620 112 L604 106Z', C.sky)}
-    ${range(5)
+    <path d="M232 44 L262 14 L292 44 M250 14 L276 14" fill="none" ${o(2.4)}/>
+    <rect x="200" y="40" width="120" height="8" rx="3" fill="${STEEL}" ${o(1.6)}/>
+    <path d="M10 50 L586 50 C636 50 670 74 688 118 L694 148 L694 168 L10 168 Z" fill="#FFFFFF" ${o(2.6)}/>
+    <path d="M10 120 L688 120 L694 148 L694 168 L10 168 Z" fill="#2E2A72" class="ns"/>
+    <path d="M10 117 L687 117" fill="none" stroke="${C.mustard}" stroke-width="5"/>
+    <path d="M586 52 C634 52 666 76 684 116" fill="none" stroke="${C.mustard}" stroke-width="5"/>
+    <path d="M598 64 C630 66 654 84 668 108 L598 108 Z" fill="${GLASS}" ${o(1.8)}/>
+    <path d="M606 72 L626 72 L612 100 L604 100 Z" fill="${GLASS_HI}" class="ns"/>
+    ${[22, 84, 186, 248, 360, 422, 508]
       .map(
-        (k) =>
-          `<rect x="${28 + k * 62}" y="72" width="44" height="28" rx="6" fill="${C.sky}" class="t"/>`,
+        (x) =>
+          `<rect x="${x}" y="66" width="52" height="34" rx="6" fill="${GLASS}" ${o(1.6)}/><path d="M${x + 6} ${70} L${x + 18} 70 L${x + 10} 96 L${x + 4} 96 Z" fill="${GLASS_HI}" class="ns"/>`,
       )
       .join('')}
-    ${range(4)
+    ${[140, 302, 566]
       .map(
-        (k) =>
-          `<rect x="${366 + k * 58}" y="72" width="42" height="28" rx="6" fill="${C.sky}" class="t"/>`,
+        (x) =>
+          `<rect x="${x}" y="58" width="40" height="110" rx="3" fill="#2E2A72" ${o(1.8)}/><rect x="${x + 6}" y="66" width="12" height="34" rx="2" fill="${GLASS}" class="ns"/><rect x="${x + 22}" y="66" width="12" height="34" rx="2" fill="${GLASS}" class="ns"/><path d="M${x + 20} 58 L${x + 20} 168" stroke="${INK}" stroke-width="1.4"/><path d="M${x + 14} 112 L${x + 14} 140 M${x + 26} 112 L${x + 26} 140" stroke="${C.mustard}" stroke-width="2.4" stroke-linecap="round"/>`,
       )
       .join('')}
-    <rect x="10" y="118" width="330" height="16" fill="${C.orange}" class="t"/>
-    <rect x="350" y="118" width="340" height="16" fill="${C.orange}" class="t"/>
-    <rect x="150" y="110" width="40" height="50" rx="4" fill="${C.mustard}" class="t"/>
-    <rect x="470" y="110" width="40" height="50" rx="4" fill="${C.mustard}" class="t"/>
-    <circle cx="676" cy="146" r="7" fill="${C.mustard}" class="t"/>
-    ${[60, 280, 410, 620].map((x) => `<circle cx="${x}" cy="172" r="22" fill="${C.brown}"/><circle cx="${x}" cy="172" r="7" fill="${C.ochre}" class="t"/>`).join('')}`,
+    <path d="M296 52 L296 166" stroke="${STEEL}" stroke-width="2"/>
+    <circle cx="470" cy="140" r="10" fill="${C.mustard}" ${o(1.4)}/>
+    <circle cx="494" cy="140" r="10" fill="#4FB3D9" ${o(1.4)}/>
+    <rect x="672" y="134" width="16" height="8" rx="3" fill="#FFF4C2" ${o(1.4)}/>
+    <rect x="10" y="166" width="684" height="8" fill="#4A4F5C" ${o(1.6)}/>
+    ${bogie(54, 120)} ${bogie(470, 130)}`,
   ),
-  coach: svg(
+  coach: svgClean(
     420,
     170,
     `
-    ${blob('M14 30 L340 30 C380 30 404 60 408 96 L410 130 L14 130 C8 130 6 124 6 118 L6 40 C6 34 10 30 14 30Z', C.teal)}
-    <rect x="22" y="44" width="300" height="40" rx="8" fill="${C.card}" class="t"/>
-    ${range(5)
+    <path d="M12 28 L356 28 C390 28 406 52 410 86 L412 134 L12 134 C8 134 6 130 6 126 L6 34 C6 30 8 28 12 28 Z" fill="#FFFFFF" ${o(2.4)}/>
+    <path d="M6 96 L411 96 L412 134 L12 134 C8 134 6 130 6 126 Z" fill="#2E8B6A" class="ns"/>
+    <path d="M6 94 C120 94 220 78 410 70" fill="none" stroke="${C.mustard}" stroke-width="5"/>
+    <rect x="18" y="40" width="304" height="40" rx="6" fill="${GLASS}" ${o(1.6)}/>
+    ${[78, 138, 198, 258].map((x) => `<path d="M${x} 40 L${x} 80" stroke="#FFFFFF" stroke-width="3"/>`).join('')}
+    ${[22, 82, 142, 202, 262].map((x) => `<path d="M${x + 6} 44 L${x + 18} 44 L${x + 10} 76 L${x + 4} 76 Z" fill="${GLASS_HI}" class="ns"/>`).join('')}
+    <path d="M354 38 C384 40 400 60 404 86 L354 86 Z" fill="${GLASS}" ${o(1.6)}/>
+    <path d="M362 44 L378 44 L366 80 L360 80 Z" fill="${GLASS_HI}" class="ns"/>
+    <rect x="326" y="40" width="24" height="92" rx="3" fill="${GLASS}" ${o(1.6)}/>
+    <path d="M338 40 L338 132" stroke="${INK}" stroke-width="1.2"/>
+    <rect x="398" y="104" width="12" height="8" rx="3" fill="#FFF4C2" ${o(1.2)}/>
+    <path d="M404 44 L414 40 L416 58" fill="none" ${o(2)}/>
+    <rect x="6" y="132" width="406" height="8" fill="#3A3F4B" ${o(1.4)}/>
+    ${[88, 318]
       .map(
-        (k) =>
-          `<rect x="${30 + k * 58}" y="50" width="46" height="28" rx="5" fill="${C.sky}" class="t"/>`,
+        (x) =>
+          `<path d="M${x - 30} 134 A30 30 0 0 1 ${x + 30} 134" fill="#2B2F3A" class="ns"/><circle cx="${x}" cy="140" r="22" fill="#2B2F3A" ${o(1.6)}/><circle cx="${x}" cy="140" r="9" fill="${STEEL}" ${o(1.2)}/>`,
       )
-      .join('')}
-    ${blob('M334 44 C364 46 388 66 394 96 L334 96Z', C.sky)}
-    <rect x="6" y="98" width="404" height="14" fill="${C.mustard}" class="t"/>
-    <circle cx="398" cy="118" r="7" fill="${C.mustard}" class="t"/>
-    ${[90, 320].map((x) => `<circle cx="${x}" cy="136" r="26" fill="${C.navy}"/><circle cx="${x}" cy="136" r="9" fill="${C.card}" class="t"/>`).join('')}`,
+      .join('')}`,
   ),
-  plane: svg(
+  plane: svgClean(
     360,
     180,
     `
-    ${blob('M150 80 L210 80 L120 10 L90 10Z', C.orange)}
-    ${blob('M20 60 L60 60 L40 20 L18 20Z', C.orange)}
-    ${blob('M20 66 C20 56 30 50 44 50 L290 50 C330 50 352 70 352 90 C352 110 330 120 290 120 L60 120 C34 120 20 100 20 66Z', C.card)}
-    ${blob('M300 58 C320 60 338 72 342 86 L306 86Z', C.navy)}
-    ${range(7)
-      .map((k) => `<circle cx="${90 + k * 28}" cy="78" r="8" fill="${C.cobalt}" class="t"/>`)
-      .join('')}
-    <rect x="40" y="96" width="290" height="10" fill="${C.orange}" class="t"/>
-    ${blob('M140 96 L220 96 L130 170 L96 170Z', C.coral)}
-    ${blob('M30 92 L70 92 L44 130 L24 130Z', C.coral)}`,
+    <path d="M38 94 L26 26 L58 26 L98 88 Z" fill="#4F78A8" ${o(2)}/>
+    <path d="M30 40 L64 40 M33 52 L72 52" stroke="#D9534F" stroke-width="4"/>
+    <path d="M42 102 L86 102 L74 116 L38 116 Z" fill="#4F78A8" ${o(1.8)}/>
+    <path d="M30 98 C30 86 44 80 62 80 L284 80 C318 80 346 92 352 104 C346 118 318 126 284 126 L62 126 C44 126 30 116 30 104 Z" fill="#FFFFFF" ${o(2.2)}/>
+    <path d="M34 112 L348 112 C336 121 314 126 284 126 L62 126 C48 126 38 120 34 112 Z" fill="#4F78A8" class="ns"/>
+    <path d="M34 109 L346 109" stroke="#D9534F" stroke-width="3"/>
+    <path d="M316 88 C330 90 340 96 345 103 L316 103 Z" fill="#9DB8D6" ${o(1.6)}/>
+    ${[0, 1, 2, 3, 4, 5, 6, 7].map((i) => `<rect x="${136 + i * 20}" y="89" width="10" height="11" rx="3" fill="#9DB8D6" ${o(1.3)}/>`).join('')}
+    <rect x="104" y="86" width="12" height="22" rx="3" fill="none" ${o(1.4)}/>
+    <rect x="296" y="86" width="12" height="22" rx="3" fill="none" ${o(1.4)}/>
+    <path d="M150 114 L236 114 L200 160 L178 160 Z" fill="#FFFFFF" ${o(2)}/>
+    <rect x="166" y="128" width="46" height="20" rx="10" fill="#4F78A8" ${o(1.8)}/>
+    <path d="M204 128 L204 148" stroke="#D9534F" stroke-width="3"/>
+    <path d="M0 92 L22 92 M6 106 L24 106" stroke="#4F78A8" stroke-width="2.4" stroke-linecap="round"/>`,
   ),
 };
 
@@ -336,7 +365,7 @@ const pages = [
   ['scene-plane.webp', planeScene, 1000, 620],
   ...Object.entries(cities).map(([slug, body]) => [
     `city-${slug}.webp`,
-    svg(400, 400, body),
+    svg(400, 400, body, '', { crisp: true }),
     400,
     400,
   ]),
