@@ -1,4 +1,5 @@
-import { LinearGradient } from 'expo-linear-gradient';
+import { Shrikhand_400Regular, useFonts } from '@expo-google-fonts/shrikhand';
+import { Image } from 'expo-image';
 import { useEffect, useRef, useState } from 'react';
 import {
   AccessibilityInfo,
@@ -6,9 +7,11 @@ import {
   Easing,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DEMO_PLACES, regionBySlug, tripMode, type TripMode } from '@wandro/shared';
@@ -16,21 +19,21 @@ import { t, type TranslationKey } from '@/i18n';
 import { isDemo } from '@/lib/env';
 import { useSession } from '@/state/session';
 import { radius, space } from '@/theme';
+import { SCENE_RATIO, TRIP_SCENE, TRIP_VEHICLE, tripCity } from '@/tripArt';
 
-const ARC_HEIGHT = 56;
+// Paper and inks from the cut-paper artwork; navy and brown on cream pass WCAG AA (8:1 and up).
+const PAPER = '#F6EBD5';
+const CARD = '#FBF4E4';
+const NAVY = '#1F3F73';
+const BROWN = '#6B3B2A';
+const MUSTARD = '#F2C14E';
+const CORAL = '#EE8C7E';
+
+const MAX_SCENE = 560;
+const CITY = 0.34; // each landmark is a third of the scene's width
 const STEPS = [0, 0.25, 0.5, 0.75, 1];
-// A parabola through the steps: the plane climbs, cruises and descends. Trains and coaches
-// stay on the ground.
-const arcY = (p: number) => -ARC_HEIGHT * 4 * p * (1 - p);
-const GROUND_Y = ARC_HEIGHT;
-
-/** Each way of travelling has its own sky: all dark enough for white text (WCAG AA). */
-const THEMES: Record<TripMode, { colors: [string, string, string]; icon: string; accent: string }> =
-  {
-    plane: { colors: ['#082A45', '#0B3A5E', '#0A5A96'], icon: '✈️', accent: '#0B6FB8' },
-    train: { colors: ['#1B1F3B', '#26305C', '#33407A'], icon: '🚆', accent: '#33407A' },
-    bus: { colors: ['#06301F', '#0B4A30', '#0E6040'], icon: '', accent: '#0B6B43' },
-  };
+/** The plane's flight path, as fractions of the scene's height: up from one city, down to the next. */
+const flightY = (p: number) => 0.5 - 0.38 * 4 * p * (1 - p);
 
 export function formatMinutes(minutes: number): string {
   const h = Math.floor(minutes / 60);
@@ -40,15 +43,23 @@ export function formatMinutes(minutes: number): string {
 }
 
 /**
- * Full-screen "you've arrived" moment: a plane flies between airports, or a train or a green
- * coach drives from the old city to the new one, whichever is how you'd really get there.
+ * Full-screen "you've arrived" postcard: a plane flies, or a train or a green coach drives,
+ * across a cut-paper landscape from one city's landmark to the next, whichever is how you'd
+ * really get there.
  */
 export function FlightOverlay() {
   const flight = useSession((s) => s.flight);
   const endFlight = useSession((s) => s.endFlight);
   const progress = useRef(new Animated.Value(0)).current;
-  const [width, setWidth] = useState(0);
+  const window = useWindowDimensions();
+  // Until the postcard has been measured, assume it fills the column, so the scene draws at once.
+  const [measured, setMeasured] = useState(0);
+  const width = measured || Math.min(window.width - 2 * space.lg - 24, MAX_SCENE);
   const [landed, setLanded] = useState(false);
+  const [fontLoaded] = useFonts({ Shrikhand_400Regular });
+  const display = fontLoaded
+    ? { fontFamily: 'Shrikhand_400Regular', fontWeight: 'normal' as const }
+    : null;
 
   useEffect(() => {
     if (!flight) return;
@@ -67,7 +78,7 @@ export function FlightOverlay() {
       }
       Animated.timing(progress, {
         toValue: 1,
-        duration: 2600,
+        duration: 3200,
         easing: Easing.inOut(Easing.cubic),
         useNativeDriver: Platform.OS !== 'web',
       }).start(({ finished }) => finished && !cancelled && setLanded(true));
@@ -83,278 +94,251 @@ export function FlightOverlay() {
   const to = regionBySlug(flight.to);
   if (!from || !to) return null;
   const { mode, minutes } = tripMode(from, to);
-  const theme = THEMES[mode];
   const flying = mode === 'plane';
-  const yAt = (p: number) => (flying ? ARC_HEIGHT + arcY(p) : GROUND_Y);
   const endLabel = (r: typeof from) => (flying ? r.airport.code : r.name);
-  // Half the vehicle's width, so it starts and stops centred on each end.
-  const half = mode === 'bus' ? 23 : 15;
   const placeCount = isDemo
     ? DEMO_PLACES.filter((p) => p.region === to.slug && !p.hidden).length
     : null;
-  const track = Math.max(width - 2 * space.lg, 0);
 
   return (
     <View
-      style={StyleSheet.absoluteFill}
+      style={[StyleSheet.absoluteFill, { backgroundColor: PAPER }]}
       accessibilityViewIsModal
       importantForAccessibility="yes"
       testID="flight-overlay"
     >
-      <LinearGradient
-        colors={theme.colors}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
-      <SafeAreaView style={styles.content}>
-        <Text style={styles.kicker}>
-          {flying ? '✈️' : mode === 'train' ? '🚆' : '🚌'} {t('flight.kicker')}
-        </Text>
-        <Text style={styles.title} accessibilityRole="header">
-          {landed
-            ? t('flight.welcome', { city: to.name })
-            : t(`trip.going.${mode}` as TranslationKey, { city: to.name })}
-        </Text>
-        <Text style={styles.mode} testID="trip-mode">
-          {t(`trip.by.${mode}` as TranslationKey, { time: formatMinutes(minutes) })}
-        </Text>
+      <SafeAreaView style={styles.safe}>
+        <ScrollView contentContainerStyle={styles.content}>
+          <View style={styles.kicker}>
+            <Text style={styles.kickerText}>{t('flight.kicker')}</Text>
+          </View>
+          <Text style={[styles.title, display]} accessibilityRole="header">
+            {landed
+              ? t('flight.welcome', { city: to.name })
+              : t(`trip.going.${mode}` as TranslationKey, { city: to.name })}
+          </Text>
+          <Text style={styles.mode} testID="trip-mode">
+            {t(`trip.by.${mode}` as TranslationKey, { time: formatMinutes(minutes) })}
+          </Text>
 
-        <View
-          style={styles.route}
-          onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
-          accessible
-          accessibilityLabel={t(`trip.routeA11y.${mode}` as TranslationKey, {
-            from: flying ? `${from.name} (${from.airport.code})` : from.name,
-            to: flying ? `${to.name} (${to.airport.code})` : to.name,
-            km: Math.round(flight.km),
-          })}
-        >
-          <View style={[styles.arc, { width: track }]} pointerEvents="none">
-            {flying &&
-              Array.from({ length: 13 }, (_, i) => i / 12).map((p) => (
-                <View key={p} style={[styles.dot, { left: p * track - 3, top: yAt(p) - 3 }]} />
-              ))}
-            {mode === 'train' && <Rails width={track} />}
-            {mode === 'bus' && <Road width={track} />}
-            <Animated.View
-              style={[
-                styles.plane,
-                {
-                  transform: [
-                    {
-                      translateX: progress.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [-half, track - half],
-                      }),
-                    },
-                    {
-                      translateY: progress.interpolate({
-                        inputRange: STEPS,
-                        outputRange: STEPS.map((p) => yAt(p) - (flying ? 16 : 26)),
-                      }),
-                    },
-                    {
-                      rotate: flying
-                        ? progress.interpolate({
-                            inputRange: [0, 0.5, 1],
-                            outputRange: ['-25deg', '0deg', '25deg'],
-                          })
-                        : '0deg',
-                    },
-                  ],
-                },
-              ]}
-              accessible={false}
-              testID={`trip-vehicle-${mode}`}
+          <View
+            style={styles.postcard}
+            accessible
+            accessibilityLabel={t(`trip.routeA11y.${mode}` as TranslationKey, {
+              from: flying ? `${from.name} (${from.airport.code})` : from.name,
+              to: flying ? `${to.name} (${to.airport.code})` : to.name,
+              km: Math.round(flight.km),
+            })}
+          >
+            <View
+              style={styles.scene}
+              onLayout={(e) => setMeasured(Math.min(e.nativeEvent.layout.width, MAX_SCENE))}
             >
-              {mode === 'bus' ? <Coach /> : <Text style={styles.vehicle}>{theme.icon}</Text>}
-            </Animated.View>
+              {width > 0 && (
+                <Scene
+                  width={width}
+                  mode={mode}
+                  fromSlug={from.slug}
+                  toSlug={to.slug}
+                  progress={progress}
+                />
+              )}
+            </View>
+            <View style={styles.ends}>
+              <End code={endLabel(from)} city={flying ? from.name : stop(mode)} display={display} />
+              <End code={endLabel(to)} city={flying ? to.name : stop(mode)} display={display} />
+            </View>
           </View>
-          <View style={styles.ends}>
-            <Airport
-              flag={from.flag}
-              code={endLabel(from)}
-              city={flying ? from.name : stop(mode)}
-            />
-            <Airport flag={to.flag} code={endLabel(to)} city={flying ? to.name : stop(mode)} />
+
+          <Text style={styles.meta}>
+            {t('flight.distance', { km: Math.round(flight.km).toLocaleString('en') })}
+          </Text>
+
+          <View style={[styles.card, { opacity: landed ? 1 : 0.7 }]}>
+            <Text style={styles.cardTitle}>{t('flight.newCity', { city: to.name })}</Text>
+            <Text style={styles.cardText}>
+              {placeCount ? `${t('travel.placeCount', { count: placeCount })} · ` : ''}
+              {t('flight.gems')}
+            </Text>
           </View>
-        </View>
 
-        <Text style={styles.meta}>
-          {t('flight.distance', { km: Math.round(flight.km).toLocaleString('en') })}
-        </Text>
-
-        <View style={[styles.card, { opacity: landed ? 1 : 0.6 }]}>
-          <Text style={styles.cardTitle}>
-            {to.flag} {t('flight.newCity', { city: to.name })}
-          </Text>
-          <Text style={styles.cardText}>
-            {placeCount ? `${t('travel.placeCount', { count: placeCount })} · ` : ''}
-            {t('flight.gems')}
-          </Text>
-        </View>
-
-        <Pressable
-          onPress={endFlight}
-          accessibilityRole="button"
-          style={styles.cta}
-          testID="flight-done"
-        >
-          <Text style={[styles.ctaText, { color: theme.accent }]}>
-            {t('flight.explore', { city: to.name })}
-          </Text>
-        </Pressable>
+          <Pressable
+            onPress={endFlight}
+            accessibilityRole="button"
+            style={styles.cta}
+            testID="flight-done"
+          >
+            <Text style={styles.ctaText}>{t('flight.explore', { city: to.name })}</Text>
+          </Pressable>
+        </ScrollView>
       </SafeAreaView>
+    </View>
+  );
+}
+
+/** The illustrated landscape with both cities' landmarks and the moving vehicle. */
+function Scene({
+  width,
+  mode,
+  fromSlug,
+  toSlug,
+  progress,
+}: {
+  width: number;
+  mode: TripMode;
+  fromSlug: string;
+  toSlug: string;
+  progress: Animated.Value;
+}) {
+  const height = width * SCENE_RATIO;
+  const scene = TRIP_SCENE[mode];
+  const vehicle = TRIP_VEHICLE[mode];
+  const vw = width * vehicle.width;
+  const vh = vw / vehicle.ratio;
+  const city = width * CITY;
+  const cityTop = height * scene.cityBase - city;
+  const flying = mode === 'plane';
+  const margin = width * 0.03;
+  // Ground vehicles drive from the first landmark to the second; the plane takes off over one
+  // city and lands over the other.
+  const startX = flying ? city / 2 - vw / 2 : margin;
+  const endX = flying ? width - city / 2 - vw / 2 : width - margin - vw;
+  const yAt = (p: number) => (flying ? height * flightY(p) - vh / 2 : height * scene.ground - vh);
+
+  return (
+    <View style={{ width, height }}>
+      <Image source={scene.src} style={StyleSheet.absoluteFill} contentFit="fill" />
+      <Image
+        source={tripCity(fromSlug)}
+        style={{ position: 'absolute', left: 0, top: cityTop, width: city, height: city }}
+      />
+      <Image
+        source={tripCity(toSlug)}
+        style={{ position: 'absolute', right: 0, top: cityTop, width: city, height: city }}
+      />
+      {flying &&
+        Array.from({ length: 15 }, (_, i) => i / 14).map((p) => (
+          <View
+            key={p}
+            style={[
+              styles.dot,
+              {
+                backgroundColor: scene.dot,
+                left: startX + vw / 2 + p * (endX - startX) - 4,
+                top: height * flightY(p) - 4,
+              },
+            ]}
+          />
+        ))}
+      <Animated.View
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          transform: [
+            {
+              translateX: progress.interpolate({ inputRange: [0, 1], outputRange: [startX, endX] }),
+            },
+            {
+              translateY: progress.interpolate({
+                inputRange: STEPS,
+                outputRange: STEPS.map(yAt),
+              }),
+            },
+            {
+              rotate: flying
+                ? progress.interpolate({
+                    inputRange: [0, 0.5, 1],
+                    outputRange: ['-18deg', '0deg', '18deg'],
+                  })
+                : '0deg',
+            },
+          ],
+        }}
+        accessible={false}
+        testID={`trip-vehicle-${mode}`}
+      >
+        <Image source={vehicle.src} style={{ width: vw, height: vh }} />
+      </Animated.View>
     </View>
   );
 }
 
 const stop = (mode: TripMode) => t(mode === 'train' ? 'trip.station' : 'trip.coachStop');
 
-/** Two rails with sleepers, for the train. */
-function Rails({ width }: { width: number }) {
+function End({
+  code,
+  city,
+  display,
+}: {
+  code: string;
+  city: string;
+  display: { fontFamily: string; fontWeight: 'normal' } | null;
+}) {
   return (
-    <View style={[styles.rails, { width, top: GROUND_Y - 2 }]}>
-      <View style={styles.rail} />
-      <View style={styles.sleepers}>
-        {Array.from({ length: Math.max(2, Math.floor(width / 14)) }, (_, i) => (
-          <View key={i} style={styles.sleeper} />
-        ))}
-      </View>
-      <View style={styles.rail} />
-    </View>
-  );
-}
-
-/** A road with a dashed centre line, for the coach. */
-function Road({ width }: { width: number }) {
-  return (
-    <View style={[styles.road, { width, top: GROUND_Y - 6 }]}>
-      {Array.from({ length: Math.max(2, Math.floor(width / 22)) }, (_, i) => (
-        <View key={i} style={styles.dash} />
-      ))}
-    </View>
-  );
-}
-
-/** A long-distance green coach, drawn so it isn't any real company's livery. */
-function Coach() {
-  return (
-    <View style={styles.coach}>
-      <View style={styles.coachBody}>
-        {[0, 1, 2, 3].map((i) => (
-          <View key={i} style={styles.coachWindow} />
-        ))}
-        <View style={styles.coachWindscreen} />
-      </View>
-      <View style={styles.coachWheels}>
-        <View style={styles.wheel} />
-        <View style={styles.wheel} />
-      </View>
-    </View>
-  );
-}
-
-function Airport({ flag, code, city }: { flag: string; code: string; city: string }) {
-  return (
-    <View style={{ alignItems: 'center', gap: 2 }}>
-      <Text style={{ fontSize: 26 }} accessible={false}>
-        {flag}
-      </Text>
-      <Text style={styles.code}>{code}</Text>
+    <View style={styles.end}>
+      <Text style={[styles.code, display]}>{code}</Text>
       <Text style={styles.city}>{city}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { flex: 1, padding: space.lg, justifyContent: 'center', gap: space.lg },
-  kicker: { color: '#DDEEFF', fontWeight: '800', textAlign: 'center', letterSpacing: 1 },
-  title: { color: '#fff', fontSize: 30, fontWeight: '900', textAlign: 'center' },
-  route: { paddingHorizontal: space.lg, gap: space.sm },
-  arc: { height: ARC_HEIGHT + 24, alignSelf: 'center' },
-  dot: {
-    position: 'absolute',
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.55)',
+  safe: { flex: 1 },
+  content: {
+    flexGrow: 1,
+    padding: space.lg,
+    justifyContent: 'center',
+    gap: space.md,
+    width: '100%',
+    maxWidth: MAX_SCENE + 2 * space.lg + 24,
+    alignSelf: 'center',
   },
-  plane: { position: 'absolute', left: 0, top: 0 },
-  vehicle: { fontSize: 30 },
-  mode: { color: '#fff', fontWeight: '800', textAlign: 'center', fontSize: 16 },
-  rails: { position: 'absolute', left: 0, height: 10, justifyContent: 'space-between' },
-  rail: { height: 2, backgroundColor: 'rgba(255,255,255,0.8)' },
-  sleepers: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  kicker: {
+    alignSelf: 'center',
+    backgroundColor: MUSTARD,
+    borderRadius: radius.pill,
+    paddingHorizontal: space.md,
+    paddingVertical: 6,
   },
-  sleeper: { width: 3, backgroundColor: 'rgba(255,255,255,0.35)' },
-  road: {
-    position: 'absolute',
-    left: 0,
-    height: 14,
-    borderRadius: 4,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
+  kickerText: { color: NAVY, fontWeight: '900', letterSpacing: 1.2, fontSize: 13 },
+  title: { color: NAVY, fontSize: 34, fontWeight: '900', textAlign: 'center' },
+  mode: { color: BROWN, fontWeight: '800', textAlign: 'center', fontSize: 17 },
+  postcard: {
+    backgroundColor: CARD,
+    borderRadius: 18,
+    padding: 12,
+    gap: space.sm,
+    shadowColor: '#3C2814',
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
   },
-  dash: { width: 10, height: 2, backgroundColor: 'rgba(255,255,255,0.8)' },
-  coach: { width: 46, alignItems: 'center' },
-  coachBody: {
-    width: 46,
-    height: 22,
-    borderRadius: 5,
-    borderTopRightRadius: 10,
-    backgroundColor: '#5BC236',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 3,
-    gap: 2,
-  },
-  coachWindow: { width: 7, height: 8, borderRadius: 1.5, backgroundColor: '#D8F5FF' },
-  coachWindscreen: {
-    width: 6,
-    height: 12,
-    borderRadius: 2,
-    borderTopRightRadius: 6,
-    backgroundColor: '#D8F5FF',
-    marginLeft: 'auto',
-  },
-  coachWheels: { flexDirection: 'row', justifyContent: 'space-between', width: 34, marginTop: -4 },
-  wheel: {
-    width: 9,
-    height: 9,
-    borderRadius: 4.5,
-    backgroundColor: '#1A1A1A',
-    borderWidth: 2,
-    borderColor: '#999',
-  },
-  ends: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: -space.sm },
-  code: { color: '#fff', fontSize: 28, fontWeight: '900', letterSpacing: 1 },
-  city: { color: '#DDEEFF', fontWeight: '700' },
-  meta: { color: '#DDEEFF', textAlign: 'center', fontWeight: '700' },
+  scene: { width: '100%', alignItems: 'center', borderRadius: 10, overflow: 'hidden' },
+  dot: { position: 'absolute', width: 8, height: 8, borderRadius: 4 },
+  ends: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: space.xs },
+  end: { alignItems: 'center', minWidth: 90 },
+  code: { color: NAVY, fontSize: 24, fontWeight: '900', letterSpacing: 0.5 },
+  city: { color: BROWN, fontWeight: '700' },
+  meta: { color: BROWN, textAlign: 'center', fontWeight: '700' },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: CARD,
     borderRadius: radius.lg,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: CORAL,
     padding: space.lg,
     gap: 4,
   },
-  cardTitle: { color: '#fff', fontWeight: '900', fontSize: 18 },
-  cardText: { color: '#fff' },
+  cardTitle: { color: NAVY, fontWeight: '900', fontSize: 18 },
+  cardText: { color: BROWN },
   cta: {
-    backgroundColor: '#fff',
+    backgroundColor: NAVY,
     borderRadius: radius.pill,
     minHeight: 56,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ctaText: { color: '#0B6FB8', fontWeight: '900', fontSize: 17 },
+  ctaText: { color: CARD, fontWeight: '900', fontSize: 17 },
 });

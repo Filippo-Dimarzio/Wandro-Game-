@@ -13,6 +13,7 @@
     "build:web": "node scripts/copy-maplibre-worker.mjs && expo export --platform web --output-dir dist"
   },
   "dependencies": {
+    "@expo-google-fonts/shrikhand": "^0.4.1",
     "@expo/metro-runtime": "~57.0.16",
     "@expo/vector-icons": "^15.1.1",
     "@react-native-async-storage/async-storage": "2.2.0",

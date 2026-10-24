@@ -263,6 +263,12 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Changed
 
+- The "new city unlocked" screen is now an illustrated postcard in the cut-paper style of the
+  Wandro stamps: a cream page, a hand-lettered welcome, and a landscape where the train, green
+  coach or plane crosses from your old city's landmark to the new one's (Pena, a Lisbon tram,
+  Porto's Clérigos and a rabelo boat, Évora's Roman temple, Aveiro's moliceiro and striped houses,
+  the Algarve cliffs). Artwork in `assets/trip`, drawn by `scripts/render-trip.mjs`; the title
+  uses the Shrikhand font. Reduce-motion still skips straight to the arrival.
 - More realistic explorers: all eight are redrawn as shaded, painted portraits (lit skin, real eyes,
   soft hair, a lit jacket), in every outfit.
 - Customise opens from the badge on your profile picture; the separate Customise button is gone.
