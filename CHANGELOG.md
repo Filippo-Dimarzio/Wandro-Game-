@@ -263,6 +263,11 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Changed
 
+- Category covers redrawn in the cut-paper stamp style, each still in its own colour: a lighthouse
+  coast in sky blue, a waterfall valley in green, a hilltop castle in terracotta, a tiled street
+  with a tram in cobalt, a museum and easel in violet, a night concert in raspberry and a cabinet
+  of curiosities in teal. Drawn by `scripts/render-category-art.mjs`, which shares its paper,
+  gaps and grain with the trip art (`scripts/paper-art.mjs`).
 - New explorers: the eight characters are redrawn as bold cartoon portraits (thick outlines, big
   eyes, rosy cheeks, a bright halftone badge) and are now a younger crowd: long wavy brown hair, a
   blond ponytail, long black hair with a fringe, short black curls, a brown quiff, blond curtains,
