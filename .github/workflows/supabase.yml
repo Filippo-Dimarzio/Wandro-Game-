@@ -2,7 +2,8 @@ name: Supabase database
 
 # Applies supabase/migrations (and the idempotent seed) to the hosted Wandro project.
 # One-time setup: Settings -> Secrets and variables -> Actions -> New repository secret:
-#   SUPABASE_ACCESS_TOKEN  (supabase.com/dashboard/account/tokens)
+#   SUPABASE_ACCESS_TOKEN  (supabase.com/dashboard/account/tokens; a scoped token needs
+#                           database and Edge Functions write access)
 #   SUPABASE_DB_PASSWORD   (Project settings -> Database -> reset/copy the password)
 on:
   push:
@@ -43,4 +44,5 @@ jobs:
           supabase db push --include-seed --password "$SUPABASE_DB_PASSWORD"
       - name: Deploy Edge Functions
         if: steps.secrets.outputs.ready == 'true'
-        run: supabase functions deploy --project-ref "$PROJECT_REF"
+        # --use-api bundles on Supabase's side, so no edge-runtime Docker image is pulled.
+        run: supabase functions deploy --use-api --project-ref "$PROJECT_REF"
