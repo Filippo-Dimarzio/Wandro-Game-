@@ -5,7 +5,10 @@ import type { TranslationKey } from '@/i18n';
 
 interface CategoryMeta {
   icon: keyof typeof Ionicons.glyphMap;
-  /** Illustrated cover for cards and category pages, and the fallback when a place has no photo. */
+  /**
+   * Illustrated cover for cards and category pages, the fallback when a place has no photo, and
+   * the picture cut out for the stamp you earn by completing a challenge in this category.
+   */
   art: ImageSource;
 }
 

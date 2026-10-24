@@ -22,7 +22,7 @@ import {
   regionFor,
   type Place,
 } from '@wandro/shared';
-import { placeImage } from '@/categories';
+import { CATEGORY_META } from '@/categories';
 import { CoinIcon } from '@/components/CoinIcon';
 import { CategoryPill } from '@/components/PlaceBits';
 import { PostageStamp } from '@/components/PostageStamp';
@@ -124,7 +124,7 @@ function IntroCard({ place, onClose }: { place: Place; onClose: () => void }) {
             <View style={[styles.stampDesk, { backgroundColor: c.goldSoft }]}>
               <PostageStamp
                 region={region}
-                art={placeImage(place)}
+                art={CATEGORY_META[place.category].art}
                 value={coins}
                 width={150}
                 tilt={-3}

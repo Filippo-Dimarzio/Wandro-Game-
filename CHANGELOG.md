@@ -6,6 +6,8 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- The stamp you earn for a challenge is now cut out of its category's picture (the same art as
+  the category card), instead of the place's own photo.
 - Removed "Volta do Duche Tile Benches" (Sintra): the promenade is real but no source mentions
   tiled benches, so its quest couldn't be done. The Ferreira de Castro House-Museum moves to Art &
   museums so Sintra keeps five places there.
@@ -273,11 +275,12 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
   blond ponytail, long black hair with a fringe, short black curls, a brown quiff, blond curtains,
   a high bun with gold hoops, and wavy black hair with round glasses. Drawn in
   `scripts/explorer-cartoons.mjs`; jackets still change colour with the shop skins.
-- The "new city unlocked" screen is now an illustrated postcard in the cut-paper style of the
-  Wandro stamps: a cream page, a hand-lettered welcome, and a landscape where the train, green
-  coach or plane crosses from your old city's landmark to the new one's (Pena, a Lisbon tram,
-  Porto's Clérigos and a rabelo boat, Évora's Roman temple, Aveiro's moliceiro and striped houses,
-  the Algarve cliffs). Artwork in `assets/trip`, drawn by `scripts/render-trip.mjs`; the title
+- The "new city unlocked" screen is now an illustrated postcard: a cream page, a hand-lettered
+  welcome, and a landscape where the train, green coach or plane crosses from your old city's
+  landmark to the new one's. The landscapes are drawn like a travel poster (soft sky, hills fading
+  into the haze, umbrella pines, olive groves, white villages, no outlines) and the landmarks are
+  engraved like each city's stamp: Pena, the Belém Tower, the Dom Luís I bridge, Évora's Roman
+  temple, Costa Nova's striped houses and a moliceiro, and Ponta da Piedade. Artwork in `assets/trip`, drawn by `scripts/render-trip.mjs`; the title
   uses the Shrikhand font. Reduce-motion still skips straight to the arrival.
 - More realistic explorers: all eight are redrawn as shaded, painted portraits (lit skin, real eyes,
   soft hair, a lit jacket), in every outfit.

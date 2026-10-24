@@ -63,7 +63,7 @@ export function PostageStamp({
 }: {
   region: Region;
   value?: number;
-  /** A place's own picture instead of the city's engraving (a challenge's stamp). */
+  /** Another picture instead of the city's engraving: a challenge's category art. */
   art?: ImageSource;
   /** Cancelled with the Wandro postmark: collected. An uncollected stamp is clean. */
   postmark?: boolean;
