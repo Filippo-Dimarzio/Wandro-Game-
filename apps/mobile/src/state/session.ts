@@ -113,6 +113,8 @@ interface SessionState extends DemoProgress {
   account: DemoAccount | null;
   /** Demo: logged in on this device (the server keeps its own session). */
   signedIn: boolean;
+  /** This device had a demo explorer that was cleared when the app connected to the server. */
+  demoRetired: boolean;
   challenge: DemoChallengeState | null;
   /** Demo position (teleport / keyboard walking). Null means real GPS. */
   teleport: LatLng | null;
@@ -201,6 +203,11 @@ interface SessionState extends DemoProgress {
   setTheme: (theme: ThemePref) => void;
   markStreakCelebrated: (day: string) => void;
   reset: () => void;
+  /**
+   * Clears a demo explorer once the app connects to the server: its login and progress only
+   * ever lived on this device, so the player creates a real account instead.
+   */
+  retireDemo: () => void;
 }
 
 const initial = {
@@ -209,6 +216,7 @@ const initial = {
   profile: null,
   account: null as DemoAccount | null,
   signedIn: false,
+  demoRetired: false,
   challenge: null,
   teleport: null,
   justUnlocked: null,
@@ -275,7 +283,13 @@ export const useSession = create<SessionState>()(
     (set, get) => ({
       ...initial,
       completeOnboarding: (profile, account) =>
-        set((s) => ({ onboarded: true, signedIn: true, profile, account: account ?? s.account })),
+        set((s) => ({
+          onboarded: true,
+          signedIn: true,
+          profile,
+          account: account ?? s.account,
+          demoRetired: false,
+        })),
       setAccount: (account) => set({ account }),
       signIn: () => set({ signedIn: true }),
       signOut: () => set({ signedIn: false, teleport: null }),
@@ -519,6 +533,13 @@ export const useSession = create<SessionState>()(
       setTheme: (theme) => set((s) => ({ prefs: { ...s.prefs, theme } })),
       markStreakCelebrated: (day) => set((s) => ({ prefs: { ...s.prefs, streakCelebrated: day } })),
       reset: () => set({ ...initial, friendChallenges: initialFriendChallenges() }),
+      retireDemo: () =>
+        set((s) => ({
+          ...initial,
+          friendChallenges: initialFriendChallenges(),
+          prefs: s.prefs,
+          demoRetired: true,
+        })),
     }),
     {
       name: 'wandro-session',

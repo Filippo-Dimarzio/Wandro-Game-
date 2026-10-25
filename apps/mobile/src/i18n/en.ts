@@ -33,6 +33,8 @@ export const en = {
   'login.demoNoAccount':
     'No explorer with that email on this device. Demo logins stay on the device where they were made.',
   'login.demoNote': 'Demo: your login and progress stay on this device.',
+  'login.wentLive':
+    'Wandro now has real accounts, so friends can find you. Your old test explorer only lived on this phone, so create your account again (the same email is fine).',
   'login.or': 'or',
   'login.newHere': 'New to Wandro?',
   'login.create': 'Create an account',

@@ -53,6 +53,7 @@ export default function Register() {
   const completeOnboarding = useSession((s) => s.completeOnboarding);
   const existing = useSession((s) => (s.onboarded ? (s.profile?.username ?? '') : null));
   const deviceAccount = useSession((s) => s.account);
+  const demoRetired = useSession((s) => s.demoRetired);
   const resetDevice = useSession((s) => s.reset);
   // A native demo build without WebCrypto can't check passwords, so it skips the login step.
   const withAccount = !isDemo || canHashPasswords();
@@ -170,6 +171,11 @@ export default function Register() {
                 <Text style={{ color: c.textMuted }}>{t('login.demoNote')}</Text>
               ) : (
                 <>
+                  {demoRetired && (
+                    <Text style={{ color: c.text, fontWeight: '600' }} testID="went-live-note">
+                      {t('login.wentLive')}
+                    </Text>
+                  )}
                   <Pressable
                     style={[styles.oauth, { backgroundColor: c.text }]}
                     onPress={() =>

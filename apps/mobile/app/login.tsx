@@ -33,6 +33,7 @@ export default function Login() {
   const username = useSession((s) => s.profile?.username);
   const signIn = useSession((s) => s.signIn);
   const completeOnboarding = useSession((s) => s.completeOnboarding);
+  const demoRetired = useSession((s) => s.demoRetired);
   const [email, setEmail] = useState(account?.email ?? '');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -108,6 +109,11 @@ export default function Login() {
           <View style={[styles.card, { backgroundColor: c.card, borderColor: c.border }]}>
             {isDemo && (
               <Text style={{ color: c.textMuted, fontSize: 13 }}>{t('login.demoNote')}</Text>
+            )}
+            {!isDemo && demoRetired && (
+              <Text style={{ color: c.text, fontWeight: '600' }} testID="went-live-note">
+                {t('login.wentLive')}
+              </Text>
             )}
             <CredentialsForm
               mode="login"

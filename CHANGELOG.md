@@ -6,6 +6,9 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Going live: when the app connects to the server and finds a demo explorer left on the device
+  (whose login only ever worked on that device), it clears it and opens account creation with a
+  note explaining why, instead of a login that can never succeed.
 - The W is the app icon everywhere: iPhones get an explicit home-screen icon
   (`apple-touch-icon.png`, they ignore the manifest), and the icon URLs and offline cache are
   renewed so devices drop any old cached octopus icon.
