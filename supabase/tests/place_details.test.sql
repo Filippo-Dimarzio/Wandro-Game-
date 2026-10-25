@@ -71,4 +71,6 @@ do $$ begin
 exception when check_violation then
   raise notice 'ok - details must be a JSON object';
 end $$;
+select pg_temp.check((select details ->> 'teaser' from places where source_id = 'cabo-da-roca') is not null,
+  'Cabo da Roca has its Learn facts (its seed row is cabo-da-roca)');
 rollback;

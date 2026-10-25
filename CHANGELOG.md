@@ -6,6 +6,8 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Fixed: Cabo da Roca's Learn facts now reach the app (they were saved under the wrong place name;
+  migration `20261107090000_cabo_da_roca_details`).
 - Sign-in: the Google and Apple buttons only show once that provider is switched on in
   Supabase (instead of opening a raw "provider is not enabled" page), and a confirmation or reset
   email the mail sender refuses now gets a plain "couldn't send the email" message.
