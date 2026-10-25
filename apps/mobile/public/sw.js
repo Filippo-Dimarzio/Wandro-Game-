@@ -1,6 +1,6 @@
 // Wandro service worker: lets the web app install on desktops and open offline.
 // Network first (always fresh when online); cached copy when offline. Map tiles are not cached.
-const CACHE = 'wandro-v2';
+const CACHE = 'wandro-v3';
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => {

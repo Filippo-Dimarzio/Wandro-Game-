@@ -51,6 +51,8 @@ const outputs = [
   [`${mobile}/assets/favicon.png`, rounded(mark(CREAM, SUN, 0.86)), 48, true],
   [`${mobile}/public/icon-192.png`, svg(mark(CREAM, SUN, 0.86), TEAL), 192, false],
   [`${mobile}/public/icon-512.png`, svg(mark(CREAM, SUN, 0.86), TEAL), 512, false],
+  // "Add to Home Screen" on iPhone: full-bleed, iOS rounds the corners.
+  [`${mobile}/public/apple-touch-icon.png`, svg(mark(CREAM, SUN, 0.86), TEAL), 180, false],
   [`${desktop}/resources/icon.png`, rounded(mark(CREAM, SUN, 0.82)), 1024, true],
 ];
 

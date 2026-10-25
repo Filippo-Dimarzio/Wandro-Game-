@@ -6,6 +6,9 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- The W is the app icon everywhere: iPhones get an explicit home-screen icon
+  (`apple-touch-icon.png`, they ignore the manifest), and the icon URLs and offline cache are
+  renewed so devices drop any old cached octopus icon.
 - Trails: walk a story through 4–5 places in order and solve a clue at each stop by looking around
   you there. Hints and wrong answers cost a few of the stop's coins; finishing pays 50 coins and
   counts as a challenge. Free, with no time limit. Two Sintra trails to start: "The Artist King"

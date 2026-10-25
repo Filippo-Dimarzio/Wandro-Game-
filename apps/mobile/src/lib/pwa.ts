@@ -40,6 +40,16 @@ export function setupPwa(): void {
     theme.name = 'theme-color';
     theme.content = '#0E7C66';
     document.head.appendChild(theme);
+    // iPhones take the home-screen icon from this, not the manifest; without it Safari falls back
+    // to the domain root's icon or a screenshot. `v` makes devices fetch the W, not a cached icon.
+    const touch = document.createElement('link');
+    touch.rel = 'apple-touch-icon';
+    touch.href = `${base}/apple-touch-icon.png?v=w`;
+    document.head.appendChild(touch);
+    const title = document.createElement('meta');
+    title.name = 'apple-mobile-web-app-title';
+    title.content = 'Wandro';
+    document.head.appendChild(title);
   }
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register(`${base}/sw.js`, { scope: `${base}/` }).catch(() => undefined);
