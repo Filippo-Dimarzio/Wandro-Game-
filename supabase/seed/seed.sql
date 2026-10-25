@@ -675,6 +675,106 @@ on conflict (trail_id, position) do update set place_id = excluded.place_id, sto
 insert into public.trail_secrets (trail_id, position, answer, hints)
 select t.id, 4, 'Pena Palace', array['It is on the highest peak you can see.', 'It is red and yellow.', 'Ferdinand II built it.']::text[] from public.trails t where t.slug = 'sintra-magpies-millionaire'
 on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trails (slug, region_id, title, intro, outro, theme, position)
+select 'lisbon-belem', r.id, 'Ships, Monks and Custard Tarts', 'Five hundred years ago, the ships that sailed for India left from this shore, and the money they brought home built Belém. Walk west along the river from a power station to the tower that guarded the Tagus.', 'From spice-trade riches to monks’ pastries and a fortress in the river: you’ve walked Belém’s golden age end to end.', 'heritage', 3
+from public.regions r where r.slug = 'lisbon'
+on conflict (slug) do update set title = excluded.title, intro = excluded.intro, outro = excluded.outro,
+  theme = excluded.theme, position = excluded.position;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 1, p.id, 'Amanda Levete’s studio AL_A designed this wave-shaped museum. Next door, the brick Tejo Power Station lit up Lisbon from 1909 until it closed in 1975.', 'Walk to the brick power station next door. What museum does it house today?', 'choice', array['The Electricity Museum', 'The Coach Museum', 'The Navy Museum', 'The Tile Museum']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'lisbon-maat'
+where t.slug = 'lisbon-belem'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 1, 'The Electricity Museum', array['Read the sign by the entrance.', 'Think about what the station used to make.', 'It lit up the city.']::text[] from public.trails t where t.slug = 'lisbon-belem'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 2, p.id, 'Monks at the Jerónimos Monastery first made these pastries. Convents starched their habits with egg whites, so the leftover yolks went into sweets. When the monastery closed in 1834, the recipe went to a sugar refinery, whose owners opened this bakery in 1837.', 'Peek at the counter (or order one). What fills the famous pastry?', 'choice', array['Egg custard', 'Chocolate', 'Almond paste', 'Fig jam']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'lisbon-pasteis-belem'
+where t.slug = 'lisbon-belem'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 2, 'Egg custard', array['Remember the leftover yolks.', 'It is yellow and wobbly.', 'Sprinkle it with cinnamon.']::text[] from public.trails t where t.slug = 'lisbon-belem'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 3, p.id, 'King Manuel I ordered this monastery in 1495, paid for with a tax on the profits of the yearly India fleets. The Treaty of Lisbon was signed here in 2007.', 'Two heroes lie in carved tombs here. One is the poet Luís de Camões. Who is the other?', 'choice', array['Vasco da Gama', 'Pedro Álvares Cabral', 'Henry the Navigator', 'Ferdinand Magellan']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'lisbon-jeronimos'
+where t.slug = 'lisbon-belem'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 3, 'Vasco da Gama', array['The tombs are near the church entrance.', 'He sailed to India.', 'His first name is Vasco.']::text[] from public.trails t where t.slug = 'lisbon-belem'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 4, p.id, 'The Berardo Collection Museum opened here in 2007 with more than 1,000 works on show. The museum has since been renamed.', 'Look at the signs. What is the museum here called since October 2023?', 'choice', array['MAC/CCB', 'Berardo Museum', 'MAAT', 'Gulbenkian Museum']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'lisbon-berardo'
+where t.slug = 'lisbon-belem'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 4, 'MAC/CCB', array['It is named after the cultural centre it sits in.', 'CCB is part of the name.', 'It starts with MAC.']::text[] from public.trails t where t.slug = 'lisbon-belem'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 5, p.id, 'Francisco de Arruda, King Manuel I’s “Master of the works”, built this tower from about 1514 to 1519, carved from lioz, the local limestone, with twisted rope, armillary spheres and crosses.', 'Look up at the turrets. What shape are their ribbed little roofs?', 'choice', array['Domes', 'Spires', 'Pyramids', 'Flat terraces']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'lisbon-belem-tower'
+where t.slug = 'lisbon-belem'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 5, 'Domes', array['They show the influence of Moorish architecture.', 'They are rounded.', 'Like half an orange.']::text[] from public.trails t where t.slug = 'lisbon-belem'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trails (slug, region_id, title, intro, outro, theme, position)
+select 'lisbon-alfama', r.id, 'Saints, Fado and a Castle Gate', 'Climb from the river through Lisbon’s oldest quarters: a saint’s birthplace, a castle older than Portugal, the street where fado found its first star, and a viewpoint over the whole city.', 'You’ve climbed from the river to the top of the city, through the streets where Lisbon’s saints, kings and fado singers lived.', 'heritage', 4
+from public.regions r where r.slug = 'lisbon'
+on conflict (slug) do update set title = excluded.title, intro = excluded.intro, outro = excluded.outro,
+  theme = excluded.theme, position = excluded.position;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 1, p.id, 'Brás de Albuquerque built this house of spikes after seeing Italy’s Renaissance palaces from 1521. It later stored salted cod, and since 2012 it has housed the José Saramago Foundation.', 'José Saramago’s ashes lie under a tree out front. What kind of tree?', 'choice', array['An olive tree', 'An orange tree', 'A cork oak', 'A palm tree']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'lisbon-casa-dos-bicos'
+where t.slug = 'lisbon-alfama'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 1, 'An olive tree', array['It is a very Portuguese tree.', 'Its fruit makes oil.', 'It is grey-green and silvery.']::text[] from public.trails t where t.slug = 'lisbon-alfama'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 2, p.id, 'Tradition says Saint Anthony was born right here in 1195, as Fernando Martins de Bulhões. Lisbon still celebrates him every 13 June.', 'Go down to the crypt. What does it mark?', 'choice', array['The room where Saint Anthony was born', 'Saint Anthony’s tomb', 'A Roman well', 'The royal treasury']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'lisbon-santo-antonio'
+where t.slug = 'lisbon-alfama'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 2, 'The room where Saint Anthony was born', array['His tomb is far away, in Padua.', 'Think about the start of his life.', 'Tradition says it happened in 1195.']::text[] from public.trails t where t.slug = 'lisbon-alfama'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 3, p.id, 'Phoenicians, Carthaginians, Romans and Moors all held this hill before the Portuguese took it in 1147. Legend says a knight jammed one of the gates open with his own body.', 'Find the knight’s bust watching over a castle gate. Who is he?', 'choice', array['Martim Moniz', 'Afonso Henriques', 'Saint George', 'King Denis']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'lisbon-sao-jorge'
+where t.slug = 'lisbon-alfama'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 3, 'Martim Moniz', array['The gate is named after him.', 'A square down the hill has his name too.', 'His first name is Martim.']::text[] from public.trails t where t.slug = 'lisbon-alfama'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 4, p.id, 'After the reconquest, Lisbon’s Muslims were confined to this quarter, the Mouraria. Maria Severa, the first famous fado singer, died on this street in 1846, aged 26.', 'An instrument is carved in marble on this street. Which one?', 'choice', array['A Portuguese guitar', 'A violin', 'An accordion', 'A drum']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'lisbon-mouraria'
+where t.slug = 'lisbon-alfama'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 4, 'A Portuguese guitar', array['It is the instrument of fado.', 'It is pear-shaped.', 'It has twelve strings.']::text[] from public.trails t where t.slug = 'lisbon-alfama'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 5, p.id, 'The trail ends with the city at your feet. The little white chapel here is from the 18th century, and inside is a chair believed to ease childbirth. Portuguese queens came to try it.', 'The chapel is dedicated to a bishop martyred in Roman times. Who?', 'choice', array['Saint Gens', 'Saint Anthony', 'Saint George', 'Saint Vincent']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'lisbon-senhora-do-monte'
+where t.slug = 'lisbon-alfama'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 5, 'Saint Gens', array['Look for the name by the chapel door.', 'It is not the saint from earlier on this trail.', 'A short name: four letters.']::text[] from public.trails t where t.slug = 'lisbon-alfama'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
 -- END generated Europe places and city sets
 
 insert into public.place_stats (place_id)

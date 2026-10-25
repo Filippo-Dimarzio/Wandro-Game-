@@ -8,7 +8,10 @@ import {
   normalizeAnswer,
   TRAIL_HINTS,
   TRAIL_MIN_STOP_COINS,
+  TRAIL_COMPLETE_COINS,
   TRAIL_STOP_COINS,
+  TRAIL_UNLOCK_AFTER,
+  TRAIL_UNLOCK_COINS,
   trailStopCoins,
   trailWalk,
   TRAILS,
@@ -28,6 +31,14 @@ describe('trails', () => {
     expect(trailStopCoins(1, 0)).toBe(15);
     expect(trailStopCoins(1, 1)).toBe(10);
     expect(trailStopCoins(3, 4)).toBe(TRAIL_MIN_STOP_COINS);
+  });
+
+  it('a trail is a treat to save up for: unlocking costs more than a perfect run pays back', () => {
+    expect(TRAIL_UNLOCK_AFTER).toBe(5);
+    for (const t of TRAILS) {
+      const back = TRAIL_STOP_COINS * t.stops.length + TRAIL_COMPLETE_COINS;
+      expect(TRAIL_UNLOCK_COINS).toBeGreaterThan(back);
+    }
   });
 
   it('answers ignore case and extra spaces', () => {

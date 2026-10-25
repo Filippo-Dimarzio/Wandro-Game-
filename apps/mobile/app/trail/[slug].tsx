@@ -18,6 +18,9 @@ import {
   TRAIL_HINTS,
   TRAIL_PENALTY,
   TRAIL_STOP_COINS,
+  TRAIL_UNLOCK_AFTER,
+  TRAIL_UNLOCK_COINS,
+  regionBySlug,
 } from '@wandro/shared';
 import { CATEGORY_META } from '@/categories';
 import { FitImage } from '@/components/FitImage';
@@ -34,18 +37,19 @@ import {
   type TrailStopView,
   type TrailView,
 } from '@/data/trails';
+import { useWallet } from '@/data/wallet';
 import { t, type TranslationKey } from '@/i18n';
 import { column, radius, shadow, space, useColors } from '@/theme';
 
 /**
- * One trail: the story so far, then each stop in order. The next stop opens its clue once you've
- * discovered the place; the ones after it stay locked until you solve it. Nothing is timed.
+ * One trail: the story so far, then each stop in order. It unlocks after 5 discoveries in its city
+ * and 300 earned coins. The next stop opens its clue once you've discovered the place; the ones
+ * after it stay locked until you solve it. Nothing is timed.
  */
 export default function TrailScreen() {
   const c = useColors();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { trail, isLoading } = useTrail(slug);
-  const start = useStartTrail();
 
   if (!trail) {
     return (
@@ -78,8 +82,8 @@ export default function TrailScreen() {
           />
         </View>
         <Text style={[styles.meta, { color: c.textMuted }]}>
-          {t('trail.stops', { count: trail.stops.length })} · {trailWalkLabel(trail)} ·{' '}
-          {t('trail.free')}
+          {t('trail.stops', { count: trail.stops.length })} · {trailWalkLabel(trail)}
+          {trail.startedAt ? '' : ` · ${t('trail.price', { coins: TRAIL_UNLOCK_COINS })}`}
         </Text>
         <Text style={[styles.body, { color: c.text }]}>{trail.intro}</Text>
         <View style={[styles.note, { backgroundColor: c.goldSoft }]}>
@@ -90,17 +94,7 @@ export default function TrailScreen() {
           </Text>
         </View>
 
-        {!trail.startedAt && (
-          <Pressable
-            onPress={() => start.mutate(trail.slug)}
-            disabled={start.isPending}
-            accessibilityRole="button"
-            style={[styles.primary, { backgroundColor: c.accent }]}
-            testID="trail-start"
-          >
-            <Text style={[styles.primaryText, { color: c.accentOn }]}>{t('trail.start')}</Text>
-          </Pressable>
-        )}
+        {!trail.startedAt && <Unlock trail={trail} />}
 
         <View style={{ gap: space.md }}>
           {trail.stops.map((s, i) => (
@@ -124,6 +118,78 @@ export default function TrailScreen() {
         )}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+/**
+ * Before a trail starts: locked until you've discovered TRAIL_UNLOCK_AFTER places in its city,
+ * then unlocked with coins you've earned (never bought).
+ */
+function Unlock({ trail }: { trail: TrailView }) {
+  const c = useColors();
+  const wallet = useWallet();
+  const start = useStartTrail();
+  const city = regionBySlug(trail.region)?.name ?? '';
+  const done = Math.min(trail.discoveries, TRAIL_UNLOCK_AFTER);
+  const back = TRAIL_STOP_COINS * trail.stops.length + TRAIL_COMPLETE_COINS;
+  const short = TRAIL_UNLOCK_COINS - wallet.coins;
+
+  if (done < TRAIL_UNLOCK_AFTER) {
+    return (
+      <View style={[styles.lock, { backgroundColor: c.surface }]} testID="trail-locked">
+        <View style={styles.lockRow}>
+          <Ionicons name="lock-closed" size={20} color={c.textMuted} />
+          <Text style={{ color: c.text, flex: 1, fontWeight: '700' }}>
+            {t('trail.lockedCity', { count: TRAIL_UNLOCK_AFTER - done, city })}
+          </Text>
+        </View>
+        <View
+          style={[styles.bar, { backgroundColor: c.border }]}
+          accessible
+          accessibilityRole="progressbar"
+          accessibilityLabel={t('trail.cityProgress', { done, total: TRAIL_UNLOCK_AFTER, city })}
+          accessibilityValue={{ min: 0, max: TRAIL_UNLOCK_AFTER, now: done }}
+        >
+          <View
+            style={[
+              styles.barFill,
+              { backgroundColor: c.accent, width: `${(done / TRAIL_UNLOCK_AFTER) * 100}%` },
+            ]}
+          />
+        </View>
+        <Text style={{ color: c.textMuted }}>
+          {t('trail.cityProgress', { done, total: TRAIL_UNLOCK_AFTER, city })}
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ gap: space.sm }}>
+      <Pressable
+        onPress={() => start.mutate(trail.slug)}
+        disabled={start.isPending || short > 0}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: start.isPending || short > 0 }}
+        style={[styles.primary, { backgroundColor: c.accent, opacity: short > 0 ? 0.5 : 1 }]}
+        testID="trail-start"
+      >
+        <Ionicons name="lock-open" size={18} color={c.accentOn} />
+        <Text style={[styles.primaryText, { color: c.accentOn }]}>
+          {t('trail.unlock', { coins: TRAIL_UNLOCK_COINS })}
+        </Text>
+      </Pressable>
+      <Text style={{ color: c.textMuted, textAlign: 'center' }}>
+        {short > 0
+          ? t('trail.needCoins', { count: short })
+          : t('trail.balance', { coins: wallet.coins, back })}
+      </Text>
+      {start.isError && (
+        <Text style={{ color: c.danger, textAlign: 'center' }} accessibilityLiveRegion="polite">
+          {t(`trail.error.${trailErrorCode(start.error)}` as TranslationKey)}
+        </Text>
+      )}
+    </View>
   );
 }
 
@@ -413,5 +479,9 @@ const styles = StyleSheet.create({
     fontSize: 17,
   },
   done: { borderRadius: radius.lg, padding: space.lg, gap: space.sm },
+  lock: { borderRadius: radius.lg, padding: space.md, gap: space.sm },
+  lockRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  bar: { height: 10, borderRadius: 5, overflow: 'hidden' },
+  barFill: { height: '100%', borderRadius: 5 },
   doneTitle: { fontSize: 18, fontWeight: '900' },
 });

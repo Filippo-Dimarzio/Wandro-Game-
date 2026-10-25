@@ -17,9 +17,11 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
   renewed so devices drop any old cached octopus icon.
 - Trails: walk a story through 4–5 places in order and solve a clue at each stop by looking around
   you there. Hints and wrong answers cost a few of the stop's coins; finishing pays 50 coins and
-  counts as a challenge. Free, with no time limit. Two Sintra trails to start: "The Artist King"
-  (Castle of the Moors to the Countess of Edla's Chalet) and "Kings, Magpies and a Millionaire"
-  (Santa Maria Church to Seteais). On Home under Trails (migration `20261105090000_trails`).
+  counts as a challenge. No time limit. A trail is a treat to save up for: it opens after 5
+  discoveries in its city and costs 300 earned coins to unlock (a perfect run pays back up to
+  150). Four to start: "The Artist King" and "Kings, Magpies and a Millionaire" in Sintra, "Ships,
+  Monks and Custard Tarts" (Belém) and "Saints, Fado and a Castle Gate" (Alfama) in Lisbon. On Home
+  under Trails (migrations `20261105090000_trails`, `20261106090000_trail_unlocks`).
 - A completed activity pays at most 50 coins: everything one discovered place earns (rarity,
   pioneer bonus, set step) shares the cap, and a daily challenge is capped on its own. Boosts you
   bought (time-of-day key, friend beacon) still pay on top. The server enforces it with one ledger

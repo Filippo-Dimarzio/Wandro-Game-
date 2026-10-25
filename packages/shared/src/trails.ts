@@ -20,6 +20,13 @@ export const TRAIL_MIN_STOP_COINS = 5;
 export const TRAIL_COMPLETE_COINS = 50;
 /** Hints per stop; each one gives more away. */
 export const TRAIL_HINTS = 3;
+/**
+ * A trail is a treat to save up for: it opens once you've discovered this many places in its
+ * city (the same step as hidden gems), and then costs TRAIL_UNLOCK_COINS to start. A perfect run
+ * pays back about half, so trails also keep coins meaningful.
+ */
+export const TRAIL_UNLOCK_AFTER = 5;
+export const TRAIL_UNLOCK_COINS = 300;
 /** Average walking pace, for the "about N min" estimate. */
 const WALK_M_PER_MIN = 75;
 /** Paths wind: straight-line distance times this is closer to the real walk. */
@@ -34,6 +41,8 @@ export const TRAIL_ERRORS = [
   'already_solved',
   'no_more_hints',
   'not_discovered',
+  'locked',
+  'insufficient_coins',
 ] as const;
 export type TrailError = (typeof TRAIL_ERRORS)[number];
 
@@ -245,6 +254,202 @@ export const TRAILS: Trail[] = [
           'It is on the highest peak you can see.',
           'It is red and yellow.',
           'Ferdinand II built it.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'lisbon-belem',
+    region: 'lisbon',
+    title: 'Ships, Monks and Custard Tarts',
+    intro:
+      'Five hundred years ago, the ships that sailed for India left from this shore, and the money they brought home built Belém. Walk west along the river from a power station to the tower that guarded the Tagus.',
+    outro:
+      'From spice-trade riches to monks’ pastries and a fortress in the river: you’ve walked Belém’s golden age end to end.',
+    theme: 'heritage',
+    stops: [
+      {
+        placeId: 'demo-lisbon-maat',
+        story:
+          'Amanda Levete’s studio AL_A designed this wave-shaped museum. Next door, the brick Tejo Power Station lit up Lisbon from 1909 until it closed in 1975.',
+        clue: {
+          kind: 'choice',
+          question: 'Walk to the brick power station next door. What museum does it house today?',
+          choices: [
+            'The Electricity Museum',
+            'The Coach Museum',
+            'The Navy Museum',
+            'The Tile Museum',
+          ],
+          answer: 'The Electricity Museum',
+        },
+        hints: [
+          'Read the sign by the entrance.',
+          'Think about what the station used to make.',
+          'It lit up the city.',
+        ],
+      },
+      {
+        placeId: 'demo-lisbon-pasteis-belem',
+        story:
+          'Monks at the Jerónimos Monastery first made these pastries. Convents starched their habits with egg whites, so the leftover yolks went into sweets. When the monastery closed in 1834, the recipe went to a sugar refinery, whose owners opened this bakery in 1837.',
+        clue: {
+          kind: 'choice',
+          question: 'Peek at the counter (or order one). What fills the famous pastry?',
+          choices: ['Egg custard', 'Chocolate', 'Almond paste', 'Fig jam'],
+          answer: 'Egg custard',
+        },
+        hints: [
+          'Remember the leftover yolks.',
+          'It is yellow and wobbly.',
+          'Sprinkle it with cinnamon.',
+        ],
+      },
+      {
+        placeId: 'demo-lisbon-jeronimos',
+        story:
+          'King Manuel I ordered this monastery in 1495, paid for with a tax on the profits of the yearly India fleets. The Treaty of Lisbon was signed here in 2007.',
+        clue: {
+          kind: 'choice',
+          question:
+            'Two heroes lie in carved tombs here. One is the poet Luís de Camões. Who is the other?',
+          choices: [
+            'Vasco da Gama',
+            'Pedro Álvares Cabral',
+            'Henry the Navigator',
+            'Ferdinand Magellan',
+          ],
+          answer: 'Vasco da Gama',
+        },
+        hints: [
+          'The tombs are near the church entrance.',
+          'He sailed to India.',
+          'His first name is Vasco.',
+        ],
+      },
+      {
+        placeId: 'demo-lisbon-berardo',
+        story:
+          'The Berardo Collection Museum opened here in 2007 with more than 1,000 works on show. The museum has since been renamed.',
+        clue: {
+          kind: 'choice',
+          question: 'Look at the signs. What is the museum here called since October 2023?',
+          choices: ['MAC/CCB', 'Berardo Museum', 'MAAT', 'Gulbenkian Museum'],
+          answer: 'MAC/CCB',
+        },
+        hints: [
+          'It is named after the cultural centre it sits in.',
+          'CCB is part of the name.',
+          'It starts with MAC.',
+        ],
+      },
+      {
+        placeId: 'demo-lisbon-belem-tower',
+        story:
+          'Francisco de Arruda, King Manuel I’s “Master of the works”, built this tower from about 1514 to 1519, carved from lioz, the local limestone, with twisted rope, armillary spheres and crosses.',
+        clue: {
+          kind: 'choice',
+          question: 'Look up at the turrets. What shape are their ribbed little roofs?',
+          choices: ['Domes', 'Spires', 'Pyramids', 'Flat terraces'],
+          answer: 'Domes',
+        },
+        hints: [
+          'They show the influence of Moorish architecture.',
+          'They are rounded.',
+          'Like half an orange.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'lisbon-alfama',
+    region: 'lisbon',
+    title: 'Saints, Fado and a Castle Gate',
+    intro:
+      'Climb from the river through Lisbon’s oldest quarters: a saint’s birthplace, a castle older than Portugal, the street where fado found its first star, and a viewpoint over the whole city.',
+    outro:
+      'You’ve climbed from the river to the top of the city, through the streets where Lisbon’s saints, kings and fado singers lived.',
+    theme: 'heritage',
+    stops: [
+      {
+        placeId: 'demo-lisbon-casa-dos-bicos',
+        story:
+          'Brás de Albuquerque built this house of spikes after seeing Italy’s Renaissance palaces from 1521. It later stored salted cod, and since 2012 it has housed the José Saramago Foundation.',
+        clue: {
+          kind: 'choice',
+          question: 'José Saramago’s ashes lie under a tree out front. What kind of tree?',
+          choices: ['An olive tree', 'An orange tree', 'A cork oak', 'A palm tree'],
+          answer: 'An olive tree',
+        },
+        hints: [
+          'It is a very Portuguese tree.',
+          'Its fruit makes oil.',
+          'It is grey-green and silvery.',
+        ],
+      },
+      {
+        placeId: 'demo-lisbon-santo-antonio',
+        story:
+          'Tradition says Saint Anthony was born right here in 1195, as Fernando Martins de Bulhões. Lisbon still celebrates him every 13 June.',
+        clue: {
+          kind: 'choice',
+          question: 'Go down to the crypt. What does it mark?',
+          choices: [
+            'The room where Saint Anthony was born',
+            'Saint Anthony’s tomb',
+            'A Roman well',
+            'The royal treasury',
+          ],
+          answer: 'The room where Saint Anthony was born',
+        },
+        hints: [
+          'His tomb is far away, in Padua.',
+          'Think about the start of his life.',
+          'Tradition says it happened in 1195.',
+        ],
+      },
+      {
+        placeId: 'demo-lisbon-sao-jorge',
+        story:
+          'Phoenicians, Carthaginians, Romans and Moors all held this hill before the Portuguese took it in 1147. Legend says a knight jammed one of the gates open with his own body.',
+        clue: {
+          kind: 'choice',
+          question: 'Find the knight’s bust watching over a castle gate. Who is he?',
+          choices: ['Martim Moniz', 'Afonso Henriques', 'Saint George', 'King Denis'],
+          answer: 'Martim Moniz',
+        },
+        hints: [
+          'The gate is named after him.',
+          'A square down the hill has his name too.',
+          'His first name is Martim.',
+        ],
+      },
+      {
+        placeId: 'demo-lisbon-mouraria',
+        story:
+          'After the reconquest, Lisbon’s Muslims were confined to this quarter, the Mouraria. Maria Severa, the first famous fado singer, died on this street in 1846, aged 26.',
+        clue: {
+          kind: 'choice',
+          question: 'An instrument is carved in marble on this street. Which one?',
+          choices: ['A Portuguese guitar', 'A violin', 'An accordion', 'A drum'],
+          answer: 'A Portuguese guitar',
+        },
+        hints: ['It is the instrument of fado.', 'It is pear-shaped.', 'It has twelve strings.'],
+      },
+      {
+        placeId: 'demo-lisbon-senhora-do-monte',
+        story:
+          'The trail ends with the city at your feet. The little white chapel here is from the 18th century, and inside is a chair believed to ease childbirth. Portuguese queens came to try it.',
+        clue: {
+          kind: 'choice',
+          question: 'The chapel is dedicated to a bishop martyred in Roman times. Who?',
+          choices: ['Saint Gens', 'Saint Anthony', 'Saint George', 'Saint Vincent'],
+          answer: 'Saint Gens',
+        },
+        hints: [
+          'Look for the name by the chapel door.',
+          'It is not the saint from earlier on this trail.',
+          'A short name: four letters.',
         ],
       },
     ],

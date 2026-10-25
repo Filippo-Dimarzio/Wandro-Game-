@@ -1,5 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { DEMO_PLACES, TRAIL_ERRORS, TRAILS, type Category, type TrailError } from '@wandro/shared';
+import {
+  DEMO_PLACES,
+  regionFor,
+  TRAIL_ERRORS,
+  TRAILS,
+  type Category,
+  type TrailError,
+} from '@wandro/shared';
 import type { ClueResult } from '@/demo/trails';
 import { isDemo } from '@/lib/env';
 import { supabase } from '@/lib/supabase';
@@ -33,6 +40,8 @@ export interface TrailView {
   theme: Category;
   startedAt: string | null;
   completedAt: string | null;
+  /** Places you've discovered in the trail's city; it unlocks at TRAIL_UNLOCK_AFTER. */
+  discoveries: number;
   stops: TrailStopView[];
 }
 
@@ -52,6 +61,9 @@ function useDemoTrails(): TrailView[] {
   const unlocked = useSession((s) => s.unlocked);
   return TRAILS.map((t) => {
     const progress = state[t.slug];
+    const discoveries = DEMO_PLACES.filter(
+      (p) => unlocked[p.id] && (p.region ?? regionFor(p)?.slug) === t.region,
+    ).length;
     return {
       slug: t.slug,
       region: t.region,
@@ -61,6 +73,7 @@ function useDemoTrails(): TrailView[] {
       theme: t.theme,
       startedAt: progress?.startedAt ?? null,
       completedAt: progress?.completedAt ?? null,
+      discoveries,
       stops: t.stops.map((s, i) => {
         const place = DEMO_PLACES.find((p) => p.id === s.placeId);
         const st = progress?.stops[i + 1];
@@ -94,6 +107,7 @@ interface ServerTrail {
   theme: Category;
   started_at: string | null;
   completed_at: string | null;
+  discoveries: number;
   stops: {
     position: number;
     place_id: string;
@@ -130,6 +144,7 @@ export function useTrails(): { trails: TrailView[]; isLoading: boolean } {
         theme: t.theme,
         startedAt: t.started_at,
         completedAt: t.completed_at,
+        discoveries: t.discoveries,
         stops: t.stops.map((s) => ({
           position: s.position,
           placeId: s.place_id,
@@ -174,7 +189,7 @@ export function useStartTrail() {
       const { error } = await supabase!.rpc('start_trail', { p_trail: slug });
       if (error) throw new Error(error.message);
     },
-    onSuccess: () => refresh(false),
+    onSuccess: () => refresh(true),
   });
 }
 

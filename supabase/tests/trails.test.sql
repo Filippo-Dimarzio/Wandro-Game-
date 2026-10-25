@@ -5,13 +5,17 @@ insert into auth.users (id, raw_user_meta_data) values
   ('00000000-0000-0000-0000-0000000000d1', '{"username":"trailwalker"}'),
   ('00000000-0000-0000-0000-0000000000d2', '{"username":"couchpotato"}');
 
-select pg_temp.check((select count(*) from trails) = 2, 'two Sintra trails are seeded');
+select pg_temp.check((select count(*) from trails t join regions r on r.id = t.region_id where r.slug = 'sintra') = 2
+  and (select count(*) from trails t join regions r on r.id = t.region_id where r.slug = 'lisbon') = 2,
+  'two trails each in Sintra and Lisbon');
+select pg_temp.check((select count(*) from trail_stops s join trails t on t.id = s.trail_id
+                      where t.slug in ('lisbon-belem', 'lisbon-alfama')) = 10, 'every Lisbon stop is seeded');
 select pg_temp.check((select count(*) from trail_stops s join trails t on t.id = s.trail_id
                       where t.slug = 'sintra-magpies-millionaire') = 4, 'the old-town trail has four stops');
 
 -- Nobody can read answers or hints, or write progress.
 select pg_temp.as_anon();
-select pg_temp.check((select count(*) from my_trails()) = 2, 'anyone can see the trails');
+select pg_temp.check((select count(*) from my_trails()) = 4, 'anyone can see the trails');
 do $$ begin
   perform 1 from trail_secrets;
   raise exception 'reading secrets should fail';
@@ -38,8 +42,50 @@ exception when others then
   if sqlerrm <> 'not_started' then raise; end if;
   raise notice 'ok - you start a trail before answering';
 end $$;
+do $$ begin
+  perform start_trail('sintra-magpies-millionaire');
+  raise exception 'starting before 5 discoveries should fail';
+exception when others then
+  if sqlerrm <> 'locked' then raise; end if;
+  raise notice 'ok - a trail is locked until you have discovered 5 places in its city';
+end $$;
+reset role;
+
+-- Five Sintra discoveries (none of them on this trail) open it, but they pay at most 250 coins.
+do $$ begin
+  perform award_visit('00000000-0000-0000-0000-0000000000d1', pg_temp.place_id(x), 38.79, -9.39, 8, 130)
+  from unnest(array['pena', 'mouros', 'monserrate', 'capuchos', 'adraga']) as x;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d1');
+select pg_temp.check((select discoveries from my_trails() where slug = 'sintra-magpies-millionaire') = 5
+  and (select discoveries from my_trails() where slug = 'lisbon-belem') = 0,
+  'my_trails counts your discoveries in each trail''s city');
+do $$ begin
+  perform start_trail('lisbon-belem');
+  raise exception 'Lisbon should still be locked';
+exception when others then
+  if sqlerrm <> 'locked' then raise; end if;
+  raise notice 'ok - discoveries only count in the trail''s own city';
+end $$;
+do $$ begin
+  perform start_trail('sintra-magpies-millionaire');
+  raise exception 'starting with under 300 coins should fail';
+exception when others then
+  if sqlerrm <> 'insufficient_coins' then raise; end if;
+  raise notice 'ok - unlocking a trail costs 300 coins';
+end $$;
+reset role;
+insert into points_ledger (user_id, kind, points) values ('00000000-0000-0000-0000-0000000000d1', 'moderation', 100);
+create temp table before_unlock on commit drop as
+  select sum(points) as coins from points_ledger where user_id = '00000000-0000-0000-0000-0000000000d1';
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d1');
 do $$ begin perform start_trail('sintra-magpies-millionaire'); perform start_trail('sintra-magpies-millionaire'); end $$;
 select pg_temp.check((select count(*) from trail_progress) = 1, 'starting twice is harmless (resume)');
+reset role;
+select pg_temp.check((select sum(points) from points_ledger where user_id = '00000000-0000-0000-0000-0000000000d1')
+                     = (select coins from before_unlock) - 300,
+  'unlocking takes 300 coins once, and resuming is free');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d1');
 do $$ begin
   perform answer_trail_clue('sintra-magpies-millionaire', 1, '3');
   raise exception 'answering away from the place should fail';

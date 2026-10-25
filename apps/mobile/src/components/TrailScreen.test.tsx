@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { router } from 'expo-router';
 import TrailScreen from '../../app/trail/[slug]';
 import { useSession } from '@/state/session';
+import { grantCoins } from '@/test/grantCoins';
 import { queryWrapper } from '@/test/queryWrapper';
 
 jest.mock('expo-router', () => ({
@@ -23,15 +24,36 @@ const unlock = (id: string) =>
     },
   }));
 
+// Five Sintra discoveries that aren't on the old-town trail open it.
+const OPENERS = ['demo-pena', 'demo-mouros', 'demo-monserrate', 'demo-capuchos', 'demo-adraga'];
+
 describe('Trail screen', () => {
   beforeEach(() => useSession.getState().reset());
 
-  it('starts, guides you to an undiscovered stop, then takes hints and answers', async () => {
+  it('stays locked until 5 discoveries in the city, then needs 300 coins', async () => {
+    OPENERS.slice(0, 3).forEach(unlock);
+    await render(<TrailScreen />, { wrapper });
+    expect(screen.getByTestId('trail-locked')).toBeTruthy();
+    expect(screen.getByText('Discover 2 more places in Sintra to unlock this trail.')).toBeTruthy();
+    expect(screen.queryByTestId('trail-start')).toBeNull();
+
+    OPENERS.slice(3).forEach(unlock);
+    grantCoins(250);
+    expect(await screen.findByTestId('trail-start')).toBeDisabled();
+    expect(screen.getByText(/Earn 50 more coins/)).toBeTruthy();
+  });
+
+  it('unlocks, guides you to an undiscovered stop, then takes hints and answers', async () => {
+    OPENERS.forEach(unlock);
+    grantCoins(400);
     await render(<TrailScreen />, { wrapper });
     expect(screen.getByText('Kings, Magpies and a Millionaire')).toBeTruthy();
     expect(screen.queryByTestId('trail-guide')).toBeNull();
 
     await fireEvent.press(screen.getByTestId('trail-start'));
+    expect(
+      useSession.getState().ledger.some((e) => e.kind === 'purchase' && e.coins === -300),
+    ).toBe(true);
     expect(useSession.getState().trails['sintra-magpies-millionaire']).toBeDefined();
     await fireEvent.press(await screen.findByTestId('trail-guide'));
     expect(router.push).toHaveBeenCalledWith(
@@ -60,6 +82,8 @@ describe('Trail screen', () => {
   });
 
   it('answers a multiple-choice clue', async () => {
+    OPENERS.forEach(unlock);
+    grantCoins(300);
     useSession.getState().startTrail('sintra-magpies-millionaire');
     unlock('demo-sintra-santa-maria');
     useSession.getState().answerTrailClue('sintra-magpies-millionaire', 1, '3');

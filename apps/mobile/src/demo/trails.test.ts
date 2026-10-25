@@ -1,4 +1,4 @@
-import { ledgerXp, TRAILS } from '@wandro/shared';
+import { ledgerXp, TRAIL_UNLOCK_COINS, TRAILS } from '@wandro/shared';
 import {
   answerTrailClue,
   startTrail,
@@ -10,6 +10,8 @@ import {
 const now = new Date('2026-10-25T10:00:00Z');
 const trail = TRAILS.find((t) => t.slug === 'sintra-magpies-millionaire')!;
 const all = () => true;
+const rich = { discoveriesInCity: 5, coins: 1000 };
+const begin = (t: DemoTrails = {}) => startTrail(t, trail.slug, now, rich).trails;
 
 const failsWith = (fn: () => unknown, code: string) => {
   try {
@@ -23,17 +25,38 @@ const failsWith = (fn: () => unknown, code: string) => {
 };
 
 describe('demo trails (mirrors the server)', () => {
+  it('unlocks after 5 discoveries in the city, for 300 coins, once', () => {
+    const go = (discoveriesInCity: number, coins: number) =>
+      startTrail({}, trail.slug, now, { discoveriesInCity, coins });
+    failsWith(() => go(4, 1000), 'locked');
+    failsWith(() => go(5, TRAIL_UNLOCK_COINS - 1), 'insufficient_coins');
+    const r = go(5, TRAIL_UNLOCK_COINS);
+    expect(r.ledger).toEqual([
+      {
+        kind: 'purchase',
+        coins: -TRAIL_UNLOCK_COINS,
+        xp: 0,
+        at: now.toISOString(),
+        ref: trail.slug,
+      },
+    ]);
+    // Resuming a started trail is free, whatever your coins.
+    expect(
+      startTrail(r.trails, trail.slug, now, { discoveriesInCity: 0, coins: 0 }).ledger,
+    ).toEqual([]);
+  });
+
   it('needs a start, a discovered place and the stops in order', () => {
     failsWith(() => answerTrailClue({}, trail.slug, 1, '3', all, now), 'not_started');
-    const t = startTrail({}, trail.slug, now);
-    expect(startTrail(t, trail.slug, now)).toBe(t);
+    const t = begin();
+    expect(startTrail(t, trail.slug, now, rich).trails).toBe(t);
     failsWith(() => answerTrailClue(t, trail.slug, 1, '3', () => false, now), 'not_discovered');
     failsWith(() => answerTrailClue(t, trail.slug, 2, 'Por bem', all, now), 'not_current');
-    failsWith(() => startTrail({}, 'nowhere', now), 'unknown_trail');
+    failsWith(() => startTrail({}, 'nowhere', now, rich), 'unknown_trail');
   });
 
   it('hints and wrong answers cost 5 each, solved stops pay once, the finish pays 50', () => {
-    let t: DemoTrails = startTrail({}, trail.slug, now);
+    let t: DemoTrails = begin();
     const h = takeTrailHint(t, trail.slug, 1);
     expect(h.hint).toBe(trail.stops[0]!.hints[0]);
     t = h.trails;
@@ -61,7 +84,7 @@ describe('demo trails (mirrors the server)', () => {
   });
 
   it('three hints per stop', () => {
-    let t = startTrail({}, trail.slug, now);
+    let t = begin();
     for (let i = 0; i < 3; i++) t = takeTrailHint(t, trail.slug, 1).trails;
     failsWith(() => takeTrailHint(t, trail.slug, 1), 'no_more_hints');
     const r = answerTrailClue(t, trail.slug, 1, '3', all, now);

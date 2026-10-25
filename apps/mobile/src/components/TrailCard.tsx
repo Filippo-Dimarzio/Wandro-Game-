@@ -1,7 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { formatDistance, trailWalk } from '@wandro/shared';
+import {
+  formatDistance,
+  regionBySlug,
+  TRAIL_UNLOCK_AFTER,
+  TRAIL_UNLOCK_COINS,
+  trailWalk,
+} from '@wandro/shared';
 import { CATEGORY_META } from '@/categories';
 import { FitImage } from '@/components/FitImage';
 import type { TrailView } from '@/data/trails';
@@ -22,9 +28,16 @@ export function TrailCard({ trail, width }: { trail: TrailView; width: number })
     ? t('trail.finished')
     : trail.startedAt
       ? t('trail.progress', { done: solved, total: trail.stops.length })
-      : t('trail.notStarted');
+      : trail.discoveries < TRAIL_UNLOCK_AFTER
+        ? t('trail.lockedShort', {
+            count: TRAIL_UNLOCK_AFTER - trail.discoveries,
+            city: regionBySlug(trail.region)?.name ?? '',
+          })
+        : t('trail.unlockShort', { coins: TRAIL_UNLOCK_COINS });
   const stops = t('trail.stops', { count: trail.stops.length });
   const walk = trailWalkLabel(trail);
+  const left = Math.max(0, TRAIL_UNLOCK_AFTER - trail.discoveries);
+  const city = regionBySlug(trail.region)?.name ?? '';
   return (
     <Pressable
       onPress={() => router.push({ pathname: '/trail/[slug]', params: { slug: trail.slug } })}
@@ -40,7 +53,11 @@ export function TrailCard({ trail, width }: { trail: TrailView; width: number })
           accessible={false}
         />
         <View style={[styles.free, { backgroundColor: c.card }]}>
-          <Text style={{ color: c.text, fontWeight: '800', fontSize: 12 }}>{t('trail.free')}</Text>
+          <Text style={{ color: c.text, fontWeight: '800', fontSize: 12 }}>
+            {trail.startedAt
+              ? regionBySlug(trail.region)?.name
+              : `🪙 ${t('trail.price', { coins: TRAIL_UNLOCK_COINS })}`}
+          </Text>
         </View>
       </View>
       <View style={styles.body}>
@@ -52,12 +69,22 @@ export function TrailCard({ trail, width }: { trail: TrailView; width: number })
         </Text>
         <View style={styles.status}>
           {trail.completedAt && <Ionicons name="checkmark-circle" size={16} color={c.accent} />}
-          <Text style={{ color: c.accent, fontWeight: '800' }}>
+          {!trail.startedAt && left > 0 && (
+            <Ionicons name="lock-closed" size={14} color={c.textMuted} />
+          )}
+          <Text
+            style={{
+              color: !trail.startedAt && left > 0 ? c.textMuted : c.accent,
+              fontWeight: '800',
+            }}
+          >
             {trail.completedAt
               ? status
               : trail.startedAt
                 ? `${t('trail.continue')} · ${status}`
-                : t('trail.start')}
+                : left > 0
+                  ? t('trail.lockedShort', { count: left, city })
+                  : t('trail.unlockShort', { coins: TRAIL_UNLOCK_COINS })}
           </Text>
         </View>
       </View>

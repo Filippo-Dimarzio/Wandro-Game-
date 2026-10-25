@@ -8,6 +8,7 @@ import {
   regionFor,
   STAMP_INK_CODE,
   TIME_KEY_CODE,
+  trailBySlug,
   type Category,
   type LatLng,
   type Place,
@@ -19,6 +20,7 @@ import {
   applyVisit,
   EMPTY_PROGRESS,
   lisbonDate,
+  walletOf,
   type DemoProgress,
   type DemoUnlock,
   type LedgerEntry,
@@ -504,7 +506,18 @@ export const useSession = create<SessionState>()(
         set((s) => ({
           inventory: { ...s.inventory, equipped: { ...s.inventory.equipped, [slot]: code } },
         })),
-      startTrail: (slug) => set((s) => ({ trails: startTrail(s.trails, slug, new Date()) })),
+      startTrail: (slug) => {
+        const s = get();
+        const region = trailBySlug(slug)?.region;
+        const discoveriesInCity = DEMO_PLACES.filter(
+          (p) => s.unlocked[p.id] && (p.region ?? regionFor(p)?.slug) === region,
+        ).length;
+        const r = startTrail(s.trails, slug, new Date(), {
+          discoveriesInCity,
+          coins: walletOf(progressOf(s)).coins,
+        });
+        set({ trails: r.trails, ledger: [...s.ledger, ...r.ledger] });
+      },
       takeTrailHint: (slug, position) => {
         const r = takeTrailHint(get().trails, slug, position);
         set({ trails: r.trails });

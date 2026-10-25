@@ -1,10 +1,13 @@
 // Trails in demo mode. Mirrors start_trail / use_trail_hint / answer_trail_clue in
-// supabase/migrations/20261105090000_trails.sql so the demo plays like the real game.
+// supabase/migrations/20261105090000_trails.sql and 20261106090000_trail_unlocks.sql so the demo
+// plays like the real game.
 import {
   CHALLENGE_XP,
   isRightAnswer,
   TRAIL_COMPLETE_COINS,
   TRAIL_HINTS,
+  TRAIL_UNLOCK_AFTER,
+  TRAIL_UNLOCK_COINS,
   trailBySlug,
   trailStopCoins,
   type TrailError,
@@ -59,10 +62,25 @@ function currentStop(trails: DemoTrails, slug: string, position: number) {
   return { def, stopDef, state };
 }
 
-export function startTrail(trails: DemoTrails, slug: string, now: Date): DemoTrails {
+/**
+ * Unlock (TRAIL_UNLOCK_AFTER discoveries in the city, then TRAIL_UNLOCK_COINS) or resume a trail.
+ * Resuming never charges again. Mirrors start_trail() in 20261106090000_trail_unlocks.sql.
+ */
+export function startTrail(
+  trails: DemoTrails,
+  slug: string,
+  now: Date,
+  player: { discoveriesInCity: number; coins: number },
+): { trails: DemoTrails; ledger: LedgerEntry[] } {
   if (!trailBySlug(slug)) throw new TrailFailure('unknown_trail');
-  if (trails[slug]) return trails;
-  return { ...trails, [slug]: { startedAt: now.toISOString(), stops: {} } };
+  if (trails[slug]) return { trails, ledger: [] };
+  if (player.discoveriesInCity < TRAIL_UNLOCK_AFTER) throw new TrailFailure('locked');
+  if (player.coins < TRAIL_UNLOCK_COINS) throw new TrailFailure('insufficient_coins');
+  const at = now.toISOString();
+  return {
+    trails: { ...trails, [slug]: { startedAt: at, stops: {} } },
+    ledger: [{ kind: 'purchase', coins: -TRAIL_UNLOCK_COINS, xp: 0, at, ref: slug }],
+  };
 }
 
 export function takeTrailHint(
