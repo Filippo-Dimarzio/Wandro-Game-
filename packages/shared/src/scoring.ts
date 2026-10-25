@@ -65,7 +65,7 @@ export function levelFromXp(xp: number): number {
 
 /** XP a reward of this kind gives: only completed challenges earn XP. Mirrors ledger_xp(). */
 export function ledgerXp(kind: string): number {
-  return kind === 'visit' || kind === 'daily_challenge' ? CHALLENGE_XP : 0;
+  return kind === 'visit' || kind === 'daily_challenge' || kind === 'trail' ? CHALLENGE_XP : 0;
 }
 
 export interface LevelProgress {

@@ -1,6 +1,7 @@
 import { detailsSql } from './details';
 import { EUROPE_PLACES } from './europe-places';
 import { CITY_SETS } from './sets';
+import { trailsSql } from './trails';
 
 export const SEED_BEGIN =
   '-- BEGIN generated Europe places and city sets (pnpm --filter @wandro/shared seed)';
@@ -56,6 +57,9 @@ on conflict do nothing;
 
 -- Learn and Plan content for the place sheet (PLACE_DETAILS).
 ${detailsSql()}
+
+-- Trails: stories, clues, answers and hints (TRAILS).
+${trailsSql()}
 ${SEED_END}`;
 }
 

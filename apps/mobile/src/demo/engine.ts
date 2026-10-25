@@ -30,7 +30,9 @@ export type LedgerKind =
   | 'purchase'
   | 'moderation'
   | 'time_quest'
-  | 'friend_beacon';
+  | 'friend_beacon'
+  | 'trail_stop'
+  | 'trail';
 
 export interface LedgerEntry {
   kind: LedgerKind;

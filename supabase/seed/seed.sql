@@ -22,7 +22,9 @@ from r, (values
   ('praia-grande', 'Praia Grande', 'Surf beach where dinosaur footprints climb the cliff at the southern end.', 'coast', 80, 38.8160, -9.4785),
   ('azenhas', 'Azenhas do Mar', 'White village tumbling down a cliff to a tide pool.', 'coast', 80, 38.8406, -9.4618),
   ('music-corner', 'Sintra Live Music Corner', 'Small local venue with traditional fado nights.', 'music_events', 100, 38.7985, -9.3875),
-  ('cruz-alta', 'Cruz Alta Viewpoint', 'The highest point of the Sintra hills.', 'nature', 80, 38.7861, -9.3897)
+  ('cruz-alta', 'Cruz Alta Viewpoint', 'The highest point of the Sintra hills.', 'nature', 80, 38.7861, -9.3897),
+  ('seteais', 'Seteais Palace Gardens', 'Neoclassical arch with sweeping views of the coast.', 'culture', 100, 38.7938, -9.403),
+  ('condessa', 'Countess of Edla''s Chalet', 'Alpine-style chalet in the Pena Park.', 'culture', 100, 38.7845, -9.3917)
 ) as v(source_id, name, description, category, base_points, lat, lng)
 on conflict (source, source_id) do nothing;
 
@@ -580,6 +582,99 @@ update public.places set details = '{"teaser":"A Carthusian monastery where monk
 update public.places set details = '{"teaser":"Quiet lanes of the city’s old Jewish quarter.","facts":[{"text":"Évora was home to one of Portugal’s important Jewish communities in the 15th century.","source":"https://en.wikipedia.org/wiki/History_of_the_Jews_in_Portugal","needsReview":true},{"text":"In 1496 King Manuel I ordered Jews to leave; in 1497 this became forced conversion.","source":"https://en.wikipedia.org/wiki/History_of_the_Jews_in_Portugal","needsReview":true}]}'::jsonb where source = 'seed' and source_id = 'evora-judiaria';
 update public.places set details = '{"teaser":"A Roman city gate still in daily use.","facts":[{"text":"It was built in the late 2nd or early 3rd century, when Évora was Ebora Liberalitas Julia.","source":"https://www.ancient-history-sites.com/sites/roman-arch-of-dona-isabel/","needsReview":true},{"text":"Its granite blocks were laid without mortar.","source":"https://www.ancient-history-sites.com/sites/roman-arch-of-dona-isabel/","needsReview":true},{"text":"It is named after Queen Isabel, wife of King Denis I.","source":"https://www.ancient-history-sites.com/sites/roman-arch-of-dona-isabel/","needsReview":true}]}'::jsonb where source = 'seed' and source_id = 'evora-arco-isabel';
 update public.places set details = '{"teaser":"A church front guarded by four stone giants.","facts":[{"text":"Work on the convent began in 1524; it is called the city’s first Renaissance monument.","source":"https://www.geocaching.com/geocache/GC6XBFR","needsReview":true},{"text":"Above each group of giants is a stone sphere with a flame.","source":"https://www.frommers.com/destinations/evora/attractions/igreja-de-nossa-senhora-de-graa","needsReview":true},{"text":"For centuries locals have called the giants the “Meninos da Graça”, the Graça boys.","source":"https://expatinportugal.substack.com/p/the-stuff-of-legend","needsReview":true}]}'::jsonb where source = 'seed' and source_id = 'evora-graca';
+
+-- Trails: stories, clues, answers and hints (TRAILS).
+insert into public.trails (slug, region_id, title, intro, outro, theme, position)
+select 'sintra-artist-king', r.id, 'The Artist King', 'In the 1800s a German prince known as the “Artist King”, Ferdinand II, fell for these hills. He saved a ruined castle, raised a palace on a peak and planted a park with trees from around the world. Follow him through five of his projects.', 'You’ve walked the Artist King’s Sintra: the castle he saved, the palace he dreamed up, his cross on the summit, his garden and the chalet he built for love.', 'heritage', 1
+from public.regions r where r.slug = 'sintra'
+on conflict (slug) do update set title = excluded.title, intro = excluded.intro, outro = excluded.outro,
+  theme = excluded.theme, position = excluded.position;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 1, p.id, 'The Moors built these walls in the 8th and 9th centuries, and Christian forces took them after Lisbon fell in 1147. By Ferdinand’s day they were a ruin, and he restored them while building his palace next door.', 'Climb to the highest point of the walls. What is that tower called?', 'choice', array['The Royal Tower', 'The Bell Tower', 'The Watchman’s Tower', 'The Moors’ Gate']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'mouros'
+where t.slug = 'sintra-artist-king'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 1, 'The Royal Tower', array['It is the highest point of the walls.', 'Check the names on the signs along the walls.', 'It is named after royalty.']::text[] from public.trails t where t.slug = 'sintra-artist-king'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 2, p.id, 'Ferdinand built his palace in the mid-1800s around the ruins of a 16th-century monastery, whose cloister and chapel survive inside. It is part of the Cultural Landscape of Sintra, a UNESCO World Heritage Site since 1995.', 'Find the Triton arch. What holds up the window on its back?', 'choice', array['A sea monster', 'A dragon', 'A lion', 'An eagle']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'pena'
+where t.slug = 'sintra-artist-king'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 2, 'A sea monster', array['The arch is named after it.', 'Triton was a god of the sea.', 'It lives in the waves.']::text[] from public.trails t where t.slug = 'sintra-artist-king'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 3, p.id, 'At about 529 m this is the roof of the Sintra hills. Ferdinand replaced the original 16th-century cross with a new one in the 1800s.', 'Stand by the cross and look down. Whose yellow towers do you see below you?', 'choice', array['Pena Palace', 'Monserrate Palace', 'Quinta da Regaleira', 'Seteais Palace']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'cruz-alta'
+where t.slug = 'sintra-artist-king'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 3, 'Pena Palace', array['You have already been there today.', 'It is red and yellow.', 'Ferdinand built it.']::text[] from public.trails t where t.slug = 'sintra-artist-king'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 4, p.id, 'Ferdinand laid out Pena Park as a Romantic garden with trees from around the world, and threaded this valley with a chain of ponds.', 'A little castle sits on the water. Who was it built for?', 'choice', array['Ducks', 'Swans', 'The king’s children', 'The gardener']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'sintra-valley-of-lakes'
+where t.slug = 'sintra-artist-king'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 4, 'Ducks', array['Whoever lives there can swim.', 'It is not the swans.', 'Listen for quacking.']::text[] from public.trails t where t.slug = 'sintra-artist-king'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 5, p.id, 'Ferdinand built this Alpine-style chalet in the 1860s with Elise Hensler, the opera singer he later married. Fire gutted it in 1999; it was restored and reopened in 2011.', 'What local material trims its windows and doors?', 'choice', array['Cork', 'Marble', 'Iron', 'Bamboo']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'condessa'
+where t.slug = 'sintra-artist-king'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 5, 'Cork', array['It is the local material of the Sintra hills.', 'It comes from the bark of a tree.', 'Wine bottles are stopped with it.']::text[] from public.trails t where t.slug = 'sintra-artist-king'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trails (slug, region_id, title, intro, outro, theme, position)
+select 'sintra-magpies-millionaire', r.id, 'Kings, Magpies and a Millionaire', 'Sintra has drawn kings, consuls and millionaires for nine centuries. Walk through the old town from a church as old as Portugal’s first king’s conquest to a consul’s arch with the best view in town.', 'From a church founded after 1147 to an arch built for a future king in 1802: nine centuries of Sintra in one walk.', 'heritage', 2
+from public.regions r where r.slug = 'sintra'
+on conflict (slug) do update set title = excluded.title, intro = excluded.intro, outro = excluded.outro,
+  theme = excluded.theme, position = excluded.position;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 1, p.id, 'One of Sintra’s oldest churches, founded after Afonso Henriques took Sintra in 1147. It was built as Romanesque gave way to Gothic, and it has been a National Monument since 1922.', 'Step inside. How many naves (aisles) does the church have?', 'number', null
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'sintra-santa-maria'
+where t.slug = 'sintra-magpies-millionaire'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 1, '3', array['Count the rows of space between the columns, front to back.', 'More than one.', 'Fewer than four.']::text[] from public.trails t where t.slug = 'sintra-magpies-millionaire'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 2, p.id, 'The two cone-shaped chimneys, about 33 m tall, belong to the royal kitchen of the best-preserved medieval royal palace in Portugal. Kings used it for centuries.', 'In the Magpie Room, every magpie holds the same motto. What does it say?', 'choice', array['Por bem', 'Por Portugal', 'Sempre fiel', 'Ordem e progresso']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'sintra-national-palace'
+where t.slug = 'sintra-magpies-millionaire'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 2, 'Por bem', array['There are 136 magpies on the ceiling.', 'It is just two words.', 'It means “for the good”.']::text[] from public.trails t where t.slug = 'sintra-magpies-millionaire'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 3, p.id, 'António Augusto Carvalho Monteiro, nicknamed “Monteiro the Millionaire”, had the Italian architect Luigi Manini design this palace and garden in the early 1900s. His strangest idea goes down, not up.', 'Spiral down the Initiation Well. How many landings does it have?', 'number', null
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'regaleira'
+where t.slug = 'sintra-magpies-millionaire'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 3, '9', array['The well is about 27 m deep.', 'More than seven.', 'One fewer than ten.']::text[] from public.trails t where t.slug = 'sintra-magpies-millionaire'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
+insert into public.trail_stops (trail_id, position, place_id, story, question, kind, choices)
+select t.id, 4, p.id, 'A neoclassical palace built in the late 1700s for the Dutch consul Daniel Gildemeester. Its triumphal arch celebrates a visit by the future King John VI in 1802. The palace is a hotel today, but the arch and its lawn are open to walk to.', 'Stand under the arch and look up the hill. Which palace sits in the middle of the frame?', 'choice', array['Pena Palace', 'Quinta da Regaleira', 'Monserrate Palace', 'Sintra National Palace']::text[]
+from public.trails t join public.places p on p.source = 'seed' and p.source_id = 'seteais'
+where t.slug = 'sintra-magpies-millionaire'
+on conflict (trail_id, position) do update set place_id = excluded.place_id, story = excluded.story,
+  question = excluded.question, kind = excluded.kind, choices = excluded.choices;
+insert into public.trail_secrets (trail_id, position, answer, hints)
+select t.id, 4, 'Pena Palace', array['It is on the highest peak you can see.', 'It is red and yellow.', 'Ferdinand II built it.']::text[] from public.trails t where t.slug = 'sintra-magpies-millionaire'
+on conflict (trail_id, position) do update set answer = excluded.answer, hints = excluded.hints;
 -- END generated Europe places and city sets
 
 insert into public.place_stats (place_id)

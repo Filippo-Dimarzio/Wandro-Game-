@@ -32,6 +32,13 @@ import {
   type FriendStatus,
 } from '@/demo/friends';
 import { DEMO_USERS } from '@/demo/social';
+import {
+  answerTrailClue,
+  startTrail,
+  takeTrailHint,
+  type ClueResult,
+  type DemoTrails,
+} from '@/demo/trails';
 import type { PasswordHash } from '@/lib/password';
 
 export type { DemoUnlock } from '@/demo/engine';
@@ -121,6 +128,8 @@ interface SessionState extends DemoProgress {
   inventory: Inventory;
   /** City stamps collected in demo mode (the server keeps these in city_stamps). */
   stamps: Record<string, { at: string; gold: boolean }>;
+  /** Trail progress in demo mode (the server keeps it in trail_progress). */
+  trails: DemoTrails;
   /** Hidden gems this player has walked within range of (demo). */
   revealed: Record<string, string>;
   /** Gem that was just revealed, for the "you found a hidden gem" banner. */
@@ -181,6 +190,10 @@ interface SessionState extends DemoProgress {
   respondFriendChallenge: (id: string, accept: boolean) => void;
   /** Same checks as light_beacon(); returns an error code, or null once lit. */
   lightBeacon: (id: string) => 'no_beacon' | 'challenge_not_found' | null;
+  /** Demo trails: these throw a TrailFailure with the server's error code. */
+  startTrail: (slug: string) => void;
+  takeTrailHint: (slug: string, position: number) => string;
+  answerTrailClue: (slug: string, position: number, answer: string) => ClueResult;
   setDemoModerator: (on: boolean) => void;
   dismissInstallPrompt: () => void;
   dismissTip: (id: string) => void;
@@ -207,6 +220,7 @@ const initial = {
   submissions: [],
   inventory: { owned: {}, activeUntil: {}, equipped: {} },
   stamps: {},
+  trails: {},
   revealed: {},
   justRevealed: null,
   browse: null,
@@ -476,6 +490,25 @@ export const useSession = create<SessionState>()(
         set((s) => ({
           inventory: { ...s.inventory, equipped: { ...s.inventory.equipped, [slot]: code } },
         })),
+      startTrail: (slug) => set((s) => ({ trails: startTrail(s.trails, slug, new Date()) })),
+      takeTrailHint: (slug, position) => {
+        const r = takeTrailHint(get().trails, slug, position);
+        set({ trails: r.trails });
+        return r.hint;
+      },
+      answerTrailClue: (slug, position, answer) => {
+        const s = get();
+        const r = answerTrailClue(
+          s.trails,
+          slug,
+          position,
+          answer,
+          (id) => !!s.unlocked[id],
+          new Date(),
+        );
+        set({ trails: r.trails, ledger: [...s.ledger, ...r.ledger] });
+        return r.result;
+      },
       setDemoModerator: (demoModerator) => set({ demoModerator }),
       dismissInstallPrompt: () => set({ installPromptDismissed: true }),
       dismissTip: (id) =>

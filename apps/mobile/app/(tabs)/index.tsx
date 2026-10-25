@@ -19,9 +19,11 @@ import { HomeTip } from '@/components/HomeTip';
 import { InterestStories } from '@/components/InterestStories';
 import { PlaceCard } from '@/components/PlaceBits';
 import { StreakFlame } from '@/components/Streak';
+import { TrailCard } from '@/components/TrailCard';
 import { useMyExplorer } from '@/data/explorer';
 import { useFriendChallenges, useFriends } from '@/data/friends';
 import { useLoadout } from '@/data/loadout';
+import { useTrails } from '@/data/trails';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { useWallet } from '@/data/wallet';
 import { t } from '@/i18n';
@@ -54,6 +56,7 @@ export default function Home() {
     incoming.length +
     friendChallenges.filter((x) => x.direction === 'incoming' && x.status === 'pending').length;
   const list = places.data ?? [];
+  const { trails } = useTrails();
 
   const nearby = list
     .filter((p) => !ids.has(p.id))
@@ -143,6 +146,24 @@ export default function Home() {
         <HomeTip discoveries={wallet.discoveries} />
 
         <DailyChallengeCard places={list} unlocked={ids} near={loc.position} />
+
+        {trails.length > 0 && (
+          <View style={{ gap: space.sm }}>
+            <Text style={[styles.section, { color: c.text }]} accessibilityRole="header">
+              {t('home.trails')}
+            </Text>
+            <Text style={{ color: c.textMuted }}>{t('home.trailsHint')}</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.rail}
+            >
+              {trails.map((tr) => (
+                <TrailCard key={tr.slug} trail={tr} width={240} />
+              ))}
+            </ScrollView>
+          </View>
+        )}
 
         <View style={styles.sectionRow}>
           <Text style={[styles.section, { color: c.text }]} accessibilityRole="header">
