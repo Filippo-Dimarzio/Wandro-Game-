@@ -6,6 +6,9 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Sign-in: the Google and Apple buttons only show once that provider is switched on in
+  Supabase (instead of opening a raw "provider is not enabled" page), and a confirmation or reset
+  email the mail sender refuses now gets a plain "couldn't send the email" message.
 - Going live: when the app connects to the server and finds a demo explorer left on the device
   (whose login only ever worked on that device), it clears it and opens account creation with a
   note explaining why, instead of a login that can never succeed.

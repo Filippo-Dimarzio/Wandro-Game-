@@ -21,7 +21,13 @@ import { ExplorerPicker } from '@/components/ExplorerPicker';
 import { loadServerProfile, useUsernameStatus } from '@/data/account';
 import { UsernameHint } from '@/components/UsernameHint';
 import { t, type TranslationKey } from '@/i18n';
-import { appLink, signInWithProvider, useAuthSession } from '@/lib/auth';
+import {
+  appLink,
+  isEmailSendFailure,
+  signInWithProvider,
+  useAuthSession,
+  useOAuthProviders,
+} from '@/lib/auth';
 import { confirmAction } from '@/lib/confirm';
 import { isDemo } from '@/lib/env';
 import {
@@ -50,6 +56,7 @@ const STYLES: { id: string; category: Category }[] = [
 export default function Register() {
   const c = useColors();
   const { session } = useAuthSession();
+  const providers = useOAuthProviders();
   const completeOnboarding = useSession((s) => s.completeOnboarding);
   const existing = useSession((s) => (s.onboarded ? (s.profile?.username ?? '') : null));
   const deviceAccount = useSession((s) => s.account);
@@ -111,7 +118,10 @@ export default function Register() {
         password,
         options: { emailRedirectTo: appLink('/register') },
       });
-      if (res.error) return setMessage(res.error.message);
+      if (res.error)
+        return setMessage(
+          isEmailSendFailure(res.error) ? t('register.emailFailed') : res.error.message,
+        );
       await offerToSavePassword({ email: email.trim(), password });
       if (!res.data.session)
         return router.push({
@@ -176,27 +186,37 @@ export default function Register() {
                       {t('login.wentLive')}
                     </Text>
                   )}
-                  <Pressable
-                    style={[styles.oauth, { backgroundColor: c.text }]}
-                    onPress={() =>
-                      signInWithProvider('apple').catch((e) => setMessage(String(e.message ?? e)))
-                    }
-                    accessibilityRole="button"
-                  >
-                    <Ionicons name="logo-apple" size={18} color={c.bg} />
-                    <Text style={{ color: c.bg, fontWeight: '700' }}>{t('register.apple')}</Text>
-                  </Pressable>
-                  <Pressable
-                    style={[styles.oauth, { borderColor: c.border, borderWidth: 1 }]}
-                    onPress={() =>
-                      signInWithProvider('google').catch((e) => setMessage(String(e.message ?? e)))
-                    }
-                    accessibilityRole="button"
-                  >
-                    <Ionicons name="logo-google" size={18} color={c.text} />
-                    <Text style={{ color: c.text, fontWeight: '700' }}>{t('register.google')}</Text>
-                  </Pressable>
-                  <Text style={{ color: c.textMuted, textAlign: 'center' }}>{t('login.or')}</Text>
+                  {providers.includes('apple') && (
+                    <Pressable
+                      style={[styles.oauth, { backgroundColor: c.text }]}
+                      onPress={() =>
+                        signInWithProvider('apple').catch((e) => setMessage(String(e.message ?? e)))
+                      }
+                      accessibilityRole="button"
+                    >
+                      <Ionicons name="logo-apple" size={18} color={c.bg} />
+                      <Text style={{ color: c.bg, fontWeight: '700' }}>{t('register.apple')}</Text>
+                    </Pressable>
+                  )}
+                  {providers.includes('google') && (
+                    <Pressable
+                      style={[styles.oauth, { borderColor: c.border, borderWidth: 1 }]}
+                      onPress={() =>
+                        signInWithProvider('google').catch((e) =>
+                          setMessage(String(e.message ?? e)),
+                        )
+                      }
+                      accessibilityRole="button"
+                    >
+                      <Ionicons name="logo-google" size={18} color={c.text} />
+                      <Text style={{ color: c.text, fontWeight: '700' }}>
+                        {t('register.google')}
+                      </Text>
+                    </Pressable>
+                  )}
+                  {providers.length > 0 && (
+                    <Text style={{ color: c.textMuted, textAlign: 'center' }}>{t('login.or')}</Text>
+                  )}
                 </>
               )}
               <CredentialsForm

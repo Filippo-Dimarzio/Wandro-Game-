@@ -16,7 +16,7 @@ import { GameBackdrop } from '@/components/GameBackdrop';
 import { WandroLogo } from '@/components/WandroLogo';
 import { loadServerProfile } from '@/data/account';
 import { t } from '@/i18n';
-import { appLink, signInWithProvider } from '@/lib/auth';
+import { appLink, isEmailSendFailure, signInWithProvider, useOAuthProviders } from '@/lib/auth';
 import { isDemo } from '@/lib/env';
 import { looksLikeEmail, normaliseEmail, verifyPassword } from '@/lib/password';
 import { offerToSavePassword } from '@/lib/passwordManager';
@@ -34,6 +34,7 @@ export default function Login() {
   const signIn = useSession((s) => s.signIn);
   const completeOnboarding = useSession((s) => s.completeOnboarding);
   const demoRetired = useSession((s) => s.demoRetired);
+  const providers = useOAuthProviders();
   const [email, setEmail] = useState(account?.email ?? '');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -79,10 +80,12 @@ export default function Login() {
     if (!looksLikeEmail(email))
       return setMessage({ tone: 'error', text: t('login.forgotNeedsEmail') });
     setBusy(true);
-    await supabase!.auth.resetPasswordForEmail(email.trim(), {
+    const { error } = await supabase!.auth.resetPasswordForEmail(email.trim(), {
       redirectTo: appLink('/reset-password'),
     });
     setBusy(false);
+    if (error && isEmailSendFailure(error))
+      return setMessage({ tone: 'error', text: t('login.emailFailed') });
     // Same screen whether or not the email has an account, so it can't be used to probe.
     router.push({ pathname: '/check-email', params: { email: email.trim(), kind: 'reset' } });
   };
@@ -146,33 +149,37 @@ export default function Login() {
             </CredentialsForm>
           </View>
 
-          {!isDemo && (
+          {providers.length > 0 && (
             <View style={{ gap: space.sm }}>
               <Text style={{ color: c.textMuted, textAlign: 'center' }}>{t('login.or')}</Text>
-              <Pressable
-                style={[styles.oauth, { backgroundColor: c.text }]}
-                onPress={() =>
-                  signInWithProvider('apple').catch((e) =>
-                    setMessage({ tone: 'error', text: String(e.message ?? e) }),
-                  )
-                }
-                accessibilityRole="button"
-              >
-                <Ionicons name="logo-apple" size={18} color={c.bg} />
-                <Text style={{ color: c.bg, fontWeight: '700' }}>{t('register.apple')}</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.oauth, { borderColor: c.border, borderWidth: 1 }]}
-                onPress={() =>
-                  signInWithProvider('google').catch((e) =>
-                    setMessage({ tone: 'error', text: String(e.message ?? e) }),
-                  )
-                }
-                accessibilityRole="button"
-              >
-                <Ionicons name="logo-google" size={18} color={c.text} />
-                <Text style={{ color: c.text, fontWeight: '700' }}>{t('register.google')}</Text>
-              </Pressable>
+              {providers.includes('apple') && (
+                <Pressable
+                  style={[styles.oauth, { backgroundColor: c.text }]}
+                  onPress={() =>
+                    signInWithProvider('apple').catch((e) =>
+                      setMessage({ tone: 'error', text: String(e.message ?? e) }),
+                    )
+                  }
+                  accessibilityRole="button"
+                >
+                  <Ionicons name="logo-apple" size={18} color={c.bg} />
+                  <Text style={{ color: c.bg, fontWeight: '700' }}>{t('register.apple')}</Text>
+                </Pressable>
+              )}
+              {providers.includes('google') && (
+                <Pressable
+                  style={[styles.oauth, { borderColor: c.border, borderWidth: 1 }]}
+                  onPress={() =>
+                    signInWithProvider('google').catch((e) =>
+                      setMessage({ tone: 'error', text: String(e.message ?? e) }),
+                    )
+                  }
+                  accessibilityRole="button"
+                >
+                  <Ionicons name="logo-google" size={18} color={c.text} />
+                  <Text style={{ color: c.text, fontWeight: '700' }}>{t('register.google')}</Text>
+                </Pressable>
+              )}
             </View>
           )}
 

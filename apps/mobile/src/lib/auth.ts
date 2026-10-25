@@ -3,6 +3,7 @@ import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
+import { env, isDemo } from './env';
 import { supabase } from './supabase';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -33,8 +34,44 @@ export function useAuthSession(): { session: Session | null; loading: boolean } 
   return { session, loading };
 }
 
+export type OAuthProvider = 'apple' | 'google';
+
+/** The providers switched on in Supabase Auth, from its public settings. */
+export function enabledProviders(settings: {
+  external?: Record<string, boolean>;
+}): OAuthProvider[] {
+  return (['apple', 'google'] as const).filter((p) => settings.external?.[p] === true);
+}
+
+/**
+ * Google / Apple buttons show only once that provider is switched on in Supabase; until then a tap
+ * would land on a raw "provider is not enabled" error page.
+ */
+export function useOAuthProviders(): OAuthProvider[] {
+  const [enabled, setEnabled] = useState<OAuthProvider[]>([]);
+  useEffect(() => {
+    if (isDemo) return;
+    let live = true;
+    fetch(`${env.supabaseUrl}/auth/v1/settings`, { headers: { apikey: env.supabaseAnonKey } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((s) => {
+        if (live && s) setEnabled(enabledProviders(s));
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, []);
+  return enabled;
+}
+
+/** Supabase reports a confirmation or reset email its mail sender refused as "Error sending … email". */
+export function isEmailSendFailure(error: { message?: string }): boolean {
+  return /error sending .*email/i.test(error.message ?? '');
+}
+
 /** Google / Apple sign-in through Supabase OAuth (PKCE). */
-export async function signInWithProvider(provider: 'google' | 'apple'): Promise<void> {
+export async function signInWithProvider(provider: OAuthProvider): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
   const redirectTo = appLink('/register');
   if (Platform.OS === 'web') {

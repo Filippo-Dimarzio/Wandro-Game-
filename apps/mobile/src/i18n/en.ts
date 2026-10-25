@@ -35,6 +35,8 @@ export const en = {
   'login.demoNote': 'Demo: your login and progress stay on this device.',
   'login.wentLive':
     'Wandro now has real accounts, so friends can find you. Your old test explorer only lived on this phone, so create your account again (the same email is fine).',
+  'login.emailFailed':
+    'We couldn’t send the reset email just now. Please try again in a few minutes.',
   'login.or': 'or',
   'login.newHere': 'New to Wandro?',
   'login.create': 'Create an account',
@@ -136,6 +138,8 @@ export const en = {
   'register.styleTitle': 'What kind of explorer are you?',
   'register.styleHint': 'Pick at least one and I’ll point you to places that match.',
   'register.finish': 'Let’s go',
+  'register.emailFailed':
+    'We couldn’t send the confirmation email just now. Please try again in a few minutes.',
   'register.checkEmail': 'Check your inbox to confirm your email, then sign in.',
   'register.next': 'Next',
 
