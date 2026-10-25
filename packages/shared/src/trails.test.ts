@@ -12,6 +12,7 @@ import {
   TRAIL_STOP_COINS,
   TRAIL_UNLOCK_AFTER,
   TRAIL_UNLOCK_COINS,
+  trailDuelReward,
   trailStopCoins,
   trailWalk,
   TRAILS,
@@ -39,6 +40,12 @@ describe('trails', () => {
       const back = TRAIL_STOP_COINS * t.stops.length + TRAIL_COMPLETE_COINS;
       expect(TRAIL_UNLOCK_COINS).toBeGreaterThan(back);
     }
+  });
+
+  it('a duel pays 25 for finishing and 25 more for the better score; a tie pays both', () => {
+    expect(trailDuelReward(80, 70)).toBe(50);
+    expect(trailDuelReward(70, 80)).toBe(25);
+    expect(trailDuelReward(75, 75)).toBe(50);
   });
 
   it('answers ignore case and extra spaces', () => {

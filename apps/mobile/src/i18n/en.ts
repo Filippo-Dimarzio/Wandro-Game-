@@ -907,6 +907,31 @@ export const en = {
   'trail.error.locked': 'Discover more places in this city first.',
   'trail.error.insufficient_coins': 'You need more coins to unlock this trail.',
   'trail.error.unknown': 'Something went wrong. Try again.',
+  // Trail duels: challenge a friend to a trail.
+  'duel.title': 'Challenge a friend',
+  'duel.explain':
+    'You both play this trail on your own. +{finish} coins each for finishing, and +{win} more for whoever keeps more coins (fewer hints and wrong answers).',
+  'duel.noFriends': 'Add friends to challenge them to this trail.',
+  'duel.challenge': 'Challenge',
+  'duel.challengeA11y': 'Challenge {name} to this trail',
+  'duel.waiting': 'Waiting for {name} to accept',
+  'duel.invited': '{name} challenged you',
+  'duel.playing': '{name}: {solved} of {stops} stops solved',
+  'duel.declined': '{name} said no this time',
+  'duel.won': 'You won, {mine} to {theirs} · +{coins} coins',
+  'duel.lost': '{name} won, {theirs} to {mine} · +{coins} coins',
+  'duel.section': 'Trail duels',
+  'duel.accept': 'Accept',
+  'duel.decline': 'Decline',
+  'duel.acceptA11y': 'Accept {name}’s duel on {trail}',
+  'duel.declineA11y': 'Decline {name}’s duel on {trail}',
+  'duel.cardA11y': '{trail}: {status}. Opens the trail',
+  'duel.error.not_friends': 'You can only challenge friends.',
+  'duel.error.unknown_trail': 'This trail isn’t available.',
+  'duel.error.not_started': 'Unlock the trail before you challenge a friend.',
+  'duel.error.rate_limited': 'That’s enough duels for today. Try again tomorrow.',
+  'duel.error.duel_not_found': 'This duel is no longer open.',
+  'duel.error.unknown': 'Something went wrong. Try again.',
 };
 
 export type TranslationKey = keyof typeof en;

@@ -23,6 +23,7 @@ import { TrailCard } from '@/components/TrailCard';
 import { useMyExplorer } from '@/data/explorer';
 import { useFriendChallenges, useFriends } from '@/data/friends';
 import { useLoadout } from '@/data/loadout';
+import { useTrailDuels } from '@/data/trailDuels';
 import { useTrails } from '@/data/trails';
 import { usePlaces, useUnlockedIds } from '@/data/places';
 import { useWallet } from '@/data/wallet';
@@ -52,9 +53,11 @@ export default function Home() {
   const loadout = useLoadout();
   const { incoming } = useFriends();
   const friendChallenges = useFriendChallenges();
+  const duels = useTrailDuels();
   const friendNews =
     incoming.length +
-    friendChallenges.filter((x) => x.direction === 'incoming' && x.status === 'pending').length;
+    friendChallenges.filter((x) => x.direction === 'incoming' && x.status === 'pending').length +
+    duels.filter((d) => d.direction === 'incoming' && d.status === 'pending').length;
   const list = places.data ?? [];
   const { trails } = useTrails();
 

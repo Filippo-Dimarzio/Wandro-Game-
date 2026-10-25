@@ -177,7 +177,11 @@ function useRefresh() {
   const qc = useQueryClient();
   return (coins: boolean) => {
     qc.invalidateQueries({ queryKey: ['trails'] });
-    if (coins) qc.invalidateQueries({ queryKey: ['wallet'] });
+    if (coins) {
+      qc.invalidateQueries({ queryKey: ['wallet'] });
+      // Finishing a trail can settle a duel.
+      qc.invalidateQueries({ queryKey: ['trail-duels'] });
+    }
   };
 }
 

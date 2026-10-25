@@ -27,6 +27,7 @@ import { FitImage } from '@/components/FitImage';
 import { GameBackdrop } from '@/components/GameBackdrop';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { trailWalkLabel } from '@/components/TrailCard';
+import { TrailDuelPanel } from '@/components/TrailDuels';
 import {
   currentStop,
   trailErrorCode,
@@ -116,6 +117,8 @@ export default function TrailScreen() {
             <Text style={{ color: c.text }}>{trail.outro}</Text>
           </View>
         )}
+
+        {trail.startedAt && <TrailDuelPanel trail={trail} />}
       </ScrollView>
     </SafeAreaView>
   );

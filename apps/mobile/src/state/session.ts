@@ -35,6 +35,12 @@ import {
 } from '@/demo/friends';
 import { DEMO_USERS } from '@/demo/social';
 import {
+  initialTrailDuels,
+  sendTrailDuel,
+  settleTrailDuels,
+  type DemoTrailDuel,
+} from '@/demo/trailDuels';
+import {
   answerTrailClue,
   startTrail,
   takeTrailHint,
@@ -134,6 +140,8 @@ interface SessionState extends DemoProgress {
   stamps: Record<string, { at: string; gold: boolean }>;
   /** Trail progress in demo mode (the server keeps it in trail_progress). */
   trails: DemoTrails;
+  /** Trail duels with friends (demo; the server keeps them in trail_duels). */
+  trailDuels: DemoTrailDuel[];
   /** Hidden gems this player has walked within range of (demo). */
   revealed: Record<string, string>;
   /** Gem that was just revealed, for the "you found a hidden gem" banner. */
@@ -198,6 +206,9 @@ interface SessionState extends DemoProgress {
   startTrail: (slug: string) => void;
   takeTrailHint: (slug: string, position: number) => string;
   answerTrailClue: (slug: string, position: number, answer: string) => ClueResult;
+  /** Demo duels: checks happen in the data layer (trailDuelError), like the server's. */
+  challengeTrailDuel: (friendId: string, slug: string) => string;
+  respondTrailDuel: (id: string, accept: boolean) => void;
   setDemoModerator: (on: boolean) => void;
   dismissInstallPrompt: () => void;
   dismissTip: (id: string) => void;
@@ -231,6 +242,7 @@ const initial = {
   inventory: { owned: {}, activeUntil: {}, equipped: {} },
   stamps: {},
   trails: {},
+  trailDuels: initialTrailDuels(),
   revealed: {},
   justRevealed: null,
   browse: null,
@@ -244,6 +256,13 @@ const initial = {
   dismissedTips: [],
   prefs: { dailyReminder: true },
 };
+
+/** A finished trail's score (the stop coins kept), or null while unfinished. */
+function myTrailScore(trails: DemoTrails, slug: string): number | null {
+  const t = trails[slug];
+  if (!t?.completedAt) return null;
+  return Object.values(t.stops).reduce((sum, st) => sum + (st.coins ?? 0), 0);
+}
 
 function progressOf(s: SessionState): DemoProgress {
   return {
@@ -533,8 +552,39 @@ export const useSession = create<SessionState>()(
           (id) => !!s.unlocked[id],
           new Date(),
         );
-        set({ trails: r.trails, ledger: [...s.ledger, ...r.ledger] });
+        const settled = settleTrailDuels(
+          s.trailDuels,
+          slug,
+          r.result.completed ? myTrailScore(r.trails, slug) : null,
+          new Date(),
+        );
+        set({
+          trails: r.trails,
+          trailDuels: settled.duels,
+          ledger: [...s.ledger, ...r.ledger, ...settled.ledger],
+        });
         return r.result;
+      },
+      challengeTrailDuel: (friendId, slug) => {
+        const r = sendTrailDuel(get().trailDuels, friendId, slug, new Date());
+        set({ trailDuels: r.duels });
+        return r.id;
+      },
+      respondTrailDuel: (id, accept) => {
+        const s = get();
+        const duel = s.trailDuels.find(
+          (d) => d.id === id && d.direction === 'incoming' && d.status === 'pending',
+        );
+        if (!duel) throw new Error('duel_not_found');
+        const answered = s.trailDuels.map((d) =>
+          d.id === id
+            ? { ...d, status: accept ? ('accepted' as const) : ('declined' as const) }
+            : d,
+        );
+        const settled = accept
+          ? settleTrailDuels(answered, duel.trail, myTrailScore(s.trails, duel.trail), new Date())
+          : { duels: answered, ledger: [] };
+        set({ trailDuels: settled.duels, ledger: [...s.ledger, ...settled.ledger] });
       },
       setDemoModerator: (demoModerator) => set({ demoModerator }),
       dismissInstallPrompt: () => set({ installPromptDismissed: true }),
@@ -545,11 +595,17 @@ export const useSession = create<SessionState>()(
       setPref: (key, value) => set((s) => ({ prefs: { ...s.prefs, [key]: value } })),
       setTheme: (theme) => set((s) => ({ prefs: { ...s.prefs, theme } })),
       markStreakCelebrated: (day) => set((s) => ({ prefs: { ...s.prefs, streakCelebrated: day } })),
-      reset: () => set({ ...initial, friendChallenges: initialFriendChallenges() }),
+      reset: () =>
+        set({
+          ...initial,
+          friendChallenges: initialFriendChallenges(),
+          trailDuels: initialTrailDuels(),
+        }),
       retireDemo: () =>
         set((s) => ({
           ...initial,
           friendChallenges: initialFriendChallenges(),
+          trailDuels: initialTrailDuels(),
           prefs: s.prefs,
           demoRetired: true,
         })),

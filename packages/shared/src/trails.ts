@@ -32,6 +32,29 @@ const WALK_M_PER_MIN = 75;
 /** Paths wind: straight-line distance times this is closer to the real walk. */
 const PATH_FACTOR = 1.3;
 
+/**
+ * Duels: challenge a friend to a trail you've unlocked. Once you've both finished, each of you
+ * gets TRAIL_DUEL_FINISH_COINS, and the higher score (the stop coins kept: fewest hints and
+ * wrong answers) gets TRAIL_DUEL_WIN_COINS more. Ties both win. Mirrors resolve_trail_duel().
+ */
+export const TRAIL_DUEL_FINISH_COINS = 25;
+export const TRAIL_DUEL_WIN_COINS = 25;
+/** Anti-spam: duels one player can send per day. */
+export const TRAIL_DUELS_PER_DAY = 10;
+export const TRAIL_DUEL_ERRORS = [
+  'not_friends',
+  'unknown_trail',
+  'not_started',
+  'rate_limited',
+  'duel_not_found',
+] as const;
+export type TrailDuelError = (typeof TRAIL_DUEL_ERRORS)[number];
+
+/** What a settled duel pays one player. */
+export function trailDuelReward(myScore: number, friendScore: number): number {
+  return TRAIL_DUEL_FINISH_COINS + (myScore >= friendScore ? TRAIL_DUEL_WIN_COINS : 0);
+}
+
 /** Error codes the trail RPCs raise; the app maps each to an i18n string (trail.error.*). */
 export const TRAIL_ERRORS = [
   'unknown_trail',

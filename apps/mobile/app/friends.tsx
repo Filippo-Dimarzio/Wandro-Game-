@@ -8,6 +8,8 @@ import { FriendButton } from '@/components/FriendButton';
 import { PlayerAvatar } from '@/components/PlayerAvatar';
 import { FriendChallengeCard } from '@/components/FriendChallengeCard';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { TrailDuelCard } from '@/components/TrailDuels';
+import { useTrailDuels } from '@/data/trailDuels';
 import {
   useFriendChallenges,
   useFriends,
@@ -31,6 +33,7 @@ export default function Friends() {
   const results = useSearchProfiles(q);
   const searching = q.trim().length >= 2 || (isDemo && q.trim().length > 0);
   const sent = challenges.filter((x) => x.direction === 'outgoing');
+  const duels = useTrailDuels().filter((d) => d.status !== 'declined');
 
   const unfriend = async (f: FriendView) => {
     const ok = await confirmAction(
@@ -102,6 +105,14 @@ export default function Friends() {
                   <Ionicons name="close" size={18} color={c.text} />
                 </Pressable>
               </Row>
+            ))}
+          </Section>
+        )}
+
+        {duels.length > 0 && (
+          <Section title={t('duel.section')}>
+            {duels.map((d) => (
+              <TrailDuelCard key={d.id} duel={d} />
             ))}
           </Section>
         )}

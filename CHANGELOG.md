@@ -6,6 +6,10 @@ All notable changes to Wandro. Release notes live in [`docs/releases/`](docs/rel
 
 ### Added
 
+- Trail duels: challenge a friend to a trail you've unlocked. You each play it on your own; when
+  you've both finished, you each get 25 coins and whoever kept more coins (fewer hints and wrong
+  answers) gets 25 more. Ties both win. Send one from the trail page; answer them on Friends
+  (migration `20261108090000_trail_duels`).
 - Fixed: Cabo da Roca's Learn facts now reach the app (they were saved under the wrong place name;
   migration `20261107090000_cabo_da_roca_details`).
 - Sign-in: the Google and Apple buttons only show once that provider is switched on in
